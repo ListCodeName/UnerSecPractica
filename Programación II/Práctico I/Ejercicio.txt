@@ -1,0 +1,7 @@
+-- Ejercitación de POO en Java --
+
+* Deben completar las siguientes clases realizando los ejercicios que se plantean dentro de cada una.
+
+El sistema está planteado en una escuela secundaria. 
+Se debe llevar la gestión de las asistencias tanto de profesores, como de los alumnos que ingresan al aula.
+Para ello se crearon 3 clases respectivas para representar el problema.
