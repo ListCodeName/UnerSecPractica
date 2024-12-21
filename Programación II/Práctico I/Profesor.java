@@ -17,4 +17,6 @@ public class Profesor{
  * 
  * setCurso(). Recibe el curso y verifica que sea válido (de 1 al 7)
  * 
+ * getCurso()
+ * 
  */

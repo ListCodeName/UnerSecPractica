@@ -11,8 +11,13 @@ public class Alumno{
  * 
  * Los siguientes métodos:
  * toString(). Devuelve los datos del profesor en el siguiente formato.
- * "Roberto Gonzalez - 15 Años"
+ * "Juan Perez - 15 Años - Menor de edad"
  * 
  * setCurso(). Recibe el curso y verifica que sea válido (de 1 al 7)
+ * 
+ * esMayor(). Devuelve un String de "Mayor de edad" y "Menor de edad"
+ * 
+ * equals(). Compara dos objetos de tipo alumno para saber si son iguales,
+ * devuelve un booleano.
  * 
  */
