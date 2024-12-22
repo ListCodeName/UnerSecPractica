@@ -10,6 +10,8 @@ public class Profesor{
  * materia
  * 
  * Los siguientes métodos:
+ * Constructor con parametros para cada atributo.
+ * 
  * toString(). Devuelve los datos del profesor en el siguiente formato.
  * "Profesor: Roberto Gonzalez"
  * "Curso: 5to"
