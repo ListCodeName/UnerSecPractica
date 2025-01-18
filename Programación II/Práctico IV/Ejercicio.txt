@@ -1,0 +1,4 @@
+-- Ejercitación de POO en Java --
+
+* Deben completar las siguientes clases realizando los ejercicios que se plantean dentro de cada una.
+
