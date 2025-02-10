@@ -17,7 +17,7 @@ public class Aula{
  * 
  * agregarProfesor(). Ingresa un profesor, verifica si está libre y lo asigna,
  * mostrando por pantalla un mensaje "Asignado correctamente".
- * De caso contrario debe mostrar por pantalla un el motivo de por qué no se pudo
+ * De caso contrario debe mostrar por pantalla el motivo de por qué no se pudo
  * asignar el profesor.
  * 
  * hayProfesor(). Devuelve verdadero en caso de que ya haya un profesor.

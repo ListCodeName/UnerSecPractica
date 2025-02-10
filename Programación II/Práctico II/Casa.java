@@ -1,9 +1,9 @@
 public class Casa{
-    
+
 }
 
 /**
- * La clase terreno cuenta con los siguientes atributos:
+ * La clase casa cuenta con los siguientes atributos:
  * nombre
  * habitantes[]
  * metrosCuadrados
