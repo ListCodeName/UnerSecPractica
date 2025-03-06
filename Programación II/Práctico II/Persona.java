@@ -1,5 +1,47 @@
 public class Persona{
+    private String nombre;
+    private String apellido;
+    private int dni;
 
+    public Persona(String nombre, String apellido){
+
+        Random r = new Random();
+        // -32M ~ 32M  ---  -49999999 a 49999999  ---  0 a 499999999
+        dni = Math.abs(r.nextInt() % 50000000) +1;
+
+        String[] nombres = {"Juan", "Jose", "María", "Roberto", "Carlos", "Yanina", "Vanesa", "Santiago", "Alejandro", "Morena", "Dylan"};
+
+        boolean flag = false;
+
+        for(int i = 0; i < nombre.lenght(); i++){
+            if(Character.isDigit(nombre.charAt(i))){
+                flag = true;
+                break;
+            }
+        }
+
+        if(flag){
+            //Encontró un numero
+            this.nombre = nombres[ Math.abs(r.nextInt() % nombres.lenght()) ];
+        }else{
+            //No encontró numeros
+            this.nombre = nombre;
+        }
+
+    }
+
+    public boolean equals(Persona p){
+        if(dni == p.getDni()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public String toString(){
+        //(5333215) Juan Perez
+        return "("+ dni + ") " + nombre + " " + apellido;
+    }
 }
 
 /**
