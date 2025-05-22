@@ -31,8 +31,10 @@
 #----------------------------------------------------------------------------------------------
 
 
-#Ahora deben poder cargarse manualmente las 10 notas por teclado. Además debe verificar que
-#sean valores válidos. Imprimalos por pantalla (cuentelos, deben haber 10, ni más ni menos)
+#Ahora deben poder cargarse manualmente las 10 notas por teclado.
+#  Además debe verificar que
+#sean valores válidos. Imprimalos por pantalla 
+# (cuentelos, deben haber 10, ni más ni menos)
 #----------------------------------------------------------------------------------------------
 
 

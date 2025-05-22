@@ -57,6 +57,18 @@ public class Persona{
  * -> El nombre de la persona creada no debe contener números ni caracteres especiales.
  * En el caso de que lo tenga, deberán elegir un nombre aleatoriamente dentro de un 
  * grupo de 10 nombres predeterminados ejemplo {Juan, Jose, María, ...}
+ * 
+ * /
+ for(int i = 0; i < nombre.length() ; i++){
+    if(Character.isDigit(nombre.charAt(i))){
+        String[] nombresPredeterminados = {"Juan", "Jose", "Maria",};
+
+        this.nombre = 
+
+    }
+ }
+ /
+ * 
  * -> Lo mismo debe aplicarse para el apellido.
  * 
  * equals(). Debe devolver un booleano dependiendo si es igual o no comparandolo con la persona que
