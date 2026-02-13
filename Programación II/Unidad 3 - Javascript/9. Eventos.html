@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Eventos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #d35400;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #eee;
+            border: 1px solid #ccc;
+            margin: 5px;
+        }
+
+        .area-mouse {
+            width: 100%;
+            height: 150px;
+            background: #d6eaf8;
+            border: 2px dashed #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        /* Clase para agregar dinámicamente */
+        .activo {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Eventos</h1>
+    <p>Los eventos son acciones que ocurren en la página (clics, movimiento, teclas, etc.) y Javascript puede
+        "escuchar".</p>
+
+    <!-- 1. Evento Click -->
+    <h2>1. Click (Hacer clic)</h2>
+    <button id="btnClick" class="btn">¡Hazme Clic!</button>
+    <p id="contador">Clics: 0</p>
+
+    <!-- 2. Eventos de Mouse -->
+    <h2>2. MouseOver / MouseOut (Pasar el mouse)</h2>
+    <div id="zonaMouse" class="area-mouse">Pasa el mouse por aquí</div>
+
+    <!-- 3. Evento Input (Escribir) -->
+    <h2>3. Input / Change (Formularios)</h2>
+    <input type="text" id="campoTexto" placeholder="Escribe algo..." style="width: 100%; padding: 10px;">
+    <p>Estás escribiendo: <span id="textoEspejo" style="color: blue;"></span></p>
+
+    <script>
+        // --- 1. CLICK ---
+        // Forma moderna: addEventListener('evento', funcion)
+        let boton = document.getElementById("btnClick");
+        let cuenta = 0;
+
+        boton.addEventListener("click", function () {
+            cuenta++;
+            document.getElementById("contador").innerText = "Clics: " + cuenta;
+
+            // Toggle de clase CSS
+            boton.classList.toggle("activo");
+        });
+
+
+        // --- 2. MOUSE ---
+        let zona = document.getElementById("zonaMouse");
+
+        zona.addEventListener("mouseover", function () {
+            zona.style.backgroundColor = "#f1948a"; // Rojo claro
+            zona.innerText = "¡ESTÁS DENTRO!";
+        });
+
+        zona.addEventListener("mouseout", function () {
+            zona.style.backgroundColor = "#d6eaf8"; // Azul original
+            zona.innerText = "Pasa el mouse por aquí";
+        });
+
+
+        // --- 3. INPUT (Teclado) ---
+        let input = document.getElementById("campoTexto");
+        let espejo = document.getElementById("textoEspejo");
+
+        // El evento 'input' se dispara con cada tecla pulsada
+        input.addEventListener("input", function (evento) {
+            // evento.target.value es lo que hay escrito en el input
+            espejo.innerText = evento.target.value;
+        });
+    </script>
+</body>
+
+</html>

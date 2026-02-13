@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Sombras</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #5d6d7e;
+        }
+
+        .box {
+            background: white;
+            width: 150px;
+            height: 100px;
+            margin: 30px;
+            display: inline-block;
+            vertical-align: top;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 1px solid #eee;
+        }
+
+        /* Sintaxis: h-offset v-offset blur spread color */
+        .shadow-1 {
+            box-shadow: 5px 5px 0px #333;
+        }
+
+        /* Sombra dura */
+        .shadow-2 {
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Sombra suave */
+        .shadow-3 {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo "Material Design" */
+        .shadow-inner {
+            box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Sombra interna */
+
+        .text-shadow {
+            font-size: 3em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px #000;
+            background: #aaa;
+            padding: 10px;
+        }
+
+        .text-neon {
+            font-size: 3em;
+            color: white;
+            text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 40px #00f;
+            background: #111;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Sombras</h1>
+    <p>Las sombras dan profundidad y realismo (o estilos retro/neon) a los elementos.</p>
+
+    <h2>1. Sombras en Cajas (box-shadow)</h2>
+    <p>Sintaxis básica: <code>eje-x eje-y desenfoque expansión color</code>.</p>
+
+    <div class="box shadow-1">Sombra Dura</div>
+    <div class="box shadow-2">Sombra Suave</div>
+    <div class="box shadow-3">Estilo Tarjeta</div>
+    <div class="box shadow-inner">Sombra Interna (inset)</div>
+
+    <h2>2. Sombras en Texto (text-shadow)</h2>
+    <p>Sintaxis básica: <code>eje-x eje-y desenfoque color</code>.</p>
+
+    <div class="text-shadow">Texto con Sombra</div>
+    <div class="text-neon">Efecto Neón</div>
+
+</body>
+
+</html>

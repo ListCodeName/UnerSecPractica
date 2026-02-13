@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Colores y Fondos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #555;
+        }
+
+        .color-box {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            margin: 10px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .code-snippet {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        .bg-demo {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Colores y Fondos</h1>
+    <p>El color es fundamental en el diseño. En CSS tenemos varias formas de definirlo y aplicarlo.</p>
+
+    <h2>1. Formatos de Color</h2>
+
+    <h3>Nombres Predefinidos</h3>
+    <p>Hay 140 nombres estándar como <code>red</code>, <code>blue</code>, <code>lightgreen</code>, <code>tomato</code>.
+    </p>
+    <div class="color-box" style="background-color: tomato;"></div>
+
+    <h3>Hexadecimal (#RRGGBB)</h3>
+    <p>El más usado. Va del 00 (cero) al FF (255). <code>#FF0000</code> es rojo.</p>
+    <div class="color-box" style="background-color: #3498db;"></div>
+
+    <h3>RGB (Red, Green, Blue)</h3>
+    <p>Valores del 0 al 255. <code>rgb(0, 255, 0)</code> es verde puro.</p>
+    <div class="color-box" style="background-color: rgb(46, 204, 113);"></div>
+
+    <h3>RGBA (Con transparencia Alpha)</h3>
+    <p>Igual que RGB pero el cuarto valor es la opacidad (0 a 1). <code>rgba(0, 0, 0, 0.5)</code> es negro
+        semitransparente.</p>
+    <div class="color-box" style="background-color: rgba(255, 0, 0, 0.3);"></div>
+
+    <h2>2. Propiedad Background (Fondo)</h2>
+    <p>No solo pinta colores planos, también imágenes.</p>
+
+    <div class="code-snippet">
+        background-color: #f0f0f0;<br>
+        background-image: url('imagen.jpg');<br>
+        background-size: cover; (Cubre todo el espacio)<br>
+        background-position: center; (Centra la imagen)<br>
+        background-repeat: no-repeat; (No la repite como mosaico)
+    </div>
+
+    <h3>Ejemplo visual de fondo con gradiente (extra avanzado)</h3>
+    <div class="bg-demo" style="background: linear-gradient(45deg, #e66465, #9198e5);">
+        Fondo degradado (linear-gradient)
+    </div>
+
+</body>
+
+</html>

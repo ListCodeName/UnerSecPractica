@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Inclusión de CSS</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #2980b9;
+            border-left: 5px solid #2980b9;
+            padding-left: 10px;
+        }
+
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        code {
+            font-family: Consolas, monospace;
+            color: #c0392b;
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .example-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Formas de Incluir CSS</h1>
+    <p>CSS (Cascading Style Sheets) es el lenguaje que usamos para dar estilo visual a nuestras páginas HTML. Existen
+        tres formas principales de aplicarlo:</p>
+
+    <div class="code-block">
+        <h2>1. Estilo en Línea (Inline Style)</h2>
+        <p>Se aplica directamente a un elemento HTML usando el atributo <code>style</code>. Es útil para pruebas rápidas
+            pero <strong>no se recomienda</strong> para sitios reales porque es difícil de mantener.</p>
+        <pre>&lt;p style="color: red; font-size: 20px;"&gt;Texto rojo&lt;/p&gt;</pre>
+        <div class="example-box">
+            <p style="color: red; font-size: 20px;">Texto rojo (Inline)</p>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <h2>2. Estilo Interno (Style Tag)</h2>
+        <p>Se escribe dentro de la etiqueta <code>&lt;style&gt;</code> en el <code>&lt;head&gt;</code> del documento
+            HTML. Afecta solo a esa página específica.</p>
+        <pre>
+&lt;head&gt;
+    &lt;style&gt;
+        h2 { color: blue; }
+        .mi-clase { background-color: yellow; }
+    &lt;/style&gt;
+&lt;/head&gt;
+        </pre>
+    </div>
+
+    <div class="code-block">
+        <h2>3. Estilo Externo (External Stylesheet) <span style="color: green; font-size: 0.8em;">(Recomendado)</span>
+        </h2>
+        <p>El CSS se escribe en un archivo separado con extensión <code>.css</code> y se vincula al HTML usando la
+            etiqueta <code>&lt;link&gt;</code>. Esto permite usar los mismos estilos en múltiples páginas.</p>
+        <pre>
+&lt;head&gt;
+    &lt;link rel="stylesheet" href="mis-estilos.css"&gt;
+&lt;/head&gt;
+        </pre>
+    </div>
+
+    <div class="code-block">
+        <h2>Jerarquía (Cascada)</h2>
+        <p>Si hay conflictos, el navegador decide qué estilo aplicar según la especificidad y el orden. Generalmente:
+        </p>
+        <ol>
+            <li><strong>Inline Style:</strong> Gana a casi todo (Mayor prioridad).</li>
+            <li><strong>Internal Style:</strong> Gana al externo si está definido después.</li>
+            <li><strong>External Style:</strong> Menor prioridad si hay conflictos directos, pero es la base de todo.
+            </li>
+        </ol>
+    </div>
+
+</body>
+
+</html>

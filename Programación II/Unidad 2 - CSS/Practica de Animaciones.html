@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica: Animaciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ejercicio {
+            background: #fdedec;
+            border: 1px solid #fadbd8;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Práctica de Animaciones</h1>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 1: Loader Giratorio</h2>
+        <p>Crea el clásico spinner de "Cargando...".</p>
+        <ol>
+            <li>Crea un div cuadrado (50x50px).</li>
+            <li>Dale <code>border: 5px solid #ccc;</code> y <code>border-top: 5px solid blue;</code>.</li>
+            <li>Hazlo redondo con <code>border-radius: 50%;</code>.</li>
+            <li>Crea un keyframe <code>girar</code> que vaya de <code>transform: rotate(0deg)</code> a
+                <code>transform: rotate(360deg)</code>.</li>
+            <li>Aplícalo al div: <code>animation: girar 1s linear infinite;</code>.</li>
+        </ol>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 2: Latido de Corazón</h2>
+        <p>Crea un div rojo redondo (o busca un ícono de corazón).</p>
+        <ul>
+            <li>Crea una animación que escale el elemento (transform: scale) de 1 a 1.2 y vuelva a 1.</li>
+            <li>Haz que se repita infinitamente para simular un latido.</li>
+        </ul>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 3: Texto Deslizante (Marquesina)</h2>
+        <p>Haz que un texto entre por la derecha de la pantalla y salga por la izquierda.</p>
+        <ul>
+            <li>Usa <code>position: relative</code> y anima la propiedad <code>left</code> o usa
+                <code>transform: translateX</code>.</li>
+            <li>El keyframe iría desde <code>translateX(100%)</code> hasta <code>translateX(-100%)</code>.</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

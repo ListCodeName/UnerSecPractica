@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica: Inclusión de CSS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ejercicio {
+            background: #eaf2f8;
+            border: 1px solid #aed6f1;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #2e86c1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Práctica de Inclusión de CSS</h1>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 1: El arcoíris inline</h2>
+        <p>Crea 5 párrafos <code>&lt;p&gt;</code>. Usa el atributo <code>style</code> en cada uno para darles un color
+            de texto diferente (rojo, naranja, amarillo, verde, azul).</p>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 2: Estilos internos</h2>
+        <p>En el mismo archivo HTML, agrega una etiqueta <code>&lt;style&gt;</code> en el <code>&lt;head&gt;</code>.</p>
+        <ul>
+            <li>Define que todos los títulos <code>h2</code> tengan el texto centrado
+                (<code>text-align: center;</code>).</li>
+            <li>Define que el <code>body</code> tenga un color de fondo gris claro
+                (<code>background-color: #f0f0f0;</code>).</li>
+        </ul>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 3: Archivo externo (Reto)</h2>
+        <p>Crea un archivo nuevo llamado <code>estilos.css</code> en la misma carpeta.</p>
+        <ol>
+            <li>En el CSS, haz que los párrafos tengan un tamaño de fuente de 18px.</li>
+            <li>En tu HTML, vincula este archivo usando <code>&lt;link rel="stylesheet" href="estilos.css"&gt;</code>.
+            </li>
+            <li>Verifica que los párrafos cambien de tamaño.</li>
+        </ol>
+    </div>
+
+</body>
+
+</html>

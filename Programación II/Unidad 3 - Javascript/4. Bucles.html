@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Bucles</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #27ae60;
+        }
+
+        .loop-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .loop-box {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+            background: #eaFafa;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #eee;
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 5px solid #27ae60;
+        }
+
+        button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #1e8449;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Bucles (Ciclos)</h1>
+    <p>Permiten repetir una acción muchas veces sin escribir el código una y otra vez.</p>
+
+    <div class="loop-container">
+
+        <div class="loop-box">
+            <h2>Bucle FOR (Para)</h2>
+            <p>Se usa cuando <strong>sabemos cuántas veces</strong> queremos repetir algo.</p>
+            <p>Contando del 1 al 5:</p>
+            <button onclick="ejecutarFor()">Ejecutar FOR</button>
+            <ul id="listaFor"></ul>
+        </div>
+
+        <div class="loop-box">
+            <h2>Bucle WHILE (Mientras)</h2>
+            <p>Se usa cuando <strong>no sabemos</strong> cuántas veces, pero sí <strong>hasta cuándo</strong> (mientras
+                una condición sea verdad).</p>
+            <p>Multiplicando x2 hasta llegar a 100:</p>
+            <button onclick="ejecutarWhile()">Ejecutar WHILE</button>
+            <ul id="listaWhile"></ul>
+        </div>
+
+    </div>
+
+    <script>
+        function ejecutarFor() {
+            let lista = document.getElementById("listaFor");
+            lista.innerHTML = ""; // Limpiar lista anterior
+
+            // Sintaxis: (inicio; condición; incremento)
+            for (let i = 1; i <= 5; i++) {
+                let item = document.createElement("li");
+                item.innerText = "Vuelta número: " + i;
+                lista.appendChild(item);
+            }
+        }
+
+        function ejecutarWhile() {
+            let lista = document.getElementById("listaWhile");
+            lista.innerHTML = ""; // Limpiar
+
+            let numero = 1;
+
+            // Mientras numero sea menor a 100...
+            while (numero < 100) {
+                let item = document.createElement("li");
+                item.innerText = "Valor actual: " + numero;
+                lista.appendChild(item);
+
+                // IMPORTANTE: Cambiar la variable para no crear un bucle infinito
+                numero = numero * 2;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Tipografía y Texto</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #444;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .demo-box {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+
+        code {
+            background: #eee;
+            padding: 2px 5px;
+            font-family: monospace;
+        }
+
+        .font-sans {
+            font-family: Arial, sans-serif;
+        }
+
+        .font-serif {
+            font-family: 'Times New Roman', serif;
+        }
+
+        .font-monospace {
+            font-family: 'Courier New', monospace;
+        }
+
+        .weight-bold {
+            font-weight: bold;
+        }
+
+        .weight-light {
+            font-weight: 300;
+        }
+
+        .decor-underline {
+            text-decoration: underline;
+        }
+
+        .decor-through {
+            text-decoration: line-through;
+        }
+
+        .decor-none {
+            text-decoration: none;
+        }
+
+        .indent {
+            text-indent: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Tipografía y Texto</h1>
+    <p>El texto es el contenido principal de la web. CSS nos da control total sobre cómo se ve.</p>
+
+    <h2>1. Familia de Fuentes (font-family)</h2>
+    <p>Define la tipografía. Siempre es bueno poner una lista de opciones terminando en una genérica (serif, sans-serif,
+        monospace).</p>
+    <div class="demo-box font-sans">Este es un texto Sans-Serif (sin remates, como Arial).</div>
+    <div class="demo-box font-serif">Este es un texto Serif (con remates, como Times New Roman).</div>
+    <div class="demo-box font-monospace">Este es un texto Monospace (ancho fijo, como código).</div>
+
+    <h2>2. Tamaño (font-size)</h2>
+    <p>Controla el tamaño. Se pueden usar `px`, `em`, `rem`, `%`.</p>
+    <p style="font-size: 12px;">Texto pequeño (12px).</p>
+    <p style="font-size: 24px;">Texto grande (24px).</p>
+
+    <h2>3. Peso (font-weight)</h2>
+    <p>Controla el grosor de la letra.</p>
+    <ul>
+        <li><code>normal</code> (400)</li>
+        <li><code>bold</code> (700)</li>
+        <li>Valores numéricos: 100 (muy fino) a 900 (muy grueso).</li>
+    </ul>
+
+    <h2>4. Decoración (text-decoration)</h2>
+    <p>Muy usado para enlaces.</p>
+    <p class="decor-underline">Texto subrayado (underline).</p>
+    <p class="decor-through">Texto tachado (line-through).</p>
+    <p><a href="#" class="decor-none">Enlace sin subrayado (none) - Muy común.</a></p>
+
+    <h2>5. Sangría (text-indent)</h2>
+    <p>Mueve la primera línea de un párrafo hacia la derecha.</p>
+    <p class="indent">Esta es la primera línea del párrafo y verás que empieza más adentro que el resto. Las siguientes
+        líneas volverán al margen normal, creando ese efecto clásico de libro impreso.</p>
+
+</body>
+
+</html>

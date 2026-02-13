@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Dimensiones y Unidades</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #444;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #8e44ad;
+        }
+
+        .box-demo {
+            background: #d2b4de;
+            border: 2px solid #8e44ad;
+            margin-bottom: 20px;
+            padding: 10px;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        code {
+            background-color: #fce4ec;
+            color: #c2185b;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f3e5f5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Dimensiones y Unidades</h1>
+    <p>En CSS, controlamos el tamaño de los elementos usando propiedades de dimensión y diferentes unidades de medida.
+    </p>
+
+    <h2>1. Propiedades de Dimensión</h2>
+    <ul>
+        <li><code>width</code>: Ancho del elemento.</li>
+        <li><code>height</code>: Alto del elemento.</li>
+        <li><code>max-width</code>: Ancho máximo (si la pantalla es más pequeña, se ajusta).</li>
+        <li><code>min-width</code>: Ancho mínimo (no se encoge más allá de este valor).</li>
+        <li><code>max-height</code>: Alto máximo.</li>
+        <li><code>min-height</code>: Alto mínimo.</li>
+    </ul>
+
+    <div class="box-demo" style="width: 50%; height: 100px;">
+        Ancho: 50% | Alto: 100px
+    </div>
+    <div class="box-demo" style="max-width: 300px; height: auto;">
+        Max-width: 300px (Intenta achicar la ventana y verás cómo me adapto hasta llegar a 300px)
+    </div>
+
+    <h2>2. Unidades de Medida</h2>
+    <p>Las unidades se dividen en <strong>Absolutas</strong> y <strong>Relativas</strong>.</p>
+
+    <h3>Unidades Absolutas</h3>
+    <p>Son fijas y no cambian según otro elemento.</p>
+    <ul>
+        <li><code>px</code> (Píxeles): La más común. Exactitud precisa en pantalla.</li>
+    </ul>
+
+    <h3>Unidades Relativas</h3>
+    <p>Dependen de otro valor (como el tamaño de fuente o el tamaño de la ventana).</p>
+    <table>
+        <tr>
+            <th>Unidad</th>
+            <th>Descripción</th>
+        </tr>
+        <tr>
+            <td><code>%</code></td>
+            <td>Porcentaje respecto al tamaño del elemento padre.</td>
+        </tr>
+        <tr>
+            <td><code>em</code></td>
+            <td>Relativo al tamaño de fuente del elemento padre (si font-size padre es 16px, 1em = 16px, 2em = 32px).
+            </td>
+        </tr>
+        <tr>
+            <td><code>rem</code></td>
+            <td>Relativo al tamaño de fuente del elemento raíz (html). Más predecible que em.</td>
+        </tr>
+        <tr>
+            <td><code>vw</code></td>
+            <td>Viewport Width. 1vw = 1% del ancho total de la ventana.</td>
+        </tr>
+        <tr>
+            <td><code>vh</code></td>
+            <td>Viewport Height. 1vh = 1% del alto total de la ventana.</td>
+        </tr>
+    </table>
+
+    <div class="box-demo" style="width: 50vw; background-color: #ebdef0; color: #333;">
+        Soy el 50% del ancho de tu ventana (50vw)
+    </div>
+
+</body>
+
+</html>

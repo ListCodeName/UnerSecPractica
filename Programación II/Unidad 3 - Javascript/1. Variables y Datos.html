@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Variables y Datos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #f1c40f;
+            text-shadow: 1px 1px 2px #333;
+        }
+
+        .console-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Variables y Tipos de Datos</h1>
+    <p>Abre la <strong>Consola del Desarrollador</strong> (F12 -> Pestaña Console) para ver los resultados.</p>
+
+    <h2>1. Variables</h2>
+    <p>Son contenedores para guardar información. Existen 3 formas de declararlas:</p>
+    <ul>
+        <li><code>var</code>: La forma antigua. (No recomendada hoy en día).</li>
+        <li><code>let</code>: Para valores que pueden cambiar.</li>
+        <li><code>const</code>: Para valores que NO deben cambiar (constantes).</li>
+    </ul>
+
+    <h2>2. Tipos de Datos Primitivos</h2>
+    <ul>
+        <li><strong>String:</strong> Texto (entre comillas simples o dobles).</li>
+        <li><strong>Number:</strong> Números (enteros o decimales).</li>
+        <li><strong>Boolean:</strong> Verdadero (true) o Falso (false).</li>
+        <li><strong>Undefined:</strong> Una variable declarada pero sin valor.</li>
+        <li><strong>Null:</strong> Ausencia intencional de valor.</li>
+    </ul>
+
+    <button class="btn" onclick="ejecutarEjemplo()">Ejecutar Ejemplo en Consola</button>
+    <div id="output" class="console-box" style="margin-top: 20px; display: none;"></div>
+
+    <script>
+        function ejecutarEjemplo() {
+            console.clear();
+            console.log("--- INICIO DEL EJEMPLO ---");
+
+            // 1. Declaración
+            let nombre = "Juan"; // String
+            const edad = 25;     // Number
+            let esEstudiante = true; // Boolean
+
+            console.log("Nombre:", nombre, "(Tipo: " + typeof nombre + ")");
+            console.log("Edad:", edad, "(Tipo: " + typeof edad + ")");
+            console.log("¿Es estudiante?", esEstudiante, "(Tipo: " + typeof esEstudiante + ")");
+
+            // 2. Modificación
+            console.log("--- Modificando variables ---");
+            nombre = "Carlos"; // Se puede cambiar porque es let
+            // edad = 30; // ESTO DARÍA ERROR porque es const
+            console.log("Nuevo nombre:", nombre);
+
+            // 3. Tipos especiales
+            let variableVacia;
+            console.log("Variable sin definir:", variableVacia); // undefined
+
+            let variableNula = null;
+            console.log("Variable nula:", variableNula); // null
+
+            // Mostrar en pantalla también para feedback visual
+            const output = document.getElementById("output");
+            output.style.display = "block";
+            output.textContent =
+                `Revisa la consola (F12) para más detalles.
+
+Nombre: ${nombre}
+Edad: ${edad}
+Estudiante: ${esEstudiante}`;
+
+            console.log("--- FIN DEL EJEMPLO ---");
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Operaciones Básicas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #e67e22;
+        }
+
+        .box {
+            background: #fdfefe;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Operaciones Básicas</h1>
+
+    <div class="box">
+        <h2>Aritmética</h2>
+        <p>Abre la consola (F12) para ver los cálculos.</p>
+        <button onclick="calcularNumeros()">Calcular: 10 y 3</button>
+    </div>
+
+    <div class="box">
+        <h2>Concatenación (Texto)</h2>
+        <p>Unir cadenas de texto.</p>
+        <label>Nombre: <input type="text" id="inputNombre" placeholder="Tu nombre"></label>
+        <button onclick="saludar()">Saludar</button>
+        <p id="resultadoSaludo"></p>
+    </div>
+
+    <script>
+        function calcularNumeros() {
+            let a = 10;
+            let b = 3;
+
+            console.log("--- Operaciones con " + a + " y " + b + " ---");
+            console.log("Suma (+):", a + b);
+            console.log("Resta (-):", a - b);
+            console.log("Multiplicación (*):", a * b);
+            console.log("División (/):", a / b);
+            console.log("Módulo o Resto (%):", a % b); // Lo que sobra de la división
+            console.log("Exponente (**):", a ** b);   // 10 elevado a 3
+        }
+
+        function saludar() {
+            // Obtener valor del input
+            let nombre = document.getElementById("inputNombre").value;
+
+            // Operación de concatenación (+)
+            let saludo = "Hola " + nombre + ", bienvenido a Javascript.";
+
+            // Template String (forma moderna con backticks `)
+            let saludoModerno = `Hola ${nombre}, usando template strings.`;
+
+            console.log(saludo);
+            document.getElementById("resultadoSaludo").innerText = saludoModerno;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Animaciones</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #c0392b;
+        }
+
+        .box {
+            width: 50px;
+            height: 50px;
+            background: #c0392b;
+            margin: 20px 0;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        /* 1. Definir los keyframes (pasos de la animación) */
+        @keyframes moverDerecha {
+            from {
+                left: 0px;
+            }
+
+            to {
+                left: 300px;
+            }
+        }
+
+        @keyframes cambiarColor {
+            0% {
+                background-color: #c0392b;
+            }
+
+            50% {
+                background-color: #f1c40f;
+                transform: scale(1.2);
+            }
+
+            100% {
+                background-color: #2980b9;
+            }
+        }
+
+        @keyframes rebote {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-30px);
+            }
+        }
+
+        /* 2. Aplicar la animación al elemento */
+        .anim-1 {
+            /* nombre duracion */
+            animation: moverDerecha 2s infinite alternate;
+            /* infinite: no para nunca. alternate: va y vuelve */
+        }
+
+        .anim-2 {
+            animation: cambiarColor 4s infinite;
+        }
+
+        .anim-3 {
+            animation: rebote 1s infinite ease-in-out;
+            margin-left: 150px;
+            border-radius: 50%;
+        }
+
+        .code-snippet {
+            background: #333;
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Animaciones (@keyframes)</h1>
+    <p>A diferencia de las transiciones (A -> B), las animaciones permiten control total de pasos intermedios y se
+        pueden reproducir solas sin interacción del usuario.</p>
+
+    <h2>1. @keyframes</h2>
+    <p>Primero definimos "la película" usando <code>@keyframes nombre-animacion</code>.</p>
+    <div class="code-snippet">
+        @keyframes rebote {<br>
+        &nbsp;&nbsp;0% { transform: translateY(0); }<br>
+        &nbsp;&nbsp;50% { transform: translateY(-30px); }<br>
+        &nbsp;&nbsp;100% { transform: translateY(0); }<br>
+        }
+    </div>
+
+    <h2>2. Propiedad animation</h2>
+    <p>Luego "proyectamos" la película en un elemento.</p>
+    <div class="code-snippet">
+        animation: rebote 1s infinite alternate;
+    </div>
+    <ul>
+        <li><strong>duration:</strong> Cuánto dura un ciclo.</li>
+        <li><strong>iteration-count:</strong> Cuántas veces (1, 3, infinite).</li>
+        <li><strong>direction:</strong> normal, reverse, alternate (va y vuelve).</li>
+    </ul>
+
+    <h2>Ejemplos</h2>
+
+    <h3>Mover y volver (alternate)</h3>
+    <div class="box anim-1"></div>
+
+    <h3>Cambio de color y forma (pasos intermedios)</h3>
+    <div class="box anim-2"></div>
+
+    <h3>Rebote (Loading...)</h3>
+    <div class="box anim-3"></div>
+
+</body>
+
+</html>

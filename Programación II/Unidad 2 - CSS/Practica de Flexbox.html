@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica: Flexbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ejercicio {
+            background: #eafaf1;
+            border: 1px solid #a9dfbf;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #196f3d;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Práctica de Flexbox</h1>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 1: Menú de Navegación</h2>
+        <p>Transforma una lista desordenada <code>&lt;ul&gt;</code> en un menú horizontal.</p>
+        <ol>
+            <li>Crea un <code>ul</code> con 4 items (Inicio, Servicios, Nosotros, Contacto).</li>
+            <li>Al <code>ul</code> dale <code>list-style: none;</code> (para quitar los puntos) y
+                <code>padding: 0;</code>.</li>
+            <li>¡Magia Flex! Dale al <code>ul</code> un <code>display: flex;</code>. Los items deberían ponerse uno al
+                lado del otro.</li>
+            <li>Usa <code>gap: 20px;</code> para separarlos.</li>
+            <li>Usa <code>justify-content: center;</code> para centrar todo el menú en la página.</li>
+        </ol>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 2: Centrado Perfecto</h2>
+        <p>El "Santo Grial" de CSS: Centrar algo vertical y horizontalmente.</p>
+        <ol>
+            <li>Crea un contenedor grande (ej. <code>height: 300px; background: #eee;</code>).</li>
+            <li>Dentro pon un solo <code>div</code> con texto "Soy el centro del mundo".</li>
+            <li>Usa Flexbox en el contenedor para centrar ese hijo perfectamente en el medio (necesitarás
+                <code>justify-content</code> y <code>align-items</code>).</li>
+        </ol>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 3: Tarjetas (Cards)</h2>
+        <p>Crea un contenedor con 3 "tarjetas" (divs con borde, título y texto).</p>
+        <ul>
+            <li>Usa <code>display: flex</code> en el contenedor.</li>
+            <li>Usa <code>justify-content: space-between</code> para que se distribuyan ocupando todo el ancho.</li>
+            <li>Prueba qué pasa si la pantalla se achica. (Tip: investiga <code>flex-wrap: wrap;</code> para puntos
+                extra).</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Condicionales</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fdfefe;
+        }
+
+        h1 {
+            color: #8e44ad;
+        }
+
+        .input-group {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f4f4f4;
+        }
+
+        input {
+            padding: 5px;
+        }
+
+        button {
+            background: #8e44ad;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #71368a;
+        }
+
+        p.result {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Condicionales</h1>
+    <p>Permiten tomar decisiones en el código: "Si pasa A, haz esto. Si no, haz lo otro".</p>
+
+    <div class="input-group">
+        <h2>1. If / Else (Si / Si no)</h2>
+        <p>Ingresa tu edad para ver si puedes entrar:</p>
+        <input type="number" id="edadInput" placeholder="Ej: 18">
+        <button onclick="verificarEdad()">Verificar</button>
+        <p id="resEdad" class="result"></p>
+    </div>
+
+    <div class="input-group">
+        <h2>2. Switch (Selector Múltiple)</h2>
+        <p>Elige un día de la semana (1-7):</p>
+        <input type="number" id="diaInput" min="1" max="7" placeholder="1">
+        <button onclick="verificarDia()">Verificar Día</button>
+        <p id="resDia" class="result"></p>
+    </div>
+
+    <script>
+        function verificarEdad() {
+            let edad = parseInt(document.getElementById("edadInput").value);
+            let mensaje = "";
+
+            // Condicional IF simple
+            if (edad >= 18) {
+                mensaje = "Eres mayor de edad. Puedes entrar. ✅";
+            }
+            // Condicional ELSE IF (otra condición)
+            else if (edad > 0) {
+                mensaje = "Eres menor de edad. Acceso denegado. ❌";
+            }
+            // Condicional ELSE (si nada de lo anterior se cumple)
+            else {
+                mensaje = "Por favor ingresa una edad válida.";
+            }
+
+            document.getElementById("resEdad").innerText = mensaje;
+        }
+
+        function verificarDia() {
+            let dia = parseInt(document.getElementById("diaInput").value);
+            let nombreDia = "";
+
+            // Switch es mejor cuando comparamos el MISM0 valor con múltiples casos exactos
+            switch (dia) {
+                case 1: nombreDia = "Lunes"; break;
+                case 2: nombreDia = "Martes"; break;
+                case 3: nombreDia = "Miércoles"; break;
+                case 4: nombreDia = "Jueves"; break;
+                case 5: nombreDia = "Viernes"; break;
+                case 6: nombreDia = "Sábado"; break;
+                case 7: nombreDia = "Domingo"; break;
+                default: nombreDia = "Día inválido (solo 1 al 7)";
+            }
+
+            document.getElementById("resDia").innerText = "El día seleccionado es: " + nombreDia;
+        }
+    </script>
+</body>
+
+</html>

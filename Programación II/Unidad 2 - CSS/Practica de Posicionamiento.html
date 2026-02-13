@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica: Posicionamiento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ejercicio {
+            background: #f4ecf7;
+            border: 1px solid #d2b4de;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #884ea0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Práctica de Posicionamiento</h1>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 1: Botón de "Volver arriba"</h2>
+        <p>Crea un botón o enlace que diga "Subir".</p>
+        <ul>
+            <li>Dale <code>position: fixed;</code>.</li>
+            <li>Ubícalo en la esquina inferior derecha (<code>bottom: 20px; right: 20px;</code>).</li>
+            <li>Agrega mucho texto en tu página (lorem ipsum) para hacer scroll y verificar que el botón te sigue.</li>
+        </ul>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 2: La chincheta (Pin)</h2>
+        <p>Crea un contenedor (div) que represente un mapa o una imagen.</p>
+        <ol>
+            <li>Dale al contenedor <code>position: relative;</code> y un tamaño fijo (ej. 300x300px).</li>
+            <li>Dentro, crea un pequeño div rojo (la chincheta).</li>
+            <li>Dale a la chincheta <code>position: absolute;</code>.</li>
+            <li>Muévela con <code>top</code> y <code>left</code> para ubicarla en un punto específico dentro del
+                contenedor.</li>
+        </ol>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 3: Capas (Z-Index)</h2>
+        <p>Crea dos cuadrados que se solapen (uno encima del otro parcialmente).</p>
+        <ul>
+            <li>Usa <code>position: absolute</code> o márgenes negativos para que se toquen.</li>
+            <li>Usa <code>z-index</code> para decidir cuál se ve arriba y cuál abajo.</li>
+            <li>Cambia el valor en el inspector del navegador para ver cómo se invierten.</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

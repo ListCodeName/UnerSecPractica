@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Bordes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #884ea0;
+        }
+
+        .box {
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fce4ec;
+            width: 60%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .solid {
+            border: 2px solid #8e44ad;
+        }
+
+        .dashed {
+            border: 3px dashed #e67e22;
+        }
+
+        .dotted {
+            border: 4px dotted #3498db;
+        }
+
+        .double {
+            border: 6px double #27ae60;
+        }
+
+        .mixed {
+            border-top: 5px solid red;
+            border-bottom: 5px solid blue;
+        }
+
+        .rounded {
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+
+        .circle {
+            width: 100px;
+            height: 100px;
+            background: #e74c3c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Bordes y Esquinas</h1>
+    <p>Los bordes delimitan las cajas de nuestros elementos.</p>
+
+    <h2>1. Propiedad border</h2>
+    <p>Se suele usar la forma abreviada: <code>ancho estilo color</code>.</p>
+    <pre>border: 2px solid black;</pre>
+
+    <h3>Estilos más comunes:</h3>
+    <ul>
+        <li><code>solid</code>: Línea continua.</li>
+        <li><code>dashed</code>: Línea discontinua (- - -).</li>
+        <li><code>dotted</code>: Línea de puntos (. . .).</li>
+        <li><code>double</code>: Doble línea.</li>
+    </ul>
+
+    <div class="box solid">Borde Solid</div>
+    <div class="box dashed">Borde Dashed</div>
+    <div class="box dotted">Borde Dotted</div>
+    <div class="box double">Borde Double</div>
+    <div class="box mixed">Borde Mixto (Top y Bottom distintos)</div>
+
+    <h2>2. Esquinas Redondeadas (border-radius)</h2>
+    <p>Suaviza las esquinas. Si el elemento es cuadrado y le das un radio de 50%, se convierte en un círculo perfecto.
+    </p>
+
+    <div class="box rounded">
+        Borde con radio de 10px
+    </div>
+
+    <div class="circle">
+        50%
+    </div>
+
+</body>
+
+</html>

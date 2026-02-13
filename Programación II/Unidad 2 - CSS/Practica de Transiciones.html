@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica: Transiciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ejercicio {
+            background: #f5eef8;
+            border: 1px solid #d7bde2;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #884ea0;
+        }
+
+        /* Espacio para tus pruebas */
+        .prueba {
+            width: 100px;
+            height: 100px;
+            background: #ccc;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Práctica de Transiciones</h1>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 1: El botón que cambia de color</h2>
+        <p>Crea un botón normal.</p>
+        <ol>
+            <li>Dale un color de fondo y de texto.</li>
+            <li>En su estado <code>:hover</code>, invierte los colores (fondo por texto y viceversa).</li>
+            <li>Agrega <code>transition: 0.3s;</code> al estado normal del botón.</li>
+            <li>¡Disfruta la suavidad del cambio!</li>
+        </ol>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 2: Input Interactivo</h2>
+        <p>Crea un campo de texto <code>&lt;input type="text"&gt;</code>.</p>
+        <ul>
+            <li>Dale un ancho pequeño (ej. 150px) y un borde gris.</li>
+            <li>Usa la pseudo-clase <code>:focus</code> (cuando haces clic dentro) para cambiar su ancho a 100% (o
+                300px) y cambiar el color del borde.</li>
+            <li>Agrega <code>transition: width 0.4s ease-in-out, border-color 0.4s;</code> para que se expanda
+                suavemente al escribir.</li>
+        </ul>
+    </div>
+
+    <div class="ejercicio">
+        <h2>Ejercicio 3: Galería Zoom</h2>
+        <p>Pon una imagen pequeña.</p>
+        <ul>
+            <li>Usa <code>transform: scale(1.1);</code> en el hover para hacerle un zoom.</li>
+            <li>No olvides la <code>transition</code> para que no sea brusco.</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

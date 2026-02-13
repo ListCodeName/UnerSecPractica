@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Objetos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #d35400;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 300px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #fdfefe;
+            margin-top: 20px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #d35400;
+        }
+
+        .card p {
+            margin: 5px 0;
+        }
+
+        button {
+            background: #d35400;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #a04000;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Objetos (Diccionarios)</h1>
+    <p>Los objetos permiten agrupar datos relacionados con pares <code>clave: valor</code>. Se definen con llaves
+        <code>{}</code>.</p>
+
+    <div>
+        <label>Nombre: <input type="text" id="inpNombre" value="Juan Pérez"></label>
+        <label>Edad: <input type="number" id="inpEdad" value="30"></label>
+        <label>Ocupación: <input type="text" id="inpOcupacion" value="Desarrollador Web"></label>
+        <button onclick="crearPersona()">Crear Objeto Persona</button>
+    </div>
+
+    <!-- Donde mostraremos el objeto -->
+    <div id="resultado" style="display: none;">
+        <div class="card">
+            <h2 id="cardNombre"></h2>
+            <p><strong>Edad:</strong> <span id="cardEdad"></span> años</p>
+            <p><strong>Trabajo:</strong> <span id="cardOcupacion"></span></p>
+            <p><em>Este HTML fue generado leyendo propiedades de un objeto JS.</em></p>
+        </div>
+    </div>
+
+    <script>
+        function crearPersona() {
+            // 1. Crear el objeto con datos del formulario
+            let persona = {
+                nombre: document.getElementById("inpNombre").value,
+                edad: parseInt(document.getElementById("inpEdad").value),
+                ocupacion: document.getElementById("inpOcupacion").value,
+
+                // Los objetos también pueden tener funciones (métodos)
+                saludar: function () {
+                    alert("Hola, soy " + this.nombre);
+                }
+            };
+
+            console.log("Objeto creado:", persona);
+
+            // 2. Usar sus propiedades para pintar el HTML
+            document.getElementById("cardNombre").innerText = persona.nombre;
+            document.getElementById("cardEdad").innerText = persona.edad;
+            document.getElementById("cardOcupacion").innerText = persona['ocupacion']; // Otra forma de acceder
+
+            document.getElementById("resultado").style.display = "block";
+
+            // Opcional: Probar método
+            // persona.saludar();
+        }
+    </script>
+</body>
+
+</html>

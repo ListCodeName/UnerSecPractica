@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: Arrays (Listas)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2980b9;
+        }
+
+        .list-container {
+            background: #eaf2f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 5px;
+        }
+
+        button {
+            background: #2980b9;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2471a3;
+        }
+
+        ul {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            max-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Arrays (Listas)</h1>
+    <p>Un Array es una colección ordenada de datos. Se define con corchetes <code>[]</code>.</p>
+
+    <div class="list-container">
+        <h2>Lista de Compras</h2>
+        <input type="text" id="nuevoItem" placeholder="Ej: Manzanas">
+        <button onclick="agregarItem()">Agregar</button>
+        <button onclick="eliminarUltimo()">Eliminar Último</button>
+
+        <h3>Contenido de la lista:</h3>
+        <ul id="listaVisual">
+            <!-- Aquí se verán los items -->
+        </ul>
+        <p>Total de elementos: <span id="contador">0</span></p>
+    </div>
+
+    <script>
+        // Declaración de un Array vacío
+        let compras = [];
+
+        function actualizarVista() {
+            let listaVisual = document.getElementById("listaVisual");
+            listaVisual.innerHTML = ""; // Limpiar antes de volver a pintar
+
+            // Recorrer el array y crear elementos LI
+            for (let i = 0; i < compras.length; i++) {
+                let li = document.createElement("li");
+                li.innerText = compras[i]; // Acceder por índice (0, 1, 2...)
+                listaVisual.appendChild(li);
+            }
+
+            // Actualizar contador (propiedad length)
+            document.getElementById("contador").innerText = compras.length;
+        }
+
+        function agregarItem() {
+            let item = document.getElementById("nuevoItem").value;
+            if (item !== "") {
+                // PUSH: Agrega al final
+                compras.push(item);
+                actualizarVista();
+                document.getElementById("nuevoItem").value = ""; // Limpiar input
+            }
+        }
+
+        function eliminarUltimo() {
+            // POP: Elimina el último elemento
+            compras.pop();
+            actualizarVista();
+        }
+
+        // Llamada inicial
+        actualizarVista();
+    </script>
+</body>
+
+</html>

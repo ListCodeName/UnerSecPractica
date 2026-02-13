@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: DOM Estilos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background 0.5s;
+        }
+
+        h1 {
+            color: #273746;
+        }
+
+        .circulo {
+            width: 100px;
+            height: 100px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            margin: 20px auto;
+            transition: all 0.5s;
+        }
+
+        .controls {
+            text-align: center;
+        }
+
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 id="titulo">Unidad 3: Manipular Estilos</h1>
+    <p>Podemos cambiar el CSS directamente desde JS usando la propiedad <code>.style</code>.</p>
+
+    <div id="miCirculo" class="circulo"></div>
+
+    <div class="controls">
+        <button onclick="cambiarColor()">Cambiar Color</button>
+        <button onclick="cambiarTamano()">Agrandar</button>
+        <button onclick="ocultar()">Ocultar / Mostrar</button>
+        <button onclick="modoOscuro()">Activar Modo Oscuro</button>
+    </div>
+
+    <script>
+        function cambiarColor() {
+            let elemento = document.getElementById("miCirculo");
+            // Las propiedades CSS con guión (background-color) se escriben en CamelCase (backgroundColor)
+            elemento.style.backgroundColor = "#3498db"; // Azul
+        }
+
+        function cambiarTamano() {
+            let elemento = document.getElementById("miCirculo");
+            elemento.style.width = "200px";
+            elemento.style.height = "200px";
+        }
+
+        function ocultar() {
+            let elemento = document.getElementById("miCirculo");
+
+            // Verificar estado actual
+            if (elemento.style.display === "none") {
+                elemento.style.display = "block";
+            } else {
+                elemento.style.display = "none";
+            }
+        }
+
+        function modoOscuro() {
+            // Podemos cambiar estilos al BODY entero
+            if (document.body.style.backgroundColor === "black") {
+                document.body.style.backgroundColor = "white";
+                document.body.style.color = "black";
+                document.getElementById("titulo").style.color = "#273746";
+            } else {
+                document.body.style.backgroundColor = "black";
+                document.body.style.color = "white";
+                document.getElementById("titulo").style.color = "white";
+            }
+        }
+    </script>
+</body>
+
+</html>

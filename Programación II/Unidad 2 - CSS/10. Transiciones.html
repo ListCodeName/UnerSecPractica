@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Transiciones</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #af7ac5;
+        }
+
+        .box {
+            width: 100px;
+            height: 100px;
+            background: #af7ac5;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .trans-1 {
+            transition: width 2s;
+        }
+
+        /* Solo ancho, lento (2s) */
+        .trans-1:hover {
+            width: 300px;
+        }
+
+        .trans-2 {
+            transition: background-color 0.5s ease-in-out;
+        }
+
+        /* Color, rápido y suave */
+        .trans-2:hover {
+            background-color: #2ecc71;
+        }
+
+        .trans-3 {
+            transition: all 0.3s;
+        }
+
+        /* Todo cambia a la vez */
+        .trans-3:hover {
+            transform: scale(1.2) rotate(10deg);
+            border-radius: 50%;
+            background: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: Transiciones</h1>
+    <p>Las transiciones permiten que los cambios en CSS (como en un <code>:hover</code>) ocurran suavemente en un
+        periodo de tiempo, en lugar de instantáneamente.</p>
+
+    <h2>1. Sintaxis Básica</h2>
+    <p><code>transition: propiedad duracion funcion-de-tiempo retardo;</code></p>
+    <ul>
+        <li><strong>Propiedad:</strong> Qué cambio animar (<code>width</code>, <code>background</code>,
+            <code>all</code>).</li>
+        <li><strong>Duración:</strong> Tiempo en segundos (<code>0.5s</code>, <code>2s</code>).</li>
+    </ul>
+
+    <h2>2. Ejemplos (Pasa el mouse por encima)</h2>
+
+    <h3>Cambio de Ancho (Lento: 2s)</h3>
+    <div class="box trans-1">Hover me</div>
+
+    <h3>Cambio de Color (Rápido: 0.5s)</h3>
+    <div class="box trans-2">Color</div>
+
+    <h3>Transformación Compleja (Escalar y Rotar)</h3>
+    <div class="box trans-3">¡Boom!</div>
+    <p>Aquí usamos la propiedad <code>transform</code> combinada con transition.</p>
+
+</body>
+
+</html>

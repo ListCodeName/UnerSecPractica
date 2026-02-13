@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Márgenes y Rellenos</title>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #d35400;
+        }
+
+        .box-model-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .margin-box {
+            background-color: #f6ddcc;
+            border: 2px dashed #d35400;
+            padding: 20px;
+            color: #d35400;
+            text-align: center;
+        }
+
+        .padding-box {
+            background-color: #d6eaf8;
+            border: 2px solid #2980b9;
+            padding: 20px;
+            margin: 10px;
+            color: #2980b9;
+            text-align: center;
+        }
+
+        .content-box {
+            background-color: #abebc6;
+            border: 1px solid #27ae60;
+            padding: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        code {
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .sintaxis {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 2: El Modelo de Caja (Margen y Relleno)</h1>
+    <p>Todo elemento en HTML es una caja rectangular. El espacio alrededor y dentro de esa caja se controla con
+        <code>margin</code> y <code>padding</code>.</p>
+
+    <div class="box-model-container">
+        <div class="margin-box">
+            Márgen (Espacio externo)
+            <div class="padding-box">
+                Relleno (Espacio interno)
+                <div class="content-box">CONTENIDO</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>1. Padding (Relleno)</h2>
+    <p>Es el espacio <strong>interno</strong>, entre el borde del elemento y su contenido. Si el elemento tiene color de
+        fondo, el padding también se pinta de ese color.</p>
+    <div class="sintaxis">
+        padding: 20px; /* Todos los lados */<br>
+        padding: 10px 20px; /* Vertical (10px) Horizontal (20px) */<br>
+        padding-top: 10px; /* Específico */
+    </div>
+
+    <h2>2. Margin (Margen)</h2>
+    <p>Es el espacio <strong>externo</strong>, entre el borde del elemento y los elementos vecinos. Es transparente (no
+        tiene color).</p>
+    <div class="sintaxis">
+        margin: 20px; /* Todos los lados */<br>
+        margin: 0 auto; /* 0 arriba/abajo, AUTOMÁTICO a los lados (Centra bloques) */<br>
+        margin-bottom: 50px; /* Solo abajo */
+    </div>
+
+    <h2>3. Colapso de Márgenes</h2>
+    <p>Nota curiosa: Si un elemento tiene <code>margin-bottom: 20px</code> y el de abajo tiene
+        <code>margin-top: 30px</code>, el espacio entre ellos NO será 50px, sino 30px (el mayor de los dos). Esto se
+        llama colapso de márgenes.</p>
+
+</body>
+
+</html>

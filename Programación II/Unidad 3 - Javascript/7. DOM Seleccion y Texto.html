@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS: DOM Selección</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #8e44ad;
+        }
+
+        .box {
+            border: 2px dashed #8e44ad;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f4ecf7;
+        }
+
+        button {
+            background: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #71368a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: DOM (Selección y Texto)</h1>
+    <p>El DOM (Document Object Model) es la representación del HTML que Javascript puede modificar.</p>
+
+    <h2>1. Seleccionar Elementos</h2>
+    <p>Para modificar algo, primero hay que buscarlo.</p>
+    <ul>
+        <li><code>document.getElementById("id")</code>: El más rápido y específico.</li>
+        <li><code>document.querySelector(".clase" o "#id" o "tag")</code>: Más flexible (como CSS).</li>
+    </ul>
+
+    <h2>2. Modificar Contenido</h2>
+    <div id="miCaja" class="box">
+        <p>Soy un texto original sin cambios.</p>
+    </div>
+
+    <button onclick="cambiarTexto()">Cambiar Texto (innerText)</button>
+    <button onclick="cambiarHTML()">Cambiar HTML (innerHTML)</button>
+
+    <script>
+        function cambiarTexto() {
+            // 1. Seleccionar
+            let contenedor = document.getElementById("miCaja");
+
+            // 2. Modificar TEXTO (solo texto plano)
+            contenedor.innerText = "¡Texto modificado con Javascript!";
+        }
+
+        function cambiarHTML() {
+            // 1. Seleccionar con querySelector (por ID usa #)
+            let contenedor = document.querySelector("#miCaja");
+
+            // 2. Modificar HTML (interpreta etiquetas)
+            contenedor.innerHTML = "<strong>¡Ahora soy negrita!</strong> y tengo un <a href='#'>enlace</a>.";
+
+            console.log("HTML modificado correctamente.");
+        }
+    </script>
+</body>
+
+</html>
