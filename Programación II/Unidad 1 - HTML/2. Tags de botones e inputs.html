@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Botones e Inputs en HTML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+        }
+
+        .tag-block {
+            background: #fdfdfd;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+        }
+
+        code {
+            background: #e0e0e0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 1.05em;
+        }
+
+        pre {
+            background: #2f3640;
+            color: #f5f6fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .example-output {
+            border: 1px dashed #bbb;
+            padding: 15px;
+            margin-top: 15px;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 1: Botones e Inputs (Formularios)</h1>
+    <p>Para interactuar con el usuario, HTML ofrece formularios y diversos elementos de entrada (inputs) y botones.</p>
+
+    <div class="tag-block">
+        <h2>1. El elemento &lt;form&gt;</h2>
+        <p>Es el contenedor principal para agrupar inputs y enviarlos a un servidor (aunque aquí solo veremos su
+            estructura visual).</p>
+        <pre>&lt;form action="/enviar" method="POST"&gt; ... &lt;/form&gt;</pre>
+    </div>
+
+    <div class="tag-block">
+        <h2>2. Tipos de &lt;input&gt;</h2>
+        <p>El tag <code>&lt;input&gt;</code> es el más versátil. Su comportamiento cambia según el atributo
+            <code>type</code>.</p>
+        <table>
+            <tr>
+                <th>Tipo</th>
+                <th>Descripción</th>
+            </tr>
+            <tr>
+                <td><code>text</code></td>
+                <td>Campo de texto de una sola línea.</td>
+            </tr>
+            <tr>
+                <td><code>password</code></td>
+                <td>Campo de contraseña (oculta los caracteres).</td>
+            </tr>
+            <tr>
+                <td><code>email</code></td>
+                <td>Valida que el texto sea un correo electrónico.</td>
+            </tr>
+            <tr>
+                <td><code>number</code></td>
+                <td>Solo permite números.</td>
+            </tr>
+            <tr>
+                <td><code>date</code></td>
+                <td>Selector de fecha.</td>
+            </tr>
+        </table>
+
+        <h3>Ejemplos de Texto</h3>
+        <pre>
+&lt;label for="nombre"&gt;Nombre:&lt;/label&gt;
+&lt;input type="text" id="nombre" name="nombre" placeholder="Escribe tu nombre"&gt;
+
+&lt;label for="pass"&gt;Clave:&lt;/label&gt;
+&lt;input type="password" id="pass" name="clave"&gt;
+        </pre>
+        <div class="example-output">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" placeholder="Escribe tu nombre"><br><br>
+            <label for="pass">Clave:</label>
+            <input type="password" id="pass">
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>3. Selección: Radio y Checkbox</h2>
+        <ul>
+            <li><code>radio</code>: Permite seleccionar <strong>una</strong> opción de un grupo (deben tener el mismo
+                <code>name</code>).</li>
+            <li><code>checkbox</code>: Permite seleccionar <strong>múltiples</strong> opciones.</li>
+        </ul>
+        <pre>
+&lt;!-- Radio --&gt;
+&lt;p&gt;Género:&lt;/p&gt;
+&lt;input type="radio" id="masc" name="genero" value="masculino"&gt;
+&lt;label for="masc"&gt;Masculino&lt;/label&gt;
+&lt;input type="radio" id="fem" name="genero" value="femenino"&gt;
+&lt;label for="fem"&gt;Femenino&lt;/label&gt;
+
+&lt;!-- Checkbox --&gt;
+&lt;p&gt;Intereses:&lt;/p&gt;
+&lt;input type="checkbox" id="deporte" name="interes" value="deporte"&gt;
+&lt;label for="deporte"&gt;Deportes&lt;/label&gt;
+&lt;input type="checkbox" id="musica" name="interes" value="musica"&gt;
+&lt;label for="musica"&gt;Música&lt;/label&gt;
+        </pre>
+        <div class="example-output">
+            <p>Género:</p>
+            <input type="radio" id="masc" name="genero"> <label for="masc">Masculino</label>
+            <input type="radio" id="fem" name="genero"> <label for="fem">Femenino</label>
+
+            <p>Intereses:</p>
+            <input type="checkbox" id="deporte" unchecked> <label for="deporte">Deportes</label>
+            <input type="checkbox" id="musica" unchecked> <label for="musica">Música</label>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>4. Botones</h2>
+        <p>Hay dos formas principales de crear botones:</p>
+        <ol>
+            <li><code>&lt;button&gt;Texto&lt;/button&gt;</code>: La etiqueta moderna y flexible. Puede contener HTML
+                dentro.</li>
+            <li><code>&lt;input type="button" value="Texto"&gt;</code>: La forma antigua.</li>
+            <li><code>&lt;input type="submit" value="Enviar"&gt;</code>: Botón especial para enviar formularios.</li>
+        </ol>
+        <pre>
+&lt;button type="button" onclick="alert('Hola!')"&gt;Haz clic aquí&lt;/button&gt;
+&lt;input type="submit" value="Enviar Formulario"&gt;
+        </pre>
+        <div class="example-output">
+            <button type="button" onclick="alert('Hola!')">Haz clic aquí</button>
+            <input type="submit" value="Enviar Formulario">
+        </div>
+    </div>
+
+</body>
+
+</html>

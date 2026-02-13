@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Tags de Imágenes</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #d35400;
+            border-bottom: 2px solid #e67e22;
+            padding-bottom: 10px;
+        }
+
+        .tag-block {
+            background: #fff8f0;
+            border: 1px solid #e67e22;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+
+        code {
+            background: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #c0392b;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .example-output {
+            border: 1px dashed #ccc;
+            padding: 15px;
+            margin-top: 15px;
+            background: #fff;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: square;
+        }
+
+        figure {
+            margin: 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: #fff;
+            display: inline-block;
+        }
+
+        figcaption {
+            font-style: italic;
+            color: #777;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 1: Profundizando en Imágenes</h1>
+    <p>Aunque ya vimos el tag <code>&lt;img&gt;</code>, las imágenes en la web tienen muchos detalles importantes que
+        debemos controlar para una buena experiencia de usuario.</p>
+
+    <div class="tag-block">
+        <h2>1. Rutas (El atributo src)</h2>
+        <p>El atributo <code>src</code> (source) le dice al navegador dónde encontrar la imagen. Existen dos tipos de
+            rutas:</p>
+
+        <h3>Rutas Absolutas</h3>
+        <p>Es la dirección completa de una imagen en internet. Si el sitio original borra la imagen, dejará de verse en
+            tu página.</p>
+        <pre>&lt;img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"&gt;</pre>
+
+        <h3>Rutas Relativas</h3>
+        <p>Buscan la imagen dentro de las carpetas de tu propio proyecto. Son más seguras y rápidas.</p>
+        <ul>
+            <li><code>src="foto.jpg"</code>: La imagen está en la misma carpeta que el archivo HTML.</li>
+            <li><code>src="img/foto.jpg"</code>: La imagen está dentro de una carpeta llamada "img".</li>
+            <li><code>src="../foto.jpg"</code>: La imagen está en la carpeta superior (atrás).</li>
+        </ul>
+    </div>
+
+    <div class="tag-block">
+        <h2>2. Accesibilidad (El atributo alt)</h2>
+        <p>El atributo <code>alt</code> (texto alternativo) es OBLIGATORIO por buenas prácticas.</p>
+        <ul>
+            <li>Se muestra si la imagen no carga (error de red o ruta incorrecta).</li>
+            <li>Es leído por lectores de pantalla para personas ciegas.</li>
+            <li>Ayuda a Google (SEO) a entender de qué trata la imagen.</li>
+        </ul>
+        <pre>&lt;img src="perro.jpg" alt="Un perro golden retriever corriendo en el parque"&gt;</pre>
+    </div>
+
+    <div class="tag-block">
+        <h2>3. Dimensiones (width y height)</h2>
+        <p>Siempre es recomendable definir el ancho (<code>width</code>) y alto (<code>height</code>) para evitar que el
+            contenido "salte" mientras carga la imagen.</p>
+        <pre>&lt;img src="logo.png" alt="Logo de la empresa" width="200" height="100"&gt;</pre>
+        <p>Nota: Si solo defines uno (ej. solo el ancho), el navegador calculará el otro automáticamente manteniendo la
+            proporción.</p>
+    </div>
+
+    <div class="tag-block">
+        <h2>4. Figuras semánticas (&lt;figure&gt;)</h2>
+        <p>Cuando una imagen es importante para el contenido (como un gráfico o una ilustración con leyenda), usamos
+            <code>&lt;figure&gt;</code> y <code>&lt;figcaption&gt;</code>.</p>
+        <pre>
+&lt;figure&gt;
+    &lt;img src="https://via.placeholder.com/300x200" alt="Gráfico de ventas" width="300" height="200"&gt;
+    &lt;figcaption&gt;Fig. 1: Crecimiento de ventas en 2023.&lt;/figcaption&gt;
+&lt;/figure&gt;
+        </pre>
+        <div class="example-output">
+            <figure>
+                <img src="https://via.placeholder.com/300x200" alt="Gráfico de ventas" width="300" height="200">
+                <figcaption>Fig. 1: Crecimiento de ventas en 2023.</figcaption>
+            </figure>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>5. Formatos Comunes</h2>
+        <ul>
+            <li><strong>JPG / JPEG:</strong> Mejor para fotografías con muchos colores. Pierde calidad al comprimirse.
+            </li>
+            <li><strong>PNG:</strong> Soporta transparencia. Mejor para logos, gráficos o imágenes con texto.</li>
+            <li><strong>SVG:</strong> Imágenes vectoriales (matemáticas). No pierden calidad al ampliarse. Ideales para
+                logos e íconos.</li>
+            <li><strong>GIF:</strong> Soporta animaciones simples. Limitado a 256 colores.</li>
+            <li><strong>WebP:</strong> Formato moderno de Google. Alta calidad y bajo peso. (Recomendado).</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

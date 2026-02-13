@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Anidamiento de Tags</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #555;
+        }
+
+        .tag-block {
+            background: #fafafa;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        code {
+            background: #e0e0e0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #d63031;
+        }
+
+        pre {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #c0392b;
+            font-weight: bold;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 1: Anidamiento de Tags</h1>
+    <p>El anidamiento se refiere a poner unos elementos HTML dentro de otros. Es como una caja dentro de otra caja. Para
+        que el navegador entienda nuestra página, debemos seguir reglas estrictas.</p>
+
+    <div class="tag-block">
+        <h2>1. Estructura de Árbol (Padre e Hijo)</h2>
+        <p>Cuando un tag está dentro de otro, se crea una relación:</p>
+        <ul>
+            <li><strong>Padre (Parent):</strong> El elemento contenedor.</li>
+            <li><strong>Hijo (Child):</strong> El elemento contenido.</li>
+            <li><strong>Hermanos (Siblings):</strong> Elementos que comparten el mismo padre.</li>
+        </ul>
+        <pre>
+&lt;div&gt;              &lt;!-- Padre --&gt;
+    &lt;p&gt;Texto 1&lt;/p&gt; &lt;!-- Hijo del div, Hermano del siguiente p --&gt;
+    &lt;p&gt;Texto 2&lt;/p&gt; &lt;!-- Hijo del div --&gt;
+&lt;/div&gt;
+        </pre>
+    </div>
+
+    <div class="tag-block">
+        <h2>2. Regla de Oro: El orden de cierre</h2>
+        <p>Los tags deben cerrarse en el orden inverso al que se abrieron (LIFO - Last In, First Out). "El último en
+            abrir es el primero en cerrar".</p>
+
+        <h3>Ejemplo Correcto <span class="correct">✔</span></h3>
+        <pre>
+&lt;p&gt;Texto en &lt;strong&gt;negrita y &lt;em&gt;cursiva&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
+        </pre>
+        <p>Aquí <code>&lt;em&gt;</code> está dentro de <code>&lt;strong&gt;</code>, y <code>&lt;strong&gt;</code> dentro
+            de <code>&lt;p&gt;</code>.</p>
+
+        <h3>Ejemplo Incorrecto <span class="incorrect">✘</span></h3>
+        <pre>
+&lt;p&gt;Texto en &lt;strong&gt;negrita y &lt;em&gt;cursiva&lt;/strong&gt;&lt;/em&gt;.&lt;/p&gt;
+        </pre>
+        <p>¡Error! Aquí intentamos cerrar <code>&lt;strong&gt;</code> antes de cerrar su hijo <code>&lt;em&gt;</code>.
+            Esto puede "romper" el diseño.</p>
+    </div>
+
+    <div class="tag-block">
+        <h2>3. Elementos de Bloque vs. En Línea</h2>
+        <p>Generalmente:</p>
+        <ul>
+            <li>Los elementos de <strong>bloque</strong> (<code>div</code>, <code>p</code>, <code>ul</code>,
+                <code>section</code>) pueden contener otros elementos de bloque y elementos en línea.</li>
+            <li>Los elementos <strong>en línea</strong> (<code>span</code>, <code>a</code>, <code>strong</code>) solo
+                pueden contener otros elementos en línea y texto.</li>
+        </ul>
+        <p><strong>Regla común:</strong> No pongas un elemento de bloque dentro de un elemento en línea.</p>
+        <pre>
+&lt;!-- MAL --&gt;
+&lt;a href="#"&gt; &lt;div&gt;Clickeame&lt;/div&gt; &lt;/a&gt; (La mayoría de las veces es mala práctica, aunque HTML5 es más flexible con &lt;a&gt;)
+
+&lt;!-- MAL --&gt;
+&lt;p&gt;Este es un párrafo con un &lt;ul&gt;&lt;li&gt;lista&lt;/li&gt;&lt;/ul&gt; dentro.&lt;/p&gt; (Un p no puede contener una lista ul)
+        </pre>
+    </div>
+
+    <div class="tag-block">
+        <h2>4. Indentación</h2>
+        <p>Para leer mejor el código y ver el anidamiento, usamos la indentación (sangría). Cada nivel de anidamiento
+            debe moverse hacia la derecha.</p>
+        <pre>
+&lt;html&gt;
+    &lt;body&gt;
+        &lt;div&gt;
+            &lt;p&gt;Hola&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+        </pre>
+    </div>
+
+</body>
+
+</html>

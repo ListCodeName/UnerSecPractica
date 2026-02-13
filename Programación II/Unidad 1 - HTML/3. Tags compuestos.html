@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Tags Compuestos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #8e44ad;
+        }
+
+        .tag-block {
+            background: #fefefe;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        code {
+            background: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #c7254e;
+        }
+
+        pre {
+            background: #222;
+            color: #a6e22e;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .example-output {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 15px;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f2f2f2;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 1: Tags Compuestos</h1>
+    <p>Los tags compuestos son aquellos que requieren una estructura de varios elementos anidados para funcionar
+        correctamente, como las tablas y las listas de selección.</p>
+
+    <div class="tag-block">
+        <h2>1. Tablas (&lt;table&gt;)</h2>
+        <p>Las tablas se usan para organizar datos en filas y columnas. No se deben usar para maquetar el sitio web.</p>
+        <ul>
+            <li><code>&lt;table&gt;</code>: Contenedor principal.</li>
+            <li><code>&lt;tr&gt;</code> (Table Row): Define una fila.</li>
+            <li><code>&lt;th&gt;</code> (Table Header): Define una celda de encabezado (negrita y centrada por defecto).
+            </li>
+            <li><code>&lt;td&gt;</code> (Table Data): Define una celda de datos estándar.</li>
+        </ul>
+        <pre>
+&lt;table border="1"&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Nombre&lt;/th&gt;
+        &lt;th&gt;Edad&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Ana&lt;/td&gt;
+        &lt;td&gt;25&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Carlos&lt;/td&gt;
+        &lt;td&gt;30&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+        </pre>
+        <div class="example-output">
+            <table border="1">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Edad</th>
+                </tr>
+                <tr>
+                    <td>Ana</td>
+                    <td>25</td>
+                </tr>
+                <tr>
+                    <td>Carlos</td>
+                    <td>30</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>2. Menús Desplegables (&lt;select&gt;)</h2>
+        <p>El tag <code>&lt;select&gt;</code> crea una lista desplegable. Cada opción dentro se define con
+            <code>&lt;option&gt;</code>.</p>
+        <p>Se pueden agrupar opciones con <code>&lt;optgroup&gt;</code>.</p>
+        <pre>
+&lt;label for="autos"&gt;Elige un auto:&lt;/label&gt;
+&lt;select id="autos" name="autos"&gt;
+    &lt;optgroup label="Marcas Europeas"&gt;
+        &lt;option value="volvo"&gt;Volvo&lt;/option&gt;
+        &lt;option value="bmw"&gt;BMW&lt;/option&gt;
+    &lt;/optgroup&gt;
+    &lt;optgroup label="Marcas Americanas"&gt;
+        &lt;option value="ford"&gt;Ford&lt;/option&gt;
+        &lt;option value="chevrolet"&gt;Chevrolet&lt;/option&gt;
+    &lt;/optgroup&gt;
+&lt;/select&gt;
+        </pre>
+        <div class="example-output">
+            <label for="autos">Elige un auto:</label>
+            <select id="autos" name="autos">
+                <optgroup label="Marcas Europeas">
+                    <option value="volvo">Volvo</option>
+                    <option value="bmw">BMW</option>
+                </optgroup>
+                <optgroup label="Marcas Americanas">
+                    <option value="ford">Ford</option>
+                    <option value="chevrolet">Chevrolet</option>
+                </optgroup>
+            </select>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>3. Listas de Descripción (&lt;dl&gt;)</h2>
+        <p>Menos comunes pero útiles para glosarios o metadatos.</p>
+        <ul>
+            <li><code>&lt;dl&gt;</code>: Lista de descripción.</li>
+            <li><code>&lt;dt&gt;</code>: Término a describir.</li>
+            <li><code>&lt;dd&gt;</code>: Descripción o definición.</li>
+        </ul>
+        <pre>
+&lt;dl&gt;
+    &lt;dt&gt;HTML&lt;/dt&gt;
+    &lt;dd&gt;Lenguaje de Marcado de Hipertexto.&lt;/dd&gt;
+    &lt;dt&gt;CSS&lt;/dt&gt;
+    &lt;dd&gt;Hojas de Estilo en Cascada.&lt;/dd&gt;
+&lt;/dl&gt;
+        </pre>
+        <div class="example-output">
+            <dl>
+                <dt>HTML</dt>
+                <dd>Lenguaje de Marcado de Hipertexto.</dd>
+                <dt>CSS</dt>
+                <dd>Hojas de Estilo en Cascada.</dd>
+            </dl>
+        </div>
+    </div>
+
+</body>
+
+</html>
