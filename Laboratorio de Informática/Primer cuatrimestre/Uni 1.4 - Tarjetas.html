@@ -1,0 +1,1396 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Tarjetas de Expansión — Laboratorio de Informática</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0d1117;
+            --s: #161b22;
+            --s2: #1f2937;
+            --bd: #30363d;
+            --gpu: #ec4899;
+            --snd: #f97316;
+            --net: #06b6d4;
+            --a: #ec4899;
+            --a2: #f97316;
+            --a3: #06b6d4;
+            --text: #e6edf3;
+            --m: #8b949e;
+            --r: 12px;
+            --rs: 8px;
+            --sh: 0 4px 24px rgba(0, 0, 0, .45)
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.5rem 1.5rem 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #1a0010 0%, #1a0a1a 40%, #001220 100%);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 50% at 20% -5%, rgba(236, 72, 153, .2) 0%, transparent 60%), radial-gradient(ellipse 55% 40% at 80% 110%, rgba(6, 182, 212, .15) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(236, 72, 153, .13);
+            border: 1px solid rgba(236, 72, 153, .4);
+            color: #fbcfe8;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .25rem .85rem;
+            border-radius: 999px;
+            margin-bottom: 1.1rem
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fecdd3, #fbcfe8, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .6rem
+        }
+
+        header p.sub {
+            color: var(--m);
+            max-width: 640px;
+            margin: 0 auto;
+            font-size: 1rem
+        }
+
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .7rem 1.5rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        .bc a {
+            color: var(--m);
+            text-decoration: none
+        }
+
+        .bc a:hover {
+            color: var(--text)
+        }
+
+        .bc .cur {
+            color: var(--gpu)
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: 1.1rem 1rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        nav.tabs button {
+            background: transparent;
+            border: 1px solid var(--bd);
+            color: var(--m);
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: .5rem 1.1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .25s
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--a);
+            color: var(--a)
+        }
+
+        nav.tabs button.active {
+            background: var(--a);
+            border-color: var(--a);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(236, 72, 153, .4)
+        }
+
+        nav.tabs button[data-t="snd"]:hover {
+            border-color: var(--snd);
+            color: var(--snd)
+        }
+
+        nav.tabs button[data-t="snd"].active {
+            background: var(--snd);
+            border-color: var(--snd);
+            box-shadow: 0 0 14px rgba(249, 115, 22, .4)
+        }
+
+        nav.tabs button[data-t="net"]:hover {
+            border-color: var(--net);
+            color: var(--net)
+        }
+
+        nav.tabs button[data-t="net"].active {
+            background: var(--net);
+            border-color: var(--net);
+            box-shadow: 0 0 14px rgba(6, 182, 212, .4)
+        }
+
+        nav.tabs button[data-t="preguntas"]:hover,
+        nav.tabs button[data-t="consulta"]:hover {
+            border-color: #6366f1;
+            color: #6366f1
+        }
+
+        nav.tabs button[data-t="preguntas"].active,
+        nav.tabs button[data-t="consulta"].active {
+            background: #6366f1;
+            border-color: #6366f1;
+            box-shadow: 0 0 14px rgba(99, 102, 241, .4)
+        }
+
+        .sec {
+            display: none;
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem 4rem;
+            animation: fi .35s ease
+        }
+
+        .sec.active {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.8rem
+        }
+
+        .sec-title .icon {
+            font-size: 1.6rem
+        }
+
+        .sec-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700
+        }
+
+        .sec-title p {
+            font-size: .9rem;
+            color: var(--m);
+            margin-top: .15rem
+        }
+
+        .sh {
+            font-size: .98rem;
+            font-weight: 700;
+            margin: 1.8rem 0 .85rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .sh::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--bd);
+            margin-left: .5rem
+        }
+
+        .ib {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.05rem 1.25rem;
+            font-size: .87rem;
+            color: var(--m);
+            margin-bottom: 1.2rem
+        }
+
+        .ib.pk {
+            border-left: 3px solid var(--gpu)
+        }
+
+        .ib.or {
+            border-left: 3px solid var(--snd)
+        }
+
+        .ib.cy {
+            border-left: 3px solid var(--net)
+        }
+
+        .ib.pu {
+            border-left: 3px solid #8b5cf6
+        }
+
+        .ib.gn {
+            border-left: 3px solid #10b981
+        }
+
+        /* CARDS GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem
+        }
+
+        .card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.1rem 1rem;
+            transition: all .25s;
+            text-align: center
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sh)
+        }
+
+        .card .em {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: .5rem
+        }
+
+        .card h3 {
+            font-size: .9rem;
+            font-weight: 600;
+            margin-bottom: .3rem
+        }
+
+        .card p {
+            font-size: .75rem;
+            color: var(--m)
+        }
+
+        .card.gpu {
+            border-top: 3px solid var(--gpu)
+        }
+
+        .card.gpu:hover {
+            border-color: var(--gpu)
+        }
+
+        .card.snd {
+            border-top: 3px solid var(--snd)
+        }
+
+        .card.snd:hover {
+            border-color: var(--snd)
+        }
+
+        .card.net {
+            border-top: 3px solid var(--net)
+        }
+
+        .card.net:hover {
+            border-color: var(--net)
+        }
+
+        /* BRANDS ROW */
+        .brands {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: .85rem;
+            margin-bottom: 1.5rem
+        }
+
+        .brand-c {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .9rem 1rem;
+            transition: box-shadow .2s
+        }
+
+        .brand-c:hover {
+            box-shadow: 0 0 0 1px var(--gpu)
+        }
+
+        .brand-c .bname {
+            font-size: .88rem;
+            font-weight: 700;
+            margin-bottom: .25rem
+        }
+
+        .brand-c p {
+            font-size: .75rem;
+            color: var(--m)
+        }
+
+        .gpu-chip {
+            color: var(--gpu)
+        }
+
+        .snd-chip {
+            color: var(--snd)
+        }
+
+        .net-chip {
+            color: var(--net)
+        }
+
+        /* USE CASES */
+        .use-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: .85rem;
+            margin-bottom: 1.5rem
+        }
+
+        .use-c {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .9rem 1rem
+        }
+
+        .use-c .ut {
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: .3rem;
+            display: flex;
+            align-items: center;
+            gap: .45rem
+        }
+
+        .use-c p {
+            font-size: .76rem;
+            color: var(--m)
+        }
+
+        /* CONNECTORS */
+        .conn-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .6rem;
+            margin-bottom: 1.2rem
+        }
+
+        .conn {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .55rem .9rem;
+            font-size: .8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: .4rem
+        }
+
+        .dot-gpu {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--gpu);
+            flex-shrink: 0
+        }
+
+        .dot-snd {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--snd);
+            flex-shrink: 0
+        }
+
+        .dot-net {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--net);
+            flex-shrink: 0
+        }
+
+        /* TABLE */
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: .84rem
+        }
+
+        .tbl th {
+            background: var(--s2);
+            padding: .6rem .85rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: .74rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--m);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        .tbl td {
+            padding: .55rem .85rem;
+            border-bottom: 1px solid var(--bd);
+            vertical-align: top
+        }
+
+        .tbl tr:last-child td {
+            border-bottom: none
+        }
+
+        .tbl tr:hover td {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .tag {
+            font-size: .7rem;
+            padding: .15rem .5rem;
+            border-radius: 999px;
+            font-weight: 600;
+            display: inline-block
+        }
+
+        .tag.pk {
+            background: rgba(236, 72, 153, .13);
+            color: #fbcfe8;
+            border: 1px solid rgba(236, 72, 153, .3)
+        }
+
+        .tag.cy {
+            background: rgba(6, 182, 212, .12);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, .3)
+        }
+
+        .tag.gn {
+            background: rgba(16, 185, 129, .12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, .3)
+        }
+
+        .tag.yw {
+            background: rgba(245, 158, 11, .12);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, .3)
+        }
+
+        /* VIDEO */
+        .vw {
+            position: relative;
+            width: 100%;
+            border-radius: var(--r);
+            overflow: hidden;
+            border: 1px solid var(--bd);
+            box-shadow: var(--sh);
+            background: #000;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 1.8rem
+        }
+
+        .vw img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            opacity: .82;
+            transition: opacity .3s, transform .3s
+        }
+
+        .vw:hover img {
+            opacity: .6;
+            transform: scale(1.02)
+        }
+
+        .vpb {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 76px;
+            height: 76px;
+            background: rgba(255, 255, 255, .93);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .25s, background .25s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .5)
+        }
+
+        .vpb svg {
+            margin-left: 5px
+        }
+
+        .vw:hover .vpb {
+            transform: translate(-50%, -50%) scale(1.12);
+            background: #ff0000
+        }
+
+        .vw:hover .vpb svg path {
+            fill: #fff
+        }
+
+        .vl {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .88));
+            padding: 1.4rem 1.25rem .85rem;
+            color: #fff;
+            font-size: .88rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .ytb {
+            background: #ff0000;
+            color: #fff;
+            font-size: .62rem;
+            font-weight: 700;
+            padding: .13rem .48rem;
+            border-radius: 4px;
+            flex-shrink: 0
+        }
+
+        /* INTRO OVERVIEW CARDS */
+        .ov {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .ov-c {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all .25s
+        }
+
+        .ov-c:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sh)
+        }
+
+        .ov-c .em {
+            font-size: 2.3rem;
+            display: block;
+            margin-bottom: .5rem
+        }
+
+        .ov-c h3 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: .3rem
+        }
+
+        .ov-c p {
+            font-size: .76rem;
+            color: var(--m)
+        }
+
+        .ov-c .lnk {
+            font-size: .7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: .4rem
+        }
+
+        .ov-c.gpu {
+            border-top: 3px solid var(--gpu)
+        }
+
+        .ov-c.gpu .lnk {
+            color: #fbcfe8
+        }
+
+        .ov-c.snd {
+            border-top: 3px solid var(--snd)
+        }
+
+        .ov-c.snd .lnk {
+            color: #fed7aa
+        }
+
+        .ov-c.net {
+            border-top: 3px solid var(--net)
+        }
+
+        .ov-c.net .lnk {
+            color: #a5f3fc
+        }
+
+        /* QUESTIONS */
+        .qgt {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--m);
+            margin: 1.8rem 0 .7rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .qgt::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--bd)
+        }
+
+        .qb {
+            margin-bottom: .75rem;
+            border-radius: var(--r);
+            border: 1px solid var(--bd);
+            overflow: hidden;
+            background: var(--s);
+            transition: box-shadow .2s
+        }
+
+        .qb:hover {
+            box-shadow: 0 0 0 1px var(--gpu)
+        }
+
+        .qh {
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            padding: .9rem 1.2rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .qn {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(236, 72, 153, .12);
+            border: 1px solid rgba(236, 72, 153, .3);
+            color: #fbcfe8;
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .qt {
+            flex: 1;
+            font-size: .92rem;
+            font-weight: 500
+        }
+
+        .qa {
+            font-size: .78rem;
+            color: var(--m);
+            transition: transform .25s
+        }
+
+        .qb.open .qa {
+            transform: rotate(180deg)
+        }
+
+        .qbody {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+
+        .qb.open .qbody {
+            max-height: 500px
+        }
+
+        .qbi {
+            padding: .85rem 1.2rem 1.1rem;
+            border-top: 1px solid var(--bd)
+        }
+
+        .qbi p {
+            color: var(--m);
+            font-size: .87rem;
+            margin-bottom: .75rem
+        }
+
+        .qtags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem
+        }
+
+        .pb-w {
+            background: var(--s2);
+            border-radius: 999px;
+            height: 8px;
+            margin-bottom: .5rem;
+            overflow: hidden
+        }
+
+        .pb-f {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gpu), var(--net));
+            border-radius: 999px;
+            transition: width .4s ease;
+            width: 0%
+        }
+
+        .pb-l {
+            font-size: .78rem;
+            color: var(--m);
+            text-align: right;
+            margin-bottom: 1.5rem
+        }
+
+        /* CONSULTA */
+        .cb {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem
+        }
+
+        .cb h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem
+        }
+
+        .ir {
+            display: flex;
+            gap: .75rem;
+            margin-bottom: .75rem;
+            flex-wrap: wrap
+        }
+
+        .ir input,
+        .ir select {
+            flex: 1;
+            min-width: 140px;
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .6rem .9rem;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .ir input:focus,
+        .ir select:focus {
+            border-color: var(--gpu)
+        }
+
+        .ir select option {
+            background: var(--s2)
+        }
+
+        textarea.ci {
+            width: 100%;
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .8rem 1rem;
+            min-height: 90px;
+            resize: vertical;
+            outline: none;
+            transition: border-color .2s;
+            margin-bottom: .75rem
+        }
+
+        textarea.ci:focus {
+            border-color: var(--gpu)
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            background: var(--gpu);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .6rem 1.3rem;
+            border: none;
+            border-radius: var(--rs);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn:hover {
+            background: #db2777;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(236, 72, 153, .35)
+        }
+
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem
+        }
+
+        .ci-item {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .9rem 1rem;
+            animation: fi .3s ease
+        }
+
+        .ci-item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            align-items: center;
+            margin-bottom: .4rem
+        }
+
+        .ci-item .nm {
+            font-weight: 600;
+            font-size: .85rem
+        }
+
+        .ci-item .tp {
+            font-size: .7rem;
+            padding: .15rem .55rem;
+            background: rgba(236, 72, 153, .12);
+            color: #fbcfe8;
+            border-radius: 999px;
+            font-weight: 600
+        }
+
+        .ci-item .tm {
+            font-size: .7rem;
+            color: var(--m);
+            margin-left: auto
+        }
+
+        .ci-item .mg {
+            font-size: .87rem;
+            color: var(--m)
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--bd);
+            color: var(--m);
+            font-size: .78rem;
+            background: var(--s)
+        }
+
+        @media(max-width:640px) {
+            nav.tabs button {
+                font-size: .74rem;
+                padding: .4rem .75rem
+            }
+
+            .ir {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <span class="badge">Laboratorio de Informática · Unidad 1</span>
+        <h1>🃏 Tarjetas de Expansión</h1>
+        <p class="sub">Tarjeta de Video, Sonido y Red: funciones, conectores, marcas y aplicaciones reales.</p>
+    </header>
+    <div class="bc">
+        <a href="Uni 1 - Hardware.html">🖥️ Hardware</a><span style="opacity:.4"> › </span><span class="cur">🃏 Tarjetas de
+            Expansión</span>
+    </div>
+    <nav class="tabs">
+        <button class="active" data-t="intro" onclick="sh('intro')" id="tab-intro">🗂️ Intro</button>
+        <button data-t="gpu" onclick="sh('gpu')" id="tab-gpu">🎮 Tarjeta de Video</button>
+        <button data-t="snd" onclick="sh('snd')" id="tab-snd">🔊 Tarjeta de Sonido</button>
+        <button data-t="net" onclick="sh('net')" id="tab-net">🌐 Tarjeta de Red</button>
+        <button data-t="preguntas" onclick="sh('preguntas')" id="tab-preguntas">❓ Preguntas</button>
+
+    </nav>
+
+    <!-- INTRO -->
+    <section id="intro" class="sec active">
+        <div class="sec-title"><span class="icon">🗂️</span>
+            <div>
+                <h2>¿Qué son las tarjetas de expansión?</h2>
+                <p>Componentes que amplían las capacidades de la computadora</p>
+            </div>
+        </div>
+        <p style="color:var(--m);margin-bottom:1.5rem;font-size:.95rem">Las <strong style="color:var(--text)">tarjetas
+                de expansión</strong> se conectan a la placa madre —principalmente por ranuras PCIe—
+            para agregar o mejorar funcionalidades específicas. Las más comunes son la tarjeta de video (GPU), la de
+            sonido y la de red,
+            aunque muchas de estas ya vienen <strong style="color:var(--text)">integradas</strong> en las placas
+            modernas.</p>
+        <div class="ov">
+            <div class="ov-c gpu" onclick="sh('gpu')"><span class="em">🎮</span>
+                <h3>Tarjeta de Video (GPU)</h3>
+                <p>Procesa gráficos en 3D, gaming, IA, minería de criptomonedas y renderizado profesional.</p><span
+                    class="lnk">Ver sección →</span>
+            </div>
+            <div class="ov-c snd" onclick="sh('snd')"><span class="em">🔊</span>
+                <h3>Tarjeta de Sonido</h3>
+                <p>Convierte señales digitales en audio analógico. Conectores, tipos y dónde se ubica.</p><span
+                    class="lnk">Ver sección →</span>
+            </div>
+            <div class="ov-c net" onclick="sh('net')"><span class="em">🌐</span>
+                <h3>Tarjeta de Red</h3>
+                <p>Conecta la PC a internet o redes locales. Ethernet, Wi-Fi, velocidades y conectores.</p><span
+                    class="lnk">Ver sección →</span>
+            </div>
+        </div>
+        <div class="ib gn">💡 <strong style="color:var(--text)">¿Integrado o dedicado?</strong> Hoy la mayoría de las
+            PCs tienen audio y red integrados en la placa madre.
+            La tarjeta de video dedicada sigue siendo indispensable para gaming de alto rendimiento, diseño 3D, edición
+            de video y uso profesional.</div>
+    </section>
+
+    <!-- GPU -->
+    <section id="gpu" class="sec">
+        <div class="sec-title"><span class="icon">🎮</span>
+            <div>
+                <h2>Tarjeta de Video (GPU)</h2>
+                <p>Graphics Processing Unit — mucho más que gaming</p>
+            </div>
+        </div>
+        <div class="ib pk">📌 La <strong style="color:var(--text)">GPU (Graphics Processing Unit)</strong> es un
+            procesador especializado en cálculos en paralelo.
+            Mientras la CPU tiene 8–32 núcleos potentes, una GPU moderna puede tener <strong
+                style="color:var(--text)">miles de núcleos pequeños</strong>, ideales para procesar miles de píxeles o
+            datos simultáneamente.</div>
+
+        <div class="sh">🎯 Aplicaciones reales</div>
+        <div class="use-grid">
+            <div class="use-c">
+                <div class="ut">🎮 <span>Gaming</span></div>
+                <p>Renderiza escenas 3D en tiempo real a altas resoluciones (1080p, 1440p, 4K) y tasas de cuadros
+                    (60–240 FPS).</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🎨 <span>Diseño y renderizado</span></div>
+                <p>Programas como Blender, After Effects o DaVinci Resolve aprovechan la GPU para acelerar render de
+                    video y animaciones 3D.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🤖 <span>Inteligencia Artificial</span></div>
+                <p>El entrenamiento de modelos de IA (ChatGPT, Stable Diffusion) requiere GPUs de alta gama. NVIDIA
+                    domina este mercado con sus CUDA cores.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">⛏️ <span>Minería de criptomonedas</span></div>
+                <p>Las GPUs procesan los algoritmos hash de blockchains como Ethereum (antes del merge) con mayor
+                    eficiencia que las CPUs. Causó escasez mundial de GPUs entre 2020–2022.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🔬 <span>Cómputo científico</span></div>
+                <p>Simulaciones físicas, análisis genómico, predicciones climáticas y más usan GPUs para paralelizar
+                    millones de cálculos.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🖥️ <span>Múltiples monitores</span></div>
+                <p>Una GPU dedicada puede manejar 3–4 monitores independientes, útil para traders, diseñadores o control
+                    de operaciones.</p>
+            </div>
+        </div>
+
+        <div class="sh">🏆 Las marcas más importantes del mercado</div>
+        <div class="brands">
+            <div class="brand-c">
+                <div class="bname gpu-chip">NVIDIA</div>
+                <p>Líder indiscutido. Serie GeForce RTX (gaming) y Quadro/Tesla (profesional/IA). Inventora de CUDA y
+                    ray tracing por hardware.</p>
+            </div>
+            <div class="brand-c">
+                <div class="bname" style="color:#ef4444">AMD (ATI)</div>
+                <p>Serie Radeon RX. Fuerte competidor en relación precio/rendimiento. Tecnología FSR como alternativa al
+                    DLSS de NVIDIA.</p>
+            </div>
+            <div class="brand-c">
+                <div class="bname" style="color:#3b82f6">Intel Arc</div>
+                <p>Ingresó al mercado de GPU dedicada en 2022 con la serie Arc Alchemist. Aún creciendo pero con precios
+                    competitivos.</p>
+            </div>
+            <div class="brand-c">
+                <div class="bname" style="color:#10b981">Apple Silicon</div>
+                <p>GPU integrada en el chip M1/M2/M3. No es dedicada pero su rendimiento gráfico supera a muchas GPUs
+                    midrange.</p>
+            </div>
+        </div>
+
+        <div class="sh">🔌 Conectores de salida de video</div>
+        <div class="conn-wrap">
+            <div class="conn">
+                <div class="dot-gpu"></div>HDMI 2.1 (hasta 8K@60Hz)
+            </div>
+            <div class="conn">
+                <div class="dot-gpu"></div>DisplayPort 1.4 / 2.1
+            </div>
+            <div class="conn">
+                <div class="dot-gpu"></div>USB-C / Thunderbolt 4
+            </div>
+            <div class="conn">
+                <div class="dot-gpu"></div>DVI-D (en desuso)
+            </div>
+            <div class="conn">
+                <div class="dot-gpu"></div>PCIe x16 (conexión a placa madre)
+            </div>
+            <div class="conn">
+                <div class="dot-gpu"></div>Conector 6/8-pin de energía
+            </div>
+        </div>
+
+        <div class="sh">📹 Video de estudio</div>
+        <a class="vw" href="https://www.youtube.com/watch?v=49NBSEMyEzU" target="_blank" rel="noopener">
+            <img src="https://img.youtube.com/vi/49NBSEMyEzU/maxresdefault.jpg"
+                onerror="this.src='https://img.youtube.com/vi/49NBSEMyEzU/hqdefault.jpg'" alt="Video GPU"
+                loading="lazy" />
+            <div class="vpb"><svg width="26" height="26" viewBox="0 0 24 24">
+                    <path fill="#ff0000" d="M8 5v14l11-7z" />
+                </svg></div>
+            <div class="vl"><span class="ytb">YouTube</span>¿Qué es una Tarjeta de Video (GPU)?</div>
+        </a>
+        <div class="ib pk">🎯 Después de ver el video: respondé las preguntas de la sección ❓ del grupo "GPU" o dejá tu
+            duda en 💬 Consulta.</div>
+    </section>
+
+    <!-- SONIDO -->
+    <section id="snd" class="sec">
+        <div class="sec-title"><span class="icon">🔊</span>
+            <div>
+                <h2>Tarjeta de Sonido</h2>
+                <p>El puente entre lo digital y lo que tus oídos escuchan</p>
+            </div>
+        </div>
+        <div class="ib or">📌 La <strong style="color:var(--text)">tarjeta de sonido</strong> convierte las señales
+            digitales del sistema en señales analógicas que pueden reproducirse por altavoces
+            o auriculares (<em>DAC: Digital to Analog Converter</em>), y viceversa capta audio del micrófono y lo
+            convierte a digital (<em>ADC: Analog to Digital Converter</em>).</div>
+
+        <div class="sh">📍 ¿Dónde se encuentra?</div>
+        <div class="grid">
+            <div class="card snd"><span class="em">🔌</span>
+                <h3>Integrada en la placa</h3>
+                <p>El 95% de las PCs actuales tienen audio integrado (codec Realtek, por ejemplo). Suficiente para uso
+                    cotidiano.</p>
+            </div>
+            <div class="card snd"><span class="em">🃏</span>
+                <h3>Tarjeta PCIe dedicada</h3>
+                <p>Se instala en un slot PCIe de la placa madre. Mejor calidad de audio, procesamiento propio, ideal
+                    para estudios.</p>
+            </div>
+            <div class="card snd"><span class="em">🎧</span>
+                <h3>DAC/AMP USB externo</h3>
+                <p>Dispositivo externo conectado por USB. Muy popular para audiófilos y streamers. Evita el ruido
+                    eléctrico interno.</p>
+            </div>
+        </div>
+
+        <div class="sh">🔌 Conectores comunes</div>
+        <div class="conn-wrap">
+            <div class="conn">
+                <div class="dot-snd"></div>Jack 3.5mm — Verde (salida auriculares/parlantes)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>Jack 3.5mm — Rosa (entrada micrófono)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>Jack 3.5mm — Negro (salida trasera / surround)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>Jack 3.5mm — Naranja (center / subwoofer)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>S/PDIF óptico TOSLINK (audio digital Hi-Fi)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>S/PDIF coaxial (audio digital)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>USB-A / USB-C (DAC externo)
+            </div>
+            <div class="conn">
+                <div class="dot-snd"></div>XLR (micrófonos profesionales, con interfaz)
+            </div>
+        </div>
+
+        <div class="sh">🎵 ¿Para qué se usa?</div>
+        <div class="use-grid">
+            <div class="use-c">
+                <div class="ut">🎙️ <span>Streaming / podcasting</span></div>
+                <p>Streamers y creadores de contenido usan interfaces de audio externas para capturar voz con alta
+                    calidad.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🎵 <span>Producción musical</span></div>
+                <p>Tarjetas de sonido profesionales (Focusrite, Universal Audio) permiten grabar instrumentos con
+                    latencia ultra-baja.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🎮 <span>Gaming con sonido surround</span></div>
+                <p>El audio posicional (DTS, Dolby Atmos) ayuda a identificar pasos y disparos en juegos con precisión.
+                </p>
+            </div>
+            <div class="use-c">
+                <div class="ut">👂 <span>Audiofilia</span></div>
+                <p>Los DAC externos (FiiO, SMSL, Topping) ofrecen conversión de alta fidelidad para audiófonos de alta
+                    impedancia.</p>
+            </div>
+        </div>
+
+        <div class="sh">📹 Video de estudio</div>
+        <a class="vw" href="https://www.youtube.com/watch?v=sBp38DmG-aI" target="_blank" rel="noopener">
+            <img src="https://img.youtube.com/vi/sBp38DmG-aI/maxresdefault.jpg"
+                onerror="this.src='https://img.youtube.com/vi/sBp38DmG-aI/hqdefault.jpg'" alt="Video Tarjeta de Sonido"
+                loading="lazy" />
+            <div class="vpb"><svg width="26" height="26" viewBox="0 0 24 24">
+                    <path fill="#ff0000" d="M8 5v14l11-7z" />
+                </svg></div>
+            <div class="vl"><span class="ytb">YouTube</span>¿Qué es y para qué sirve la Tarjeta de Sonido?</div>
+        </a>
+    </section>
+
+    <!-- RED -->
+    <section id="net" class="sec">
+        <div class="sec-title"><span class="icon">🌐</span>
+            <div>
+                <h2>Tarjeta de Red</h2>
+                <p>La puerta de entrada de la computadora a internet y las redes locales</p>
+            </div>
+        </div>
+        <div class="ib cy">📌 La <strong style="color:var(--text)">tarjeta de red</strong> (NIC — Network Interface
+            Card) es el componente que permite a la computadora <strong style="color:var(--text)">comunicarse en
+                red</strong>: internet, redes locales (LAN), impresoras en red, servidores y más. Hoy viene integrada en
+            la placa madre pero puede agregarse como tarjeta PCIe.</div>
+
+        <div class="sh">🔌 Tipos de conectores y tecnologías</div>
+        <div class="conn-wrap">
+            <div class="conn">
+                <div class="dot-net"></div>RJ-45 Ethernet (cable de red estándar)
+            </div>
+            <div class="conn">
+                <div class="dot-net"></div>Wi-Fi (antenas, 802.11 a/b/g/n/ac/ax)
+            </div>
+            <div class="conn">
+                <div class="dot-net"></div>Bluetooth 5.x (redes personales, PAN)
+            </div>
+            <div class="conn">
+                <div class="dot-net"></div>SFP / SFP+ (fibra óptica, servidores)
+            </div>
+            <div class="conn">
+                <div class="dot-net"></div>USB-to-Ethernet (adaptador externo)
+            </div>
+        </div>
+
+        <div class="sh">⚡ Velocidades de transmisión</div>
+        <div style="overflow-x:auto;margin-bottom:1.5rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Tecnología</th>
+                        <th>Velocidad</th>
+                        <th>Conector</th>
+                        <th>Uso típico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag yw">Fast Ethernet</span></td>
+                        <td>100 Mbps</td>
+                        <td>RJ-45</td>
+                        <td>Redes domésticas antiguas</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag gn">Gigabit Ethernet</span></td>
+                        <td>1 Gbps</td>
+                        <td>RJ-45</td>
+                        <td>Estándar doméstico/oficina actual</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag cy">2.5G Ethernet</span></td>
+                        <td>2,5 Gbps</td>
+                        <td>RJ-45</td>
+                        <td>PCs gaming y routers modernos</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag pk">10G Ethernet</span></td>
+                        <td>10 Gbps</td>
+                        <td>RJ-45 / SFP+</td>
+                        <td>Servidores, NAS de alto rendimiento</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag gn">Wi-Fi 5 (802.11ac)</span></td>
+                        <td>hasta 3,5 Gbps*</td>
+                        <td>Antena interna/ext.</td>
+                        <td>Hogares, laptops</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag cy">Wi-Fi 6/6E (802.11ax)</span></td>
+                        <td>hasta 9,6 Gbps*</td>
+                        <td>Antena interna/ext.</td>
+                        <td>Alta densidad, baja latencia</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size:.75rem;color:var(--m);margin-bottom:1.5rem">* Velocidades teóricas máximas bajo condiciones
+            ideales. La velocidad real depende de la distancia, obstáculos e interferencias.</p>
+
+        <div class="sh">🔍 Curiosidades sobre la tarjeta de red</div>
+        <div class="use-grid">
+            <div class="use-c">
+                <div class="ut">🪪 <span>Dirección MAC</span></div>
+                <p>Cada tarjeta de red tiene una dirección MAC única de 48 bits (6 pares hexadecimales) asignada de
+                    fábrica. Identifica el dispositivo en la red local.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">📡 <span>Wake-on-LAN</span></div>
+                <p>Las NIC modernas permiten encender una PC remotamente enviando un "magic packet" por la red, sin que
+                    nadie presione el botón de encendido.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🔗 <span>Teaming / Bonding</span></div>
+                <p>Las NIC de servidor permiten unir dos o más conexiones Ethernet para duplicar el ancho de banda o
+                    tener redundancia si una falla.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🔒 <span>NIC y seguridad</span></div>
+                <p>Algunas NIC incluyen hardware de cifrado (offloading TLS/IPsec) para no cargar CPU con el
+                    procesamiento criptográfico de las conexiones seguras.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">🌐 <span>IPv4 vs IPv6</span></div>
+                <p>Las NIC modernas soportan ambos protocolos. IPv6 tiene 128 bits de dirección (vs 32 de IPv4), con
+                    espacio para 340 sextillones de dispositivos.</p>
+            </div>
+            <div class="use-c">
+                <div class="ut">⚡ <span>Latencia vs descarga</span></div>
+                <p>Para gaming importa más la latencia (ms) que la velocidad de descarga (Mbps). Una conexión de 100
+                    Mbps con baja latencia supera a una de 1 Gbps con alta latencia.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREGUNTAS -->
+    <section id="preguntas" class="sec">
+        <div class="sec-title"><span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Investigación</h2>
+                <p>GPU, Sonido y Red — hacé clic para ver la pista</p>
+            </div>
+        </div>
+        <div class="pb-w">
+            <div class="pb-f" id="pf"></div>
+        </div>
+        <div class="pb-l" id="pl">0 de 15 preguntas leídas</div>
+        <div id="qc"></div>
+    </section>
+
+    <footer>Laboratorio de Informática · Unidad 1 &nbsp;›&nbsp; Tarjetas de Expansión: GPU · Sonido · Red</footer>
+
+    <script>
+        const Qs = [
+            { g: "Tarjeta de Video (GPU)", n: 1, t: "¿Por qué una GPU tiene miles de núcleos y la CPU solo tiene unos pocos?", h: "La CPU tiene pocos núcleos muy potentes para tareas secuenciales. La GPU tiene miles de núcleos simples para procesar muchas tareas en paralelo (píxeles, vértices 3D, datos de IA).", tags: ["GPU", "Paralelo", "CPU"], c: ["pk", "cy", "gn"] },
+            { g: "Tarjeta de Video (GPU)", n: 2, t: "¿Qué es el ray tracing y por qué requiere una GPU dedicada de alta gama?", h: "Ray tracing simula cómo la luz rebota en superficies reales. Requiere millones de cálculos por frame. Las RTX de NVIDIA tienen núcleos RT dedicados para esto.", tags: ["Ray Tracing", "NVIDIA", "Gráficos"], c: ["pk", "gn", "cy"] },
+            { g: "Tarjeta de Video (GPU)", n: 3, t: "¿Qué es la VRAM (GDDR) y por qué importa su cantidad al elegir una GPU?", h: "La VRAM es la RAM dedicada de la GPU. Texturas en alta resolución y juegos modernos requieren 8–16 GB de VRAM. Si no alcanza, el rendimiento cae drásticamente.", tags: ["VRAM", "GDDR", "Rendimiento"], c: ["pk", "gn", "yw"] },
+            { g: "Tarjeta de Video (GPU)", n: 4, t: "¿Por qué las GPUs se usaron masivamente para minar criptomonedas entre 2020 y 2022?", h: "El algoritmo Ethash de Ethereum era GPU-friendly. Miles de GPUs operando en paralelo generaban criptomonedas. Esto causó escasez y precios desorbitados en el mercado.", tags: ["Minería", "Criptomonedas", "Historia"], c: ["yw", "gn", "pk"] },
+            { g: "Tarjeta de Video (GPU)", n: 5, t: "¿Qué diferencia hay entre una GPU integrada (iGPU) y una GPU dedicada?", h: "La iGPU comparte RAM con la CPU y tiene rendimiento limitado. La GPU dedicada tiene su propia VRAM, disipador y potencia, siendo mucho más potente para tareas exigentes.", tags: ["iGPU", "Dedicada", "Diferencias"], c: ["cy", "pk", "gn"] },
+            { g: "Tarjeta de Sonido", n: 6, t: "¿Qué significa DAC y ADC en el contexto de una tarjeta de sonido?", h: "DAC = Digital to Analog Converter (reproduce audio). ADC = Analog to Digital Converter (graba audio). Ambos determinan la calidad de sonido final.", tags: ["DAC", "ADC", "Audio"], c: ["gn", "cy", "yw"] },
+            { g: "Tarjeta de Sonido", n: 7, t: "¿Por qué un DAC/AMP externo USB puede sonar mejor que el audio integrado de la placa madre?", h: "El audio integrado está expuesto al ruido eléctrico interno del gabinete. Un DAC USB procesa el audio fuera del gabinete, aislado de interferencias electromagnéticas.", tags: ["DAC", "Ruido", "Calidad"], c: ["yw", "pk", "gn"] },
+            { g: "Tarjeta de Sonido", n: 8, t: "¿Para qué sirve el conector TOSLINK óptico? ¿Qué ventaja tiene sobre el jack 3.5mm?", h: "TOSLINK transmite audio digital por fibra óptica: sin interferencia electromagnética, ideal para conexiones largas y equipos Hi-Fi. Soporta hasta 7.1 surround digital.", tags: ["TOSLINK", "Digital", "Hi-Fi"], c: ["cy", "gn", "yw"] },
+            { g: "Tarjeta de Red", n: 9, t: "¿Cuál es la diferencia entre una dirección IP y una dirección MAC?", h: "MAC: identificador físico único del hardware de red (permanente). IP: dirección lógica asignada por la red (puede cambiar). Son dos capas distintas del modelo OSI.", tags: ["MAC", "IP", "Redes"], c: ["cy", "gn", "yw"] },
+            { g: "Tarjeta de Red", n: 10, t: "¿Por qué para gaming se prefiere Ethernet por cable sobre Wi-Fi, aunque ambos tengan la misma velocidad?", h: "Ethernet tiene latencia más baja y estable. Wi-Fi sufre de jitter (variación de latencia) por interferencias y retransmisiones. En juegos online, 5ms de diferencia puede ser decisivo.", tags: ["Gaming", "Latencia", "Ethernet"], c: ["cy", "pk", "gn"] },
+            { g: "Tarjeta de Red", n: 11, t: "¿Qué es el Wi-Fi 6 (802.11ax) y en qué mejora al Wi-Fi 5?", h: "Wi-Fi 6 usa OFDMA y MU-MIMO mejorado: más dispositivos simultáneos, mejor rendimiento en entornos congestionados (edificios, hogares con muchos dispositivos), y menor latencia.", tags: ["Wi-Fi 6", "802.11ax", "Red"], c: ["cy", "gn", "yw"] },
+            { g: "Tarjeta de Red", n: 12, t: "¿Qué es el 'Wake-on-LAN' y en qué situaciones resulta útil?", h: "Permite encender una PC remotamente. Útil para administradores de red, trabajo remoto, o encender la PC del hogar desde otro lugar para acceder a archivos.", tags: ["WoL", "Red", "Curiosidad"], c: ["gn", "cy", "pk"] },
+            { g: "Reflexión general", n: 13, t: "¿Qué tarjeta de expansión tiene mayor impacto en el rendimiento para un estudiante de informática? ¿Por qué?", h: "Depende del uso: para programación, la CPU/RAM importan más. Para gaming o diseño, la GPU. Para trabajo en red, la NIC. Reflexioná desde tu experiencia.", tags: ["Reflexión", "Prioridades"], c: ["gn", "yw"] },
+            { g: "Reflexión general", n: 14, t: "¿Puede una computadora funcionar sin tarjeta de video, sin tarjeta de sonido y sin tarjeta de red?", h: "Sin GPU dedicada, sí (con iGPU). Sin sonido, sí (modo silencio). Sin red... técnicamente sí, pero la utilidad moderna es muy limitada. Probá razonar cada caso.", tags: ["Reflexión", "Hardware"], c: ["cy", "pk", "gn"] },
+            { g: "Reflexión general", n: 15, t: "¿Por qué crees que hoy estas tarjetas vienen integradas en la placa madre en vez de ser componentes separados?", h: "Reducción de costos, espacio, energía y complejidad. La integración democratizó el acceso a estas funciones. Solo cuando se necesita más rendimiento se agrega una tarjeta dedicada.", tags: ["Integración", "Evolución", "Historia"], c: ["gn", "yw", "cy"] },
+        ];
+        let oQ = new Set(), cvs = [];
+        function sh(id) { document.querySelectorAll('.sec').forEach(s => s.classList.remove('active')); document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('tab-' + id).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function renderQ() { const c = document.getElementById('qc'); let lg = ''; Qs.forEach(q => { if (q.g !== lg) { lg = q.g; const d = document.createElement('div'); d.className = 'qgt'; d.textContent = q.g; c.appendChild(d); } const b = document.createElement('div'); b.className = 'qb'; b.id = 'q-' + q.n; b.innerHTML = `<div class="qh" onclick="tq(${q.n})"><div class="qn">${q.n}</div><div class="qt">${q.t}</div><span class="qa">▼</span></div><div class="qbody"><div class="qbi"><p>💡 <em>${q.h}</em></p><div class="qtags">${q.tags.map((t, i) => `<span class="tag ${q.c[i]}">${t}</span>`).join('')}</div></div></div>`; c.appendChild(b); }); }
+        function tq(n) { const b = document.getElementById('q-' + n); const w = b.classList.contains('open'); document.querySelectorAll('.qb').forEach(x => x.classList.remove('open')); if (!w) { b.classList.add('open'); oQ.add(n); upP(); } }
+        function upP() { const p = Math.round(oQ.size / Qs.length * 100); document.getElementById('pf').style.width = p + '%'; document.getElementById('pl').textContent = oQ.size + ' de ' + Qs.length + ' preguntas leídas'; }
+        document.getElementById('cm').addEventListener('input', function () { document.getElementById('cc').textContent = this.value.length + ' / 500'; });
+        function sendC() { const n = document.getElementById('cn').value.trim() || 'Anónimo'; const t = document.getElementById('ct').value; const m = document.getElementById('cm').value.trim(); if (!m) { const el = document.getElementById('cm'); el.style.borderColor = '#ef4444'; setTimeout(() => el.style.borderColor = '', 1500); return; } cvs.unshift({ n, t, m, h: new Date() }); rf(); document.getElementById('cm').value = ''; document.getElementById('cn').value = ''; document.getElementById('ct').value = ''; document.getElementById('cc').textContent = '0 / 500'; }
+        function rf() { const f = document.getElementById('feed'); if (!cvs.length) { f.innerHTML = '<p style="color:var(--m);font-size:.88rem;text-align:center;padding:2rem">Aún no hay consultas. ¡Sé el primero! 🙋</p>'; return; } f.innerHTML = ''; cvs.forEach(c => { const d = document.createElement('div'); d.className = 'ci-item'; const h = c.h.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }); d.innerHTML = `<div class="meta"><span class="nm">👤 ${e(c.n)}</span>${c.t ? `<span class="tp">${e(c.t)}</span>` : ''}<span class="tm">${h}</span></div><div class="mg">${e(c.m)}</div>`; f.appendChild(d); }); }
+        function e(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        renderQ();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1369 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Placa Madre — Laboratorio de Informática</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0d1117;
+            --s: #161b22;
+            --s2: #1f2937;
+            --bd: #30363d;
+            --a: #8b5cf6;
+            --a2: #a78bfa;
+            --a3: #10b981;
+            --text: #e6edf3;
+            --m: #8b949e;
+            --r: 12px;
+            --rs: 8px;
+            --sh: 0 4px 24px rgba(0, 0, 0, .45)
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.5rem 1.5rem 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #0a0414 0%, #1a0833 50%, #0d1117 100%);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 50% at 30% -10%, rgba(139, 92, 246, .22) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(167, 139, 250, .15) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, .15);
+            border: 1px solid rgba(139, 92, 246, .4);
+            color: #c4b5fd;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .25rem .85rem;
+            border-radius: 999px;
+            margin-bottom: 1.1rem
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #ede9fe, #c4b5fd, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .6rem
+        }
+
+        header p.sub {
+            color: var(--m);
+            max-width: 640px;
+            margin: 0 auto;
+            font-size: 1rem
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .7rem 1.5rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        .breadcrumb a {
+            color: var(--m);
+            text-decoration: none
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text)
+        }
+
+        .breadcrumb .cur {
+            color: var(--a)
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: 1.1rem 1rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        nav.tabs button {
+            background: transparent;
+            border: 1px solid var(--bd);
+            color: var(--m);
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: .5rem 1.1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .25s
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--a);
+            color: var(--a)
+        }
+
+        nav.tabs button.active {
+            background: var(--a);
+            border-color: var(--a);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(139, 92, 246, .4)
+        }
+
+        .sec {
+            display: none;
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem 4rem;
+            animation: fi .35s ease
+        }
+
+        .sec.active {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.8rem
+        }
+
+        .sec-title .icon {
+            font-size: 1.6rem
+        }
+
+        .sec-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700
+        }
+
+        .sec-title p {
+            font-size: .9rem;
+            color: var(--m);
+            margin-top: .15rem
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.15rem 1rem;
+            cursor: pointer;
+            transition: all .25s;
+            text-align: center
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sh)
+        }
+
+        .card .em {
+            font-size: 2.1rem;
+            display: block;
+            margin-bottom: .5rem
+        }
+
+        .card h3 {
+            font-size: .93rem;
+            font-weight: 600;
+            margin-bottom: .3rem
+        }
+
+        .card p {
+            font-size: .75rem;
+            color: var(--m)
+        }
+
+        .card.c1 {
+            border-top: 3px solid #8b5cf6
+        }
+
+        .card.c2 {
+            border-top: 3px solid #06b6d4
+        }
+
+        .card.c3 {
+            border-top: 3px solid #f59e0b
+        }
+
+        .card.c4 {
+            border-top: 3px solid #10b981
+        }
+
+        .card.c5 {
+            border-top: 3px solid #ef4444
+        }
+
+        .card.c6 {
+            border-top: 3px solid #ec4899
+        }
+
+        .card:hover.c1 {
+            border-color: #8b5cf6
+        }
+
+        .card:hover.c2 {
+            border-color: #06b6d4
+        }
+
+        .card:hover.c3 {
+            border-color: #f59e0b
+        }
+
+        .card:hover.c4 {
+            border-color: #10b981
+        }
+
+        .card:hover.c5 {
+            border-color: #ef4444
+        }
+
+        .card:hover.c6 {
+            border-color: #ec4899
+        }
+
+        .lnk {
+            font-size: .7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: .4rem
+        }
+
+        .c1 .lnk {
+            color: #c4b5fd
+        }
+
+        .c2 .lnk {
+            color: #67e8f9
+        }
+
+        .c3 .lnk {
+            color: #fcd34d
+        }
+
+        .c4 .lnk {
+            color: #6ee7b7
+        }
+
+        .c5 .lnk {
+            color: #fca5a5
+        }
+
+        .c6 .lnk {
+            color: #fbcfe8
+        }
+
+        .ib {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.05rem 1.25rem;
+            font-size: .87rem;
+            color: var(--m);
+            margin-bottom: 1.2rem
+        }
+
+        .ib.p {
+            border-left: 3px solid var(--a)
+        }
+
+        .ib.t {
+            border-left: 3px solid #06b6d4
+        }
+
+        .ib.g {
+            border-left: 3px solid var(--a3)
+        }
+
+        .ib.y {
+            border-left: 3px solid #f59e0b
+        }
+
+        .ib.r {
+            border-left: 3px solid #ef4444
+        }
+
+        .sh {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 1.8rem 0 .85rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .sh::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--bd);
+            margin-left: .5rem
+        }
+
+        /* HISTORY TIMELINE */
+        .timeline {
+            position: relative;
+            padding-left: 1.8rem;
+            margin-bottom: 1.5rem
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: .6rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--bd)
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 1.2rem
+        }
+
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: .35rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--a);
+            border: 2px solid var(--bg)
+        }
+
+        .tl-year {
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--a2);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: .15rem
+        }
+
+        .tl-item p {
+            font-size: .85rem;
+            color: var(--m)
+        }
+
+        /* SOCKETS TABLE */
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: .84rem
+        }
+
+        .tbl th {
+            background: var(--s2);
+            padding: .6rem .85rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: .75rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--m);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        .tbl td {
+            padding: .55rem .85rem;
+            border-bottom: 1px solid var(--bd);
+            vertical-align: top
+        }
+
+        .tbl tr:last-child td {
+            border-bottom: none
+        }
+
+        .tbl tr:hover td {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .tag {
+            font-size: .7rem;
+            padding: .15rem .5rem;
+            border-radius: 999px;
+            font-weight: 600;
+            display: inline-block
+        }
+
+        .tag.p {
+            background: rgba(139, 92, 246, .15);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, .3)
+        }
+
+        .tag.t {
+            background: rgba(6, 182, 212, .12);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, .3)
+        }
+
+        .tag.g {
+            background: rgba(16, 185, 129, .12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, .3)
+        }
+
+        .tag.y {
+            background: rgba(245, 158, 11, .12);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, .3)
+        }
+
+        .tag.r {
+            background: rgba(239, 68, 68, .12);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, .3)
+        }
+
+        /* ZONES MAP */
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: .85rem;
+            margin-bottom: 1.5rem
+        }
+
+        .zone {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .95rem 1rem;
+            transition: box-shadow .2s
+        }
+
+        .zone:hover {
+            box-shadow: 0 0 0 1px var(--a)
+        }
+
+        .zone .ztitle {
+            font-size: .88rem;
+            font-weight: 600;
+            margin-bottom: .35rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .zone p {
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        /* QUESTIONS */
+        .qgt {
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--m);
+            margin: 1.8rem 0 .7rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .qgt::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--bd)
+        }
+
+        .qb {
+            margin-bottom: .75rem;
+            border-radius: var(--r);
+            border: 1px solid var(--bd);
+            overflow: hidden;
+            background: var(--s);
+            transition: box-shadow .2s
+        }
+
+        .qb:hover {
+            box-shadow: 0 0 0 1px var(--a)
+        }
+
+        .qh {
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            padding: .9rem 1.2rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .qn {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, .12);
+            border: 1px solid rgba(139, 92, 246, .3);
+            color: #c4b5fd;
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .qt {
+            flex: 1;
+            font-size: .92rem;
+            font-weight: 500
+        }
+
+        .qa {
+            font-size: .78rem;
+            color: var(--m);
+            transition: transform .25s
+        }
+
+        .qb.open .qa {
+            transform: rotate(180deg)
+        }
+
+        .qbody {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+
+        .qb.open .qbody {
+            max-height: 500px
+        }
+
+        .qbi {
+            padding: .85rem 1.2rem 1.1rem;
+            border-top: 1px solid var(--bd)
+        }
+
+        .qbi p {
+            color: var(--m);
+            font-size: .87rem;
+            margin-bottom: .75rem
+        }
+
+        .qtags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem
+        }
+
+        .pb-w {
+            background: var(--s2);
+            border-radius: 999px;
+            height: 8px;
+            margin-bottom: .5rem;
+            overflow: hidden
+        }
+
+        .pb-f {
+            height: 100%;
+            background: linear-gradient(90deg, var(--a), var(--a2));
+            border-radius: 999px;
+            transition: width .4s ease;
+            width: 0%
+        }
+
+        .pb-l {
+            font-size: .78rem;
+            color: var(--m);
+            text-align: right;
+            margin-bottom: 1.5rem
+        }
+
+        /* VIDEO */
+        .vpair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .vw {
+            position: relative;
+            width: 100%;
+            border-radius: var(--r);
+            overflow: hidden;
+            border: 1px solid var(--bd);
+            box-shadow: var(--sh);
+            background: #000;
+            display: block;
+            text-decoration: none
+        }
+
+        .vw img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            opacity: .82;
+            transition: opacity .3s, transform .3s
+        }
+
+        .vw:hover img {
+            opacity: .6;
+            transform: scale(1.03)
+        }
+
+        .vpb {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, .93);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .25s, background .25s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .5)
+        }
+
+        .vpb svg {
+            margin-left: 4px
+        }
+
+        .vw:hover .vpb {
+            transform: translate(-50%, -50%) scale(1.12);
+            background: #ff0000
+        }
+
+        .vw:hover .vpb svg path {
+            fill: #fff
+        }
+
+        .vl {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .88));
+            padding: 1.2rem 1rem .75rem;
+            color: #fff;
+            font-size: .8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .45rem
+        }
+
+        .ytb {
+            background: #ff0000;
+            color: #fff;
+            font-size: .6rem;
+            font-weight: 700;
+            padding: .12rem .45rem;
+            border-radius: 4px;
+            flex-shrink: 0
+        }
+
+        /* VIDEO NOTES */
+        .vn {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.4rem;
+            margin-bottom: 1.5rem
+        }
+
+        .vn h3 {
+            font-size: .93rem;
+            font-weight: 600;
+            margin-bottom: 1rem
+        }
+
+        .cg {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: .5rem
+        }
+
+        .chip {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: 999px;
+            padding: .3rem .85rem;
+            font-size: .78rem;
+            color: var(--m);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .chip:hover,
+        .chip.sel {
+            background: rgba(139, 92, 246, .12);
+            border-color: var(--a);
+            color: var(--a2)
+        }
+
+        .sg {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: .6rem;
+            margin-bottom: .75rem
+        }
+
+        .sc {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .7rem .9rem;
+            font-size: .81rem;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--m)
+        }
+
+        .sc:hover {
+            border-color: var(--a2);
+            color: var(--text);
+            background: rgba(139, 92, 246, .06)
+        }
+
+        .sc .sn {
+            color: var(--a2);
+            font-weight: 700;
+            margin-right: .3rem;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        /* CONSULTA */
+        .cb {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem
+        }
+
+        .cb h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem
+        }
+
+        .ir {
+            display: flex;
+            gap: .75rem;
+            margin-bottom: .75rem;
+            flex-wrap: wrap
+        }
+
+        .ir input,
+        .ir select {
+            flex: 1;
+            min-width: 140px;
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .6rem .9rem;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .ir input:focus,
+        .ir select:focus {
+            border-color: var(--a)
+        }
+
+        .ir select option {
+            background: var(--s2)
+        }
+
+        textarea.ci {
+            width: 100%;
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .8rem 1rem;
+            min-height: 90px;
+            resize: vertical;
+            outline: none;
+            transition: border-color .2s;
+            margin-bottom: .75rem
+        }
+
+        textarea.ci:focus {
+            border-color: var(--a)
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            background: var(--a);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .6rem 1.3rem;
+            border: none;
+            border-radius: var(--rs);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn:hover {
+            background: #7c3aed;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(139, 92, 246, .35)
+        }
+
+        .btn.g {
+            background: var(--a3)
+        }
+
+        .btn.g:hover {
+            background: #059669
+        }
+
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem
+        }
+
+        .ci-item {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .9rem 1rem;
+            animation: fi .3s ease
+        }
+
+        .ci-item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            align-items: center;
+            margin-bottom: .4rem
+        }
+
+        .ci-item .nm {
+            font-weight: 600;
+            font-size: .85rem
+        }
+
+        .ci-item .tp {
+            font-size: .7rem;
+            padding: .15rem .55rem;
+            background: rgba(139, 92, 246, .12);
+            color: #c4b5fd;
+            border-radius: 999px;
+            font-weight: 600
+        }
+
+        .ci-item .tm {
+            font-size: .7rem;
+            color: var(--m);
+            margin-left: auto
+        }
+
+        .ci-item .mg {
+            font-size: .87rem;
+            color: var(--m)
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--bd);
+            color: var(--m);
+            font-size: .78rem;
+            background: var(--s)
+        }
+
+        @media(max-width:640px) {
+            nav.tabs button {
+                font-size: .74rem;
+                padding: .4rem .8rem
+            }
+
+            .vpair {
+                grid-template-columns: 1fr
+            }
+
+            .ir {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <span class="badge">Laboratorio de Informática · Unidad 1</span>
+        <h1>🔌 Placa Madre</h1>
+        <p class="sub">La columna vertebral de la computadora: conecta, coordina y da vida a todos los componentes.</p>
+    </header>
+    <div class="breadcrumb">
+        <a href="Uni 1 - Hardware.html">🖥️ Hardware</a><span style="opacity:.5"> › </span><span class="cur">🔌 Placa
+            Madre</span>
+    </div>
+    <nav class="tabs">
+        <button class="active" onclick="sh('intro')" id="tab-intro">🔌 Intro</button>
+        <button onclick="sh('componentes')" id="tab-componentes">🧩 Componentes</button>
+        <button onclick="sh('historia')" id="tab-historia">📜 Historia</button>
+        <button onclick="sh('preguntas')" id="tab-preguntas">❓ Preguntas</button>
+        <button onclick="sh('videos')" id="tab-videos">▶️ Videos</button>
+
+    </nav>
+
+    <!-- INTRO -->
+    <section id="intro" class="sec active">
+        <div class="sec-title"><span class="icon">🔌</span>
+            <div>
+                <h2>¿Qué es la Placa Madre?</h2>
+                <p>El hub central que une todos los componentes del sistema</p>
+            </div>
+        </div>
+        <p style="color:var(--m);margin-bottom:1.5rem;font-size:.95rem">La <strong style="color:var(--text)">placa
+                madre</strong> (motherboard o mainboard) es el circuito impreso principal de la computadora.
+            Su función es <strong style="color:var(--text)">interconectar</strong> todos los componentes: CPU, RAM,
+            almacenamiento, tarjetas de expansión y periféricos,
+            permitiéndoles comunicarse entre sí a través de <em>buses de datos</em>. También distribuye la energía de la
+            fuente de alimentación.</p>
+        <div class="grid">
+            <div class="card c1" onclick="sh('componentes')"><span class="em">🧩</span>
+                <h3>Componentes y slots</h3>
+                <p>Socket CPU, ranuras RAM, PCIe, SATA, conectores de energía y más.</p><span class="lnk">Ver detalle
+                    →</span>
+            </div>
+            <div class="card c2" onclick="sh('componentes')"><span class="em">🗺️</span>
+                <h3>Zonas de la placa</h3>
+                <p>Área de CPU, chipset, zona de energía (VRM), zona de I/O y ranuras de expansión.</p><span
+                    class="lnk">Ver detalle →</span>
+            </div>
+            <div class="card c3" onclick="sh('historia')"><span class="em">📜</span>
+                <h3>Historia y evolución</h3>
+                <p>Desde las primeras placas XT en los 80 hasta las modernas ATX con PCIe 5.0 y DDR5.</p><span
+                    class="lnk">Ver detalle →</span>
+            </div>
+            <div class="card c4" onclick="sh('componentes')"><span class="em">🔩</span>
+                <h3>Factores de forma</h3>
+                <p>ATX, Micro-ATX, Mini-ITX: tamaños estándar y sus diferencias.</p><span class="lnk">Ver detalle
+                    →</span>
+            </div>
+            <div class="card c5" onclick="sh('componentes')"><span class="em">🔗</span>
+                <h3>Tipos de sockets</h3>
+                <p>LGA, PGA, BGA: cómo se conecta la CPU a la placa y qué compatibilidades existen.</p><span
+                    class="lnk">Ver detalle →</span>
+            </div>
+            <div class="card c6" onclick="sh('videos')"><span class="em">▶️</span>
+                <h3>Videos de estudio</h3>
+                <p>Dos videos que explican visualmente la placa madre y sus partes.</p><span class="lnk">Ver videos
+                    →</span>
+            </div>
+        </div>
+        <div class="ib p">💡 <strong style="color:var(--text)">¿Sabías que?</strong> Una placa madre moderna tiene hasta
+            <strong style="color:var(--text)">2.000 componentes</strong> individuales: transistores, capacitores,
+            resistencias, inductores y conectores, todo en un circuito impreso multicapa de 6 a 12 capas de cobre.
+        </div>
+    </section>
+
+    <!-- COMPONENTES -->
+    <section id="componentes" class="sec">
+        <div class="sec-title"><span class="icon">🧩</span>
+            <div>
+                <h2>Componentes y Zonas</h2>
+                <p>Qué tiene una placa madre, dónde se ubica y para qué sirve cada cosa</p>
+            </div>
+        </div>
+
+        <div class="sh">🗺️ Zonas principales de la placa madre</div>
+        <div class="zones-grid">
+            <div class="zone">
+                <div class="ztitle">⚙️ <span>Socket CPU</span></div>
+                <p>El zócalo donde se instala el procesador. Su diseño varía según el fabricante (Intel o AMD) y la
+                    generación del procesador.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">⚡ <span>VRM (Regulador de voltaje)</span></div>
+                <p>Convierte el voltaje de la fuente en niveles estables y precisos para la CPU. Más fases = más
+                    estabilidad, mejor overclock.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🧠 <span>Slots de RAM (DIMM)</span></div>
+                <p>Ranuras donde se instalan los módulos de memoria. Suelen ser 2 o 4. El color diferencia los canales
+                    (dual channel).</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🔮 <span>Chipset</span></div>
+                <p>Chip que gestiona la comunicación entre CPU, RAM, PCIe, USB y almacenamiento. Determina las funciones
+                    disponibles.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🎮 <span>Slots PCIe</span></div>
+                <p>Ranuras de expansión para tarjetas de video (x16), tarjetas de red, capturadoras y SSD M.2 mediante
+                    adaptadores.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">💾 <span>Conectores SATA</span></div>
+                <p>Puertos para conectar discos HDD y SSD 2.5"/3.5". Una placa típica tiene 4–8 puertos SATA.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🔬 <span>Slots M.2</span></div>
+                <p>Ranuras para SSD NVMe compactos. Pueden ser SATA o PCIe. Las placas modernas tienen 2–4 slots M.2.
+                </p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🔌 <span>Panel I/O trasero</span></div>
+                <p>Puertos USB, HDMI/DisplayPort, audio, Ethernet, Thunderbolt y antenas Wi-Fi. Es la "cara" trasera
+                    visible de la placa.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🔋 <span>Conector 24-pin ATX</span></div>
+                <p>Conector principal de energía desde la fuente. El secundario EPS (4/8 pin) alimenta específicamente
+                    la CPU.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🕹️ <span>BIOS / UEFI</span></div>
+                <p>Chip que contiene el firmware de arranque. Permite configurar el hardware antes de que cargue el
+                    sistema operativo.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🔑 <span>Pila CMOS</span></div>
+                <p>Pequeña batería CR2032 que mantiene la hora y la configuración del BIOS cuando la PC está
+                    desenchufada.</p>
+            </div>
+            <div class="zone">
+                <div class="ztitle">🌡️ <span>Cabezales (headers)</span></div>
+                <p>Conectores para botones del gabinete, LEDs, ventiladores, USB frontales y el pin de speaker del panel
+                    frontal.</p>
+            </div>
+        </div>
+
+        <div class="sh">🔩 Factores de forma (tamaños estándar)</div>
+        <div style="overflow-x:auto;margin-bottom:1.5rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Formato</th>
+                        <th>Tamaño aprox.</th>
+                        <th>Slots PCIe</th>
+                        <th>Slots RAM</th>
+                        <th>Uso típico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag p">ATX</span></td>
+                        <td>305 × 244 mm</td>
+                        <td>7</td>
+                        <td>4</td>
+                        <td>PC de escritorio completa, gaming, workstation</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag t">Micro-ATX</span></td>
+                        <td>244 × 244 mm</td>
+                        <td>4</td>
+                        <td>4</td>
+                        <td>PC compacta de escritorio, buen balance tamaño/expansión</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag g">Mini-ITX</span></td>
+                        <td>170 × 170 mm</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>PCs muy pequeñas (HTPC, NAS), limitada expansión</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag y">E-ATX</span></td>
+                        <td>305 × 330 mm</td>
+                        <td>7+</td>
+                        <td>8</td>
+                        <td>Workstations y servidores de alto rendimiento</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">🔗 Tipos de socket de CPU</div>
+        <div style="overflow-x:auto;margin-bottom:1.5rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Quién lo usa</th>
+                        <th>Pines en…</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag t">LGA</span></td>
+                        <td>Land Grid Array. Los pines están en la placa, el procesador tiene contactos planos.</td>
+                        <td>Intel (LGA1700, LGA1851)</td>
+                        <td>La placa madre</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag g">PGA</span></td>
+                        <td>Pin Grid Array. Los pines están en el procesador, la placa tiene agujeros.</td>
+                        <td>AMD (AM4, hasta AM5 pasó a LGA)</td>
+                        <td>El procesador</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag p">AM5</span></td>
+                        <td>Nuevo socket AMD. Cambió de PGA a LGA desde la serie Ryzen 7000.</td>
+                        <td>AMD Ryzen 7000/8000/9000</td>
+                        <td>La placa madre</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag r">BGA</span></td>
+                        <td>Ball Grid Array. CPU soldada directamente, sin zócalo. No es intercambiable.</td>
+                        <td>Laptops, tablets, celulares</td>
+                        <td>Soldado a la placa</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="ib g">⚠️ <strong style="color:var(--text)">Compatibilidad:</strong> Un procesador solo funciona con
+            placas que tengan el mismo socket. El socket también determina qué generaciones de RAM son compatibles (DDR4
+            o DDR5).</div>
+    </section>
+
+    <!-- HISTORIA -->
+    <section id="historia" class="sec">
+        <div class="sec-title"><span class="icon">📜</span>
+            <div>
+                <h2>Historia y Evolución</h2>
+                <p>De los circuitos separados de los 70 a las placas ultra-integradas de hoy</p>
+            </div>
+        </div>
+        <div class="ib p">🕹️ La placa madre no siempre existió como la conocemos. Los primeras computadoras tenían
+            tarjetas separadas para cada función, conectadas por un <em>backplane</em>. El concepto de placa base
+            integrada apareció con las PCs de IBM en los años 80.</div>
+
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-year">1981</div>
+                <p><strong style="color:var(--text)">IBM PC XT:</strong> Primera placa madre masiva. Bus ISA de 8 bits,
+                    socket para Intel 8088. Todo en una sola placa, un hito industrial.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">1984–1987</div>
+                <p><strong style="color:var(--text)">AT y Bus ISA 16 bits:</strong> Placa más grande con Intel 286/386.
+                    Más ranuras y mayor ancho de banda. Nace el factor de forma AT.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">1995</div>
+                <p><strong style="color:var(--text)">Estándar ATX (Intel):</strong> Intel define el factor de forma ATX,
+                    todavía vigente hoy. Mejor circulación de aire, conector de energía estandarizado y layout moderno.
+                </p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">1997–2000</div>
+                <p><strong style="color:var(--text)">AGP, USB 1.1, Slot 1:</strong> Llega el bus AGP exclusivo para
+                    tarjetas gráficas, los primeros puertos USB y los sockets Slot 1/Slot A para Pentium II/III y
+                    Athlon.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">2003–2006</div>
+                <p><strong style="color:var(--text)">PCIe reemplaza AGP:</strong> PCI Express revoluciona la expansión
+                    con velocidades de transferencia escalables (x1, x4, x8, x16). USB 2.0 y SATA reemplazan
+                    IDE/Paralelo.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">2011–2017</div>
+                <p><strong style="color:var(--text)">UEFI, USB 3.0, M.2:</strong> El BIOS clásico es reemplazado por
+                    UEFI moderno (interfaz gráfica, arranque rápido). Aparecen los primeros slots M.2 para SSD NVMe.
+                    DDR4 llega al mercado masivo.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">2021–2023</div>
+                <p><strong style="color:var(--text)">DDR5, PCIe 5.0, WiFi integrado:</strong> Las placas modernas
+                    incluyen Wi-Fi 6E y Bluetooth de fábrica, varios slots M.2 NVMe, conectividad 2.5G Ethernet y PCIe
+                    5.0 para velocidades mayores a 10 GB/s en SSD.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-year">Hoy</div>
+                <p><strong style="color:var(--text)">Integración extrema:</strong> Algunas placas incluyen I/O dedicada,
+                    controladores de almacenamiento integrados, refrigeración de chipset y hasta sistemas de iluminación
+                    ARGB sincronizable.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREGUNTAS -->
+    <section id="preguntas" class="sec">
+        <div class="sec-title"><span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Investigación</h2>
+                <p>Abrí cada pregunta para ver la pista de búsqueda</p>
+            </div>
+        </div>
+        <div class="pb-w">
+            <div class="pb-f" id="pf"></div>
+        </div>
+        <div class="pb-l" id="pl">0 de 14 preguntas leídas</div>
+        <div id="qc"></div>
+    </section>
+
+    <!-- VIDEOS -->
+    <section id="videos" class="sec">
+        <div class="sec-title"><span class="icon">▶️</span>
+            <div>
+                <h2>Videos de Estudio</h2>
+                <p>Mirá los videos y completá las actividades</p>
+            </div>
+        </div>
+        <div class="vpair">
+            <a class="vw" href="https://www.youtube.com/watch?v=3uJCSs1jeWU" target="_blank" rel="noopener">
+                <img src="https://img.youtube.com/vi/3uJCSs1jeWU/hqdefault.jpg"
+                    onerror="this.src='https://img.youtube.com/vi/3uJCSs1jeWU/mqdefault.jpg'" alt="Video placa madre 1"
+                    loading="lazy" />
+                <div class="vpb"><svg width="22" height="22" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="vl"><span class="ytb">YouTube</span>¿Qué es una Placa Madre?</div>
+            </a>
+            <a class="vw" href="https://www.youtube.com/watch?v=B8sTUfusKyo" target="_blank" rel="noopener">
+                <img src="https://img.youtube.com/vi/B8sTUfusKyo/hqdefault.jpg"
+                    onerror="this.src='https://img.youtube.com/vi/B8sTUfusKyo/mqdefault.jpg'" alt="Video placa madre 2"
+                    loading="lazy" />
+                <div class="vpb"><svg width="22" height="22" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="vl"><span class="ytb">YouTube</span>Partes de la Motherboard explicadas</div>
+            </a>
+        </div>
+        <div class="vn">
+            <h3>🏷️ Marcá los temas que aparecen en los videos</h3>
+            <div class="cg" id="chips"></div>
+            <p style="font-size:.77rem;color:var(--m);margin-top:.5rem" id="cs">Ningún tema seleccionado.</p>
+        </div>
+        <div class="vn">
+            <h3>💬 Preguntas para reflexionar después de ver los videos</h3>
+            <div class="sg" id="sug"></div>
+            <p style="font-size:.77rem;color:var(--m)">Hacé clic en una pregunta para enviarla a 💬 Consulta</p>
+        </div>
+        <div class="vn">
+            <h3>⭐ ¿Qué aprendiste de los videos?</h3>
+            <textarea class="ci" id="vnote"
+                placeholder="Escribí algo que te llamó la atención, una duda, o una conclusión…"></textarea>
+            <button class="btn g" onclick="saveNote()">💾 Guardar nota</button>
+            <span id="ns" style="margin-left:.7rem;font-size:.82rem;color:var(--a3);display:none">✓ Guardada</span>
+        </div>
+    </section>
+
+    <footer>Laboratorio de Informática · Unidad 1: Partes de la Computadora &nbsp;›&nbsp; Placa Madre (Motherboard)
+    </footer>
+
+    <script>
+        const Qs = [
+            { g: "¿Qué es la placa madre?", n: 1, t: "¿Cuál es la función principal de la placa madre en una computadora?", h: "No solo conecta: también distribuye energía y permite que todos los componentes se comuniquen a través de buses de datos.", tags: ["Función", "Definición"], c: ["p", "t"] },
+            { g: "¿Qué es la placa madre?", n: 2, t: "¿Qué es un 'bus de datos' y qué papel cumple en la placa madre?", h: "El bus es como una autopista de datos entre componentes. Investigá qué es el bus del sistema, el bus de memoria y el bus PCIe.", tags: ["Bus", "Comunicación"], c: ["t", "g"] },
+            { g: "¿Qué es la placa madre?", n: 3, t: "¿Qué es el chipset de una placa madre y cómo determina sus características?", h: "El chipset gestiona el tráfico de datos entre CPU, RAM y periféricos. Compará un chipset de gama alta (Z790) con uno básico (B760).", tags: ["Chipset", "Gamas"], c: ["p", "y"] },
+            { g: "Componentes y slots", n: 4, t: "¿Por qué existen diferentes tipos de socket (LGA, PGA, BGA) y cuál es la ventaja de cada uno?", h: "LGA: pines en la placa (más fácil reemplazar CPU). PGA: pines en la CPU. BGA: soldado permanentemente (laptops, celulares).", tags: ["Socket", "LGA", "PGA"], c: ["t", "p", "g"] },
+            { g: "Componentes y slots", n: 5, t: "¿Qué es PCIe y cuántas versiones existen? ¿Qué dispositivos usan un slot PCIe x16?", h: "PCIe evoluciona duplicando velocidad cada generación (PCIe 3.0 → 4.0 → 5.0). El slot x16 es para tarjetas gráficas; x4 y x1 para periféricos.", tags: ["PCIe", "Expansión", "GPU"], c: ["g", "t", "p"] },
+            { g: "Componentes y slots", n: 6, t: "¿Cuántos slots de RAM tiene típicamente una placa ATX y qué es el 'dual channel'?", h: "ATX estándar tiene 4 slots DIMM. Al poblar 2 de forma simétrica se activa dual channel, que casi duplica el ancho de banda de memoria.", tags: ["RAM", "Dual channel"], c: ["p", "g"] },
+            { g: "Factores de forma", n: 7, t: "¿Qué diferencias prácticas hay entre una placa ATX y una Mini-ITX para armar una PC?", h: "Mini-ITX: chica, 1 slot PCIe, 2 slots RAM, menos conectores SATA. ATX: más expansión, mejor refrigeración, compatible con más gabinetes.", tags: ["ATX", "Mini-ITX", "Formato"], c: ["y", "t", "p"] },
+            { g: "BIOS y UEFI", n: 8, t: "¿Qué es la BIOS y qué diferencia hay con la UEFI moderna?", h: "BIOS (1980): interfaz de texto, 16 bits, no soporta discos >2 TB. UEFI (2005+): interfaz gráfica, 64 bits, arranque rápido y soporte para discos grandes.", tags: ["BIOS", "UEFI", "Arranque"], c: ["p", "t", "g"] },
+            { g: "BIOS y UEFI", n: 9, t: "¿Para qué sirve la pila CMOS de la placa madre? ¿Qué pasa si se agota?", h: "Mantiene el reloj del sistema y la configuración del BIOS sin electricidad. Si se agota, la PC pierde la hora y vuelve a los ajustes de fábrica.", tags: ["CMOS", "Pila", "BIOS"], c: ["y", "p", "t"] },
+            { g: "VRM y energía", n: 10, t: "¿Qué es el VRM (Voltage Regulator Module) y por qué es importante para el overclocking?", h: "El VRM convierte los 12V de la fuente en los 0.9–1.4V que necesita la CPU. Más fases = corriente más estable = más margen para subir el voltaje (OC).", tags: ["VRM", "Voltaje", "Overclocking"], c: ["t", "p", "g"] },
+            { g: "Historia", n: 11, t: "¿Por qué el estándar ATX de 1995 fue tan importante que sigue vigente 30 años después?", h: "Definió dimensiones, ubicación de la fuente, flujo de aire y conectores de energía. Su universalidad redujo costos y facilitó el ensamblado por usuarios.", tags: ["ATX", "Historia", "Estándar"], c: ["y", "g", "t"] },
+            { g: "Historia", n: 12, t: "¿Cuáles fueron los cambios más importantes que recibió la placa madre entre 2005 y 2020?", h: "PCIe reemplazó AGP, UEFI reemplazó BIOS, llegaron USB 3.0, SATA III, M.2 NVMe y el Wi-Fi integrado. Investigá cada año clave.", tags: ["Evolución", "Historia"], c: ["p", "t"] },
+            { g: "Reflexión y videos", n: 13, t: "Según los videos: ¿cuántas zonas o áreas distinguen en la placa madre? ¿Son las mismas que se mencionan aquí?", h: "Observá cómo el video divide la placa: zona de CPU, zona de RAM, chipset, slots, I/O. Comparalo con la sección de Componentes de esta página.", tags: ["Video", "Zonas", "Observación"], c: ["g", "t", "p"] },
+            { g: "Reflexión y videos", n: 14, t: "¿Qué componente de la placa madre te resultó más difícil de entender? ¿Por qué?", h: "No hay respuesta incorrecta. Puede ser el chipset, el VRM, el tipo de socket… Escribilo en el espacio de Consulta si querés profundizar.", tags: ["Reflexión", "Personal"], c: ["y", "p"] },
+        ];
+        const chips = ["Socket CPU", "Slots RAM", "PCIe x16", "Slots M.2", "Conectores SATA", "Panel I/O", "VRM / fases", "Chipset", "Headers frontales", "BIOS/UEFI", "Pila CMOS", "Factor de forma ATX"];
+        const sugs = ["¿Cuántas partes identificaron en el video?", "¿Qué herramienta usaron para señalar cada zona?", "¿El video menciona diferencias entre marcas de placas?", "¿Se explica el VRM en el video?", "¿Qué es lo más difícil de reconocer en una placa real?", "¿Cambiarías algo de lo visto en el video?", "¿Qué pregunta le harías al docente sobre este tema?", "¿Hay componentes que no habías visto antes?"];
+        let openQ = new Set(), cvs = [];
+        function sh(id) { document.querySelectorAll('.sec').forEach(s => s.classList.remove('active')); document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('tab-' + id).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function renderQ() { const c = document.getElementById('qc'); let lg = ''; Qs.forEach(q => { if (q.g !== lg) { lg = q.g; const d = document.createElement('div'); d.className = 'qgt'; d.textContent = q.g; c.appendChild(d); } const b = document.createElement('div'); b.className = 'qb'; b.id = 'q-' + q.n; b.innerHTML = `<div class="qh" onclick="tq(${q.n})"><div class="qn">${q.n}</div><div class="qt">${q.t}</div><span class="qa">▼</span></div><div class="qbody"><div class="qbi"><p>💡 <em>${q.h}</em></p><div class="qtags">${q.tags.map((t, i) => `<span class="tag ${q.c[i]}">${t}</span>`).join('')}</div></div></div>`; c.appendChild(b); }); }
+        function tq(n) { const b = document.getElementById('q-' + n); const was = b.classList.contains('open'); document.querySelectorAll('.qb').forEach(x => x.classList.remove('open')); if (!was) { b.classList.add('open'); openQ.add(n); upP(); } }
+        function upP() { const p = Math.round(openQ.size / Qs.length * 100); document.getElementById('pf').style.width = p + '%'; document.getElementById('pl').textContent = openQ.size + ' de ' + Qs.length + ' preguntas leídas'; }
+        function renderChips() { const c = document.getElementById('chips'); chips.forEach(t => { const d = document.createElement('div'); d.className = 'chip'; d.textContent = t; d.onclick = () => { d.classList.toggle('sel'); upCS(); }; c.appendChild(d); }); }
+        function upCS() { const s = [...document.querySelectorAll('.chip.sel')].map(c => c.textContent); document.getElementById('cs').textContent = s.length ? '✓ Identificados: ' + s.join(', ') : 'Ningún tema seleccionado.'; }
+        function renderSug() { const g = document.getElementById('sug'); sugs.forEach((s, i) => { const d = document.createElement('div'); d.className = 'sc'; d.innerHTML = `<span class="sn">${String(i + 1).padStart(2, '0')}</span>${s}`; d.onclick = () => { document.getElementById('cm').value = s; document.getElementById('ct').value = 'Video 1 — ¿Qué es?'; sh('consulta'); }; g.appendChild(d); }); }
+        function saveNote() { const v = document.getElementById('vnote').value.trim(); if (!v) return; localStorage.setItem('mb_note', v); const e = document.getElementById('ns'); e.style.display = 'inline'; setTimeout(() => e.style.display = 'none', 2500); }
+        window.addEventListener('load', () => { const s = localStorage.getItem('mb_note'); if (s) document.getElementById('vnote').value = s; });
+        document.getElementById('cm').addEventListener('input', function () { document.getElementById('cc').textContent = this.value.length + ' / 500'; });
+        function send() { const n = document.getElementById('cn').value.trim() || 'Anónimo'; const t = document.getElementById('ct').value; const m = document.getElementById('cm').value.trim(); if (!m) { const el = document.getElementById('cm'); el.style.borderColor = '#ef4444'; setTimeout(() => el.style.borderColor = '', 1500); return; } cvs.unshift({ n, t, m, h: new Date() }); rf(); document.getElementById('cm').value = ''; document.getElementById('cn').value = ''; document.getElementById('ct').value = ''; document.getElementById('cc').textContent = '0 / 500'; }
+        function rf() { const f = document.getElementById('feed'); if (!cvs.length) { f.innerHTML = '<p style="color:var(--m);font-size:.88rem;text-align:center;padding:2rem">Aún no hay consultas. ¡Sé el primero! 🙋</p>'; return; } f.innerHTML = ''; cvs.forEach(c => { const d = document.createElement('div'); d.className = 'ci-item'; const h = c.h.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }); d.innerHTML = `<div class="meta"><span class="nm">👤 ${e(c.n)}</span>${c.t ? `<span class="tp">${e(c.t)}</span>` : ''}<span class="tm">${h}</span></div><div class="mg">${e(c.m)}</div>`; f.appendChild(d); }); }
+        function e(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        renderQ(); renderChips(); renderSug();
+    </script>
+</body>
+
+</html>

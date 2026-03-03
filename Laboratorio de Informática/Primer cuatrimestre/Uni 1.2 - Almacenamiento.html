@@ -1,0 +1,1519 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Almacenamiento Interno — Laboratorio de Informática</title>
+    <meta name="description" content="RAM, HDD, SSD y M.2: medios de almacenamiento interno de la computadora." />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1f2937;
+            --border: #30363d;
+            --accent: #10b981;
+            --accent2: #06b6d4;
+            --accent3: #6366f1;
+            --ram: #8b5cf6;
+            --hdd: #f59e0b;
+            --ssd: #10b981;
+            --m2: #06b6d4;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, .45);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.5rem 1.5rem 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #030f0a 0%, #042a1a 50%, #0d1117 100%);
+            border-bottom: 1px solid var(--border)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 50% at 30% -10%, rgba(16, 185, 129, .2) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(6, 182, 212, .15) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, .15);
+            border: 1px solid rgba(16, 185, 129, .4);
+            color: #6ee7b7;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .25rem .85rem;
+            border-radius: 999px;
+            margin-bottom: 1.1rem
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .6rem
+        }
+
+        header p.sub {
+            color: var(--muted);
+            max-width: 640px;
+            margin: 0 auto;
+            font-size: 1rem
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .7rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-size: .78rem;
+            color: var(--muted)
+        }
+
+        .breadcrumb a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .2s
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text)
+        }
+
+        .breadcrumb span.sep {
+            opacity: .5
+        }
+
+        .breadcrumb span.cur {
+            color: var(--accent)
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: 1.1rem 1rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        nav.tabs button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: .5rem 1.1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .25s
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        nav.tabs button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(16, 185, 129, .4)
+        }
+
+        .section {
+            display: none;
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem 4rem;
+            animation: fadeIn .35s ease
+        }
+
+        .section.active {
+            display: block
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.8rem
+        }
+
+        .section-title .icon {
+            font-size: 1.6rem
+        }
+
+        .section-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700
+        }
+
+        .section-title p {
+            font-size: .9rem;
+            color: var(--muted);
+            margin-top: .15rem
+        }
+
+        /* OVERVIEW CARDS */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .ov-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1rem;
+            cursor: pointer;
+            transition: all .25s;
+            text-align: center
+        }
+
+        .ov-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow)
+        }
+
+        .ov-card .emoji {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: .5rem
+        }
+
+        .ov-card h3 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: .3rem
+        }
+
+        .ov-card p {
+            font-size: .76rem;
+            color: var(--muted)
+        }
+
+        .ov-card.ram {
+            border-top: 3px solid var(--ram)
+        }
+
+        .ov-card.ram:hover {
+            border-color: var(--ram)
+        }
+
+        .ov-card.hdd {
+            border-top: 3px solid var(--hdd)
+        }
+
+        .ov-card.hdd:hover {
+            border-color: var(--hdd)
+        }
+
+        .ov-card.ssd {
+            border-top: 3px solid var(--ssd)
+        }
+
+        .ov-card.ssd:hover {
+            border-color: var(--ssd)
+        }
+
+        .ov-card.m2 {
+            border-top: 3px solid var(--m2)
+        }
+
+        .ov-card.m2:hover {
+            border-color: var(--m2)
+        }
+
+        /* INFO & COMPARISON BOXES */
+        .info-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.1rem 1.3rem;
+            font-size: .88rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem
+        }
+
+        .info-box.teal {
+            border-left: 3px solid var(--accent2)
+        }
+
+        .info-box.green {
+            border-left: 3px solid var(--accent)
+        }
+
+        .info-box.purple {
+            border-left: 3px solid var(--ram)
+        }
+
+        .info-box.yellow {
+            border-left: 3px solid var(--hdd)
+        }
+
+        .sub-heading {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 2rem 0 .9rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .sub-heading::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin-left: .5rem
+        }
+
+        /* STORAGE COMPARISON TABLE */
+        .storage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: .85rem
+        }
+
+        .storage-table th {
+            background: var(--surface2);
+            padding: .65rem .9rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: .78rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .storage-table td {
+            padding: .6rem .9rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top
+        }
+
+        .storage-table tr:last-child td {
+            border-bottom: none
+        }
+
+        .storage-table tr:hover td {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .tag-hdd {
+            color: var(--hdd);
+            font-weight: 600
+        }
+
+        .tag-ssd {
+            color: var(--ssd);
+            font-weight: 600
+        }
+
+        .tag-m2 {
+            color: var(--m2);
+            font-weight: 600
+        }
+
+        td.good {
+            color: #6ee7b7
+        }
+
+        td.mid {
+            color: #fdba74
+        }
+
+        td.bad {
+            color: #fca5a5
+        }
+
+        /* ACCORDION */
+        .q-group-title {
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 1.8rem 0 .7rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .q-group-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border)
+        }
+
+        .q-block {
+            margin-bottom: .75rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--surface);
+            transition: box-shadow .2s
+        }
+
+        .q-block:hover {
+            box-shadow: 0 0 0 1px var(--accent)
+        }
+
+        .q-header {
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            padding: .9rem 1.2rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .q-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, .12);
+            border: 1px solid rgba(16, 185, 129, .3);
+            color: #6ee7b7;
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .q-text {
+            flex: 1;
+            font-size: .93rem;
+            font-weight: 500
+        }
+
+        .q-arrow {
+            font-size: .78rem;
+            color: var(--muted);
+            transition: transform .25s
+        }
+
+        .q-block.open .q-arrow {
+            transform: rotate(180deg)
+        }
+
+        .q-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+
+        .q-block.open .q-body {
+            max-height: 500px
+        }
+
+        .q-body-inner {
+            padding: .85rem 1.2rem 1.1rem;
+            border-top: 1px solid var(--border)
+        }
+
+        .q-body-inner p {
+            color: var(--muted);
+            font-size: .87rem;
+            margin-bottom: .8rem
+        }
+
+        .q-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem
+        }
+
+        .q-tag {
+            font-size: .7rem;
+            padding: .18rem .6rem;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: .04em
+        }
+
+        .q-tag.green {
+            background: rgba(16, 185, 129, .12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, .25)
+        }
+
+        .q-tag.teal {
+            background: rgba(6, 182, 212, .12);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, .25)
+        }
+
+        .q-tag.purple {
+            background: rgba(139, 92, 246, .12);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, .25)
+        }
+
+        .q-tag.yellow {
+            background: rgba(245, 158, 11, .12);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, .25)
+        }
+
+        .q-tag.orange {
+            background: rgba(249, 115, 22, .12);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, .25)
+        }
+
+        .q-tag.blue {
+            background: rgba(59, 130, 246, .12);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .25)
+        }
+
+        .progress-bar-wrap {
+            background: var(--surface2);
+            border-radius: 999px;
+            height: 8px;
+            margin-bottom: .5rem;
+            overflow: hidden
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 999px;
+            transition: width .4s ease;
+            width: 0%
+        }
+
+        .progress-label {
+            font-size: .78rem;
+            color: var(--muted);
+            text-align: right;
+            margin-bottom: 1.5rem
+        }
+
+        /* VIDEO */
+        .video-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .video-thumb-wrap {
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            background: #000;
+            cursor: pointer;
+            display: block;
+            text-decoration: none
+        }
+
+        .video-thumb-wrap img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            opacity: .82;
+            transition: opacity .3s, transform .3s
+        }
+
+        .video-thumb-wrap:hover img {
+            opacity: .6;
+            transform: scale(1.03)
+        }
+
+        .video-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 62px;
+            height: 62px;
+            background: rgba(255, 255, 255, .93);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .25s, background .25s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .5)
+        }
+
+        .video-play-btn svg {
+            margin-left: 4px
+        }
+
+        .video-thumb-wrap:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.12);
+            background: #ff0000
+        }
+
+        .video-thumb-wrap:hover .video-play-btn svg path {
+            fill: #fff
+        }
+
+        .video-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .88));
+            padding: 1.2rem 1rem .75rem;
+            color: #fff;
+            font-size: .8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .45rem
+        }
+
+        .yt-badge {
+            background: #ff0000;
+            color: #fff;
+            font-size: .6rem;
+            font-weight: 700;
+            padding: .12rem .45rem;
+            border-radius: 4px;
+            flex-shrink: 0
+        }
+
+        .video-single {
+            margin-bottom: 2rem
+        }
+
+        .video-single .video-thumb-wrap .video-play-btn {
+            width: 80px;
+            height: 80px
+        }
+
+        .video-single .video-label {
+            font-size: .9rem;
+            padding: 1.5rem 1.25rem .85rem
+        }
+
+        /* VIDEO NOTES */
+        .video-notes {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.4rem;
+            margin-bottom: 1.5rem
+        }
+
+        .video-notes h3 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: 1rem
+        }
+
+        .chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: .5rem
+        }
+
+        .chip {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: .3rem .85rem;
+            font-size: .78rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .chip:hover,
+        .chip.selected {
+            background: rgba(16, 185, 129, .12);
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: .6rem;
+            margin-bottom: .75rem
+        }
+
+        .sug-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .75rem .9rem;
+            font-size: .82rem;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--muted)
+        }
+
+        .sug-card:hover {
+            border-color: var(--accent2);
+            color: var(--text);
+            background: rgba(6, 182, 212, .06)
+        }
+
+        .sug-card .num {
+            color: var(--accent2);
+            font-weight: 700;
+            margin-right: .3rem;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        /* CONSULTA */
+        .consulta-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem
+        }
+
+        .consulta-box h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem
+        }
+
+        .input-row {
+            display: flex;
+            gap: .75rem;
+            margin-bottom: .75rem;
+            flex-wrap: wrap
+        }
+
+        .input-row input,
+        .input-row select {
+            flex: 1;
+            min-width: 140px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .6rem .9rem;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .input-row input:focus,
+        .input-row select:focus {
+            border-color: var(--accent)
+        }
+
+        .input-row select option {
+            background: var(--surface2)
+        }
+
+        textarea.ci {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .8rem 1rem;
+            min-height: 90px;
+            resize: vertical;
+            outline: none;
+            transition: border-color .2s;
+            margin-bottom: .75rem
+        }
+
+        textarea.ci:focus {
+            border-color: var(--accent)
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .6rem 1.3rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, .35)
+        }
+
+        .btn.cyan {
+            background: var(--accent2)
+        }
+
+        .btn.cyan:hover {
+            background: #0891b2;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, .35)
+        }
+
+        .consultas-feed {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem
+        }
+
+        .consulta-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .9rem 1rem;
+            animation: fadeIn .3s ease
+        }
+
+        .consulta-item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            align-items: center;
+            margin-bottom: .4rem
+        }
+
+        .consulta-item .name {
+            font-weight: 600;
+            font-size: .85rem
+        }
+
+        .consulta-item .topic {
+            font-size: .7rem;
+            padding: .15rem .55rem;
+            background: rgba(16, 185, 129, .12);
+            color: #6ee7b7;
+            border-radius: 999px;
+            font-weight: 600
+        }
+
+        .consulta-item .time {
+            font-size: .7rem;
+            color: var(--muted);
+            margin-left: auto
+        }
+
+        .consulta-item .msg {
+            font-size: .87rem;
+            color: var(--muted)
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: .78rem;
+            background: var(--surface)
+        }
+
+        @media(max-width:640px) {
+            nav.tabs button {
+                font-size: .75rem;
+                padding: .4rem .8rem
+            }
+
+            .video-pair {
+                grid-template-columns: 1fr
+            }
+
+            .input-row {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <span class="badge">Laboratorio de Informática · Unidad 1</span>
+        <h1>💾 Almacenamiento Interno</h1>
+        <p class="sub">RAM, discos magnéticos, SSD y M.2: cómo la computadora guarda datos de forma temporal y
+            permanente.</p>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="Uni 1 - Hardware.html">🖥️ Hardware</a>
+        <span class="sep">›</span>
+        <span class="cur">💾 Almacenamiento Interno</span>
+    </div>
+
+    <nav class="tabs">
+        <button class="active" onclick="show('intro')" id="tab-intro">🗂️ Introducción</button>
+        <button onclick="show('ram')" id="tab-ram">🧠 Memoria RAM</button>
+        <button onclick="show('discos')" id="tab-discos">💽 Discos</button>
+        <button onclick="show('preguntas')" id="tab-preguntas">❓ Preguntas</button>
+        <button onclick="show('videos')" id="tab-videos">▶️ Videos</button>
+
+    </nav>
+
+    <!-- ============ INTRO ============ -->
+    <section id="intro" class="section active">
+        <div class="section-title">
+            <span class="icon">🗂️</span>
+            <div>
+                <h2>¿Dónde guarda datos la computadora?</h2>
+                <p>Dos tipos de almacenamiento con funciones muy distintas</p>
+            </div>
+        </div>
+
+        <p style="color:var(--muted);margin-bottom:1.5rem;font-size:.95rem">
+            Una computadora usa <strong style="color:var(--text)">dos tipos de almacenamiento interno</strong>:
+            la <strong style="color:#c4b5fd">memoria RAM</strong>, rápida y temporal (se borra al apagar),
+            y los <strong style="color:#fcd34d">dispositivos de almacenamiento masivo</strong> (HDD, SSD, M.2),
+            lentos en comparación pero <strong style="color:var(--text)">permanentes</strong>.
+            Ambos son imprescindibles y se complementan.
+        </p>
+
+        <div class="overview-grid">
+            <div class="ov-card ram" onclick="show('ram')">
+                <span class="emoji">🧠</span>
+                <h3>Memoria RAM</h3>
+                <p>Almacenamiento temporal y ultra-rápido. Los datos se pierden al apagar.</p>
+                <span style="font-size:.7rem;color:#c4b5fd;font-weight:600;display:inline-block;margin-top:.4rem">Ver
+                    sección →</span>
+            </div>
+            <div class="ov-card hdd" onclick="show('discos')">
+                <span class="emoji">🖴</span>
+                <h3>Disco Duro (HDD)</h3>
+                <p>Almacenamiento magnético permanente. Económico pero más lento.</p>
+                <span style="font-size:.7rem;color:#fcd34d;font-weight:600;display:inline-block;margin-top:.4rem">Ver
+                    sección →</span>
+            </div>
+            <div class="ov-card ssd" onclick="show('discos')">
+                <span class="emoji">⚡</span>
+                <h3>SSD</h3>
+                <p>Memoria flash permanente. Mucho más rápido que el HDD, sin partes móviles.</p>
+                <span style="font-size:.7rem;color:#6ee7b7;font-weight:600;display:inline-block;margin-top:.4rem">Ver
+                    sección →</span>
+            </div>
+            <div class="ov-card m2" onclick="show('discos')">
+                <span class="emoji">🔬</span>
+                <h3>M.2 / NVMe</h3>
+                <p>SSD de formato compacto conectado directo a la placa madre. El más veloz.</p>
+                <span style="font-size:.7rem;color:#67e8f9;font-weight:600;display:inline-block;margin-top:.4rem">Ver
+                    sección →</span>
+            </div>
+        </div>
+
+        <div class="info-box green">
+            💡 <strong style="color:var(--text)">Analogía útil:</strong>
+            La <strong style="color:#c4b5fd">RAM</strong> es el <em>escritorio</em> donde trabajás ahora mismo: rápido
+            pero limitado.
+            El <strong style="color:#fcd34d">disco</strong> es el <em>archivero</em>: más lento para buscar cosas, pero
+            guarda todo aunque apagues el negocio.
+        </div>
+    </section>
+
+    <!-- ============ RAM ============ -->
+    <section id="ram" class="section">
+        <div class="section-title">
+            <span class="icon">🧠</span>
+            <div>
+                <h2>Memoria RAM</h2>
+                <p>Random Access Memory — almacenamiento de trabajo temporal</p>
+            </div>
+        </div>
+
+        <div class="info-box purple">
+            📌 <strong style="color:var(--text)">¿Qué es la RAM?</strong>
+            La <em>Random Access Memory</em> (Memoria de Acceso Aleatorio) es donde el procesador carga los datos y
+            programas
+            que está usando <strong style="color:var(--text)">en este momento</strong>. Es extremadamente rápida pero
+            <strong style="color:var(--text)">volátil</strong>: pierde todo su contenido cuando se corta la energía.
+        </div>
+
+        <div class="sub-heading">🔑 Conceptos clave</div>
+
+        <div class="info-box teal">
+            <strong style="color:var(--text)">Capacidad (GB):</strong> cuanta información puede mantener cargada al
+            mismo tiempo.
+            8 GB es el mínimo actual; 16 GB es recomendable para tareas modernas; 32 GB+ para edición profesional.
+        </div>
+        <div class="info-box teal">
+            <strong style="color:var(--text)">Velocidad (MHz / MT/s):</strong> qué tan rápido transfiere datos al
+            procesador.
+            Las generaciones actuales son <em>DDR4</em> (2133–3600 MHz) y <em>DDR5</em> (4800 MHz y más).
+        </div>
+        <div class="info-box teal">
+            <strong style="color:var(--text)">Latencia (CL):</strong> el tiempo de espera antes de que responda. Menor
+            CL = más ágil.
+        </div>
+        <div class="info-box teal">
+            <strong style="color:var(--text)">Canales (Dual / Quad Channel):</strong> instalar dos módulos iguales
+            activa el modo dual channel,
+            que puede casi duplicar el ancho de banda disponible.
+        </div>
+
+        <div class="sub-heading">📹 Videos de estudio — Memoria RAM</div>
+        <div class="video-pair">
+            <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=yRNwl24l39E" target="_blank"
+                rel="noopener noreferrer">
+                <img src="https://img.youtube.com/vi/yRNwl24l39E/hqdefault.jpg" alt="Video RAM 1" loading="lazy" />
+                <div class="video-play-btn"><svg width="22" height="22" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="video-label"><span class="yt-badge">YouTube</span>¿Qué es la RAM?</div>
+            </a>
+            <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=OZCEHXlHY4E" target="_blank"
+                rel="noopener noreferrer">
+                <img src="https://img.youtube.com/vi/OZCEHXlHY4E/hqdefault.jpg" alt="Video RAM 2" loading="lazy" />
+                <div class="video-play-btn"><svg width="22" height="22" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="video-label"><span class="yt-badge">YouTube</span>RAM: tipos y funcionamiento</div>
+            </a>
+        </div>
+
+        <div class="info-box green" style="margin-top:.5rem">
+            🎯 <strong style="color:var(--text)">Actividad:</strong>
+            Mirá los dos videos y luego respondé las preguntas de la sección <strong style="color:var(--text)">❓
+                Preguntas</strong>
+            relacionadas con RAM. También podés dejar tus dudas en <strong style="color:var(--text)">💬
+                Consulta</strong>.
+            <button onclick="show('preguntas')" class="btn"
+                style="margin-top:.75rem;font-size:.8rem;padding:.45rem 1rem">Ver preguntas de RAM →</button>
+        </div>
+    </section>
+
+    <!-- ============ DISCOS ============ -->
+    <section id="discos" class="section">
+        <div class="section-title">
+            <span class="icon">💽</span>
+            <div>
+                <h2>Discos de Almacenamiento</h2>
+                <p>HDD → SSD → M.2: la evolución del almacenamiento permanente</p>
+            </div>
+        </div>
+
+        <div class="info-box yellow">
+            📌 <strong style="color:var(--text)">¿Por qué necesitamos almacenamiento masivo?</strong>
+            La RAM es rápida pero temporal. Los discos guardan el <em>sistema operativo</em>, tus <em>archivos</em>,
+            los <em>programas instalados</em> y todo lo que no querés perder.
+            Sin un disco, la computadora no puede ni arrancar.
+        </div>
+
+        <div class="sub-heading">🖴 Disco Duro Magnético (HDD)</div>
+        <div class="info-box yellow">
+            El <strong style="color:var(--text)">HDD (Hard Disk Drive)</strong> almacena datos en platos metálicos que
+            giran
+            a 5.400 o 7.200 RPM mientras un cabezal magnético lee y escribe.
+            Es la tecnología clásica: <span class="tag-hdd">precio bajo</span>, gran capacidad (hasta 20 TB o más),
+            pero <em>lento</em> y sensible a golpes por tener piezas móviles.
+        </div>
+
+        <div class="sub-heading">⚡ SSD (Solid State Drive)</div>
+        <div class="info-box green">
+            El <strong style="color:var(--text)">SSD</strong> usa chips de memoria flash (similar a un pendrive, pero
+            más rápido y resistente).
+            <span class="tag-ssd">Sin partes móviles</span>, silencioso, resistente a golpes y consume menos energía.
+            Su velocidad de lectura supera los <strong style="color:var(--text)">550 MB/s</strong> frente a los ~150
+            MB/s del HDD.
+            La contra: más caro por GB.
+        </div>
+
+        <div class="sub-heading">🔬 M.2 / NVMe</div>
+        <div class="info-box teal">
+            El <strong style="color:var(--text)">M.2 NVMe</strong> es un SSD en formato de tarjeta que se conecta
+            directamente a la placa madre por el bus <em>PCIe</em>, sin cables.
+            Usa el protocolo <strong style="color:var(--text)">NVMe</strong> (Non-Volatile Memory Express), diseñado
+            para flash,
+            y alcanza velocidades de <strong style="color:var(--text)">3.000 a 7.000 MB/s</strong>.
+            Es el estándar en laptops y PCs modernas.
+        </div>
+
+        <div class="sub-heading">📊 Comparativa rápida</div>
+        <div style="overflow-x:auto;margin-bottom:1.5rem">
+            <table class="storage-table">
+                <thead>
+                    <tr>
+                        <th>Característica</th>
+                        <th><span class="tag-hdd">HDD</span></th>
+                        <th><span class="tag-ssd">SSD SATA</span></th>
+                        <th><span class="tag-m2">M.2 NVMe</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Velocidad lectura</td>
+                        <td class="bad">~150 MB/s</td>
+                        <td class="mid">~550 MB/s</td>
+                        <td class="good">3.000–7.000 MB/s</td>
+                    </tr>
+                    <tr>
+                        <td>Partes móviles</td>
+                        <td class="bad">Sí (platos + cabezal)</td>
+                        <td class="good">No</td>
+                        <td class="good">No</td>
+                    </tr>
+                    <tr>
+                        <td>Resistencia a golpes</td>
+                        <td class="bad">Baja</td>
+                        <td class="good">Alta</td>
+                        <td class="good">Alta</td>
+                    </tr>
+                    <tr>
+                        <td>Consumo energético</td>
+                        <td class="mid">Medio-Alto</td>
+                        <td class="good">Bajo</td>
+                        <td class="good">Muy bajo</td>
+                    </tr>
+                    <tr>
+                        <td>Precio por GB</td>
+                        <td class="good">Muy bajo</td>
+                        <td class="mid">Medio</td>
+                        <td class="bad">Alto</td>
+                    </tr>
+                    <tr>
+                        <td>Capacidad típica</td>
+                        <td class="good">1–20 TB</td>
+                        <td class="mid">250 GB – 4 TB</td>
+                        <td class="mid">256 GB – 4 TB</td>
+                    </tr>
+                    <tr>
+                        <td>Ruido</td>
+                        <td class="bad">Sí</td>
+                        <td class="good">No</td>
+                        <td class="good">No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sub-heading">📹 Video de estudio — SSD y M.2</div>
+        <div class="video-single">
+            <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=ANVvxlv6DV4" target="_blank"
+                rel="noopener noreferrer">
+                <img src="https://img.youtube.com/vi/ANVvxlv6DV4/maxresdefault.jpg"
+                    onerror="this.src='https://img.youtube.com/vi/ANVvxlv6DV4/hqdefault.jpg'" alt="Video SSD y M.2"
+                    loading="lazy" />
+                <div class="video-play-btn"><svg width="28" height="28" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="video-label"><span class="yt-badge">YouTube</span>SSD vs M.2 NVMe — Todo lo que necesitás
+                    saber</div>
+            </a>
+        </div>
+
+        <div class="info-box green">
+            🎯 <strong style="color:var(--text)">Preguntas sobre el video:</strong>
+            Después de mirar el video, respondé las preguntas de la sección ❓ en el grupo "SSD y M.2", o dejá tu opinión
+            en 💬 Consulta.
+            <button onclick="show('preguntas')" class="btn"
+                style="margin-top:.75rem;font-size:.8rem;padding:.45rem 1rem">Ver preguntas de SSD / M.2 →</button>
+        </div>
+    </section>
+
+    <!-- ============ PREGUNTAS ============ -->
+    <section id="preguntas" class="section">
+        <div class="section-title">
+            <span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Investigación</h2>
+                <p>RAM, discos y almacenamiento — hacé clic para ver la pista de cada pregunta</p>
+            </div>
+        </div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">0 de 16 preguntas leídas</div>
+        <div id="questions-container"></div>
+    </section>
+
+    <!-- ============ VIDEOS ============ -->
+    <section id="videos" class="section">
+        <div class="section-title">
+            <span class="icon">▶️</span>
+            <div>
+                <h2>Todos los Videos</h2>
+                <p>Recursos audiovisuales del módulo — abrís cada uno en YouTube</p>
+            </div>
+        </div>
+
+        <div class="sub-heading">🧠 Memoria RAM</div>
+        <div class="video-pair" style="margin-bottom:2rem">
+            <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=yRNwl24l39E" target="_blank"
+                rel="noopener noreferrer">
+                <img src="https://img.youtube.com/vi/yRNwl24l39E/hqdefault.jpg" alt="RAM video 1" loading="lazy" />
+                <div class="video-play-btn"><svg width="22" height="22" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="video-label"><span class="yt-badge">YouTube</span>¿Qué es la RAM?</div>
+            </a>
+            <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=OZCEHXlHY4E" target="_blank"
+                rel="noopener noreferrer">
+                <img src="https://img.youtube.com/vi/OZCEHXlHY4E/hqdefault.jpg" alt="RAM video 2" loading="lazy" />
+                <div class="video-play-btn"><svg width="22" height="22" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="video-label"><span class="yt-badge">YouTube</span>RAM: tipos y funcionamiento</div>
+            </a>
+        </div>
+
+        <div class="sub-heading">💽 SSD y M.2</div>
+        <div class="video-single">
+            <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=ANVvxlv6DV4" target="_blank"
+                rel="noopener noreferrer">
+                <img src="https://img.youtube.com/vi/ANVvxlv6DV4/maxresdefault.jpg"
+                    onerror="this.src='https://img.youtube.com/vi/ANVvxlv6DV4/hqdefault.jpg'" alt="SSD y M.2 video"
+                    loading="lazy" />
+                <div class="video-play-btn"><svg width="28" height="28" viewBox="0 0 24 24">
+                        <path fill="#ff0000" d="M8 5v14l11-7z" />
+                    </svg></div>
+                <div class="video-label"><span class="yt-badge">YouTube</span>SSD vs M.2 NVMe — Todo lo que necesitás
+                    saber</div>
+            </a>
+        </div>
+
+        <!-- Chips de temas SSD -->
+        <div class="video-notes">
+            <h3>🏷️ Marcá los temas que aparecen en el video de SSD / M.2</h3>
+            <div class="chip-grid" id="topicChips"></div>
+            <p style="font-size:.78rem;color:var(--muted);margin-top:.6rem" id="chipsStatus">Ningún tema seleccionado
+                todavía.</p>
+        </div>
+
+        <!-- Preguntas sugeridas SSD -->
+        <div class="video-notes">
+            <h3>💬 Preguntas para reflexionar sobre el video</h3>
+            <div class="suggestions-grid" id="suggestionsGrid"></div>
+            <p style="font-size:.78rem;color:var(--muted)">Hacé clic en una pregunta para enviarla a 💬 Consulta</p>
+        </div>
+
+        <!-- Nota -->
+        <div class="video-notes">
+            <h3>⭐ ¿Qué aprendiste de los videos?</h3>
+            <textarea class="ci" id="videoNote"
+                placeholder="Escribí algo que te llamó la atención, una duda o una conclusión personal…"></textarea>
+            <button class="btn cyan" onclick="saveNote()">💾 Guardar nota</button>
+            <span id="noteSaved" style="margin-left:.7rem;font-size:.82rem;color:var(--accent);display:none">✓
+                Guardada</span>
+        </div>
+    </section>
+
+
+    <footer>
+        Laboratorio de Informática · Unidad 1: Partes de la Computadora &nbsp;›&nbsp; Almacenamiento Interno
+        &nbsp;|&nbsp; RAM · HDD · SSD · M.2
+    </footer>
+
+    <script>
+        /* =========================================================  DATA  ========================================================= */
+        const questions = [
+            // RAM
+            {
+                g: "Memoria RAM", num: 1,
+                text: "¿Qué significa RAM y por qué se dice que es un almacenamiento 'volátil'?",
+                hint: "Volátil = pierde los datos sin energía eléctrica. Investigá qué significa 'acceso aleatorio' y cómo se diferencia de la memoria de solo lectura (ROM).",
+                tags: ["RAM", "Definición", "Volátil"], colors: ["purple", "green", "teal"]
+            },
+            {
+                g: "Memoria RAM", num: 2,
+                text: "¿Cuánta RAM tiene la computadora que estás usando? ¿Es suficiente para las tareas de hoy?",
+                hint: "En Windows: clic derecho en 'Este equipo' → Propiedades. Para gaming se recomiendan 16 GB; para ofimática, 8 GB suele alcanzar.",
+                tags: ["RAM", "Práctica", "Capacidad"], colors: ["green", "yellow", "purple"]
+            },
+            {
+                g: "Memoria RAM", num: 3,
+                text: "¿Qué diferencia hay entre DDR4 y DDR5? ¿Por qué importa la generación de RAM?",
+                hint: "DDR5 tiene mayor velocidad de transferencia y menor consumo, pero requiere placa madre compatible. El precio sigue siendo más alto que DDR4.",
+                tags: ["DDR4", "DDR5", "Generaciones"], colors: ["purple", "teal", "blue"]
+            },
+            {
+                g: "Memoria RAM", num: 4,
+                text: "¿Qué es el 'dual channel' y cómo afecta al rendimiento instalar dos módulos de RAM iguales?",
+                hint: "El modo dual channel duplica el ancho de banda al procesador. Ejemplo: 2×8 GB en dual channel suele superar a 1×16 GB en rendimiento.",
+                tags: ["Dual channel", "Rendimiento", "RAM"], colors: ["teal", "green", "purple"]
+            },
+            {
+                g: "Memoria RAM", num: 5,
+                text: "¿Qué pasa cuando la RAM se llena? ¿Qué es la memoria virtual o 'swap'?",
+                hint: "Cuando la RAM se llena, el sistema operativo usa parte del disco como memoria temporal (swap/archivo de paginación). Esto es mucho más lento y causa el 'lag'.",
+                tags: ["RAM llena", "Swap", "Paginación"], colors: ["yellow", "orange", "purple"]
+            },
+            {
+                g: "Memoria RAM", num: 6,
+                text: "¿La RAM de un celular es igual a la de una PC? ¿Qué tipo de RAM usan los smartphones?",
+                hint: "Los celulares usan LPDDR (Low Power DDR): mismo concepto pero optimizado para consumo energético mínimo. Un celular moderno puede tener 8–16 GB LPDDR5.",
+                tags: ["LPDDR", "Celular", "Tipos"], colors: ["teal", "blue", "green"]
+            },
+            // HDD
+            {
+                g: "Disco Duro (HDD)", num: 7,
+                text: "¿Cómo funciona un disco duro magnético (HDD)? ¿Cuáles son sus partes principales?",
+                hint: "Platos magnéticos giratorios + cabezal de lectura/escritura + motor. Investigá cómo se organiza la información en pistas, cilindros y sectores.",
+                tags: ["HDD", "Funcionamiento", "Mecánico"], colors: ["yellow", "orange", "teal"]
+            },
+            {
+                g: "Disco Duro (HDD)", num: 8,
+                text: "¿Qué significa 'desfragmentar' un disco? ¿Por qué no se hace con un SSD?",
+                hint: "Con el tiempo los archivos quedan dispersos en el plato y el cabezal tarda más en leerlos. Los SSD no tienen ese problema porque no hay movimiento físico.",
+                tags: ["HDD", "Desfragmentación", "SSD"], colors: ["yellow", "green", "teal"]
+            },
+            // SSD
+            {
+                g: "SSD y M.2 NVMe", num: 9,
+                text: "¿Por qué un SSD es más rápido que un HDD si ambos almacenan los mismos GB de datos?",
+                hint: "El SSD usa transistores (memoria flash NAND), no platos mecánicos. El acceso es electrónico, no físico: no hay que esperar que un cabezal se mueva.",
+                tags: ["SSD", "Flash NAND", "Velocidad"], colors: ["green", "teal", "blue"]
+            },
+            {
+                g: "SSD y M.2 NVMe", num: 10,
+                text: "¿Qué es el M.2 y en qué se diferencia de un SSD SATA tradicional?",
+                hint: "M.2 es el formato físico (una tarjeta chica que se enchufa directo a la placa madre). Un M.2 NVMe usa PCIe en vez del bus SATA y puede ser 5–10× más rápido.",
+                tags: ["M.2", "NVMe", "SATA", "Comparación"], colors: ["teal", "blue", "green", "yellow"]
+            },
+            {
+                g: "SSD y M.2 NVMe", num: 11,
+                text: "Según el video: ¿cuáles son las ventajas concretas de un M.2 NVMe frente a un SSD SATA en el rendimiento del sistema?",
+                hint: "Observá las velocidades de lectura/escritura que muestran en el video y anotá los números. ¿En qué tareas se nota más la diferencia?",
+                tags: ["Video", "M.2", "Rendimiento"], colors: ["blue", "teal", "green"]
+            },
+            {
+                g: "SSD y M.2 NVMe", num: 12,
+                text: "¿Cuántos ciclos de escritura soporta una celda de memoria flash? ¿Qué es el TBW de un SSD?",
+                hint: "TBW = Terabytes Written, indica cuántos TB podés escribir antes de que el SSD empiece a fallar. Un SSD barato puede tener 60 TBW; uno de gama alta, 600 TBW o más.",
+                tags: ["TBW", "Durabilidad", "SSD"], colors: ["yellow", "orange", "green"]
+            },
+            {
+                g: "SSD y M.2 NVMe", num: 13,
+                text: "¿En qué situaciones todavía tiene sentido usar un HDD en lugar de un SSD?",
+                hint: "Pensá en archivos de backup de gran volumen (1-8 TB), servidores NAS, copias de seguridad. El costo por GB sigue siendo mucho menor en HDD.",
+                tags: ["HDD", "Uso actual", "Precio/GB"], colors: ["yellow", "teal", "blue"]
+            },
+            // General
+            {
+                g: "Integración y reflexión", num: 14,
+                text: "¿Cómo trabajan juntos la RAM, la CPU y el disco duro? Dibujá o describí el flujo de datos.",
+                hint: "Cuando abrís un programa: el OS lo lee del disco → lo carga en RAM → la CPU lo procesa. Cada capa es más rápida y más pequeña que la anterior.",
+                tags: ["Integración", "CPU", "RAM", "Disco"], colors: ["green", "teal", "purple", "yellow"]
+            },
+            {
+                g: "Integración y reflexión", num: 15,
+                text: "Si pudieras mejorar UNA cosa de tu computadora (más RAM, cambiar HDD por SSD, o más espacio en disco), ¿cuál elegirías y por qué?",
+                hint: "No hay respuesta incorrecta. Pensá en tu uso habitual: ¿la PC es lenta al abrir programas (RAM/disco) o se te llena el almacenamiento?",
+                tags: ["Reflexión", "Práctica", "Decisión"], colors: ["blue", "green", "orange"]
+            },
+            {
+                g: "Integración y reflexión", num: 16,
+                text: "¿Cuánto espacio ocupa el sistema operativo Windows 11 instalado? ¿Y Linux? ¿Por qué la diferencia?",
+                hint: "Windows 11 ocupa ~20-25 GB base. Una distro ligera de Linux puede funcionar en 5-10 GB. Investigá qué incluye cada uno de fábrica.",
+                tags: ["SO", "Espacio", "Comparación"], colors: ["teal", "blue", "yellow"]
+            },
+        ];
+
+        const videoTopics = [
+            "SSD vs HDD velocidad", "Protocolo NVMe", "Bus PCIe", "Bus SATA",
+            "Formato M.2 2280", "Memoria flash NAND", "Precio por GB", "Instalación en placa madre",
+            "Benchmark de velocidades", "SSD portátil", "Diferencia de arranque", "Temperatura de operación"
+        ];
+
+        const videoSuggestions = [
+            "¿Cuánto más rápido es el M.2 NVMe que el SSD SATA según el video?",
+            "¿Qué tipo de SSD recomiendan para armar una PC de medio rango?",
+            "¿El video muestra diferencia de velocidad al iniciar el sistema operativo?",
+            "¿Qué es el protocolo NVMe y por qué importa?",
+            "¿En qué situación no vale la pena gastar en M.2 NVMe?",
+            "¿Qué marcas de SSD mencionan en el video?",
+            "¿Qué preguntarías al docente sobre lo que no quedó claro?",
+            "¿Cambiarías el disco de tu PC por lo que viste? ¿Por qué?",
+        ];
+
+        /* STATE */
+        let openedQ = new Set(); let consultas = [];
+
+        /* TABS */
+        function show(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('tab-' + id).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* QUESTIONS */
+        function renderQ() {
+            const c = document.getElementById('questions-container');
+            let lg = '';
+            questions.forEach(q => {
+                if (q.g !== lg) {
+                    lg = q.g;
+                    const gt = document.createElement('div');
+                    gt.className = 'q-group-title'; gt.textContent = q.g; c.appendChild(gt);
+                }
+                const b = document.createElement('div');
+                b.className = 'q-block'; b.id = 'q-' + q.num;
+                b.innerHTML = `<div class="q-header" onclick="toggleQ(${q.num})">
+      <div class="q-num">${q.num}</div>
+      <div class="q-text">${q.text}</div>
+      <span class="q-arrow">▼</span>
+    </div>
+    <div class="q-body"><div class="q-body-inner">
+      <p>💡 <em>${q.hint}</em></p>
+      <div class="q-tags">${q.tags.map((t, i) => `<span class="q-tag ${q.colors[i]}">${t}</span>`).join('')}</div>
+    </div></div>`;
+                c.appendChild(b);
+            });
+        }
+        function toggleQ(n) {
+            const b = document.getElementById('q-' + n);
+            const was = b.classList.contains('open');
+            document.querySelectorAll('.q-block').forEach(x => x.classList.remove('open'));
+            if (!was) { b.classList.add('open'); openedQ.add(n); updateP(); }
+        }
+        function updateP() {
+            const pct = Math.round(openedQ.size / questions.length * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent = openedQ.size + ' de ' + questions.length + ' preguntas leídas';
+        }
+
+        /* VIDEO CHIPS */
+        function renderChips() {
+            const c = document.getElementById('topicChips');
+            videoTopics.forEach(t => {
+                const ch = document.createElement('div'); ch.className = 'chip'; ch.textContent = t;
+                ch.onclick = () => { ch.classList.toggle('selected'); updateCS(); }; c.appendChild(ch);
+            });
+        }
+        function updateCS() {
+            const s = [...document.querySelectorAll('.chip.selected')].map(c => c.textContent);
+            document.getElementById('chipsStatus').textContent = s.length ? '✓ Identificados: ' + s.join(', ') : 'Ningún tema seleccionado todavía.';
+        }
+
+        /* SUGGESTIONS */
+        function renderSug() {
+            const g = document.getElementById('suggestionsGrid');
+            videoSuggestions.forEach((s, i) => {
+                const d = document.createElement('div'); d.className = 'sug-card';
+                d.innerHTML = `<span class="num">${String(i + 1).padStart(2, '0')}</span>${s}`;
+                d.onclick = () => {
+                    document.getElementById('cTexto').value = s;
+                    document.getElementById('cTema').value = 'Video de SSD / M.2';
+                    show('consulta');
+                }; g.appendChild(d);
+            });
+        }
+
+        /* NOTE */
+        function saveNote() {
+            const v = document.getElementById('videoNote').value.trim(); if (!v) return;
+            localStorage.setItem('alm_video_note', v);
+            const el = document.getElementById('noteSaved'); el.style.display = 'inline';
+            setTimeout(() => el.style.display = 'none', 2500);
+        }
+        window.addEventListener('load', () => {
+            const s = localStorage.getItem('alm_video_note');
+            if (s) document.getElementById('videoNote').value = s;
+        });
+
+        /* CONSULTAS */
+        document.getElementById('cTexto').addEventListener('input', function () {
+            document.getElementById('charCount').textContent = this.value.length + ' / 500';
+        });
+        function enviar() {
+            const nombre = document.getElementById('cNombre').value.trim() || 'Anónimo';
+            const tema = document.getElementById('cTema').value;
+            const texto = document.getElementById('cTexto').value.trim();
+            if (!texto) { const t = document.getElementById('cTexto'); t.style.borderColor = '#ef4444'; setTimeout(() => t.style.borderColor = '', 1500); return; }
+            consultas.unshift({ nombre, tema, texto, hora: new Date() });
+            renderFeed();
+            document.getElementById('cTexto').value = '';
+            document.getElementById('cNombre').value = '';
+            document.getElementById('cTema').value = '';
+            document.getElementById('charCount').textContent = '0 / 500';
+        }
+        function renderFeed() {
+            const feed = document.getElementById('feed');
+            if (!consultas.length) { feed.innerHTML = '<p style="color:var(--muted);font-size:.88rem;text-align:center;padding:2rem">Aún no hay consultas. ¡Sé el primero! 🙋</p>'; return; }
+            feed.innerHTML = '';
+            consultas.forEach(c => {
+                const d = document.createElement('div'); d.className = 'consulta-item';
+                const h = c.hora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                d.innerHTML = `<div class="meta"><span class="name">👤 ${e(c.nombre)}</span>${c.tema ? `<span class="topic">${e(c.tema)}</span>` : ''}<span class="time">${h}</span></div><div class="msg">${e(c.texto)}</div>`;
+                feed.appendChild(d);
+            });
+        }
+        function e(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        /* INIT */
+        renderQ(); renderChips(); renderSug();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1344 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CPU y Procesadores — Laboratorio de Informática</title>
+    <meta name="description"
+        content="Guía interactiva sobre CPU y Procesadores: qué son, cómo funcionan, marcas, tipos y overclocking." />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1f2937;
+            --border: #30363d;
+            --accent: #ef4444;
+            --accent2: #f97316;
+            --accent3: #10b981;
+            --amd: #ed1c24;
+            --intel: #0068b5;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, .45);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh
+        }
+
+        /* HEADER */
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.5rem 1.5rem 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #0f0a0a 0%, #1a0a0a 50%, #0d1117 100%);
+            border-bottom: 1px solid var(--border)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 50% at 30% -10%, rgba(239, 68, 68, .22) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(249, 115, 22, .18) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(239, 68, 68, .15);
+            border: 1px solid rgba(239, 68, 68, .4);
+            color: #fca5a5;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .25rem .85rem;
+            border-radius: 999px;
+            margin-bottom: 1.1rem
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fecaca, #fed7aa, #fde68a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .6rem
+        }
+
+        header p.sub {
+            color: var(--muted);
+            max-width: 620px;
+            margin: 0 auto;
+            font-size: 1rem
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .7rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-size: .78rem;
+            color: var(--muted)
+        }
+
+        .breadcrumb a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .2s
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text)
+        }
+
+        .breadcrumb span {
+            color: var(--accent)
+        }
+
+        /* TABS */
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: 1.1rem 1rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        nav.tabs button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: .5rem 1.1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .25s
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        nav.tabs button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(239, 68, 68, .4)
+        }
+
+        /* SECTIONS */
+        .section {
+            display: none;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem 4rem;
+            animation: fadeIn .35s ease
+        }
+
+        .section.active {
+            display: block
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.8rem
+        }
+
+        .section-title .icon {
+            font-size: 1.6rem
+        }
+
+        .section-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700
+        }
+
+        .section-title p {
+            font-size: .9rem;
+            color: var(--muted);
+            margin-top: .15rem
+        }
+
+        /* INTRO CARDS */
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem
+        }
+
+        .topic-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1rem;
+            cursor: pointer;
+            transition: all .25s;
+            position: relative;
+            overflow: hidden
+        }
+
+        .topic-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            opacity: 0;
+            transition: opacity .3s
+        }
+
+        .topic-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow)
+        }
+
+        .topic-card .emoji {
+            font-size: 2.2rem;
+            margin-bottom: .5rem;
+            display: block
+        }
+
+        .topic-card h3 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: .3rem
+        }
+
+        .topic-card p {
+            font-size: .76rem;
+            color: var(--muted)
+        }
+
+        .topic-card.t1 {
+            border-top: 3px solid #ef4444
+        }
+
+        .topic-card.t2 {
+            border-top: 3px solid #f97316
+        }
+
+        .topic-card.t3 {
+            border-top: 3px solid #eab308
+        }
+
+        .topic-card.t4 {
+            border-top: 3px solid #8b5cf6
+        }
+
+        .topic-card.t5 {
+            border-top: 3px solid #06b6d4
+        }
+
+        .topic-card.t6 {
+            border-top: 3px solid #10b981
+        }
+
+        /* INFO BOX */
+        .info-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent2);
+            border-radius: var(--radius);
+            padding: 1.1rem 1.3rem;
+            font-size: .88rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem
+        }
+
+        /* ACCORDION */
+        .q-group-title {
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 1.8rem 0 .7rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .q-group-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border)
+        }
+
+        .q-block {
+            margin-bottom: .75rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--surface);
+            transition: box-shadow .2s
+        }
+
+        .q-block:hover {
+            box-shadow: 0 0 0 1px var(--accent)
+        }
+
+        .q-header {
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            padding: .9rem 1.2rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .q-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, .12);
+            border: 1px solid rgba(239, 68, 68, .3);
+            color: #fca5a5;
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .q-text {
+            flex: 1;
+            font-size: .93rem;
+            font-weight: 500
+        }
+
+        .q-arrow {
+            font-size: .78rem;
+            color: var(--muted);
+            transition: transform .25s
+        }
+
+        .q-block.open .q-arrow {
+            transform: rotate(180deg)
+        }
+
+        .q-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+
+        .q-block.open .q-body {
+            max-height: 500px
+        }
+
+        .q-body-inner {
+            padding: .85rem 1.2rem 1.1rem;
+            border-top: 1px solid var(--border)
+        }
+
+        .q-body-inner p {
+            color: var(--muted);
+            font-size: .87rem;
+            margin-bottom: .8rem
+        }
+
+        .q-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem
+        }
+
+        .q-tag {
+            font-size: .7rem;
+            padding: .18rem .6rem;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: .04em
+        }
+
+        .q-tag.red {
+            background: rgba(239, 68, 68, .12);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, .25)
+        }
+
+        .q-tag.orange {
+            background: rgba(249, 115, 22, .12);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, .25)
+        }
+
+        .q-tag.purple {
+            background: rgba(139, 92, 246, .12);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, .25)
+        }
+
+        .q-tag.blue {
+            background: rgba(59, 130, 246, .12);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .25)
+        }
+
+        .q-tag.green {
+            background: rgba(16, 185, 129, .12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, .25)
+        }
+
+        .q-tag.yellow {
+            background: rgba(234, 179, 8, .12);
+            color: #fde047;
+            border: 1px solid rgba(234, 179, 8, .25)
+        }
+
+        /* PROGRESS */
+        .progress-bar-wrap {
+            background: var(--surface2);
+            border-radius: 999px;
+            height: 8px;
+            margin-bottom: .5rem;
+            overflow: hidden
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 999px;
+            transition: width .4s ease;
+            width: 0%
+        }
+
+        .progress-label {
+            font-size: .78rem;
+            color: var(--muted);
+            text-align: right;
+            margin-bottom: 1.5rem
+        }
+
+        /* VIDEO */
+        .video-thumb-wrap {
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            background: #000;
+            cursor: pointer;
+            display: block;
+            text-decoration: none
+        }
+
+        .video-thumb-wrap img {
+            width: 100%;
+            display: block;
+            opacity: .85;
+            transition: opacity .3s, transform .3s
+        }
+
+        .video-thumb-wrap:hover img {
+            opacity: .6;
+            transform: scale(1.02)
+        }
+
+        .video-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, .95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .25s, background .25s;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .5)
+        }
+
+        .video-play-btn svg {
+            margin-left: 5px
+        }
+
+        .video-thumb-wrap:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.12);
+            background: #ff0000
+        }
+
+        .video-thumb-wrap:hover .video-play-btn svg path {
+            fill: #fff
+        }
+
+        .video-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .85));
+            padding: 1.5rem 1.25rem .85rem;
+            color: #fff;
+            font-size: .9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .yt-badge {
+            background: #ff0000;
+            color: #fff;
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .15rem .5rem;
+            border-radius: 4px;
+            letter-spacing: .04em
+        }
+
+        /* BRAND BATTLE */
+        .battle-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem
+        }
+
+        .brand-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            text-align: center;
+            transition: all .25s
+        }
+
+        .brand-card.amd {
+            border-top: 3px solid var(--amd)
+        }
+
+        .brand-card.intel {
+            border-top: 3px solid var(--intel)
+        }
+
+        .brand-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow)
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: .4rem
+        }
+
+        .brand-logo.amd {
+            color: var(--amd)
+        }
+
+        .brand-logo.intel {
+            color: var(--intel)
+        }
+
+        .brand-card p {
+            font-size: .78rem;
+            color: var(--muted);
+            line-height: 1.5
+        }
+
+        .vs-circle {
+            width: 48px;
+            height: 48px;
+            background: var(--surface2);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .85rem;
+            color: var(--muted);
+            flex-shrink: 0
+        }
+
+        /* CHIP GRID */
+        .video-notes {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.4rem;
+            margin-bottom: 1.5rem
+        }
+
+        .video-notes h3 {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: .5rem
+        }
+
+        .chip {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: .3rem .85rem;
+            font-size: .78rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .chip:hover,
+        .chip.selected {
+            background: rgba(239, 68, 68, .12);
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .chip.intel-chip:hover,
+        .chip.intel-chip.selected {
+            background: rgba(0, 104, 181, .12);
+            border-color: var(--intel);
+            color: #60a5fa
+        }
+
+        /* SUGGESTIONS */
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: .6rem;
+            margin-bottom: .75rem
+        }
+
+        .sug-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .75rem .9rem;
+            font-size: .82rem;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--muted)
+        }
+
+        .sug-card:hover {
+            border-color: var(--accent2);
+            color: var(--text);
+            background: rgba(249, 115, 22, .06)
+        }
+
+        .sug-card .num {
+            color: var(--accent2);
+            font-weight: 700;
+            margin-right: .3rem;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        /* CONSULTA */
+        .consulta-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem
+        }
+
+        .consulta-box h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem
+        }
+
+        .input-row {
+            display: flex;
+            gap: .75rem;
+            margin-bottom: .75rem;
+            flex-wrap: wrap
+        }
+
+        .input-row input,
+        .input-row select {
+            flex: 1;
+            min-width: 140px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .6rem .9rem;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .input-row input:focus,
+        .input-row select:focus {
+            border-color: var(--accent)
+        }
+
+        .input-row select option {
+            background: var(--surface2)
+        }
+
+        textarea.consulta-input {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .8rem 1rem;
+            min-height: 95px;
+            resize: vertical;
+            outline: none;
+            transition: border-color .2s;
+            margin-bottom: .75rem
+        }
+
+        textarea.consulta-input:focus {
+            border-color: var(--accent)
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .6rem 1.3rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(239, 68, 68, .35)
+        }
+
+        .btn.green {
+            background: var(--accent3)
+        }
+
+        .btn.green:hover {
+            background: #059669;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, .35)
+        }
+
+        .consultas-feed {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem
+        }
+
+        .consulta-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .9rem 1rem;
+            animation: fadeIn .3s ease
+        }
+
+        .consulta-item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            align-items: center;
+            margin-bottom: .4rem
+        }
+
+        .consulta-item .name {
+            font-weight: 600;
+            font-size: .85rem
+        }
+
+        .consulta-item .topic {
+            font-size: .7rem;
+            padding: .15rem .55rem;
+            background: rgba(239, 68, 68, .12);
+            color: #fca5a5;
+            border-radius: 999px;
+            font-weight: 600
+        }
+
+        .consulta-item .time {
+            font-size: .7rem;
+            color: var(--muted);
+            margin-left: auto
+        }
+
+        .consulta-item .msg {
+            font-size: .87rem;
+            color: var(--muted)
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: .78rem;
+            background: var(--surface)
+        }
+
+        @media(max-width:600px) {
+            nav.tabs {
+                gap: .3rem
+            }
+
+            nav.tabs button {
+                font-size: .75rem;
+                padding: .4rem .8rem
+            }
+
+            .battle-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vs-circle {
+                margin: 0 auto
+            }
+
+            .input-row {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <span class="badge">Laboratorio de Informática · Unidad 1</span>
+        <h1>⚙️ CPU y Procesadores</h1>
+        <p class="sub">El cerebro de la computadora: qué es, cómo funciona, sus tipos y las grandes marcas del mercado.
+        </p>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="Uni 1 - Hardware.html">🖥️ Hardware</a>
+        <span>›</span>
+        <span>⚙️ CPU y Procesadores</span>
+    </div>
+
+    <nav class="tabs">
+        <button class="active" onclick="showSection('intro')" id="tab-intro">⚙️ Introducción</button>
+        <button onclick="showSection('preguntas')" id="tab-preguntas">❓ Preguntas</button>
+        <button onclick="showSection('video')" id="tab-video">▶️ Video</button>
+
+    </nav>
+
+    <!-- ====== INTRO ====== -->
+    <section id="intro" class="section active">
+        <div class="section-title">
+            <span class="icon">⚙️</span>
+            <div>
+                <h2>¿Qué es la CPU?</h2>
+                <p>La Unidad Central de Procesamiento — el motor que ejecuta todo</p>
+            </div>
+        </div>
+
+        <p style="color:var(--muted);margin-bottom:1.5rem;font-size:.95rem;">
+            La <strong style="color:var(--text)">CPU (Central Processing Unit)</strong> es el componente principal de
+            una computadora.
+            Su función es interpretar y ejecutar las instrucciones de los programas, realizar cálculos y coordinar el
+            resto del hardware.
+            Popularmente también se la llama <strong style="color:var(--text)">procesador</strong>.
+            Sin ella, ningún software podría ejecutarse.
+        </p>
+
+        <div class="topics-grid">
+            <div class="topic-card t1" onclick="showSection('preguntas')">
+                <span class="emoji">🧮</span>
+                <h3>¿Qué es la CPU?</h3>
+                <p>Definición, función principal y diferencia con el procesador.</p>
+            </div>
+            <div class="topic-card t2" onclick="showSection('preguntas')">
+                <span class="emoji">⚡</span>
+                <h3>Cómo funciona</h3>
+                <p>El ciclo Fetch–Decode–Execute y la relación con la memoria.</p>
+            </div>
+            <div class="topic-card t3" onclick="showSection('preguntas')">
+                <span class="emoji">🏷️</span>
+                <h3>Marcas del mercado</h3>
+                <p>Intel, AMD y ARM: las empresas que lideran la industria.</p>
+            </div>
+            <div class="topic-card t4" onclick="showSection('preguntas')">
+                <span class="emoji">🖥️</span>
+                <h3>Tipos de procesadores</h3>
+                <p>Escritorio, laptop, servidor y celular: diferencias clave.</p>
+            </div>
+            <div class="topic-card t5" onclick="showSection('preguntas')">
+                <span class="emoji">⚖️</span>
+                <h3>Comparativas</h3>
+                <p>AMD vs Intel: rendimiento, consumo y precio.</p>
+            </div>
+            <div class="topic-card t6" onclick="showSection('preguntas')">
+                <span class="emoji">🔥</span>
+                <h3>Overclocking</h3>
+                <p>Acelerar el procesador más allá de sus límites de fábrica.</p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            💡 <strong style="color:var(--text)">¿Sabías que?</strong>
+            Los procesadores modernos contienen <em>miles de millones de transistores</em> en un chip del tamaño de una
+            uña.
+            El primer microprocesador comercial, el Intel 4004 (1971), tenía apenas <strong
+                style="color:var(--text)">2.300 transistores</strong>.
+            Hoy, algunos procesadores superan los <strong style="color:var(--text)">80.000 millones</strong>.
+        </div>
+    </section>
+
+    <!-- ====== PREGUNTAS ====== -->
+    <section id="preguntas" class="section">
+        <div class="section-title">
+            <span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Investigación</h2>
+                <p>Investigá cada tema usando internet, libros o el video. ¡Abrí cada pregunta para ver la pista!</p>
+            </div>
+        </div>
+
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">0 de 14 preguntas leídas</div>
+
+        <div id="questions-container"></div>
+    </section>
+
+    <!-- ====== VIDEO ====== -->
+    <section id="video" class="section">
+        <div class="section-title">
+            <span class="icon">▶️</span>
+            <div>
+                <h2>Video: AMD vs Intel</h2>
+                <p>Comparativa de microprocesadores — mirá el video y completá las actividades</p>
+            </div>
+        </div>
+
+        <!-- Thumbnail -->
+        <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=uHwRqoZPL3o" target="_blank"
+            rel="noopener noreferrer" title="Ver en YouTube">
+            <img src="https://img.youtube.com/vi/uHwRqoZPL3o/maxresdefault.jpg"
+                onerror="this.src='https://img.youtube.com/vi/uHwRqoZPL3o/hqdefault.jpg'"
+                alt="AMD vs Intel - Comparativa de microprocesadores" />
+            <div class="video-play-btn">
+                <svg width="28" height="28" viewBox="0 0 24 24">
+                    <path fill="#ff0000" d="M8 5v14l11-7z" />
+                </svg>
+            </div>
+            <div class="video-label">
+                <span class="yt-badge">YouTube</span>
+                AMD vs Intel — Comparativa de Microprocesadores
+            </div>
+        </a>
+
+        <!-- BATTLE CARDS -->
+        <div class="video-notes">
+            <h3>⚔️ El duelo de las marcas</h3>
+            <div class="battle-grid">
+                <div class="brand-card amd">
+                    <div class="brand-logo amd">AMD</div>
+                    <p>Advanced Micro Devices<br />Series Ryzen (escritorio/laptop)<br />EPYC
+                        (servidores)<br />Snapdragon (móviles, en ARM)</p>
+                </div>
+                <div class="vs-circle">VS</div>
+                <div class="brand-card intel">
+                    <div class="brand-logo intel">Intel</div>
+                    <p>Intel Corporation<br />Core i3 / i5 / i7 / i9<br />Xeon (servidores)<br />Atom / Core Ultra
+                        (móviles)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temas del video -->
+        <div class="video-notes">
+            <h3>🏷️ Marcá los temas que aparecen en el video</h3>
+            <div class="chip-grid" id="topicChips"></div>
+            <p style="font-size:.78rem;color:var(--muted);margin-top:.6rem" id="chipsStatus">Ningún tema seleccionado
+                todavía.</p>
+        </div>
+
+        <!-- Preguntas sugeridas -->
+        <div class="video-notes">
+            <h3>💬 Preguntas para reflexionar después de ver el video</h3>
+            <div class="suggestions-grid" id="suggestionsGrid"></div>
+            <p style="font-size:.78rem;color:var(--muted)">Hacé clic en una pregunta para enviarla al espacio de
+                Consulta 👆</p>
+        </div>
+
+        <!-- Nota personal -->
+        <div class="video-notes">
+            <h3>⭐ ¿Qué fue lo más interesante del video?</h3>
+            <textarea class="consulta-input" id="videoNote"
+                placeholder="Escribí lo que más te llamó la atención, lo que aprendiste o lo que te quedó por entender…"></textarea>
+            <button class="btn green" onclick="saveVideoNote()">💾 Guardar nota</button>
+            <span id="noteSaved" style="margin-left:.7rem;font-size:.82rem;color:var(--accent3);display:none">✓ Nota
+                guardada</span>
+        </div>
+    </section>
+
+    <!-- ====== CONSULTA ====== -->
+    <section id="consulta" class="section">
+        <div class="section-title">
+            <span class="icon">💬</span>
+            <div>
+                <h2>Espacio de Consulta</h2>
+                <p>Escribí tus preguntas, dudas o comentarios sobre CPU y procesadores</p>
+            </div>
+        </div>
+
+        <div class="consulta-box">
+            <h3>✍️ Nueva consulta</h3>
+            <div class="input-row">
+                <input type="text" id="consultaNombre" placeholder="Tu nombre (opcional)" maxlength="40" />
+                <select id="consultaTema">
+                    <option value="">-- Tema --</option>
+                    <option>¿Qué es la CPU?</option>
+                    <option>Cómo funciona la CPU</option>
+                    <option>AMD vs Intel</option>
+                    <option>Procesadores de escritorio</option>
+                    <option>Procesadores de laptop</option>
+                    <option>Procesadores de servidor</option>
+                    <option>Procesadores de celular</option>
+                    <option>Overclocking</option>
+                    <option>Video de estudio</option>
+                    <option>Otro</option>
+                </select>
+            </div>
+            <textarea class="consulta-input" id="consultaTexto" placeholder="Escribí tu pregunta o comentario…"
+                maxlength="500"></textarea>
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+                <button class="btn" onclick="enviarConsulta()">📤 Enviar consulta</button>
+                <span style="font-size:.78rem;color:var(--muted)" id="charCount">0 / 500</span>
+            </div>
+        </div>
+
+        <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">📋 Consultas registradas</h3>
+        <div class="consultas-feed" id="consultasFeed">
+            <p style="color:var(--muted);font-size:.88rem;text-align:center;padding:2rem">Aún no hay consultas. ¡Sé el
+                primero en preguntar! 🙋</p>
+        </div>
+    </section>
+
+    <footer>
+        Laboratorio de Informática · Unidad 1: Partes de la Computadora &nbsp;›&nbsp; CPU y Procesadores &nbsp;|&nbsp;
+        Buscá, investigá y preguntá 🔍
+    </footer>
+
+    <script>
+        /* =========================================================
+           DATA
+        ========================================================= */
+        const questions = [
+            // --- ¿Qué es la CPU? ---
+            {
+                g: "¿Qué es la CPU?", num: 1,
+                text: "¿Qué significa la sigla CPU y cuál es su función principal en una computadora?",
+                hint: "CPU = Central Processing Unit. Investigá qué tipo de operaciones realiza y por qué se la considera el 'cerebro' del sistema.",
+                tags: ["Definición", "Fundamental"], colors: ["red", "orange"]
+            },
+            {
+                g: "¿Qué es la CPU?", num: 2,
+                text: "¿Cómo funciona la CPU internamente? Describí el ciclo Fetch–Decode–Execute.",
+                hint: "Fetch = buscar la instrucción en memoria. Decode = interpretarla. Execute = ejecutarla. Investigá qué hace la CPU en cada paso.",
+                tags: ["Funcionamiento", "Ciclo de instrucción"], colors: ["red", "purple"]
+            },
+            {
+                g: "¿Qué es la CPU?", num: 3,
+                text: "¿Qué son los registros, la caché y la ALU dentro de una CPU?",
+                hint: "La ALU (Arithmetic Logic Unit) hace cálculos. Los registros son memoria ultra-rápida dentro del chip. La caché es un almacenamiento intermedio entre la CPU y la RAM.",
+                tags: ["Componentes internos", "CPU"], colors: ["orange", "red"]
+            },
+            // --- Qué es un procesador ---
+            {
+                g: "¿Qué es un procesador?", num: 4,
+                text: "¿Cuál es la diferencia entre 'CPU' y 'procesador'? ¿Son lo mismo?",
+                hint: "En la práctica se usan como sinónimos, pero técnicamente la CPU es el chip y el 'procesador' puede incluir otros bloques integrados (GPU, controlador de memoria).",
+                tags: ["Conceptos", "Diferencias"], colors: ["blue", "orange"]
+            },
+            {
+                g: "¿Qué es un procesador?", num: 5,
+                text: "¿Qué son los núcleos (cores) y los hilos (threads)? ¿Por qué importa la cantidad?",
+                hint: "Un procesador de 8 núcleos puede ejecutar 8 tareas en simultáneo. Los hilos (SMT/Hyper-Threading) permiten duplicar eso virtualmente.",
+                tags: ["Núcleos", "Hilos", "Rendimiento"], colors: ["purple", "blue", "green"]
+            },
+            {
+                g: "¿Qué es un procesador?", num: 6,
+                text: "¿Qué es la velocidad de reloj (GHz) y cómo afecta el rendimiento?",
+                hint: "1 GHz = 1.000 millones de ciclos por segundo. Más GHz = más instrucciones por segundo, pero también más calor.",
+                tags: ["GHz", "Velocidad de reloj"], colors: ["red", "orange"]
+            },
+            // --- Marcas ---
+            {
+                g: "Marcas del mercado", num: 7,
+                text: "¿Cuáles son las principales marcas de procesadores para computadoras de escritorio y laptop? Listá al menos 3 líneas de productos de cada una.",
+                hint: "Las dos grandes son Intel (Core i3/i5/i7/i9) y AMD (Ryzen 3/5/7/9). Investigá sus familias actuales.",
+                tags: ["Intel", "AMD", "Marcas"], colors: ["blue", "red", "orange"]
+            },
+            {
+                g: "Marcas del mercado", num: 8,
+                text: "¿Qué es ARM y por qué los procesadores de celulares son casi todos basados en esa arquitectura?",
+                hint: "ARM diseña la arquitectura y vende licencias (a Apple, Qualcomm, Samsung, etc.). Su ventaja principal es el bajo consumo eléctrico.",
+                tags: ["ARM", "Arquitectura", "Celulares"], colors: ["green", "purple", "blue"]
+            },
+            // --- Tipos ---
+            {
+                g: "Tipos de procesadores", num: 9,
+                text: "¿Qué diferencias hay entre un procesador de escritorio y uno de laptop en cuanto a rendimiento, consumo y temperatura?",
+                hint: "Los de laptop tienen TDP más bajo (15–45 W vs 65–125 W en escritorio) para ahorrar batería y reducir calor en un espacio reducido.",
+                tags: ["Escritorio", "Laptop", "Comparación"], colors: ["blue", "orange", "purple"]
+            },
+            {
+                g: "Tipos de procesadores", num: 10,
+                text: "¿Por qué los procesadores de servidor (ej. Intel Xeon, AMD EPYC) son tan diferentes a los de una PC hogareña?",
+                hint: "Más núcleos (hasta 96+), ECC RAM, múltiples sockets, mayor fiabilidad 24/7. Investiga el precio de uno y compará con un Core i9.",
+                tags: ["Servidor", "EPYC", "Xeon"], colors: ["red", "blue", "orange"]
+            },
+            {
+                g: "Tipos de procesadores", num: 11,
+                text: "¿Cuál es el procesador que usa tu celular? ¿Cuántos núcleos tiene y a qué velocidad funciona?",
+                hint: "Buscá en Ajustes → Información del teléfono, o buscá el modelo en GSMArena.com para ver las especificaciones completas.",
+                tags: ["Celular", "Práctica", "Investigación"], colors: ["green", "orange", "blue"]
+            },
+            // --- Diferencias ---
+            {
+                g: "AMD vs Intel", num: 12,
+                text: "¿En qué situaciones conviene elegir un procesador AMD Ryzen por sobre un Intel Core, y viceversa?",
+                hint: "Considerá precio/rendimiento, consumo energético, compatibilidad de plataforma y uso (gaming, edición de video, ofimática).",
+                tags: ["AMD", "Intel", "Comparativa"], colors: ["red", "blue", "purple"]
+            },
+            // --- Overclocking ---
+            {
+                g: "Overclocking", num: 13,
+                text: "¿Qué es el overclocking y cuáles son sus ventajas y riesgos?",
+                hint: "Es aumentar la velocidad de reloj del procesador más allá de los valores de fábrica. Aumenta el rendimiento pero también el calor y puede reducir la vida útil.",
+                tags: ["Overclocking", "Riesgo", "Rendimiento"], colors: ["yellow", "red", "orange"]
+            },
+            {
+                g: "Overclocking", num: 14,
+                text: "¿Qué tipo de refrigeración se necesita para hacer overclocking? ¿Qué es el refrigerado líquido (Liquid Cooling)?",
+                hint: "El disipador de stock no suele ser suficiente. Existen torres de aire de alto rendimiento y sistemas de refrigeración líquida AIO (All-In-One).",
+                tags: ["Cooling", "Refrigeración", "Overclocking"], colors: ["blue", "green", "yellow"]
+            },
+        ];
+
+        const videoTopics = [
+            { t: "Rendimiento por núcleo", cl: "" },
+            { t: "Precio / rendimiento", cl: "" },
+            { t: "Consumo energético", cl: "" },
+            { t: "Gaming", cl: "" },
+            { t: "Edición de video", cl: "" },
+            { t: "Inteligencia Artificial", cl: "" },
+            { t: "Overclock AMD", cl: "" },
+            { t: "Overclock Intel", cl: "intel-chip" },
+            { t: "Temperatura / TDP", cl: "" },
+            { t: "Plataformas AM5 / LGA1700", cl: "" },
+            { t: "Hyper-Threading", cl: "intel-chip" },
+            { t: "Precio de gama alta", cl: "" },
+        ];
+
+        const videoSuggestions = [
+            "¿Cuál salió ganador en el video, AMD o Intel?",
+            "¿En qué categoría ganó cada marca según el video?",
+            "¿Te sorprendió algún resultado de la comparativa?",
+            "¿Cuál elegiría para armar una PC de juegos según lo visto?",
+            "¿Qué preguntarías al docente sobre lo que no entendiste?",
+            "¿El precio justifica el rendimiento según el video?",
+            "¿Cómo se relaciona el video con los temas del temario?",
+            "¿Qué componentes mencionaron además del procesador?",
+        ];
+
+        /* =========================================================
+           STATE
+        ========================================================= */
+        let openedQ = new Set();
+        let consultas = [];
+
+        /* =========================================================
+           TABS
+        ========================================================= */
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('tab-' + id).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* =========================================================
+           QUESTIONS
+        ========================================================= */
+        function renderQuestions() {
+            const c = document.getElementById('questions-container');
+            let lastGroup = '';
+            questions.forEach(q => {
+                if (q.g !== lastGroup) {
+                    lastGroup = q.g;
+                    const gt = document.createElement('div');
+                    gt.className = 'q-group-title';
+                    gt.textContent = q.g;
+                    c.appendChild(gt);
+                }
+                const block = document.createElement('div');
+                block.className = 'q-block';
+                block.id = 'q-' + q.num;
+                block.innerHTML = `
+      <div class="q-header" onclick="toggleQ(${q.num})">
+        <div class="q-num">${q.num}</div>
+        <div class="q-text">${q.text}</div>
+        <span class="q-arrow">▼</span>
+      </div>
+      <div class="q-body">
+        <div class="q-body-inner">
+          <p>💡 <em>${q.hint}</em></p>
+          <div class="q-tags">${q.tags.map((t, i) => `<span class="q-tag ${q.colors[i]}">${t}</span>`).join('')}</div>
+        </div>
+      </div>`;
+                c.appendChild(block);
+            });
+        }
+
+        function toggleQ(num) {
+            const b = document.getElementById('q-' + num);
+            const wasOpen = b.classList.contains('open');
+            document.querySelectorAll('.q-block').forEach(x => x.classList.remove('open'));
+            if (!wasOpen) { b.classList.add('open'); openedQ.add(num); updateProgress(); }
+        }
+        function updateProgress() {
+            const pct = Math.round(openedQ.size / questions.length * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent = openedQ.size + ' de ' + questions.length + ' preguntas leídas';
+        }
+
+        /* =========================================================
+           VIDEO
+        ========================================================= */
+        function renderChips() {
+            const c = document.getElementById('topicChips');
+            videoTopics.forEach(({ t, cl }) => {
+                const ch = document.createElement('div');
+                ch.className = 'chip ' + (cl || '');
+                ch.textContent = t;
+                ch.onclick = () => { ch.classList.toggle('selected'); updateChipStatus(); };
+                c.appendChild(ch);
+            });
+        }
+        function updateChipStatus() {
+            const sel = [...document.querySelectorAll('.chip.selected')].map(c => c.textContent);
+            document.getElementById('chipsStatus').textContent = sel.length === 0
+                ? 'Ningún tema seleccionado todavía.'
+                : '✓ Identificados: ' + sel.join(', ');
+        }
+
+        function renderSuggestions() {
+            const g = document.getElementById('suggestionsGrid');
+            videoSuggestions.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'sug-card';
+                d.innerHTML = `<span class="num">${String(i + 1).padStart(2, '0')}</span>${s}`;
+                d.onclick = () => {
+                    document.getElementById('consultaTexto').value = s;
+                    document.getElementById('consultaTema').value = 'Video de estudio';
+                    showSection('consulta');
+                };
+                g.appendChild(d);
+            });
+        }
+
+        function saveVideoNote() {
+            const v = document.getElementById('videoNote').value.trim();
+            if (!v) return;
+            localStorage.setItem('cpu_video_note', v);
+            const el = document.getElementById('noteSaved');
+            el.style.display = 'inline';
+            setTimeout(() => el.style.display = 'none', 2500);
+        }
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('cpu_video_note');
+            if (saved) document.getElementById('videoNote').value = saved;
+        });
+
+
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        /* =========================================================
+           INIT
+        ========================================================= */
+        renderQuestions();
+        renderChips();
+        renderSuggestions();
+    </script>
+</body>
+
+</html>

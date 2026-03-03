@@ -1,0 +1,1190 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laboratorio de Informática — Unidad 1: Hardware</title>
+    <meta name="description"
+        content="Guía interactiva sobre Hardware para el Laboratorio de Informática. Preguntas de investigación, video y espacio de consulta." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1f2937;
+            --border: #30363d;
+            --accent: #3b82f6;
+            --accent2: #6366f1;
+            --accent3: #10b981;
+            --warn: #f59e0b;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, .45);
+        }
+
+        /* ============================================================
+       RESET & BASE
+    ============================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+       HERO HEADER
+    ============================================================ */
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.5rem 1.5rem 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0d1117 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 30% -10%, rgba(99, 102, 241, .25) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 110%, rgba(59, 130, 246, .2) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, .18);
+            border: 1px solid rgba(99, 102, 241, .4);
+            color: #a5b4fc;
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .25rem .85rem;
+            border-radius: 999px;
+            margin-bottom: 1.1rem;
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #e0e7ff, #93c5fd, #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .6rem;
+        }
+
+        header p.sub {
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1rem;
+        }
+
+        /* ============================================================
+       NAV TABS
+    ============================================================ */
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: 1.2rem 1rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav.tabs button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            padding: .5rem 1.1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .25s ease;
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        nav.tabs button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(59, 130, 246, .4);
+        }
+
+        /* ============================================================
+       SECTIONS
+    ============================================================ */
+        .section {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem 4rem;
+            animation: fadeIn .35s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+       SECTION TITLES
+    ============================================================ */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .section-title .icon {
+            font-size: 1.6rem;
+        }
+
+        .section-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .section-title p {
+            font-size: .9rem;
+            color: var(--muted);
+            margin-top: .15rem;
+        }
+
+        /* ============================================================
+       INTRO CARDS (Hardware components)
+    ============================================================ */
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .comp-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all .25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comp-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            opacity: 0;
+            transition: opacity .3s;
+        }
+
+        .comp-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+
+        .comp-card:hover::before {
+            opacity: 1;
+        }
+
+        .comp-card .emoji {
+            font-size: 2.4rem;
+            margin-bottom: .5rem;
+            display: block;
+        }
+
+        .comp-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: .3rem;
+        }
+
+        .comp-card p {
+            font-size: .78rem;
+            color: var(--muted);
+        }
+
+        /* color accents per card */
+        .comp-card.cpu {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .comp-card.ram {
+            border-top: 3px solid #10b981;
+        }
+
+        .comp-card.hdd {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .comp-card.mb {
+            border-top: 3px solid #8b5cf6;
+        }
+
+        .comp-card.gpu {
+            border-top: 3px solid #ec4899;
+        }
+
+        .comp-card.peri {
+            border-top: 3px solid #06b6d4;
+        }
+
+        /* ============================================================
+       QUESTIONS ACCORDION
+    ============================================================ */
+        .q-block {
+            margin-bottom: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            background: var(--surface);
+            transition: box-shadow .2s;
+        }
+
+        .q-block:hover {
+            box-shadow: 0 0 0 1px var(--accent2);
+        }
+
+        .q-header {
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .q-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, .15);
+            border: 1px solid rgba(99, 102, 241, .35);
+            color: #a5b4fc;
+            font-size: .75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q-text {
+            flex: 1;
+            font-size: .95rem;
+            font-weight: 500;
+        }
+
+        .q-arrow {
+            font-size: .8rem;
+            color: var(--muted);
+            transition: transform .25s;
+        }
+
+        .q-block.open .q-arrow {
+            transform: rotate(180deg);
+        }
+
+        .q-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease, padding .35s ease;
+        }
+
+        .q-block.open .q-body {
+            max-height: 400px;
+        }
+
+        .q-body-inner {
+            padding: 0 1.25rem 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .q-body-inner p {
+            color: var(--muted);
+            font-size: .88rem;
+            margin-bottom: .8rem;
+        }
+
+        .q-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        .q-tag {
+            font-size: .7rem;
+            padding: .2rem .65rem;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .q-tag.blue {
+            background: rgba(59, 130, 246, .15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .3);
+        }
+
+        .q-tag.green {
+            background: rgba(16, 185, 129, .12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, .3);
+        }
+
+        .q-tag.purple {
+            background: rgba(139, 92, 246, .12);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, .3);
+        }
+
+        /* ============================================================
+       PROGRESS TRACKER
+    ============================================================ */
+        .progress-bar-wrap {
+            background: var(--surface2);
+            border-radius: 999px;
+            height: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 999px;
+            transition: width .4s ease;
+            width: 0%;
+        }
+
+        .progress-label {
+            font-size: .8rem;
+            color: var(--muted);
+            text-align: right;
+            margin-top: .3rem;
+        }
+
+        /* ============================================================
+       VIDEO SECTION
+    ============================================================ */
+        .video-thumb-wrap {
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            background: #000;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+        }
+
+        .video-thumb-wrap img {
+            width: 100%;
+            display: block;
+            opacity: .85;
+            transition: opacity .3s, transform .3s;
+        }
+
+        .video-thumb-wrap:hover img {
+            opacity: .6;
+            transform: scale(1.02);
+        }
+
+        .video-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, .95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .25s, background .25s;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .5);
+        }
+
+        .video-play-btn svg {
+            margin-left: 5px;
+        }
+
+        .video-thumb-wrap:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.12);
+            background: #ff0000;
+        }
+
+        .video-thumb-wrap:hover .video-play-btn svg path {
+            fill: #fff;
+        }
+
+        .video-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, .85));
+            padding: 1.5rem 1.25rem .85rem;
+            color: #fff;
+            font-size: .9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .yt-badge {
+            background: #ff0000;
+            color: #fff;
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .15rem .5rem;
+            border-radius: 4px;
+            letter-spacing: .04em;
+        }
+
+        .video-notes {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .video-notes h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: .5rem;
+        }
+
+        .chip {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: .3rem .85rem;
+            font-size: .78rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .chip:hover,
+        .chip.selected {
+            background: rgba(59, 130, 246, .15);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ============================================================
+       CONSULTA / FORUM
+    ============================================================ */
+        .consulta-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .consulta-box h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: .75rem;
+            margin-bottom: .75rem;
+            flex-wrap: wrap;
+        }
+
+        .input-row input,
+        .input-row select {
+            flex: 1;
+            min-width: 140px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .6rem .9rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .input-row input:focus,
+        .input-row select:focus {
+            border-color: var(--accent);
+        }
+
+        .input-row select option {
+            background: var(--surface2);
+        }
+
+        textarea.consulta-input {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            padding: .8rem 1rem;
+            min-height: 100px;
+            resize: vertical;
+            outline: none;
+            transition: border-color .2s;
+            margin-bottom: .75rem;
+        }
+
+        textarea.consulta-input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            font-weight: 600;
+            padding: .6rem 1.3rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, .35);
+        }
+
+        .btn.green {
+            background: var(--accent3);
+        }
+
+        .btn.green:hover {
+            background: #059669;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, .35);
+        }
+
+        /* Feed de consultas */
+        .consultas-feed {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .consulta-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .9rem 1rem;
+            animation: fadeIn .3s ease;
+        }
+
+        .consulta-item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            align-items: center;
+            margin-bottom: .4rem;
+        }
+
+        .consulta-item .name {
+            font-weight: 600;
+            font-size: .85rem;
+        }
+
+        .consulta-item .topic {
+            font-size: .7rem;
+            padding: .15rem .55rem;
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .consulta-item .time {
+            font-size: .7rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .consulta-item .msg {
+            font-size: .87rem;
+            color: var(--muted);
+        }
+
+        /* ============================================================
+       SUGGESTED QUESTIONS BOX
+    ============================================================ */
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: .6rem;
+            margin-bottom: 1rem;
+        }
+
+        .sug-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: .75rem .9rem;
+            font-size: .82rem;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--muted);
+        }
+
+        .sug-card:hover {
+            border-color: var(--accent2);
+            color: var(--text);
+            background: rgba(99, 102, 241, .08);
+        }
+
+        .sug-card .num {
+            color: var(--accent2);
+            font-weight: 700;
+            margin-right: .3rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ============================================================
+       FOOTER
+    ============================================================ */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: .78rem;
+            background: var(--surface);
+        }
+
+        /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+        @media (max-width: 600px) {
+            nav.tabs {
+                gap: .35rem;
+            }
+
+            nav.tabs button {
+                font-size: .75rem;
+                padding: .4rem .85rem;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======================== HEADER ======================== -->
+    <header>
+        <span class="badge">Laboratorio de Informática</span>
+        <h1>Unidad 1 — Hardware</h1>
+        <p class="sub">Exploración introductoria de los componentes físicos de una computadora: investiga, pregunta y
+            aprende.</p>
+    </header>
+
+    <!-- ======================== NAV TABS ======================== -->
+    <nav class="tabs">
+        <button class="active" onclick="showSection('intro')" id="tab-intro">🖥️ Introducción</button>
+        <button onclick="showSection('preguntas')" id="tab-preguntas">❓ Preguntas</button>
+        <button onclick="showSection('video')" id="tab-video">▶️ Video</button>
+
+    </nav>
+
+    <!-- ===============================================================
+     SECCIÓN 1: INTRODUCCIÓN
+================================================================ -->
+    <section id="intro" class="section active">
+        <div class="section-title">
+            <span class="icon">🖥️</span>
+            <div>
+                <h2>¿Qué es el Hardware?</h2>
+                <p>Los componentes físicos que forman una computadora</p>
+            </div>
+        </div>
+
+        <p style="color:var(--muted);margin-bottom:1.5rem;font-size:.95rem;">
+            El <strong style="color:var(--text)">hardware</strong> son todas las partes físicas y tangibles de una
+            computadora:
+            los circuitos, placas, cables y dispositivos que podés ver y tocar.
+            Sin hardware, el software no tendría en qué ejecutarse.
+            A continuación verás los componentes clave que vas a investigar en esta unidad.
+        </p>
+
+        <div class="components-grid">
+            <div class="comp-card cpu" onclick="window.location.href='Uni 1.1 - CPU.html'" style="cursor:pointer">
+                <span class="emoji">⚙️</span>
+                <h3>CPU / Procesador</h3>
+                <p>El "cerebro" de la computadora. Ejecuta instrucciones y procesa datos.</p>
+                <span style="display:inline-block;margin-top:.5rem;font-size:.7rem;color:#93c5fd;font-weight:600">Ver
+                    módulo completo →</span>
+            </div>
+            <div class="comp-card ram" onclick="window.location.href='Uni 1.2 - Almacenamiento.html'"
+                style="cursor:pointer">
+                <span class="emoji">🧠</span>
+                <h3>Memoria RAM</h3>
+                <p>Almacenamiento temporal de alta velocidad para los datos en uso.</p>
+                <span style="display:inline-block;margin-top:.5rem;font-size:.7rem;color:#c4b5fd;font-weight:600">Ver
+                    módulo completo →</span>
+            </div>
+            <div class="comp-card hdd" onclick="window.location.href='Uni 1.2 - Almacenamiento.html'"
+                style="cursor:pointer">
+                <span class="emoji">💾</span>
+                <h3>Disco Duro / SSD / M.2</h3>
+                <p>Almacenamiento permanente del sistema operativo, programas y archivos.</p>
+                <span style="display:inline-block;margin-top:.5rem;font-size:.7rem;color:#fcd34d;font-weight:600">Ver
+                    módulo completo →</span>
+            </div>
+            <div class="comp-card mb" onclick="window.location.href='Uni 1.3 - Motherboard.html'"
+                style="cursor:pointer">
+                <span class="emoji">🔌</span>
+                <h3>Placa Madre</h3>
+                <p>Conecta todos los componentes. Es la "columna vertebral" del sistema.</p>
+                <span style="display:inline-block;margin-top:.5rem;font-size:.7rem;color:#c4b5fd;font-weight:600">Ver
+                    módulo completo →</span>
+            </div>
+            <div class="comp-card gpu" onclick="window.location.href='Uni 1.4 - Tarjetas.html'" style="cursor:pointer">
+                <span class="emoji">🎮</span>
+                <h3>Tarjeta de Video / Sonido / Red</h3>
+                <p>GPU, Tarjeta de Sonido y Tarjeta de Red: funciones, marcas y conectores.</p>
+                <span style="display:inline-block;margin-top:.5rem;font-size:.7rem;color:#fbcfe8;font-weight:600">Ver
+                    módulo completo →</span>
+            </div>
+            <div class="comp-card peri" onclick="window.location.href='Uni 1.5 - Perifericos.html'"
+                style="cursor:pointer">
+                <span class="emoji">🖥️</span>
+                <h3>Periféricos</h3>
+                <p>Mouse, teclado, monitor, audio: tipos, gamas, marcas y conexiones.</p>
+                <span style="display:inline-block;margin-top:.5rem;font-size:.7rem;color:#bbf7d0;font-weight:600">Ver
+                    módulo completo →</span>
+            </div>
+        </div>
+
+        <div
+            style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:var(--radius);padding:1.1rem 1.3rem;font-size:.88rem;color:var(--muted);">
+            💡 <strong style="color:var(--text)">Actividad:</strong>
+            Hacé clic en cualquier componente para ir a las preguntas de investigación,
+            o usá las pestañas de arriba para navegar entre las secciones.
+        </div>
+    </section>
+
+    <!-- ===============================================================
+     SECCIÓN 2: PREGUNTAS DE INVESTIGACIÓN
+================================================================ -->
+    <section id="preguntas" class="section">
+        <div class="section-title">
+            <span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Investigación</h2>
+                <p>Investigá cada tema usando internet, libros o el video. ¡No hace falta saberlas de memoria!</p>
+            </div>
+        </div>
+
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">0 de 12 preguntas leídas</div>
+
+        <div id="questions-container"></div>
+    </section>
+
+    <!-- ===============================================================
+     SECCIÓN 3: VIDEO
+================================================================ -->
+    <section id="video" class="section">
+        <div class="section-title">
+            <span class="icon">▶️</span>
+            <div>
+                <h2>Video de Estudio</h2>
+                <p>Mirá el video y completá las actividades de abajo mientras avanzás</p>
+            </div>
+        </div>
+
+        <!-- Video: abre en YouTube (el video no permite embebido externo) -->
+        <a class="video-thumb-wrap" href="https://www.youtube.com/watch?v=0zkX6nlpiSk" target="_blank"
+            rel="noopener noreferrer" title="Ver video en YouTube">
+            <img src="https://img.youtube.com/vi/0zkX6nlpiSk/maxresdefault.jpg"
+                onerror="this.src='https://img.youtube.com/vi/0zkX6nlpiSk/hqdefault.jpg'"
+                alt="Thumbnail del video sobre Hardware" />
+            <div class="video-play-btn">
+                <svg width="28" height="28" viewBox="0 0 24 24">
+                    <path fill="#ff0000" d="M8 5v14l11-7z" />
+                </svg>
+            </div>
+            <div class="video-label">
+                <span class="yt-badge">YouTube</span>
+                Ver video: Partes de la computadora — Hardware
+            </div>
+        </a>
+
+        <!-- Selección de temas -->
+        <div class="video-notes">
+            <h3>🏷️ Marcá los temas que aparecen en el video</h3>
+            <div class="chip-grid" id="topicChips"></div>
+            <p style="font-size:.78rem;color:var(--muted);margin-top:.6rem;" id="chipsStatus">Ningún tema seleccionado
+                todavía.</p>
+        </div>
+
+        <!-- Preguntas sugeridas -->
+        <div class="video-notes">
+            <h3>💬 Preguntas para reflexionar después de ver el video</h3>
+            <div class="suggestions-grid" id="suggestionsGrid"></div>
+            <p style="font-size:.78rem;color:var(--muted);">Hacé clic en una pregunta para enviarla directamente a la
+                sección de Consulta 👆</p>
+        </div>
+
+        <!-- Aspectos interesantes -->
+        <div class="video-notes">
+            <h3>⭐ ¿Qué fue lo más interesante del video?</h3>
+            <textarea class="consulta-input" id="videoNote"
+                placeholder="Escribí aquí lo que más te llamó la atención, lo que aprendiste o lo que te quedó por entender…"></textarea>
+            <button class="btn green" onclick="saveVideoNote()">💾 Guardar nota</button>
+            <span id="noteSaved" style="margin-left:.7rem;font-size:.82rem;color:var(--accent3);display:none;">✓ Nota
+                guardada</span>
+        </div>
+    </section>
+
+
+
+    <!-- ======================== FOOTER ======================== -->
+    <footer>
+        Laboratorio de Informática · Unidad 1: Partes de la Computadora — Hardware &nbsp;|&nbsp; Usá los recursos
+        disponibles para investigar cada pregunta 🔍
+    </footer>
+
+    <!-- ======================== JAVASCRIPT ======================== -->
+    <script>
+        /* ============================================================
+           DATA
+        ============================================================ */
+        const questions = [
+            {
+                num: 1,
+                text: "¿Qué es el hardware y cómo se diferencia del software?",
+                hint: "Pensá en todo lo que podés tocar en una computadora versus lo que no podés tocar pero que la hace funcionar.",
+                tags: ["Conceptos básicos", "Definición", "Fácil"],
+                colors: ["blue", "green", "green"]
+            },
+            {
+                num: 2,
+                text: "¿Cuáles son los componentes principales que forman una computadora de escritorio?",
+                hint: "Listá al menos 5 componentes internos y 2 dispositivos externos.",
+                tags: ["Hardware general", "Componentes", "Investigación"],
+                colors: ["blue", "blue", "purple"]
+            },
+            {
+                num: 3,
+                text: "¿Qué hace la CPU y por qué se la llama el 'cerebro' de la computadora?",
+                hint: "Investigá qué tipo de operaciones realiza y con qué rapidez lo hace.",
+                tags: ["CPU", "Procesamiento", "Fundamental"],
+                colors: ["purple", "blue", "green"]
+            },
+            {
+                num: 4,
+                text: "¿Qué significa 'núcleo' (core) en un procesador? ¿Cuantos núcleos tiene el procesador de tu celular?",
+                hint: "Los procesadores modernos tienen múltiples núcleos. Buscá las especificaciones de tu dispositivo.",
+                tags: ["CPU", "Núcleos", "Práctica"],
+                colors: ["purple", "purple", "green"]
+            },
+            {
+                num: 5,
+                text: "¿Qué es la memoria RAM y para qué se usa? ¿Qué pasa si se llena?",
+                hint: "RAM = Memoria de Acceso Aleatorio. Compará la RAM con un escritorio físico donde ponés lo que usás ahora.",
+                tags: ["RAM", "Memoria", "Analogía"],
+                colors: ["blue", "green", "purple"]
+            },
+            {
+                num: 6,
+                text: "¿Cuál es la diferencia entre un disco duro (HDD) y una memoria de estado sólido (SSD)?",
+                hint: "Comparalos en velocidad, precio, durabilidad y funcionamiento interno.",
+                tags: ["HDD", "SSD", "Comparación"],
+                colors: ["blue", "blue", "purple"]
+            },
+            {
+                num: 7,
+                text: "¿Qué es la placa madre (motherboard) y qué componentes conecta?",
+                hint: "Buscá una imagen de placa madre e identificá el socket del procesador, slots de RAM y puertos de almacenamiento.",
+                tags: ["Placa madre", "Conexiones", "Imagen"],
+                colors: ["blue", "green", "purple"]
+            },
+            {
+                num: 8,
+                text: "¿Para qué sirve una tarjeta de video (GPU)? ¿Todos los procesadores tienen una integrada?",
+                hint: "Fijate la diferencia entre GPU integrada y GPU dedicada.",
+                tags: ["GPU", "Gráficos", "Tipos"],
+                colors: ["blue", "purple", "blue"]
+            },
+            {
+                num: 9,
+                text: "¿Qué son los periféricos de entrada y de salida? Dá 3 ejemplos de cada tipo.",
+                hint: "Pensá en cómo el usuario le envía información a la computadora y cómo la computadora le responde.",
+                tags: ["Periféricos", "E/S", "Ejemplos"],
+                colors: ["green", "blue", "green"]
+            },
+            {
+                num: 10,
+                text: "¿Cuánta RAM y qué tipo de procesador tiene la computadora que estás usando ahora mismo?",
+                hint: "En Windows: clic derecho en 'Este equipo' → Propiedades, o buscá 'Información del sistema'.",
+                tags: ["Práctica", "Tu PC", "Exploración"],
+                colors: ["green", "purple", "purple"]
+            },
+            {
+                num: 11,
+                text: "¿Qué es el 'bit' y el 'byte'? ¿Por qué las memorias se miden en GB (gigabytes)?",
+                hint: "1 byte = 8 bits. Investigá cuántos bytes hay en 1 KB, 1 MB, 1 GB y 1 TB.",
+                tags: ["Unidades", "Bit/Byte", "Fundamental"],
+                colors: ["blue", "green", "green"]
+            },
+            {
+                num: 12,
+                text: "¿Qué diferencias encontrás entre el hardware de una laptop, una PC de escritorio y un celular?",
+                hint: "Considerá tamaño, consumo eléctrico, refrigeración y posibilidades de actualización.",
+                tags: ["Comparación", "Dispositivos", "Reflexión"],
+                colors: ["purple", "blue", "green"]
+            }
+        ];
+
+        const videoTopics = [
+            "CPU / Procesador", "Memoria RAM", "Disco Duro (HDD)", "SSD",
+            "Placa Madre", "Tarjeta de Video", "Periféricos", "BIOS/UEFI",
+            "Fuente de alimentación", "Refrigeración", "Bus de datos", "Velocidad de reloj"
+        ];
+
+        const videoSuggestions = [
+            "¿Qué parte del video te resultó más difícil de entender?",
+            "¿Por qué crees que el procesador es tan importante?",
+            "¿Qué diferencia hay entre RAM y disco duro según el video?",
+            "¿Qué componente te gustaría conocer más en profundidad?",
+            "¿Cómo se conectan los componentes en la placa madre?",
+            "¿Qué pasaría si quitamos la RAM de una computadora?",
+            "¿Los componentes del video que viste se parecen a los de tu computadora?",
+            "¿Qué preguntarías al docente sobre lo visto en el video?"
+        ];
+
+        /* ============================================================
+           STATE
+        ============================================================ */
+        let openedQuestions = new Set();
+        let consultas = [];
+
+        /* ============================================================
+           TABS
+        ============================================================ */
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('tab-' + id).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ============================================================
+           RENDER QUESTIONS
+        ============================================================ */
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            questions.forEach(q => {
+                const block = document.createElement('div');
+                block.className = 'q-block';
+                block.id = 'q-' + q.num;
+                block.innerHTML = `
+        <div class="q-header" onclick="toggleQuestion(${q.num})">
+          <div class="q-num">${q.num}</div>
+          <div class="q-text">${q.text}</div>
+          <span class="q-arrow">▼</span>
+        </div>
+        <div class="q-body">
+          <div class="q-body-inner">
+            <p>💡 <em>${q.hint}</em></p>
+            <div class="q-tags">
+              ${q.tags.map((t, i) => `<span class="q-tag ${q.colors[i]}">${t}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+                container.appendChild(block);
+            });
+        }
+
+        function toggleQuestion(num) {
+            const block = document.getElementById('q-' + num);
+            const wasOpen = block.classList.contains('open');
+            // close all
+            document.querySelectorAll('.q-block').forEach(b => b.classList.remove('open'));
+            if (!wasOpen) {
+                block.classList.add('open');
+                openedQuestions.add(num);
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const pct = Math.round((openedQuestions.size / questions.length) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent =
+                `${openedQuestions.size} de ${questions.length} preguntas leídas`;
+        }
+
+        /* ============================================================
+           VIDEO TOPICS CHIPS
+        ============================================================ */
+        function renderChips() {
+            const container = document.getElementById('topicChips');
+            videoTopics.forEach(t => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.textContent = t;
+                chip.onclick = () => {
+                    chip.classList.toggle('selected');
+                    updateChipStatus();
+                };
+                container.appendChild(chip);
+            });
+        }
+
+        function updateChipStatus() {
+            const selected = [...document.querySelectorAll('.chip.selected')].map(c => c.textContent);
+            const status = document.getElementById('chipsStatus');
+            if (selected.length === 0) {
+                status.textContent = 'Ningún tema seleccionado todavía.';
+            } else {
+                status.textContent = '✓ Temas identificados: ' + selected.join(', ');
+            }
+        }
+
+        /* ============================================================
+           VIDEO SUGGESTIONS
+        ============================================================ */
+        function renderSuggestions() {
+            const grid = document.getElementById('suggestionsGrid');
+            videoSuggestions.forEach((s, i) => {
+                const card = document.createElement('div');
+                card.className = 'sug-card';
+                card.innerHTML = `<span class="num">${String(i + 1).padStart(2, '0')}</span>${s}`;
+                card.onclick = () => {
+                    document.getElementById('consultaTexto').value = s;
+                    document.getElementById('consultaTema').value = 'Video de estudio';
+                    showSection('consulta');
+                };
+                grid.appendChild(card);
+            });
+        }
+
+        /* ============================================================
+           VIDEO NOTE
+        ============================================================ */
+        function saveVideoNote() {
+            const note = document.getElementById('videoNote').value.trim();
+            if (!note) return;
+            localStorage.setItem('hardware_video_note', note);
+            const saved = document.getElementById('noteSaved');
+            saved.style.display = 'inline';
+            setTimeout(() => saved.style.display = 'none', 2500);
+        }
+
+        // restore saved note
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('hardware_video_note');
+            if (saved) document.getElementById('videoNote').value = saved;
+        });
+
+
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        /* ============================================================
+           INIT
+        ============================================================ */
+        renderQuestions();
+        renderChips();
+        renderSuggestions();
+    </script>
+</body>
+
+</html>
