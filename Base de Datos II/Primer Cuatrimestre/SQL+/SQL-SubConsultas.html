@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SQL SubConsultas — Base de Datos II</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f8f9fc;
+            --s: #fff;
+            --s2: #f1f4f9;
+            --bd: #e2e8f0;
+            --a: #0891b2;
+            --a2: #0284c7;
+            --a3: #10b981;
+            --a4: #f59e0b;
+            --pk: #ef4444;
+            --fk: #3b82f6;
+            --text: #1e293b;
+            --m: #64748b;
+            --r: 12px;
+            --rs: 7px;
+            --sh: 0 2px 12px rgba(8, 145, 178, .09)
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.2rem 1.5rem 2.2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #e0f7fa 0%, #ede9fe 50%, #fce7f3 100%);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 55% 50% at 20% -10%, rgba(8, 145, 178, .12) 0%, transparent 60%), radial-gradient(ellipse 50% 45% at 85% 110%, rgba(139, 92, 246, .09) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, .1);
+            border: 1px solid rgba(139, 92, 246, .3);
+            color: #6d28d9;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: .25rem .9rem;
+            border-radius: 999px;
+            margin-bottom: .9rem
+        }
+
+        header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.7rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #0e7490, #7c3aed, #be185d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .5rem
+        }
+
+        header p.sub {
+            color: var(--m);
+            max-width: 620px;
+            margin: 0 auto;
+            font-size: .95rem
+        }
+
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .65rem 1.5rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        .bc a {
+            color: var(--m);
+            text-decoration: none
+        }
+
+        .bc a:hover {
+            color: var(--a)
+        }
+
+        .bc .cur {
+            color: #7c3aed;
+            font-weight: 600
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .4rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .04)
+        }
+
+        nav.tabs button {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            color: var(--m);
+            font-family: 'Inter', sans-serif;
+            font-size: .8rem;
+            font-weight: 500;
+            padding: .42rem .95rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        nav.tabs button:hover {
+            border-color: #7c3aed;
+            color: #7c3aed;
+            background: #ede9fe
+        }
+
+        nav.tabs button.active {
+            background: #7c3aed;
+            border-color: #7c3aed;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(124, 58, 237, .3)
+        }
+
+        .sec {
+            display: none;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2.4rem 1.2rem 4rem;
+            animation: fi .3s ease
+        }
+
+        .sec.active {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bd)
+        }
+
+        .sec-title .icon {
+            font-size: 1.6rem
+        }
+
+        .sec-title h2 {
+            font-size: 1.4rem;
+            font-weight: 700
+        }
+
+        .sec-title p {
+            font-size: .87rem;
+            color: var(--m);
+            margin-top: .1rem
+        }
+
+        .sh {
+            font-size: .93rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 1.8rem 0 .8rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .sh::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--bd), transparent);
+            margin-left: .5rem
+        }
+
+        .ib {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: .95rem 1.15rem;
+            font-size: .86rem;
+            color: var(--m);
+            margin-bottom: 1.1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .03)
+        }
+
+        .ib.cy {
+            border-left: 3px solid var(--a)
+        }
+
+        .ib.gr {
+            border-left: 3px solid var(--a3)
+        }
+
+        .ib.am {
+            border-left: 3px solid var(--a4)
+        }
+
+        .ib.rd {
+            border-left: 3px solid var(--pk)
+        }
+
+        .ib.pu {
+            border-left: 3px solid #7c3aed
+        }
+
+        .ib.bl {
+            border-left: 3px solid var(--fk)
+        }
+
+        .syntax {
+            background: #faf5ff;
+            border: 1px solid #ddd6fe;
+            border-radius: var(--rs);
+            padding: .8rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            color: #3b0764;
+            margin-bottom: .85rem;
+            white-space: pre-wrap;
+            line-height: 1.7
+        }
+
+        .kw {
+            color: #7c3aed;
+            font-weight: 700
+        }
+
+        .val {
+            color: #047857
+        }
+
+        .op {
+            color: #be185d
+        }
+
+        .str {
+            color: #b45309
+        }
+
+        .cm {
+            color: #94a3b8
+        }
+
+        .ex-box {
+            background: #faf5ff;
+            border: 1px solid #ddd6fe;
+            border-radius: var(--rs);
+            padding: .85rem 1rem;
+            margin-bottom: .85rem
+        }
+
+        .ex-box .ex-title {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #6d28d9;
+            margin-bottom: .55rem
+        }
+
+        .ex-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem;
+            color: #3b0764;
+            background: #ede9fe;
+            padding: .6rem .85rem;
+            border-radius: 6px;
+            margin-bottom: .6rem;
+            white-space: pre-wrap
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .81rem;
+            margin-bottom: 1rem
+        }
+
+        .tbl th {
+            background: var(--s2);
+            padding: .5rem .8rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: .7rem;
+            color: var(--m);
+            border: 1px solid var(--bd)
+        }
+
+        .tbl td {
+            padding: .45rem .8rem;
+            border: 1px solid var(--bd);
+            color: var(--text);
+            vertical-align: top
+        }
+
+        .tbl tr:hover td {
+            background: var(--s2)
+        }
+
+        /* STEP DEMO */
+        .step-demo {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 1.5rem
+        }
+
+        .step-nav {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .8rem 1rem;
+            background: var(--s2);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        .step-nav span {
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--m);
+            flex: 1
+        }
+
+        .step-btn {
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: .35rem .85rem;
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s
+        }
+
+        .step-btn:hover {
+            background: #6d28d9
+        }
+
+        .step-btn:disabled {
+            background: #c4b5fd;
+            cursor: default
+        }
+
+        .step-btn.sec-btn {
+            background: var(--s);
+            color: #7c3aed;
+            border: 1px solid #ddd6fe
+        }
+
+        .step-btn.sec-btn:hover {
+            background: #ede9fe
+        }
+
+        .step-content {
+            padding: 1.2rem 1.1rem
+        }
+
+        .step-dots {
+            display: flex;
+            gap: .4rem;
+            justify-content: center;
+            padding: .6rem 0 .8rem
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bd);
+            transition: background .3s
+        }
+
+        .dot.active {
+            background: #7c3aed
+        }
+
+        .step-panel {
+            display: none
+        }
+
+        .step-panel.active {
+            display: block
+        }
+
+        .step-title {
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: #7c3aed;
+            margin-bottom: .7rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem
+        }
+
+        .step-query {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            background: #ede9fe;
+            border: 1px solid #c4b5fd;
+            border-radius: var(--rs);
+            padding: .75rem 1rem;
+            white-space: pre-wrap;
+            line-height: 1.75;
+            margin-bottom: .85rem
+        }
+
+        .hl-sub {
+            background: #fde68a;
+            border-radius: 3px;
+            padding: .05rem .1rem;
+            color: #92400e;
+            font-weight: 700
+        }
+
+        .hl-res {
+            background: #bbf7d0;
+            border-radius: 3px;
+            padding: .05rem .1rem;
+            color: #065f46;
+            font-weight: 700
+        }
+
+        .step-explain {
+            font-size: .85rem;
+            color: var(--m);
+            padding: .7rem 1rem;
+            background: #f8fafc;
+            border: 1px solid var(--bd);
+            border-radius: var(--rs)
+        }
+
+        /* CONCEPT CARDS */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem
+        }
+
+        .concept-card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.1rem;
+            box-shadow: var(--sh);
+            transition: box-shadow .2s
+        }
+
+        .concept-card:hover {
+            box-shadow: 0 4px 18px rgba(124, 58, 237, .15)
+        }
+
+        .concept-card .cc-icon {
+            font-size: 1.7rem;
+            margin-bottom: .5rem
+        }
+
+        .concept-card h4 {
+            font-size: .9rem;
+            font-weight: 700;
+            margin-bottom: .3rem;
+            color: var(--text)
+        }
+
+        .concept-card p {
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        .cc-tag {
+            display: inline-block;
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .12rem .5rem;
+            border-radius: 4px;
+            margin-top: .5rem;
+            background: #ede9fe;
+            color: #6d28d9
+        }
+
+        /* TYPES TABLE */
+        .type-row {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: .5rem;
+            align-items: start;
+            margin-bottom: .65rem;
+            font-size: .84rem
+        }
+
+        .type-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .76rem;
+            font-weight: 700;
+            background: #ede9fe;
+            color: #6d28d9;
+            padding: .2rem .55rem;
+            border-radius: 5px;
+            text-align: center
+        }
+
+        /* QUIZ SECTION */
+        .quiz-card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 1.2rem
+        }
+
+        .quiz-card-head {
+            padding: 1rem 1.2rem;
+            background: linear-gradient(135deg, #faf5ff, #ede9fe);
+            border-bottom: 1px solid #ddd6fe;
+            display: flex;
+            align-items: center;
+            gap: .8rem
+        }
+
+        .qnum {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #7c3aed;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .82rem;
+            font-weight: 800;
+            flex-shrink: 0
+        }
+
+        .qenunciado {
+            font-size: .9rem;
+            font-weight: 600;
+            color: var(--text)
+        }
+
+        .quiz-card-body {
+            padding: 1rem 1.2rem
+        }
+
+        .quiz-context {
+            background: #f8fafc;
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .8rem 1rem;
+            margin-bottom: .85rem;
+            font-size: .83rem;
+            color: var(--m)
+        }
+
+        .quiz-context strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: .4rem;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        .quiz-context .ctx-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            color: #3b0764;
+            background: #ede9fe;
+            padding: .5rem .75rem;
+            border-radius: 5px;
+            margin-top: .4rem;
+            white-space: pre-wrap
+        }
+
+        .quiz-label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #6d28d9;
+            margin-bottom: .4rem
+        }
+
+        .quiz-input {
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            padding: .5rem .75rem;
+            border: 1.5px solid #ddd6fe;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s;
+            resize: vertical;
+            min-height: 60px
+        }
+
+        .quiz-input:focus {
+            border-color: #7c3aed
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: .5rem;
+            margin-top: .6rem;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .quiz-btn {
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: .4rem 1rem;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s
+        }
+
+        .quiz-btn:hover {
+            background: #6d28d9
+        }
+
+        .quiz-btn-hint {
+            background: var(--s);
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+            border-radius: 6px;
+            padding: .4rem .85rem;
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .2s
+        }
+
+        .quiz-btn-hint:hover {
+            background: #ede9fe
+        }
+
+        .quiz-fb {
+            margin-top: .6rem;
+            font-size: .82rem;
+            font-weight: 600;
+            padding: .5rem .85rem;
+            border-radius: 6px;
+            display: none
+        }
+
+        .quiz-fb.ok {
+            background: #d1fae5;
+            color: #065f46;
+            display: block
+        }
+
+        .quiz-fb.err {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block
+        }
+
+        .quiz-hint-text {
+            display: none;
+            margin-top: .6rem;
+            font-size: .8rem;
+            color: #6d28d9;
+            background: #ede9fe;
+            border-radius: 6px;
+            padding: .5rem .85rem
+        }
+
+        .quiz-hint-text.show {
+            display: block
+        }
+
+        .quiz-solution {
+            display: none;
+            margin-top: .7rem;
+            font-size: .8rem;
+            background: #f0fdf4;
+            border: 1px solid #a7f3d0;
+            border-radius: 6px;
+            padding: .6rem .9rem;
+            color: #065f46
+        }
+
+        .quiz-solution.show {
+            display: block
+        }
+
+        .quiz-solution pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            white-space: pre-wrap;
+            margin-top: .35rem;
+            color: #065f46
+        }
+
+        /* PROGRESS */
+        .pb-w {
+            background: var(--s2);
+            border-radius: 999px;
+            height: 7px;
+            margin-bottom: .4rem;
+            overflow: hidden;
+            border: 1px solid var(--bd)
+        }
+
+        .pb-f {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #be185d);
+            border-radius: 999px;
+            transition: width .4s;
+            width: 0%
+        }
+
+        .pb-l {
+            font-size: .75rem;
+            color: var(--m);
+            text-align: right;
+            margin-bottom: 1.4rem
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--bd);
+            color: var(--m);
+            font-size: .75rem;
+            background: var(--s)
+        }
+
+        @media(max-width:640px) {
+            nav.tabs button {
+                font-size: .72rem;
+                padding: .37rem .7rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <span class="badge">Base de Datos II · Primer Cuatrimestre</span>
+        <h1>🔍 SQL SubConsultas</h1>
+        <p class="sub">Teoría, tipos, ejemplo paso a paso y ejercicios interactivos sobre subconsultas (subqueries) en
+            SQL.</p>
+    </header>
+    <div class="bc">
+        <a href="../../../">🏠 Inicio</a><span style="opacity:.4"> › </span>
+        <a href="../../">Base de Datos II</a><span style="opacity:.4"> › </span>
+        <a href="SQL-Básico.html">🗄️ SQL Básico</a><span style="opacity:.4"> › </span>
+        <span class="cur">🔍 SubConsultas</span>
+    </div>
+
+    <nav class="tabs">
+        <button class="active" onclick="sh('teoria')" id="tab-teoria">📖 Teoría</button>
+        <button onclick="sh('tipos')" id="tab-tipos">🗂️ Tipos</button>
+        <button onclick="sh('ejemplo')" id="tab-ejemplo">🔬 Paso a Paso</button>
+        <button onclick="sh('quiz')" id="tab-quiz">🧩 Ejercicios QUIZ</button>
+    </nav>
+
+    <!-- ==================== TEORIA ==================== -->
+    <section id="teoria" class="sec active">
+        <div class="sec-title">
+            <span class="icon">📖</span>
+            <div>
+                <h2>¿Qué es una SubConsulta?</h2>
+                <p>Una consulta anidada dentro de otra consulta SQL</p>
+            </div>
+        </div>
+
+        <div class="ib pu">
+            <strong style="color:var(--text);display:block;margin-bottom:.4rem">📌 Definición</strong>
+            Una <strong>subconsulta</strong> (o <em>subquery</em>) es una instrucción <code
+                style="background:#ede9fe;padding:.05rem .3rem;border-radius:3px">SELECT</code>
+            que se encuentra <strong>dentro de otra instrucción SQL</strong>. La consulta interna se ejecuta primero
+            y su resultado es utilizado por la consulta externa. También se las llama <em>consultas anidadas</em>.
+        </div>
+
+        <div class="sh">🧠 ¿Por qué usarlas?</div>
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="cc-icon">🎯</div>
+                <h4>Filtrar con datos dinámicos</h4>
+                <p>Cuando el valor del filtro no es un literal fijo sino que depende de otra consulta. Ej: "todos los
+                    produtos más caros que el promedio".</p>
+                <span class="cc-tag">WHERE dinámico</span>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">📊</div>
+                <h4>Reemplazar JOINs complejos</h4>
+                <p>En algunos casos una subconsulta puede ser más legible que un JOIN, especialmente cuando solo
+                    necesitás verificar existencia.</p>
+                <span class="cc-tag">Legibilidad</span>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">🔗</div>
+                <h4>Consultas correlacionadas</h4>
+                <p>Subconsultas que hacen referencia a la tabla de la consulta externa, ejecutándose una vez por cada
+                    fila procesada.</p>
+                <span class="cc-tag">Correlacionada</span>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">📋</div>
+                <h4>Usar como tabla virtual</h4>
+                <p>Una subconsulta en el FROM actúa como una tabla temporal (tabla derivada) sobre la que se puede hacer
+                    SELECT.</p>
+                <span class="cc-tag">Tabla derivada</span>
+            </div>
+        </div>
+
+        <div class="sh">📐 Sintaxis general</div>
+        <div class="syntax"><span class="kw">SELECT</span> columna1, columna2
+            <span class="kw">FROM</span> tabla_principal
+            <span class="kw">WHERE</span> columna <span class="op">OPERADOR</span> (
+            <span class="kw">SELECT</span> columna
+            <span class="kw">FROM</span> otra_tabla
+            <span class="kw">WHERE</span> condicion
+            );
+        </div>
+
+        <div class="ib am">
+            <strong style="color:var(--text);display:block;margin-bottom:.3rem">⚠️ Reglas importantes</strong>
+            <ul style="padding-left:1.2rem;font-size:.85rem;line-height:1.9">
+                <li>La subconsulta <strong>siempre va entre paréntesis</strong> <code
+                        style="background:#fef3c7;padding:.05rem .3rem;border-radius:3px">( )</code>.</li>
+                <li>Si se usa con <code>=</code>, <code>&lt;</code>, <code>&gt;</code> etc., la subconsulta debe
+                    retornar <strong>exactamente un valor (escalar)</strong>.</li>
+                <li>Si se usa con <code>IN</code>, la subconsulta puede retornar <strong>múltiples filas</strong> (una
+                    columna).</li>
+                <li>Si se usa con <code>EXISTS</code>, solo importa si la subconsulta retorna filas o no.</li>
+                <li>El <code>ORDER BY</code> no suele tener efecto dentro de una subconsulta (salvo casos específicos).
+                </li>
+            </ul>
+        </div>
+
+        <div class="sh">🔄 ¿Cuándo elegir subconsulta vs JOIN?</div>
+        <div style="overflow-x:auto">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Situación</th>
+                        <th>Preferir</th>
+                        <th>Motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Comparar con un valor calculado (promedio, máximo)</td>
+                        <td><strong>SubConsulta</strong></td>
+                        <td>Más natural y legible</td>
+                    </tr>
+                    <tr>
+                        <td>Combinar columnas de dos tablas en el resultado</td>
+                        <td><strong>JOIN</strong></td>
+                        <td>JOIN proyecta columnas de ambas tablas</td>
+                    </tr>
+                    <tr>
+                        <td>Verificar si existe algún registro</td>
+                        <td><strong>EXISTS</strong></td>
+                        <td>Detiene la búsqueda al primer resultado</td>
+                    </tr>
+                    <tr>
+                        <td>Obtener datos agrupados como tabla</td>
+                        <td><strong>SubConsulta en FROM</strong></td>
+                        <td>Actúa como tabla temporal (tabla derivada)</td>
+                    </tr>
+                    <tr>
+                        <td>Una fila depende del contexto de la fila externa</td>
+                        <td><strong>SubConsulta correlacionada</strong></td>
+                        <td>Accede a valores de la fila actual</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==================== TIPOS ==================== -->
+    <section id="tipos" class="sec">
+        <div class="sec-title">
+            <span class="icon">🗂️</span>
+            <div>
+                <h2>Tipos de SubConsultas</h2>
+                <p>Según dónde se ubican y cuántos valores retornan</p>
+            </div>
+        </div>
+
+        <div class="sh">📍 Por ubicación en la consulta</div>
+
+        <div class="ib pu" style="margin-bottom:.6rem">
+            <div class="type-row">
+                <span class="type-label">EN WHERE</span>
+                <div>
+                    La más común. Filtra filas según el resultado de la subconsulta. Puede usar <code>=</code>,
+                    <code>IN</code>, <code>&gt;</code>, <code>EXISTS</code>, etc.
+                    <div class="ex-code" style="margin-top:.5rem;font-size:.78rem">SELECT nombre FROM empleados
+                        WHERE salario &gt; (SELECT AVG(salario) FROM empleados);</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ib cy" style="margin-bottom:.6rem">
+            <div class="type-row">
+                <span class="type-label" style="background:#e0f2fe;color:#0369a1">EN FROM</span>
+                <div>
+                    La subconsulta actúa como una <strong>tabla virtual</strong>. Se le debe asignar un alias. Muy útil
+                    para calcular subtotales y luego filtrarlos.
+                    <div class="ex-code" style="margin-top:.5rem;font-size:.78rem">SELECT depto, total
+                        FROM (SELECT depto_id AS depto, COUNT(*) AS total
+                        FROM empleados GROUP BY depto_id) AS resumen
+                        WHERE total &gt; 5;</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ib gr" style="margin-bottom:.6rem">
+            <div class="type-row">
+                <span class="type-label" style="background:#d1fae5;color:#065f46">EN SELECT</span>
+                <div>
+                    Devuelve un valor calculado para <strong>cada fila</strong> del resultado. La subconsulta debe
+                    retornar exactamente un valor (escalar).
+                    <div class="ex-code" style="margin-top:.5rem;font-size:.78rem">SELECT nombre,
+                        (SELECT COUNT(*) FROM pedidos WHERE pedidos.cliente_id = c.id) AS total_pedidos
+                        FROM clientes c;</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ib am" style="margin-bottom:1.5rem">
+            <div class="type-row">
+                <span class="type-label" style="background:#fef3c7;color:#92400e">EN HAVING</span>
+                <div>
+                    Filtra grupos después del <code>GROUP BY</code>, usando el resultado de una subconsulta como umbral
+                    de comparación.
+                    <div class="ex-code" style="margin-top:.5rem;font-size:.78rem">SELECT depto_id, AVG(salario) AS prom
+                        FROM empleados GROUP BY depto_id
+                        HAVING AVG(salario) &gt; (SELECT AVG(salario) FROM empleados);</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sh">📏 Por cantidad de valores retornados</div>
+        <div style="overflow-x:auto">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Retorna</th>
+                        <th>Operadores compatibles</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Escalar</strong></td>
+                        <td>1 fila, 1 columna</td>
+                        <td><code>=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;&gt;</code></td>
+                        <td><code>(SELECT MAX(precio) FROM productos)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Columna</strong></td>
+                        <td>Varias filas, 1 columna</td>
+                        <td><code>IN</code> <code>NOT IN</code> <code>ANY</code> <code>ALL</code></td>
+                        <td><code>(SELECT id FROM clientes WHERE pais = 'AR')</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tabla</strong></td>
+                        <td>Varias filas, varias columnas</td>
+                        <td><code>EXISTS</code> (en FROM con alias)</td>
+                        <td><code>(SELECT id, nombre FROM clientes WHERE activo = 1) AS c</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Correlacionada</strong></td>
+                        <td>Varía por fila externa</td>
+                        <td><code>EXISTS</code> <code>=</code> <code>IN</code></td>
+                        <td>Referencia a alias de la consulta externa</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">🔑 Operadores especiales con subconsultas</div>
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="cc-icon">📋</div>
+                <h4>IN / NOT IN</h4>
+                <p>Comprueba si el valor pertenece (o no) al conjunto de resultados de la subconsulta. La más usada.</p>
+                <div class="ex-code" style="margin-top:.5rem;font-size:.76rem">WHERE cliente_id IN
+                    (SELECT id FROM clientes
+                    WHERE pais = 'AR')</div>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">✅</div>
+                <h4>EXISTS / NOT EXISTS</h4>
+                <p>Retorna verdadero si la subconsulta devuelve al menos una fila. No importa qué columnas retorna, solo
+                    si hay resultado.</p>
+                <div class="ex-code" style="margin-top:.5rem;font-size:.76rem">WHERE EXISTS
+                    (SELECT 1 FROM pedidos p
+                    WHERE p.cliente_id = c.id)</div>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">🔢</div>
+                <h4>ANY / SOME</h4>
+                <p>Verdadero si la comparación se cumple para <em>al menos uno</em> de los valores de la subconsulta.
+                    <code>= ANY</code> es igual a <code>IN</code>.</p>
+                <div class="ex-code" style="margin-top:.5rem;font-size:.76rem">WHERE salario > ANY
+                    (SELECT salario FROM empleados
+                    WHERE depto_id = 3)</div>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">🔒</div>
+                <h4>ALL</h4>
+                <p>Verdadero si la comparación se cumple para <em>todos</em> los valores de la subconsulta. Equivale a
+                    mayor que el máximo (<code>> ALL = > MAX</code>).</p>
+                <div class="ex-code" style="margin-top:.5rem;font-size:.76rem">WHERE salario > ALL
+                    (SELECT salario FROM empleados
+                    WHERE depto_id = 3)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PASO A PASO ==================== -->
+    <section id="ejemplo" class="sec">
+        <div class="sec-title">
+            <span class="icon">🔬</span>
+            <div>
+                <h2>Ejemplo Paso a Paso</h2>
+                <p>Observá cómo el motor SQL resuelve una subconsulta internamente</p>
+            </div>
+        </div>
+
+        <div class="ib pu">
+            <strong style="color:var(--text);display:block;margin-bottom:.4rem">🏪 Escenario: Tienda online</strong>
+            Tenemos dos tablas: <code style="background:#ede9fe;padding:.05rem .3rem;border-radius:3px">productos</code>
+            y <code style="background:#ede9fe;padding:.05rem .3rem;border-radius:3px">pedidos</code>.
+            Queremos encontrar <strong>los productos cuyo precio es mayor al precio promedio</strong> de todos los
+            productos.
+        </div>
+
+        <div class="sh">📋 Tablas de ejemplo</div>
+        <div
+            style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem">
+            <div>
+                <div
+                    style="font-size:.75rem;font-weight:700;color:#7c3aed;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em">
+                    Tabla: productos</div>
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>nombre</th>
+                            <th>precio</th>
+                            <th>categoria</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Auriculares BT</td>
+                            <td>8500</td>
+                            <td>Audio</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Mouse Inalámbrico</td>
+                            <td>4200</td>
+                            <td>PC</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Monitor 24"</td>
+                            <td>32000</td>
+                            <td>PC</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Teclado Mecánico</td>
+                            <td>11500</td>
+                            <td>PC</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Webcam HD</td>
+                            <td>6800</td>
+                            <td>Video</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Hub USB-C</td>
+                            <td>3900</td>
+                            <td>Accesorios</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <div
+                    style="font-size:.75rem;font-weight:700;color:#0891b2;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em">
+                    Tabla: pedidos</div>
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>cliente</th>
+                            <th>producto_id</th>
+                            <th>cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Ana Martínez</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Luis García</td>
+                            <td>1</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>María López</td>
+                            <td>4</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Carlos Díaz</td>
+                            <td>2</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Ana Martínez</td>
+                            <td>6</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="sh">🎬 Demostración interactiva</div>
+        <p style="font-size:.85rem;color:var(--m);margin-bottom:1rem">Usá los botones para avanzar y ver cómo el motor
+            SQL resuelve la subconsulta paso a paso.</p>
+
+        <div class="step-demo">
+            <div class="step-nav">
+                <button class="step-btn sec-btn" id="btn-prev" onclick="stepNav(-1)" disabled>◀ Anterior</button>
+                <span id="step-label">Paso 1 de 4</span>
+                <button class="step-btn" id="btn-next" onclick="stepNav(1)">Siguiente ▶</button>
+            </div>
+            <div class="step-dots" id="step-dots"></div>
+            <div class="step-content">
+
+                <!-- Paso 1 -->
+                <div class="step-panel active" id="step-0">
+                    <div class="step-title">📝 Paso 1 — La consulta completa</div>
+                    <div class="step-query"><span class="kw">SELECT</span> nombre, precio
+                        <span class="kw">FROM</span> productos
+                        <span class="kw">WHERE</span> precio <span class="op">&gt;</span> <span class="hl-sub">(SELECT
+                            AVG(precio) FROM productos)</span>;
+                    </div>
+                    <div class="step-explain">
+                        👀 Esta es la consulta que escribimos. La parte <strong style="color:#92400e">destacada en
+                            amarillo</strong> es la subconsulta.
+                        El motor SQL detecta que hay una subconsulta y la ejecutará <strong>primero</strong> antes de
+                        procesar la consulta principal.
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="step-panel" id="step-1">
+                    <div class="step-title">⚙️ Paso 2 — Ejecución de la subconsulta</div>
+                    <div class="step-query"><span class="cm">-- El motor ejecuta PRIMERO esta subconsulta:</span>
+                        <span class="kw">SELECT</span> <span class="op">AVG</span>(precio) <span class="kw">FROM</span>
+                        productos;
+
+                        <span class="cm">-- Calcula el promedio de: 8500, 4200, 32000, 11500, 6800, 3900</span>
+                        <span class="cm">-- Suma total = 66900 / 6 productos</span>
+                        <span class="hl-res">-- Resultado: 11150.00</span>
+                    </div>
+                    <div class="step-explain">
+                        🔢 El motor ejecuta la subconsulta de forma independiente.
+                        Calcula el promedio de todos los precios: <strong>(8500+4200+32000+11500+6800+3900) / 6 =
+                            11150</strong>.
+                        Este valor escalar (un solo número) reemplazará a la subconsulta en la consulta externa.
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="step-panel" id="step-2">
+                    <div class="step-title">🔄 Paso 3 — Sustitución del resultado</div>
+                    <div class="step-query"><span class="cm">-- La subconsulta se reemplaza por su resultado:</span>
+                        <span class="kw">SELECT</span> nombre, precio
+                        <span class="kw">FROM</span> productos
+                        <span class="kw">WHERE</span> precio <span class="op">&gt;</span> <span
+                            class="hl-res">11150</span>;
+
+                        <span class="cm">-- Ahora el motor evalúa cada fila:</span>
+                        <span class="cm">-- Auriculares BT : 8500 > 11150 → ❌ NO</span>
+                        <span class="cm">-- Mouse Inalámbrico: 4200 > 11150 → ❌ NO</span>
+                        <span class="cm">-- Monitor 24" : 32000 > 11150 → ✅ SÍ</span>
+                        <span class="cm">-- Teclado Mecánico : 11500 > 11150 → ✅ SÍ</span>
+                        <span class="cm">-- Webcam HD : 6800 > 11150 → ❌ NO</span>
+                        <span class="cm">-- Hub USB-C : 3900 > 11150 → ❌ NO</span>
+                    </div>
+                    <div class="step-explain">
+                        🔄 El resultado <strong style="color:#065f46">11150</strong> reemplaza a la subconsulta
+                        completa.
+                        La consulta externa filtra fila por fila: solo pasan las filas donde
+                        <code>precio > 11150</code>.
+                        El Monitor y el Teclado superan ese umbral.
+                    </div>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="step-panel" id="step-3">
+                    <div class="step-title">✅ Paso 4 — Resultado final</div>
+                    <div class="step-query"><span class="cm">-- Resultado de la consulta:</span>
+                        <span class="kw">SELECT</span> nombre, precio
+                        <span class="kw">FROM</span> productos
+                        <span class="kw">WHERE</span> precio <span class="op">&gt;</span> (SELECT AVG(precio) FROM
+                        productos);
+                    </div>
+                    <div style="margin-top:.8rem">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th>nombre</th>
+                                    <th>precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Monitor 24"</strong></td>
+                                    <td style="color:#065f46;font-weight:700">32000</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Teclado Mecánico</strong></td>
+                                    <td style="color:#065f46;font-weight:700">11500</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="step-explain">
+                        🎉 <strong>¡Listo!</strong> Solo 2 productos tienen un precio superior al promedio (11150).
+                        El Motor ejecutó la subconsulta una sola vez, obtuvo el promedio y lo usó para filtrar las filas
+                        de la consulta principal.
+                        Sin subconsulta, habría que saber el promedio de antemano y "hardcodearlo" como literal.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sh">➕ Ejemplo adicional: subconsulta con IN</div>
+        <div class="ib cy">
+            <strong style="color:var(--text);display:block;margin-bottom:.4rem">🎯 Objetivo:</strong>
+            Obtener los productos que <strong>sí fueron pedidos</strong> al menos una vez.
+        </div>
+        <div class="step-query" style="margin-bottom:.6rem"><span class="kw">SELECT</span> nombre, precio
+            <span class="kw">FROM</span> productos
+            <span class="kw">WHERE</span> id <span class="op">IN</span> (<span class="kw">SELECT DISTINCT</span>
+            producto_id <span class="kw">FROM</span> pedidos);</span>
+
+            <span class="cm">-- La subconsulta retorna: (3, 1, 4, 2, 6)</span>
+            <span class="cm">-- Se buscan los productos con id IN (1, 2, 3, 4, 6)</span>
+        </div>
+        <table class="tbl" style="max-width:360px">
+            <thead>
+                <tr>
+                    <th>nombre</th>
+                    <th>precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Auriculares BT</td>
+                    <td>8500</td>
+                </tr>
+                <tr>
+                    <td>Mouse Inalámbrico</td>
+                    <td>4200</td>
+                </tr>
+                <tr>
+                    <td>Monitor 24"</td>
+                    <td>32000</td>
+                </tr>
+                <tr>
+                    <td>Teclado Mecánico</td>
+                    <td>11500</td>
+                </tr>
+                <tr>
+                    <td>Hub USB-C</td>
+                    <td>3900</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size:.82rem;color:var(--m);margin-top:.3rem">📌 La Webcam HD (id=5) no aparece porque nunca fue
+            pedida.</p>
+    </section>
+
+    <!-- ==================== QUIZ ==================== -->
+    <section id="quiz" class="sec">
+        <div class="sec-title">
+            <span class="icon">🧩</span>
+            <div>
+                <h2>Ejercicios QUIZ</h2>
+                <p>Escribí la consulta SQL en base al enunciado — debe usar subconsultas obligatoriamente</p>
+            </div>
+        </div>
+
+        <div class="pb-w">
+            <div class="pb-f" id="qpf"></div>
+        </div>
+        <div class="pb-l" id="qpl">0 de 2 ejercicios resueltos</div>
+
+        <div class="ib cy" style="margin-bottom:1.4rem">
+            <strong style="color:var(--text);display:block;margin-bottom:.2rem">📋 Tablas disponibles para los
+                ejercicios</strong>
+            <div
+                style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:.6rem;font-size:.8rem;color:var(--m)">
+                <div><strong style="color:var(--text)">empleados</strong><br>id, nombre, salario, depto_id,
+                    fecha_ingreso</div>
+                <div><strong style="color:var(--text)">departamentos</strong><br>id, nombre_depto, presupuesto</div>
+                <div><strong style="color:var(--text)">proyectos</strong><br>id, nombre_proyecto, depto_id, costo</div>
+                <div><strong style="color:var(--text)">asignaciones</strong><br>id, empleado_id, proyecto_id, horas
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ 1 -->
+        <div class="quiz-card">
+            <div class="quiz-card-head">
+                <div class="qnum">1</div>
+                <div class="qenunciado">Empleados con salario mayor al promedio del departamento 2</div>
+            </div>
+            <div class="quiz-card-body">
+                <div class="quiz-context">
+                    <strong>📌 Enunciado completo</strong>
+                    Obtené el <strong>nombre</strong> y <strong>salario</strong> de todos los empleados cuyo salario
+                    supera
+                    el salario promedio de los empleados que pertenecen al <strong>departamento con id = 2</strong>.
+                    Ordená el resultado de mayor a menor salario.
+                    <div class="ctx-code">-- Resultado esperado (ejemplo):
+                        nombre | salario
+                        ----------------|--------
+                        Carlos Ruiz | 95000
+                        María Fernández | 87500
+                        Juan Pérez | 76000</div>
+                </div>
+                <div class="quiz-label">✍️ Escribí tu consulta SQL (debe usar subconsulta):</div>
+                <textarea class="quiz-input" id="qi-1"
+                    placeholder="SELECT ...&#10;FROM ...&#10;WHERE salario > (SELECT ...)&#10;ORDER BY ..."></textarea>
+                <div class="quiz-actions">
+                    <button class="quiz-btn" onclick="chkQuiz(1)">✅ Verificar</button>
+                    <button class="quiz-btn-hint" onclick="tglHint(1)">💡 Pista</button>
+                    <button class="quiz-btn-hint" onclick="tglSol(1)">👁️ Ver solución</button>
+                </div>
+                <div class="quiz-hint-text" id="hint-1">
+                    💡 <strong>Pista:</strong> Usá una subconsulta escalar en el WHERE que calcule
+                    <code>AVG(salario)</code>
+                    filtrando por <code>WHERE depto_id = 2</code>. La consulta externa compara
+                    <code>salario &gt; (subconsulta)</code>.
+                </div>
+                <div class="quiz-fb" id="qf-1"></div>
+                <div class="quiz-solution" id="sol-1">
+                    ✅ <strong>Una solución correcta:</strong>
+                    <pre>SELECT nombre, salario
+FROM   empleados
+WHERE  salario > (
+           SELECT AVG(salario)
+           FROM   empleados
+           WHERE  depto_id = 2
+       )
+ORDER BY salario DESC;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ 2 -->
+        <div class="quiz-card">
+            <div class="quiz-card-head">
+                <div class="qnum">2</div>
+                <div class="qenunciado">Departamentos cuyo presupuesto supera el costo de todos sus proyectos</div>
+            </div>
+            <div class="quiz-card-body">
+                <div class="quiz-context">
+                    <strong>📌 Enunciado completo</strong>
+                    Listá el <strong>nombre del departamento</strong> y su <strong>presupuesto</strong> para aquellos
+                    departamentos
+                    cuyo presupuesto sea mayor a la <strong>suma total del costo de sus propios proyectos</strong>.
+                    Es decir, departamentos que "tienen fondos de sobra" después de cubrir todos sus proyectos.
+                    <div class="ctx-code">-- Lógica de comparación:
+                        -- departamentos.presupuesto > SUM(proyectos.costo) del mismo depto
+                        -- Usá una subconsulta correlacionada con EXISTS o en WHERE</div>
+                </div>
+                <div class="quiz-label">✍️ Escribí tu consulta SQL (debe usar subconsulta correlacionada):</div>
+                <textarea class="quiz-input" id="qi-2"
+                    placeholder="SELECT d.nombre_depto, d.presupuesto&#10;FROM   departamentos d&#10;WHERE  d.presupuesto > (SELECT ...)&#10;..."></textarea>
+                <div class="quiz-actions">
+                    <button class="quiz-btn" onclick="chkQuiz(2)">✅ Verificar</button>
+                    <button class="quiz-btn-hint" onclick="tglHint(2)">💡 Pista</button>
+                    <button class="quiz-btn-hint" onclick="tglSol(2)">👁️ Ver solución</button>
+                </div>
+                <div class="quiz-hint-text" id="hint-2">
+                    💡 <strong>Pista:</strong> Usá una subconsulta correlacionada: en la subconsulta hacé referencia al
+                    alias de la consulta externa (<code>d.id</code>).
+                    La subconsulta calcula <code>SUM(costo)</code> de la tabla <code>proyectos</code> donde
+                    <code>depto_id = d.id</code>.
+                    Si un departamento no tiene proyectos, <code>SUM</code> retorna NULL → usá <code>COALESCE</code>.
+                </div>
+                <div class="quiz-fb" id="qf-2"></div>
+                <div class="quiz-solution" id="sol-2">
+                    ✅ <strong>Una solución correcta:</strong>
+                    <pre>SELECT d.nombre_depto, d.presupuesto
+FROM   departamentos d
+WHERE  d.presupuesto > (
+           SELECT COALESCE(SUM(p.costo), 0)
+           FROM   proyectos p
+           WHERE  p.depto_id = d.id
+       );</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        🔍 SQL SubConsultas · Base de Datos II · Primer Cuatrimestre
+        &nbsp;·&nbsp; <a href="SQL-Básico.html" style="color:var(--a);text-decoration:none">← SQL Básico</a>
+    </footer>
+
+    <script>
+        // ── TABS ──────────────────────────────────────────
+        function sh(id) {
+            document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('tab-' + id).classList.add('active');
+        }
+
+        // ── STEP DEMO ─────────────────────────────────────
+        const TOTAL_STEPS = 4;
+        let currentStep = 0;
+
+        (function initDots() {
+            const dc = document.getElementById('step-dots');
+            for (let i = 0; i < TOTAL_STEPS; i++) {
+                const d = document.createElement('span');
+                d.className = 'dot' + (i === 0 ? ' active' : '');
+                d.id = 'dot-' + i;
+                dc.appendChild(d);
+            }
+        })();
+
+        function stepNav(dir) {
+            document.getElementById('step-' + currentStep).classList.remove('active');
+            document.getElementById('dot-' + currentStep).classList.remove('active');
+            currentStep = Math.max(0, Math.min(TOTAL_STEPS - 1, currentStep + dir));
+            document.getElementById('step-' + currentStep).classList.add('active');
+            document.getElementById('dot-' + currentStep).classList.add('active');
+            document.getElementById('step-label').textContent = 'Paso ' + (currentStep + 1) + ' de ' + TOTAL_STEPS;
+            document.getElementById('btn-prev').disabled = currentStep === 0;
+            document.getElementById('btn-next').disabled = currentStep === TOTAL_STEPS - 1;
+        }
+
+        // ── QUIZ ──────────────────────────────────────────
+        let solved = new Set();
+
+        const ANSWERS = {
+            1: {
+                keywords: ['avg(salario)', 'depto_id = 2', 'depto_id=2'],
+                must: ['select', 'from', 'where', 'avg'],
+                hint: 'Debe tener SELECT, FROM empleados, WHERE salario > (SELECT AVG(salario) FROM empleados WHERE depto_id = 2)'
+            },
+            2: {
+                keywords: ['sum(', 'depto_id', 'presupuesto'],
+                must: ['select', 'from', 'where', 'sum'],
+                hint: 'Debe comparar presupuesto con una subconsulta que calcule SUM(costo) de proyectos del mismo depto (subconsulta correlacionada).'
+            }
+        };
+
+        function normalize(s) { return s.toLowerCase().replace(/\s+/g, ' ').trim(); }
+
+        function chkQuiz(n) {
+            const el = document.getElementById('qi-' + n);
+            const fb = document.getElementById('qf-' + n);
+            const ans = normalize(el.value);
+            const cfg = ANSWERS[n];
+
+            const hasMust = cfg.must.every(k => ans.includes(k));
+            const hasKeywords = cfg.keywords.some(k => ans.includes(normalize(k)));
+
+            if (hasMust && hasKeywords) {
+                fb.textContent = '✅ ¡Muy bien! La estructura de tu consulta es correcta. ' + cfg.hint;
+                fb.className = 'quiz-fb ok';
+                solved.add(n);
+            } else {
+                fb.textContent = '❌ Revisá: ' + cfg.hint;
+                fb.className = 'quiz-fb err';
+            }
+            updateProgress();
+        }
+
+        function tglHint(n) {
+            const h = document.getElementById('hint-' + n);
+            h.classList.toggle('show');
+        }
+
+        function tglSol(n) {
+            const s = document.getElementById('sol-' + n);
+            s.classList.toggle('show');
+            if (s.classList.contains('show')) { solved.add(n); updateProgress(); }
+        }
+
+        function updateProgress() {
+            const pct = Math.round(solved.size / 2 * 100);
+            document.getElementById('qpf').style.width = pct + '%';
+            document.getElementById('qpl').textContent = solved.size + ' de 2 ejercicios resueltos';
+        }
+    </script>
+</body>
+
+</html>

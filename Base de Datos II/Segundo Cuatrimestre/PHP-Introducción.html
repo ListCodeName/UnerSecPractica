@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>PHP Introducción — Base de Datos II</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --bg2: #222;
+            --bg3: #2a2a2a;
+            --bg4: #111;
+            --bd: #3a3a3a;
+            --bd2: #4a4a4a;
+            --fg: #c8c8b4;
+            --fg2: #a0a08c;
+            --fg3: #787868;
+            --grn: #6aab6a;
+            --grn2: #4d8a4d;
+            --grn3: #2d5a2d;
+            --amb: #c8a84b;
+            --amb2: #a88c38;
+            --amb3: #5a4a1a;
+            --red: #c86464;
+            --red2: #8a4040;
+            --cya: #6aaab4;
+            --cya2: #4a7a84;
+            --wht: #d8d8c8;
+            --r: 4px;
+            --rs: 2px;
+            --sh: 0 2px 8px rgba(0, 0, 0, .5);
+            --mono: 'IBM Plex Mono', monospace;
+            --sans: 'IBM Plex Sans', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.7;
+            min-height: 100vh
+        }
+
+        /* SCANLINES overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, .08) 2px, rgba(0, 0, 0, .08) 4px);
+            pointer-events: none;
+            z-index: 9999
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3rem 1.5rem 2rem;
+            text-align: center;
+            background: var(--bg4);
+            border-bottom: 2px solid var(--grn2)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(106, 171, 106, .07) 0%, transparent 70%);
+            pointer-events: none
+        }
+
+        .crt-badge {
+            display: inline-block;
+            border: 1px solid var(--grn2);
+            color: var(--grn);
+            font-family: var(--mono);
+            font-size: .7rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            padding: .22rem 1rem;
+            border-radius: var(--rs);
+            margin-bottom: .8rem;
+            background: rgba(106, 171, 106, .06)
+        }
+
+        header h1 {
+            font-family: 'VT323', monospace;
+            font-size: clamp(2.2rem, 6vw, 3.8rem);
+            color: var(--grn);
+            letter-spacing: .05em;
+            text-shadow: 0 0 18px rgba(106, 171, 106, .5), 0 0 40px rgba(106, 171, 106, .2);
+            margin-bottom: .4rem
+        }
+
+        header p.sub {
+            color: var(--fg2);
+            max-width: 580px;
+            margin: 0 auto;
+            font-size: .88rem;
+            font-family: var(--mono)
+        }
+
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .55rem 1.4rem;
+            background: var(--bg4);
+            border-bottom: 1px solid var(--bd);
+            font-size: .75rem;
+            color: var(--fg3);
+            font-family: var(--mono)
+        }
+
+        .bc a {
+            color: var(--fg3);
+            text-decoration: none
+        }
+
+        .bc a:hover {
+            color: var(--grn)
+        }
+
+        .bc .cur {
+            color: var(--grn)
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .35rem;
+            flex-wrap: wrap;
+            padding: .8rem;
+            background: var(--bg4);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .6)
+        }
+
+        nav.tabs button {
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            color: var(--fg2);
+            font-family: var(--mono);
+            font-size: .75rem;
+            padding: .38rem .9rem;
+            border-radius: var(--rs);
+            cursor: pointer;
+            transition: all .2s;
+            letter-spacing: .03em
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--grn2);
+            color: var(--grn);
+            background: var(--bg2)
+        }
+
+        nav.tabs button.active {
+            background: var(--grn3);
+            border-color: var(--grn);
+            color: var(--grn);
+            box-shadow: 0 0 8px rgba(106, 171, 106, .3)
+        }
+
+        .sec {
+            display: none;
+            max-width: 940px;
+            margin: 0 auto;
+            padding: 2.2rem 1.2rem 4rem;
+            animation: fi .3s ease
+        }
+
+        .sec.active {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: .9rem;
+            border-bottom: 1px solid var(--bd)
+        }
+
+        .sec-title .icon {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--grn)
+        }
+
+        .sec-title h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--wht)
+        }
+
+        .sec-title p {
+            font-size: .82rem;
+            color: var(--fg2);
+            margin-top: .1rem;
+            font-family: var(--mono)
+        }
+
+        .sh {
+            font-family: var(--mono);
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--grn2);
+            margin: 1.8rem 0 .8rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            text-transform: uppercase;
+            letter-spacing: .1em
+        }
+
+        .sh::before {
+            content: '//';
+            color: var(--fg3)
+        }
+
+        .sh::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--bd);
+            margin-left: .5rem
+        }
+
+        .ib {
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .9rem 1.1rem;
+            font-size: .84rem;
+            color: var(--fg2);
+            margin-bottom: 1rem
+        }
+
+        .ib.gn {
+            border-left: 3px solid var(--grn2)
+        }
+
+        .ib.am {
+            border-left: 3px solid var(--amb)
+        }
+
+        .ib.rd {
+            border-left: 3px solid var(--red)
+        }
+
+        .ib.cy {
+            border-left: 3px solid var(--cya)
+        }
+
+        /* CODE BOX */
+        .code-box {
+            background: var(--bg4);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            font-family: var(--mono);
+            font-size: .8rem;
+            color: #b8d8b8;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            padding: .9rem 1.1rem;
+            margin-bottom: .9rem;
+            position: relative;
+            overflow-x: auto
+        }
+
+        .code-box .file-tag {
+            position: absolute;
+            top: .4rem;
+            right: .7rem;
+            font-size: .64rem;
+            color: var(--fg3);
+            letter-spacing: .06em
+        }
+
+        .kw {
+            color: #82b8d8
+        }
+
+        .str {
+            color: #c8a87a
+        }
+
+        .val {
+            color: #8ac88a
+        }
+
+        .fn {
+            color: #d8b882
+        }
+
+        .cm {
+            color: #565648;
+            font-style: italic
+        }
+
+        .op {
+            color: #c882c8
+        }
+
+        .tp {
+            color: #82d8c8
+        }
+
+        /* COMPARISON TABLE */
+        .cmp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.2rem
+        }
+
+        @media(max-width:560px) {
+            .cmp-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .cmp-card {
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: 1rem 1.1rem
+        }
+
+        .cmp-card h4 {
+            font-family: var(--mono);
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: .7rem;
+            padding-bottom: .4rem;
+            border-bottom: 1px solid var(--bd)
+        }
+
+        .cmp-card.js h4 {
+            color: #d8c882;
+            border-color: #5a5020
+        }
+
+        .cmp-card.php h4 {
+            color: var(--cya)
+        }
+
+        .cmp-item {
+            font-size: .8rem;
+            padding: .3rem 0;
+            border-bottom: 1px solid var(--bg4);
+            display: flex;
+            gap: .5rem;
+            align-items: flex-start
+        }
+
+        .cmp-item:last-child {
+            border-bottom: none
+        }
+
+        .ci-icon {
+            flex-shrink: 0;
+            width: 14px
+        }
+
+        /* TYPE CARDS */
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: .8rem;
+            margin-bottom: 1.2rem
+        }
+
+        .type-card {
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .95rem 1rem;
+            transition: border-color .2s
+        }
+
+        .type-card:hover {
+            border-color: var(--grn2)
+        }
+
+        .tc-label {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--grn);
+            border: 1px solid var(--grn3);
+            padding: .1rem .45rem;
+            border-radius: 2px;
+            display: inline-block;
+            margin-bottom: .4rem;
+            letter-spacing: .06em
+        }
+
+        .type-card h4 {
+            font-size: .88rem;
+            font-weight: 600;
+            color: var(--wht);
+            margin-bottom: .25rem
+        }
+
+        .type-card p {
+            font-size: .78rem;
+            color: var(--fg2)
+        }
+
+        /* OP TABLE */
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
+            margin-bottom: 1rem
+        }
+
+        .tbl th {
+            background: var(--bg4);
+            padding: .5rem .8rem;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--fg3);
+            border: 1px solid var(--bd);
+            letter-spacing: .06em
+        }
+
+        .tbl td {
+            padding: .42rem .8rem;
+            border: 1px solid var(--bd);
+            color: var(--fg);
+            vertical-align: top
+        }
+
+        .tbl tr:hover td {
+            background: var(--bg2)
+        }
+
+        .mono {
+            font-family: var(--mono);
+            color: var(--grn)
+        }
+
+        /* SERVER DIAGRAM */
+        .srv-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: .6rem;
+            margin-bottom: 1.2rem;
+            align-items: center
+        }
+
+        .srv-box {
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .85rem .7rem;
+            text-align: center
+        }
+
+        .srv-box .em {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--grn)
+        }
+
+        .srv-box p {
+            font-size: .72rem;
+            color: var(--fg2);
+            font-family: var(--mono)
+        }
+
+        .srv-box strong {
+            display: block;
+            font-size: .8rem;
+            color: var(--wht);
+            margin-bottom: .2rem
+        }
+
+        .srv-arr {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--grn3);
+            padding: .3rem 0
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.8rem 1rem;
+            border-top: 1px solid var(--bd);
+            color: var(--fg3);
+            font-size: .72rem;
+            font-family: var(--mono);
+            background: var(--bg4)
+        }
+
+        footer a {
+            color: var(--grn2);
+            text-decoration: none
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <span class="crt-badge">Base de Datos II · Segundo Cuatrimestre</span>
+        <h1>[ PHP: Introducción ]</h1>
+        <p class="sub">// contexto · sintaxis · variables · tipos de dato · operadores</p>
+    </header>
+    <div class="bc">
+        <a href="../../../">~/inicio</a><span>/</span>
+        <a href="../../">base-datos-ii</a><span>/</span>
+        <a href="./">segundo-cuatrimestre</a><span>/</span>
+        <span class="cur">PHP-Introducción</span>
+    </div>
+
+    <nav class="tabs">
+        <button class="active" onclick="sh('contexto')" id="tab-contexto">&gt;_ Contexto</button>
+        <button onclick="sh('servidor')" id="tab-servidor">⚙ Servidor</button>
+        <button onclick="sh('vs-js')" id="tab-vs-js">⚖ PHP vs JS</button>
+        <button onclick="sh('sintaxis')" id="tab-sintaxis">{ } Sintaxis</button>
+        <button onclick="sh('tipos')" id="tab-tipos">📦 Tipos</button>
+        <button onclick="sh('operadores')" id="tab-operadores">± Operadores</button>
+    </nav>
+
+    <!-- ===== CONTEXTO ===== -->
+    <section id="contexto" class="sec active">
+        <div class="sec-title">
+            <span class="icon">&gt;_</span>
+            <div>
+                <h2>¿Qué es PHP?</h2>
+                <p>// Hypertext Preprocessor — lenguaje de servidor</p>
+            </div>
+        </div>
+
+        <div class="ib gn">
+            <strong style="color:var(--wht);display:block;margin-bottom:.35rem">📌 Definición</strong>
+            <strong>PHP</strong> (<em>PHP: Hypertext Preprocessor</em>) es un lenguaje de programación de
+            <strong>propósito general</strong>
+            orientado al desarrollo web, diseñado para ejecutarse del lado del <strong>servidor</strong>.
+            PHP procesa el código antes de enviar la respuesta al navegador: el cliente <em>nunca ve el código PHP</em>,
+            solo el HTML resultante.
+        </div>
+
+        <div class="sh">Historia rápida</div>
+        <div class="ib cy">
+            <strong style="color:var(--wht)">1994</strong> — Rasmus Lerdorf crea las primeras herramientas PHP para
+            rastrear visitas a su CV online.<br>
+            <strong style="color:var(--wht)">1997</strong> — PHP 3: reescritura completa. Adopción masiva como lenguaje
+            web.<br>
+            <strong style="color:var(--wht)">2004</strong> — PHP 5: POO robusta, PDO, excepciones.<br>
+            <strong style="color:var(--wht)">2015</strong> — PHP 7: velocidad 2× respecto a PHP 5, tipado escalar.<br>
+            <strong style="color:var(--wht)">2020–hoy</strong> — PHP 8.x: JIT compiler, match expressions, named
+            arguments, fibers.
+        </div>
+
+        <div class="sh">¿Dónde se ejecuta?</div>
+        <div class="cmp-grid">
+            <div class="ib gn" style="margin:0">
+                <strong style="color:var(--grn);display:block;margin-bottom:.3rem">🖥 Lado del SERVIDOR</strong>
+                <ul style="padding-left:1.1rem;font-size:.83rem;line-height:1.9">
+                    <li>El código PHP corre en la máquina donde está instalado Apache/Nginx + PHP.</li>
+                    <li>El navegador del cliente solo recibe el <strong>HTML final</strong>.</li>
+                    <li>Acceso directo a bases de datos, sistema de archivos, variables de entorno.</li>
+                    <li>El cliente <strong>no puede ver</strong> el código fuente PHP.</li>
+                </ul>
+            </div>
+            <div class="ib rd" style="margin:0">
+                <strong style="color:var(--red);display:block;margin-bottom:.3rem">🚫 No funciona sin servidor</strong>
+                <ul style="padding-left:1.1rem;font-size:.83rem;line-height:1.9">
+                    <li>Un archivo <code>.php</code> abierto directamente en el navegador <strong>no se
+                            procesa</strong>.</li>
+                    <li>Se necesita un servidor web con el módulo PHP activo (Apache, Nginx, etc.).</li>
+                    <li>En desarrollo local: <strong>XAMPP</strong>, Laragon, WAMP o PHP built-in server
+                        (<code>php -S</code>).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sh">Ventajas de PHP</div>
+        <div class="ib gn">
+            <ul style="padding-left:1.1rem;font-size:.83rem;line-height:1.95;column-count:2;column-gap:1.5rem">
+                <li>✅ Integración nativa con bases de datos (MySQL, PostgreSQL, SQLite…)</li>
+                <li>✅ Sintaxis familiar para quienes conocen C, Java o JS</li>
+                <li>✅ Soporte masivo en hostings compartidos (casi siempre incluido)</li>
+                <li>✅ Gran ecosistema: Laravel, Symfony, WordPress, Drupal</li>
+                <li>✅ Manejo de archivos, sesiones y cookies integrado</li>
+                <li>✅ Código fuente oculto al cliente</li>
+                <li>✅ PHP 8 con JIT es muy rápido para web</li>
+                <li>✅ Curva de aprendizaje baja para iniciarse</li>
+            </ul>
+        </div>
+
+        <div class="sh">Desventajas de PHP</div>
+        <div class="ib rd">
+            <ul style="padding-left:1.1rem;font-size:.83rem;line-height:1.95">
+                <li>❌ <strong>Requiere servidor</strong> — no se puede usar directamente en el navegador sin
+                    infraestructura.</li>
+                <li>❌ Inconsistencias históricas en nombres de funciones (<code>str_len</code> vs <code>strlen</code>)
+                    en versiones antiguas.</li>
+                <li>❌ Tipado débil por defecto — puede generar bugs sutiles si no se usa
+                    <code>declare(strict_types=1)</code>.</li>
+                <li>❌ No es ideal para aplicaciones de tiempo real (WebSockets, chat) sin extensiones adicionales.</li>
+                <li>❌ En proyectos mal mantenidos, el código puede volverse difícil de escalar ("código espagueti").
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===== SERVIDOR ===== -->
+    <section id="servidor" class="sec">
+        <div class="sec-title">
+            <span class="icon">⚙</span>
+            <div>
+                <h2>¿Por qué se necesita Apache?</h2>
+                <p>// El flujo de una petición PHP</p>
+            </div>
+        </div>
+
+        <div class="ib am">
+            <strong style="color:var(--wht);display:block;margin-bottom:.3rem">⚠ Diferencia fundamental</strong>
+            Un archivo <code>.html</code> puede abrirse directamente en el navegador — es texto estático que el
+            navegador interpreta.
+            Un archivo <code>.php</code> contiene <strong>instrucciones que debe ejecutar un motor PHP en el
+                servidor</strong>.
+            Sin ese procesamiento previo, el navegador mostraría el código PHP en crudo o nada.
+        </div>
+
+        <div class="sh">Flujo de una petición PHP</div>
+        <div class="srv-flow">
+            <div class="srv-box">
+                <div class="em">🖥</div><strong>Navegador</strong>
+                <p>Usuario solicita una URL (.php)</p>
+            </div>
+            <div class="srv-arr">→</div>
+            <div class="srv-box">
+                <div class="em">🌐</div><strong>Apache / Nginx</strong>
+                <p>Servidor web recibe la petición HTTP</p>
+            </div>
+            <div class="srv-arr">→</div>
+            <div class="srv-box">
+                <div class="em">⚙</div><strong>Motor PHP</strong>
+                <p>Procesa el código .php, consulta BD si es necesario</p>
+            </div>
+            <div class="srv-arr">→</div>
+            <div class="srv-box">
+                <div class="em">📄</div><strong>HTML puro</strong>
+                <p>Se genera y devuelve al navegador</p>
+            </div>
+            <div class="srv-arr">→</div>
+            <div class="srv-box">
+                <div class="em">👁</div><strong>Renderizado</strong>
+                <p>El cliente ve la página — sin ver PHP</p>
+            </div>
+        </div>
+
+        <div class="sh">Con XAMPP en desarrollo local</div>
+        <div class="code-box"><span class="cm">// Pasos para ver un archivo PHP en el navegador con XAMPP</span>
+
+            1. Abrir XAMPP Control Panel
+            2. Iniciar el módulo <span class="val">Apache</span> (y MySQL si se necesita BD)
+            3. Guardar el archivo en: <span class="str">C:\xampp\htdocs\mi-proyecto\archivo.php</span>
+            4. Abrir en el navegador: <span class="str">http://localhost/mi-proyecto/archivo.php</span>
+
+            <span class="cm">// Alternativa: PHP Built-in Server (sin XAMPP, desde terminal)</span>
+            <span class="kw">php</span> -S <span class="str">localhost:8000</span>
+            <span class="cm">// Luego acceder a http://localhost:8000/archivo.php</span>
+        </div>
+
+        <div class="ib cy">
+            <strong style="color:var(--wht);display:block;margin-bottom:.25rem">💡 Diferencia con archivos HTML</strong>
+            Los archivos <code>.html</code> estáticos se pueden abrir con doble clic desde el explorador de archivos
+            porque
+            el navegador los interpreta directamente. Los <code>.php</code> <strong>no</strong>: abrir un .php sin
+            servidor
+            mostrará texto plano o el código en crudo, según el navegador.
+        </div>
+    </section>
+
+    <!-- ===== PHP VS JS ===== -->
+    <section id="vs-js" class="sec">
+        <div class="sec-title">
+            <span class="icon">⚖</span>
+            <div>
+                <h2>PHP vs JavaScript</h2>
+                <p>// Comparativa: ejecución, seguridad y rendimiento</p>
+            </div>
+        </div>
+
+        <div class="cmp-grid">
+            <div class="cmp-card php">
+                <h4>[PHP] — Servidor</h4>
+                <div class="cmp-item"><span class="ci-icon">🖥</span><span>Corre en el <strong>servidor</strong>. El
+                        cliente nunca ve el código.</span></div>
+                <div class="cmp-item"><span class="ci-icon">🔒</span><span>Lógica de negocio y credenciales
+                        protegidas.</span></div>
+                <div class="cmp-item"><span class="ci-icon">🗃</span><span>Acceso directo a BD, archivos, email.</span>
+                </div>
+                <div class="cmp-item"><span class="ci-icon">📄</span><span>Genera el HTML antes de enviarlo.</span>
+                </div>
+                <div class="cmp-item"><span class="ci-icon">🔃</span><span>Cada petición puede recargar la página (sin
+                        JS).</span></div>
+                <div class="cmp-item"><span class="ci-icon">⚙</span><span>Requiere Apache / Nginx + motor PHP
+                        instalado.</span></div>
+            </div>
+            <div class="cmp-card js">
+                <h4>[JavaScript] — Cliente (+ Node en servidor)</h4>
+                <div class="cmp-item"><span class="ci-icon">🌐</span><span>Corre en el <strong>navegador</strong>. El
+                        código es visible con F12.</span></div>
+                <div class="cmp-item"><span class="ci-icon">⚡</span><span>Interactividad inmediata sin recargar la
+                        página.</span></div>
+                <div class="cmp-item"><span class="ci-icon">🔓</span><span>No se deben poner credenciales en JS del
+                        cliente.</span></div>
+                <div class="cmp-item"><span class="ci-icon">📡</span><span>Acceso a BD solo vía API (fetch/AJAX).</span>
+                </div>
+                <div class="cmp-item"><span class="ci-icon">⏱</span><span>Asincrónico nativo (Promises,
+                        async/await).</span></div>
+                <div class="cmp-item"><span class="ci-icon">📦</span><span>Con Node.js puede correr también en el
+                        servidor.</span></div>
+            </div>
+        </div>
+
+        <div class="sh">Tabla comparativa</div>
+        <div style="overflow-x:auto">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Aspecto</th>
+                        <th>PHP</th>
+                        <th>JavaScript (cliente)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>¿Dónde corre?</td>
+                        <td class="mono">Servidor</td>
+                        <td class="mono">Navegador</td>
+                    </tr>
+                    <tr>
+                        <td>¿El cliente ve el código?</td>
+                        <td>❌ No (solo recibe HTML)</td>
+                        <td>✅ Sí (F12 → Sources)</td>
+                    </tr>
+                    <tr>
+                        <td>Acceso a base de datos</td>
+                        <td>✅ Directo (PDO, MySQLi)</td>
+                        <td>⚠ Solo via API/backend</td>
+                    </tr>
+                    <tr>
+                        <td>Seguridad de credenciales</td>
+                        <td>✅ Alta (código en servidor)</td>
+                        <td>❌ Nunca poner passwords en JS cliente</td>
+                    </tr>
+                    <tr>
+                        <td>Interactividad sin recarga</td>
+                        <td>❌ Requiere JS o recarga</td>
+                        <td>✅ Nativa (DOM, eventos)</td>
+                    </tr>
+                    <tr>
+                        <td>Tiempo real (WebSockets)</td>
+                        <td>⚠ Con Ratchet/Swoole</td>
+                        <td>✅ Nativo (WS API)</td>
+                    </tr>
+                    <tr>
+                        <td>Requiere servidor</td>
+                        <td>✅ Siempre</td>
+                        <td>❌ No (abre como .html)</td>
+                    </tr>
+                    <tr>
+                        <td>Tipado</td>
+                        <td>Dinámico (opcional estricto)</td>
+                        <td>Dinámico</td>
+                    </tr>
+                    <tr>
+                        <td>Principales usos</td>
+                        <td>CMS, APIs, backends web</td>
+                        <td>UI, SPAs, animaciones</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="ib am">
+            <strong style="color:var(--wht);display:block;margin-bottom:.25rem">💡 ¿Se usan juntos?</strong>
+            Sí, y es lo más común. PHP genera el HTML del lado del servidor y JavaScript lo enriquece en el navegador.
+            Por ejemplo: PHP trae los datos de la BD y los embebe en el HTML; JavaScript luego agrega filtros o
+            animaciones sin recargar.
+            Esta combinación es la base de gran parte de la web actual (WordPress, por ejemplo, usa PHP + JS).
+        </div>
+    </section>
+
+    <!-- ===== SINTAXIS ===== -->
+    <section id="sintaxis" class="sec">
+        <div class="sec-title">
+            <span class="icon">{ }</span>
+            <div>
+                <h2>Sintaxis PHP</h2>
+                <p>// etiquetas de apertura, variables y asignación</p>
+            </div>
+        </div>
+
+        <div class="sh">Etiquetas PHP</div>
+        <div class="ib gn">
+            El código PHP se escribe dentro de etiquetas <code>&lt;?php</code> ... <code>?&gt;</code>.
+            Todo lo que esté fuera de esas etiquetas se trata como HTML puro y se envía tal cual al navegador.
+        </div>
+        <div class="code-box"><span class="file-tag">archivo.php</span><span class="cm">&lt;!-- HTML normal que el
+                navegador recibe directamente --&gt;</span>
+            &lt;h1&gt;Bienvenido al sitio&lt;/h1&gt;
+
+            <span class="cm">&lt;!-- Aquí comienza el código PHP --&gt;</span>
+            <span class="kw">&lt;?php</span>
+            <span class="cm">// PHP comienza con &lt;?php — siempre obligatorio</span>
+            <span class="fn">echo</span> <span class="str">"&lt;p&gt;Este texto lo generó PHP&lt;/p&gt;"</span>;
+            <span class="kw">?&gt;</span>
+
+            <span class="cm">&lt;!-- Sigue el HTML normal --&gt;</span>
+            &lt;footer&gt;Pie de página&lt;/footer&gt;
+        </div>
+
+        <div class="sh">Variables</div>
+        <div class="ib gn">
+            En PHP <strong>todas las variables comienzan con el símbolo <code
+                    style="color:var(--grn)">$</code></strong>.
+            No se declara el tipo explícitamente (tipado dinámico): PHP infiere el tipo según el valor asignado.
+            Los nombres son <strong>case-sensitive</strong> (<code>$nombre</code> ≠ <code>$Nombre</code>).
+        </div>
+        <div class="code-box"><span class="kw">&lt;?php</span>
+            <span class="cm">// Declaración y asignación — siempre con $ delante del nombre</span>
+            <span class="op">$</span><span class="val">nombre</span> = <span class="str">"Ana"</span>; <span
+                class="cm">// string</span>
+            <span class="op">$</span><span class="val">edad</span> = <span class="val">28</span>; <span class="cm">//
+                integer</span>
+            <span class="op">$</span><span class="val">precio</span> = <span class="val">1499.99</span>; <span
+                class="cm">// float</span>
+            <span class="op">$</span><span class="val">activo</span> = <span class="kw">true</span>; <span class="cm">//
+                boolean</span>
+            <span class="op">$</span><span class="val">nada</span> = <span class="kw">null</span>; <span class="cm">//
+                null</span>
+
+            <span class="cm">// Mostrar en pantalla con echo o print</span>
+            <span class="fn">echo</span> <span class="str">"Hola, "</span> . <span class="op">$</span><span
+                class="val">nombre</span> . <span class="str">" — Tenés "</span> . <span class="op">$</span><span
+                class="val">edad</span> . <span class="str">" años."</span>;
+            <span class="cm">// Salida: Hola, Ana — Tenés 28 años.</span>
+
+            <span class="cm">// El punto (.) es el operador de concatenación en PHP</span>
+            <span class="cm">// También se puede usar interpolación dentro de comillas dobles:</span>
+            <span class="fn">echo</span> <span class="str">"Hola, <span class="op">{$</span><span
+                    class="val">nombre</span><span class="op">}</span> — precio: <span class="op">{$</span><span
+                    class="val">precio</span><span class="op">}</span>"</span>;
+            <span class="kw">?&gt;</span>
+        </div>
+
+        <div class="sh">Constantes</div>
+        <div class="code-box"><span class="kw">&lt;?php</span>
+            <span class="cm">// Con define() — clásico, funciona en cualquier versión</span>
+            <span class="fn">define</span>(<span class="str">"PI"</span>, <span class="val">3.14159</span>);
+            <span class="fn">define</span>(<span class="str">"NOMBRE_APP"</span>, <span class="str">"MiSistema"</span>);
+
+            <span class="cm">// Con const — moderno, preferido en clases y namespaces</span>
+            <span class="kw">const</span> <span class="tp">MAX_INTENTOS</span> = <span class="val">3</span>;
+
+            <span class="fn">echo</span> PI; <span class="cm">// 3.14159 — las constantes NO llevan $</span>
+            <span class="fn">echo</span> <span class="tp">MAX_INTENTOS</span>; <span class="cm">// 3</span>
+            <span class="kw">?&gt;</span>
+        </div>
+
+        <div class="sh">Comentarios</div>
+        <div class="code-box"><span class="kw">&lt;?php</span>
+            <span class="cm">// Comentario de una línea (estilo C++ / JS)</span>
+            <span class="cm"># Comentario de una línea (estilo Shell)</span>
+            <span class="cm">/*
+                Comentario
+                de múltiples
+                líneas
+                */</span>
+            <span class="kw">?&gt;</span>
+        </div>
+    </section>
+
+    <!-- ===== TIPOS ===== -->
+    <section id="tipos" class="sec">
+        <div class="sec-title">
+            <span class="icon">📦</span>
+            <div>
+                <h2>Tipos de Dato</h2>
+                <p>// Los 8 tipos primitivos de PHP con ejemplos</p>
+            </div>
+        </div>
+
+        <div class="type-grid">
+            <div class="type-card"><span class="tc-label">string</span>
+                <h4>Cadena de texto</h4>
+                <p>Secuencia de caracteres. Se delimita con comillas simples <code>'...'</code> o dobles
+                    <code>"..."</code>. Las dobles permiten interpolación de variables.</p>
+            </div>
+            <div class="type-card"><span class="tc-label">int</span>
+                <h4>Entero</h4>
+                <p>Números sin parte decimal. Puede ser positivo, negativo o cero. Tamaño depende del SO (32 o 64 bits).
+                </p>
+            </div>
+            <div class="type-card"><span class="tc-label">float</span>
+                <h4>Flotante / Decimal</h4>
+                <p>Números con parte decimal. También llamado <code>double</code>. Ej: <code>3.14</code>,
+                    <code>-0.5</code>, <code>1.2e3</code>.</p>
+            </div>
+            <div class="type-card"><span class="tc-label">bool</span>
+                <h4>Booleano</h4>
+                <p>Solo dos valores: <code>true</code> o <code>false</code>. Se usa para condiciones lógicas.
+                    Case-insensitive.</p>
+            </div>
+            <div class="type-card"><span class="tc-label">array</span>
+                <h4>Arreglo</h4>
+                <p>Colección de valores indexados (numérico) o asociativos (clave→valor). Muy flexibles en PHP.</p>
+            </div>
+            <div class="type-card"><span class="tc-label">null</span>
+                <h4>Nulo</h4>
+                <p>Representa la ausencia de valor. Una variable no asignada, asignada a <code>null</code> o eliminada
+                    con <code>unset()</code>.</p>
+            </div>
+            <div class="type-card"><span class="tc-label">object</span>
+                <h4>Objeto</h4>
+                <p>Instancia de una clase. Agrupa propiedades y métodos. Base de la programación orientada a objetos en
+                    PHP.</p>
+            </div>
+            <div class="type-card"><span class="tc-label">callable</span>
+                <h4>Callable / Closure</h4>
+                <p>Funciones anónimas, lambdas o referencias a funciones que se pasan como parámetros.</p>
+            </div>
+        </div>
+
+        <div class="sh">Ejemplos de cada tipo</div>
+        <div class="code-box"><span class="kw">&lt;?php</span>
+
+            <span class="cm">// STRING</span>
+            <span class="op">$</span><span class="val">s1</span> = <span class="str">'Hola mundo'</span>; <span
+                class="cm">// comillas simples: sin interpolación</span>
+            <span class="op">$</span><span class="val">s2</span> = <span class="str">"Hola <span
+                    class="op">{$</span><span class="val">s1</span><span class="op">}</span>"</span>; <span
+                class="cm">// comillas dobles: con interpolación</span>
+            <span class="op">$</span><span class="val">lon</span> = <span class="fn">strlen</span>(<span
+                class="op">$</span><span class="val">s1</span>); <span class="cm">// 10 — longitud del string</span>
+
+            <span class="cm">// INTEGER</span>
+            <span class="op">$</span><span class="val">i1</span> = <span class="val">42</span>;
+            <span class="op">$</span><span class="val">i2</span> = <span class="val">-100</span>;
+            <span class="op">$</span><span class="val">i3</span> = <span class="val">0xFF</span>; <span class="cm">//
+                255 — hexadecimal</span>
+            <span class="op">$</span><span class="val">i4</span> = <span class="val">0b1010</span>; <span class="cm">//
+                10 — binario</span>
+
+            <span class="cm">// FLOAT</span>
+            <span class="op">$</span><span class="val">f1</span> = <span class="val">3.1416</span>;
+            <span class="op">$</span><span class="val">f2</span> = <span class="val">1.5e3</span>; <span class="cm">//
+                1500.0 — notación científica</span>
+
+            <span class="cm">// BOOL</span>
+            <span class="op">$</span><span class="val">b1</span> = <span class="kw">true</span>;
+            <span class="op">$</span><span class="val">b2</span> = <span class="kw">false</span>;
+            <span class="fn">var_dump</span>(<span class="op">$</span><span class="val">b1</span>); <span class="cm">//
+                bool(true)</span>
+
+            <span class="cm">// ARRAY indexado</span>
+            <span class="op">$</span><span class="val">frutas</span> = [<span class="str">"manzana"</span>, <span
+                class="str">"pera"</span>, <span class="str">"uva"</span>];
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">frutas</span>[<span
+                class="val">0</span>]; <span class="cm">// manzana</span>
+
+            <span class="cm">// ARRAY asociativo (clave => valor)</span>
+            <span class="op">$</span><span class="val">persona</span> = [
+            <span class="str">"nombre"</span> <span class="op">=&gt;</span> <span class="str">"Luis"</span>,
+            <span class="str">"edad"</span> <span class="op">=&gt;</span> <span class="val">32</span>,
+            <span class="str">"activo"</span> <span class="op">=&gt;</span> <span class="kw">true</span>
+            ];
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">persona</span>[<span
+                class="str">"nombre"</span>]; <span class="cm">// Luis</span>
+
+            <span class="cm">// NULL</span>
+            <span class="op">$</span><span class="val">vacio</span> = <span class="kw">null</span>;
+            <span class="fn">var_dump</span>(<span class="fn">is_null</span>(<span class="op">$</span><span
+                class="val">vacio</span>)); <span class="cm">// bool(true)</span>
+
+            <span class="cm">// Verificar tipo en runtime</span>
+            <span class="fn">gettype</span>(<span class="op">$</span><span class="val">i1</span>); <span class="cm">//
+                "integer"</span>
+            <span class="fn">gettype</span>(<span class="op">$</span><span class="val">f1</span>); <span class="cm">//
+                "double"</span>
+            <span class="fn">gettype</span>(<span class="op">$</span><span class="val">s1</span>); <span class="cm">//
+                "string"</span>
+
+            <span class="kw">?&gt;</span>
+        </div>
+
+        <div class="sh">Conversión (Casting)</div>
+        <div class="code-box"><span class="kw">&lt;?php</span>
+            <span class="op">$</span><span class="val">txt</span> = <span class="str">"42"</span>; <span class="cm">//
+                string</span>
+            <span class="op">$</span><span class="val">num</span> = (<span class="tp">int</span>) <span
+                class="op">$</span><span class="val">txt</span>; <span class="cm">// 42 — cast a entero</span>
+            <span class="op">$</span><span class="val">dec</span> = (<span class="tp">float</span>) <span
+                class="str">"3.14"</span>; <span class="cm">// 3.14</span>
+            <span class="op">$</span><span class="val">bool</span> = (<span class="tp">bool</span>) <span
+                class="val">0</span>; <span class="cm">// false (0 es falsy)</span>
+            <span class="op">$</span><span class="val">str2</span> = (<span class="tp">string</span>) <span
+                class="val">99</span>; <span class="cm">// "99"</span>
+
+            <span class="cm">// settype() modifica la variable directamente</span>
+            <span class="fn">settype</span>(<span class="op">$</span><span class="val">txt</span>, <span
+                class="str">"integer"</span>); <span class="cm">// $txt ahora es 42 (int)</span>
+            <span class="kw">?&gt;</span>
+        </div>
+    </section>
+
+    <!-- ===== OPERADORES ===== -->
+    <section id="operadores" class="sec">
+        <div class="sec-title">
+            <span class="icon">±</span>
+            <div>
+                <h2>Operadores en PHP</h2>
+                <p>// aritméticos, asignación, comparación, lógicos, string</p>
+            </div>
+        </div>
+
+        <div class="sh">Operadores aritméticos</div>
+        <div style="overflow-x:auto;margin-bottom:.8rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Símbolo</th>
+                        <th>Nombre</th>
+                        <th>Ejemplo</th>
+                        <th>Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">+</td>
+                        <td>Suma</td>
+                        <td class="mono">$a + $b / 10 + 5</td>
+                        <td class="mono">15</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">-</td>
+                        <td>Resta</td>
+                        <td class="mono">$a - $b / 10 - 3</td>
+                        <td class="mono">7</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">*</td>
+                        <td>Multiplicación</td>
+                        <td class="mono">$a * $b / 4 * 3</td>
+                        <td class="mono">12</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">/</td>
+                        <td>División</td>
+                        <td class="mono">$a / $b / 10 / 4</td>
+                        <td class="mono">2.5</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">%</td>
+                        <td>Módulo (resto)</td>
+                        <td class="mono">$a % $b / 10 % 3</td>
+                        <td class="mono">1</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">**</td>
+                        <td>Potencia</td>
+                        <td class="mono">$a ** $b / 2 ** 8</td>
+                        <td class="mono">256</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">Operadores de asignación</div>
+        <div style="overflow-x:auto;margin-bottom:.8rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Símbolo</th>
+                        <th>Equivale a</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">=</td>
+                        <td class="mono">$a = 5</td>
+                        <td>Asignación simple</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">+=</td>
+                        <td class="mono">$a = $a + 3</td>
+                        <td>Suma y asigna</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">-=</td>
+                        <td class="mono">$a = $a - 2</td>
+                        <td>Resta y asigna</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">*=</td>
+                        <td class="mono">$a = $a * 4</td>
+                        <td>Multiplica y asigna</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">/=</td>
+                        <td class="mono">$a = $a / 2</td>
+                        <td>Divide y asigna</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">%=</td>
+                        <td class="mono">$a = $a % 3</td>
+                        <td>Módulo y asigna</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">.=</td>
+                        <td class="mono">$s = $s . " más"</td>
+                        <td>Concatena y asigna (strings)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">++</td>
+                        <td class="mono">$a = $a + 1</td>
+                        <td>Incremento en 1 (pre/post)</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">--</td>
+                        <td class="mono">$a = $a - 1</td>
+                        <td>Decremento en 1 (pre/post)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">Operadores de comparación</div>
+        <div class="ib am" style="margin-bottom:.8rem">
+            <strong style="color:var(--wht);display:block;margin-bottom:.25rem">⚠ == vs ===</strong>
+            <code>==</code> compara solo el <strong>valor</strong> (con conversión de tipo). <code>===</code> compara
+            valor <strong>y tipo</strong> (estricto).
+            Se recomienda usar <code>===</code> para evitar comparaciones inesperadas como <code>0 == "a"</code> →
+            <code>true</code> en PHP 7.
+        </div>
+        <div style="overflow-x:auto;margin-bottom:.8rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Símbolo</th>
+                        <th>Nombre</th>
+                        <th>Ejemplo</th>
+                        <th>Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">==</td>
+                        <td>Igual (valor)</td>
+                        <td class="mono">5 == "5"</td>
+                        <td class="mono">true</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">===</td>
+                        <td>Idéntico (valor + tipo)</td>
+                        <td class="mono">5 === "5"</td>
+                        <td class="mono">false</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">!=</td>
+                        <td>Distinto (valor)</td>
+                        <td class="mono">5 != 3</td>
+                        <td class="mono">true</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">!==</td>
+                        <td>No idéntico</td>
+                        <td class="mono">5 !== "5"</td>
+                        <td class="mono">true</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">&lt;</td>
+                        <td>Menor que</td>
+                        <td class="mono">3 &lt; 5</td>
+                        <td class="mono">true</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">&gt;</td>
+                        <td>Mayor que</td>
+                        <td class="mono">8 &gt; 10</td>
+                        <td class="mono">false</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">&lt;=</td>
+                        <td>Menor o igual</td>
+                        <td class="mono">5 &lt;= 5</td>
+                        <td class="mono">true</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">&gt;=</td>
+                        <td>Mayor o igual</td>
+                        <td class="mono">4 &gt;= 7</td>
+                        <td class="mono">false</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">&lt;=&gt;</td>
+                        <td>Spaceship (PHP 7+)</td>
+                        <td class="mono">5 &lt;=&gt; 3</td>
+                        <td class="mono">1 (izq &gt; der)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">Operadores lógicos</div>
+        <div style="overflow-x:auto;margin-bottom:.8rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Símbolo</th>
+                        <th>Alternativa</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">&amp;&amp;</td>
+                        <td class="mono">and</td>
+                        <td>AND lógico</td>
+                        <td>Verdadero si <strong>ambas</strong> condiciones son verdaderas</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">||</td>
+                        <td class="mono">or</td>
+                        <td>OR lógico</td>
+                        <td>Verdadero si <strong>al menos una</strong> es verdadera</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">!</td>
+                        <td class="mono">not</td>
+                        <td>NOT lógico</td>
+                        <td>Invierte el valor booleano</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">xor</td>
+                        <td>—</td>
+                        <td>XOR lógico</td>
+                        <td>Verdadero si <strong>exactamente una</strong> es verdadera</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">Operador de string · Concatenación</div>
+        <div style="overflow-x:auto;margin-bottom:.8rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Símbolo</th>
+                        <th>Nombre</th>
+                        <th>Ejemplo</th>
+                        <th>Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="mono">.</td>
+                        <td>Concatenar</td>
+                        <td class="mono">"Hola" . " " . "mundo"</td>
+                        <td class="mono">"Hola mundo"</td>
+                    </tr>
+                    <tr>
+                        <td class="mono">.=</td>
+                        <td>Concat. y asignar</td>
+                        <td class="mono">$s .= "!"</td>
+                        <td>Agrega "!" al final de $s</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sh">Ejemplo integrador</div>
+        <div class="code-box"><span class="kw">&lt;?php</span>
+            <span class="op">$</span><span class="val">a</span> = <span class="val">10</span>;
+            <span class="op">$</span><span class="val">b</span> = <span class="val">3</span>;
+
+            <span class="cm">// Aritméticos</span>
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">a</span> <span class="op">+</span>
+            <span class="op">$</span><span class="val">b</span>; <span class="cm">// 13</span>
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">a</span> <span class="op">-</span>
+            <span class="op">$</span><span class="val">b</span>; <span class="cm">// 7</span>
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">a</span> <span class="op">*</span>
+            <span class="op">$</span><span class="val">b</span>; <span class="cm">// 30</span>
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">a</span> <span class="op">/</span>
+            <span class="op">$</span><span class="val">b</span>; <span class="cm">// 3.333...</span>
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">a</span> <span class="op">%</span>
+            <span class="op">$</span><span class="val">b</span>; <span class="cm">// 1 (resto de 10 / 3)</span>
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">a</span> <span class="op">**</span>
+            <span class="op">$</span><span class="val">b</span>; <span class="cm">// 1000 (10 elevado a 3)</span>
+
+            <span class="cm">// Asignación compuesta</span>
+            <span class="op">$</span><span class="val">a</span> <span class="op">+=</span> <span class="val">5</span>;
+            <span class="cm">// $a = 15</span>
+            <span class="op">$</span><span class="val">a</span> <span class="op">*=</span> <span class="val">2</span>;
+            <span class="cm">// $a = 30</span>
+            <span class="op">$</span><span class="val">a</span><span class="op">++</span>; <span class="cm">// $a =
+                31</span>
+
+            <span class="cm">// Comparación</span>
+            <span class="op">$</span><span class="val">x</span> = <span class="val">5</span>; <span
+                class="op">$</span><span class="val">y</span> = <span class="str">"5"</span>;
+            <span class="fn">var_dump</span>(<span class="op">$</span><span class="val">x</span> <span
+                class="op">==</span> <span class="op">$</span><span class="val">y</span>); <span class="cm">//
+                bool(true) — mismos valores</span>
+            <span class="fn">var_dump</span>(<span class="op">$</span><span class="val">x</span> <span
+                class="op">===</span> <span class="op">$</span><span class="val">y</span>); <span class="cm">//
+                bool(false) — tipos distintos</span>
+
+            <span class="cm">// Lógicos</span>
+            <span class="op">$</span><span class="val">mayor</span> = <span class="val">18</span>;
+            <span class="op">$</span><span class="val">activo</span> = <span class="kw">true</span>;
+            <span class="kw">if</span> (<span class="op">$</span><span class="val">mayor</span> <span
+                class="op">&gt;=</span> <span class="val">18</span> <span class="op">&amp;&amp;</span> <span
+                class="op">$</span><span class="val">activo</span>) {
+            <span class="fn">echo</span> <span class="str">"Acceso permitido"</span>;
+            }
+
+            <span class="cm">// Concatenación de strings</span>
+            <span class="op">$</span><span class="val">msg</span> = <span class="str">"Resultado: "</span> <span
+                class="op">.</span> (<span class="op">$</span><span class="val">a</span> <span class="op">+</span> <span
+                class="op">$</span><span class="val">b</span>);
+            <span class="op">$</span><span class="val">msg</span> <span class="op">.=</span> <span class="str">"
+                unidades."</span>;
+            <span class="fn">echo</span> <span class="op">$</span><span class="val">msg</span>; <span class="cm">//
+                Resultado: 33 unidades.</span>
+            <span class="kw">?&gt;</span>
+        </div>
+    </section>
+
+    <footer>
+        [ PHP: Introducción ] · Base de Datos II · Segundo Cuatrimestre
+        &nbsp;·&nbsp; <a href="../Primer Cuatrimestre/SQL+/SQL-Básico.html">← SQL Básico</a>
+        &nbsp;·&nbsp; <a href="../../../">~/inicio</a>
+    </footer>
+
+    <script>
+        function sh(id) {
+            document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('tab-' + id).classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SQL Básico — Base de Datos II</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f8f9fc;
+            --s: #fff;
+            --s2: #f1f4f9;
+            --bd: #e2e8f0;
+            --a: #0891b2;
+            --a2: #0284c7;
+            --a3: #10b981;
+            --a4: #f59e0b;
+            --pk: #ef4444;
+            --fk: #3b82f6;
+            --text: #1e293b;
+            --m: #64748b;
+            --r: 12px;
+            --rs: 7px;
+            --sh: 0 2px 12px rgba(8, 145, 178, .09)
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.2rem 1.5rem 2.2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 50%, #fff9c4 100%);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 55% 50% at 20% -10%, rgba(8, 145, 178, .12) 0%, transparent 60%), radial-gradient(ellipse 50% 45% at 85% 110%, rgba(16, 185, 129, .09) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(8, 145, 178, .1);
+            border: 1px solid rgba(8, 145, 178, .3);
+            color: #0e7490;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: .25rem .9rem;
+            border-radius: 999px;
+            margin-bottom: .9rem
+        }
+
+        header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.7rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #0e7490, #0369a1, #047857);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .5rem
+        }
+
+        header p.sub {
+            color: var(--m);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: .95rem
+        }
+
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .65rem 1.5rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        .bc a {
+            color: var(--m);
+            text-decoration: none
+        }
+
+        .bc a:hover {
+            color: var(--a)
+        }
+
+        .bc .cur {
+            color: var(--a);
+            font-weight: 600
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .4rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .04)
+        }
+
+        nav.tabs button {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            color: var(--m);
+            font-family: 'Inter', sans-serif;
+            font-size: .8rem;
+            font-weight: 500;
+            padding: .42rem .95rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--a);
+            color: var(--a);
+            background: #e0f7fa
+        }
+
+        nav.tabs button.active {
+            background: var(--a);
+            border-color: var(--a);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(8, 145, 178, .3)
+        }
+
+        .sec {
+            display: none;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2.4rem 1.2rem 4rem;
+            animation: fi .3s ease
+        }
+
+        .sec.active {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bd)
+        }
+
+        .sec-title .icon {
+            font-size: 1.6rem
+        }
+
+        .sec-title h2 {
+            font-size: 1.4rem;
+            font-weight: 700
+        }
+
+        .sec-title p {
+            font-size: .87rem;
+            color: var(--m);
+            margin-top: .1rem
+        }
+
+        .sh {
+            font-size: .93rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 1.8rem 0 .8rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .sh::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--bd), transparent);
+            margin-left: .5rem
+        }
+
+        .ib {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: .95rem 1.15rem;
+            font-size: .86rem;
+            color: var(--m);
+            margin-bottom: 1.1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .03)
+        }
+
+        .ib.cy {
+            border-left: 3px solid var(--a)
+        }
+
+        .ib.gr {
+            border-left: 3px solid var(--a3)
+        }
+
+        .ib.am {
+            border-left: 3px solid var(--a4)
+        }
+
+        .ib.rd {
+            border-left: 3px solid var(--pk)
+        }
+
+        .ib.bl {
+            border-left: 3px solid var(--fk)
+        }
+
+        /* GROUP HEADER */
+        .grp-head {
+            background: linear-gradient(135deg, var(--s2), var(--s));
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem
+        }
+
+        .grp-badge {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            padding: .3rem .75rem;
+            border-radius: 6px;
+            flex-shrink: 0;
+            margin-top: .1rem;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .grp-head h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: .2rem
+        }
+
+        .grp-head p {
+            font-size: .83rem;
+            color: var(--m)
+        }
+
+        /* COMMAND CARDS */
+        .cmd-list {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            margin-bottom: 2rem
+        }
+
+        .cmd-card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            transition: box-shadow .2s
+        }
+
+        .cmd-card:hover {
+            box-shadow: 0 4px 18px rgba(8, 145, 178, .15)
+        }
+
+        .cmd-head {
+            display: flex;
+            align-items: center;
+            gap: .9rem;
+            padding: .85rem 1.1rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .cmd-kw {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .85rem;
+            font-weight: 700;
+            padding: .2rem .65rem;
+            border-radius: 6px;
+            flex-shrink: 0
+        }
+
+        .cmd-desc {
+            flex: 1;
+            font-size: .87rem;
+            font-weight: 500
+        }
+
+        .cmd-arr {
+            font-size: .75rem;
+            color: var(--m);
+            transition: transform .25s;
+            flex-shrink: 0
+        }
+
+        .cmd-card.open .cmd-arr {
+            transform: rotate(180deg)
+        }
+
+        .cmd-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .38s ease
+        }
+
+        .cmd-card.open .cmd-body {
+            max-height: 900px
+        }
+
+        .cmd-inner {
+            padding: .85rem 1.1rem 1.1rem;
+            border-top: 1px solid var(--bd)
+        }
+
+        .cmd-inner p {
+            font-size: .86rem;
+            color: var(--m);
+            margin-bottom: .85rem
+        }
+
+        /* SYNTAX BOX */
+        .syntax {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: var(--rs);
+            padding: .8rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            color: #0c4a6e;
+            margin-bottom: .85rem;
+            white-space: pre-wrap;
+            line-height: 1.7
+        }
+
+        .kw {
+            color: #0369a1;
+            font-weight: 700
+        }
+
+        .val {
+            color: #047857
+        }
+
+        .op {
+            color: #7c3aed
+        }
+
+        .str {
+            color: #b45309
+        }
+
+        .cm {
+            color: #94a3b8
+        }
+
+        /* EXAMPLE BOX */
+        .ex-box {
+            background: #f8fafc;
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .85rem 1rem;
+            margin-bottom: .85rem
+        }
+
+        .ex-box .ex-title {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--m);
+            margin-bottom: .55rem
+        }
+
+        .ex-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem;
+            color: #0c4a6e;
+            background: #e0f2fe;
+            padding: .6rem .85rem;
+            border-radius: 6px;
+            margin-bottom: .6rem
+        }
+
+        /* QUIZ */
+        .quiz-wrap {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: var(--rs);
+            padding: .85rem 1rem
+        }
+
+        .quiz-wrap .q-label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: .5rem
+        }
+
+        .quiz-input {
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            padding: .5rem .75rem;
+            border: 1.5px solid #fcd34d;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .quiz-input:focus {
+            border-color: #f59e0b
+        }
+
+        .quiz-btn {
+            margin-top: .5rem;
+            background: var(--a4);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: .4rem 1rem;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s
+        }
+
+        .quiz-btn:hover {
+            background: #d97706
+        }
+
+        .quiz-fb {
+            margin-top: .5rem;
+            font-size: .8rem;
+            font-weight: 600;
+            padding: .4rem .75rem;
+            border-radius: 6px;
+            display: none
+        }
+
+        .quiz-fb.ok {
+            background: #d1fae5;
+            color: #065f46;
+            display: block
+        }
+
+        .quiz-fb.err {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block
+        }
+
+        /* TABLE */
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .81rem;
+            margin-bottom: 1rem
+        }
+
+        .tbl th {
+            background: var(--s2);
+            padding: .5rem .8rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: .7rem;
+            color: var(--m);
+            border: 1px solid var(--bd)
+        }
+
+        .tbl td {
+            padding: .45rem .8rem;
+            border: 1px solid var(--bd);
+            color: var(--text);
+            vertical-align: top
+        }
+
+        .tbl tr:hover td {
+            background: var(--s2)
+        }
+
+        /* ENGINES */
+        .eng-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem
+        }
+
+        .eng-card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.1rem;
+            box-shadow: var(--sh)
+        }
+
+        .eng-card .em {
+            font-size: 1.8rem;
+            margin-bottom: .5rem
+        }
+
+        .eng-card h4 {
+            font-size: .9rem;
+            font-weight: 700;
+            margin-bottom: .3rem
+        }
+
+        .eng-card p {
+            font-size: .76rem;
+            color: var(--m)
+        }
+
+        .eng-card .eng-tag {
+            display: inline-block;
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .1rem .45rem;
+            border-radius: 4px;
+            margin-top: .5rem
+        }
+
+        /* QUESTIONS */
+        .qb {
+            margin-bottom: .65rem;
+            border-radius: var(--r);
+            border: 1px solid var(--bd);
+            overflow: hidden;
+            background: var(--s);
+            box-shadow: var(--sh)
+        }
+
+        .qb:hover {
+            box-shadow: 0 4px 14px rgba(8, 145, 178, .14)
+        }
+
+        .qh {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding: .85rem 1.1rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .qn {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e0f7fa;
+            border: 1px solid rgba(8, 145, 178, .3);
+            color: var(--a);
+            font-size: .73rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .qt {
+            flex: 1;
+            font-size: .88rem;
+            font-weight: 500
+        }
+
+        .qa {
+            font-size: .73rem;
+            color: var(--m);
+            transition: transform .25s
+        }
+
+        .qb.open .qa {
+            transform: rotate(180deg)
+        }
+
+        .qbdy {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+
+        .qb.open .qbdy {
+            max-height: 400px
+        }
+
+        .qbi {
+            padding: .8rem 1.1rem 1rem;
+            border-top: 1px solid var(--bd)
+        }
+
+        .qbi p {
+            color: var(--m);
+            font-size: .85rem;
+            margin-bottom: .55rem
+        }
+
+        .qtgs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .35rem
+        }
+
+        .tg {
+            font-size: .67rem;
+            padding: .1rem .45rem;
+            border-radius: 999px;
+            font-weight: 600
+        }
+
+        .tg.cy {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd
+        }
+
+        .tg.gr {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0
+        }
+
+        .tg.am {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d
+        }
+
+        .tg.rd {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5
+        }
+
+        .pb-w {
+            background: var(--s2);
+            border-radius: 999px;
+            height: 7px;
+            margin-bottom: .4rem;
+            overflow: hidden;
+            border: 1px solid var(--bd)
+        }
+
+        .pb-f {
+            height: 100%;
+            background: linear-gradient(90deg, var(--a), var(--a3));
+            border-radius: 999px;
+            transition: width .4s;
+            width: 0%
+        }
+
+        .pb-l {
+            font-size: .75rem;
+            color: var(--m);
+            text-align: right;
+            margin-bottom: 1.4rem
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--bd);
+            color: var(--m);
+            font-size: .75rem;
+            background: var(--s)
+        }
+
+        @media(max-width:640px) {
+            nav.tabs button {
+                font-size: .72rem;
+                padding: .37rem .7rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <span class="badge">Base de Datos II · Primer Cuatrimestre</span>
+        <h1>🗄️ SQL Básico</h1>
+        <p class="sub">Comandos esenciales de SQL agrupados por categoría, con sintaxis, ejemplos prácticos y ejercicios
+            interactivos.</p>
+    </header>
+    <div class="bc"><a href="../../../">🏠 Inicio</a><span style="opacity:.4"> › </span><a href="../../">Base de Datos
+            II</a><span style="opacity:.4"> › </span><span class="cur">🗄️ SQL Básico</span></div>
+    <nav class="tabs">
+        <button class="active" onclick="sh('intro')" id="tab-intro">🗂️ Intro</button>
+        <button onclick="sh('dql')" id="tab-dql">🔍 DQL</button>
+        <button onclick="sh('ddl')" id="tab-ddl">🏗️ DDL</button>
+        <button onclick="sh('dml')" id="tab-dml">✏️ DML</button>
+        <button onclick="sh('dcl')" id="tab-dcl">🔒 DCL / TCL</button>
+        <button onclick="sh('motores')" id="tab-motores">🛢️ Motores</button>
+        <button onclick="sh('preguntas')" id="tab-preguntas">❓ Preguntas</button>
+    </nav>
+
+    <!-- INTRO -->
+    <section id="intro" class="sec active">
+        <div class="sec-title"><span class="icon">🗂️</span>
+            <div>
+                <h2>Elementos de una Base de Datos</h2>
+                <p>Tablas, columnas y filas: los bloques fundamentales</p>
+            </div>
+        </div>
+        <div
+            style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.8rem">
+            <div class="ib cy" style="cursor:pointer" onclick="sh('ddl')">
+                <div style="font-size:1.5rem;margin-bottom:.4rem">📦</div>
+                <strong style="color:var(--text);display:block;margin-bottom:.25rem">Base de Datos</strong>
+                <span style="font-size:.8rem">Contenedor lógico que agrupa tablas relacionadas. Ej: <code
+                        style="font-size:.75rem;background:#e0f2fe;padding:.05rem .3rem;border-radius:3px">mi_empresa</code></span>
+            </div>
+            <div class="ib gr" style="cursor:pointer" onclick="sh('dql')">
+                <div style="font-size:1.5rem;margin-bottom:.4rem">📋</div>
+                <strong style="color:var(--text);display:block;margin-bottom:.25rem">Tabla (Table)</strong>
+                <span style="font-size:.8rem">Estructura de filas y columnas. Cada tabla representa una entidad
+                    (Clientes, Productos).</span>
+            </div>
+            <div class="ib am">
+                <div style="font-size:1.5rem;margin-bottom:.4rem">📊</div>
+                <strong style="color:var(--text);display:block;margin-bottom:.25rem">Columna (Column / Campo)</strong>
+                <span style="font-size:.8rem">Define un atributo y su tipo de dato: <code
+                        style="font-size:.75rem;background:#fef3c7;padding:.05rem .3rem;border-radius:3px">nombre VARCHAR(80)</code></span>
+            </div>
+            <div class="ib bl">
+                <div style="font-size:1.5rem;margin-bottom:.4rem">➡️</div>
+                <strong style="color:var(--text);display:block;margin-bottom:.25rem">Fila (Row / Registro)</strong>
+                <span style="font-size:.8rem">Un registro individual. Cada fila es una instancia de la entidad con todos
+                    sus valores.</span>
+            </div>
+        </div>
+        <div class="sh">📊 Visualización de una tabla SQL</div>
+        <div style="overflow-x:auto;margin-bottom:1.5rem">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th style="color:#ef4444">id_producto (PK · INT)</th>
+                        <th>nombre (VARCHAR)</th>
+                        <th>precio (DECIMAL)</th>
+                        <th>stock (INT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight:700;color:#ef4444">1</td>
+                        <td>Mesa de Pino</td>
+                        <td>15000.00</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700;color:#ef4444">2</td>
+                        <td>Silla Gamer</td>
+                        <td>28500.50</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700;color:#ef4444">3</td>
+                        <td>Monitor 24"</td>
+                        <td>62000.00</td>
+                        <td>12</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="sh">🗂️ Grupos de comandos SQL</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.85rem;margin-bottom:1.5rem"
+            id="groups-summary"></div>
+    </section>
+
+    <!-- DQL -->
+    <section id="dql" class="sec">
+        <div class="sec-title"><span class="icon">🔍</span>
+            <div>
+                <h2>DQL — Data Query Language</h2>
+                <p>Consultar y recuperar datos de las tablas</p>
+            </div>
+        </div>
+        <div id="dql-list" class="cmd-list"></div>
+    </section>
+
+    <!-- DDL -->
+    <section id="ddl" class="sec">
+        <div class="sec-title"><span class="icon">🏗️</span>
+            <div>
+                <h2>DDL — Data Definition Language</h2>
+                <p>Crear y modificar la estructura de la base de datos</p>
+            </div>
+        </div>
+        <div id="ddl-list" class="cmd-list"></div>
+    </section>
+
+    <!-- DML -->
+    <section id="dml" class="sec">
+        <div class="sec-title"><span class="icon">✏️</span>
+            <div>
+                <h2>DML — Data Manipulation Language</h2>
+                <p>Insertar, modificar y eliminar datos</p>
+            </div>
+        </div>
+        <div id="dml-list" class="cmd-list"></div>
+    </section>
+
+    <!-- DCL/TCL -->
+    <section id="dcl" class="sec">
+        <div class="sec-title"><span class="icon">🔒</span>
+            <div>
+                <h2>DCL / TCL</h2>
+                <p>Control de permisos y transacciones</p>
+            </div>
+        </div>
+        <div class="grp-head"><span class="grp-badge" style="background:#dbeafe;color:#1d4ed8">DCL</span>
+            <div>
+                <h3>Data Control Language</h3>
+                <p>Controla quién puede hacer qué en la base de datos. Comandos: <strong>GRANT</strong> (otorgar
+                    permiso) y <strong>REVOKE</strong> (quitar permiso).</p>
+            </div>
+        </div>
+        <div class="ib cy"><strong style="color:var(--text)">GRANT SELECT ON clientes TO usuario1;</strong><br><span
+                style="font-size:.8rem">— Le da permiso de solo lectura sobre la tabla clientes al usuario1.</span>
+        </div>
+        <div class="ib rd"><strong style="color:var(--text)">REVOKE INSERT ON productos FROM usuario2;</strong><br><span
+                style="font-size:.8rem">— Le quita el permiso de insertar registros en productos al usuario2.</span>
+        </div>
+        <div class="grp-head" style="margin-top:1.5rem"><span class="grp-badge"
+                style="background:#d1fae5;color:#065f46">TCL</span>
+            <div>
+                <h3>Transaction Control Language</h3>
+                <p>Controla el flujo de transacciones: agrupa operaciones para que se ejecuten todas juntas o ninguna.
+                </p>
+            </div>
+        </div>
+        <div class="ib gr"><strong style="color:var(--text)">BEGIN / START TRANSACTION</strong> — Inicia una
+            transacción.<br><strong style="color:var(--text)">COMMIT</strong> — Confirma todos los cambios realizados en
+            la transacción.<br><strong style="color:var(--text)">ROLLBACK</strong> — Deshace todos los cambios si algo
+            salió mal.</div>
+        <div style="overflow-x:auto">
+            <pre class="syntax"><span class="cm">-- Transferencia bancaria segura</span>
+<span class="kw">BEGIN</span>;
+  <span class="kw">UPDATE</span> cuentas <span class="kw">SET</span> saldo = saldo - <span class="val">5000</span> <span class="kw">WHERE</span> id = <span class="val">1</span>;
+  <span class="kw">UPDATE</span> cuentas <span class="kw">SET</span> saldo = saldo + <span class="val">5000</span> <span class="kw">WHERE</span> id = <span class="val">2</span>;
+<span class="kw">COMMIT</span>; <span class="cm">-- Solo si ambas operaciones salieron OK</span></pre>
+        </div>
+    </section>
+
+    <!-- MOTORES -->
+    <section id="motores" class="sec">
+        <div class="sec-title"><span class="icon">🛢️</span>
+            <div>
+                <h2>Motores de Base de Datos</h2>
+                <p>Los principales gestores y sus diferencias clave</p>
+            </div>
+        </div>
+        <div class="ib cy">📌 El <strong style="color:var(--text)">SQL estándar (ANSI/ISO)</strong> es el idioma base,
+            pero cada motor tiene pequeñas variaciones en sintaxis, funciones y comportamiento.</div>
+        <div class="eng-grid" id="eng-grid"></div>
+        <div class="sh">🔄 Diferencias prácticas entre motores</div>
+        <div style="overflow-x:auto">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Característica</th>
+                        <th>MySQL / MariaDB</th>
+                        <th>PostgreSQL</th>
+                        <th>SQL Server</th>
+                        <th>Oracle</th>
+                        <th>SQLite</th>
+                    </tr>
+                </thead>
+                <tbody id="diff-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- PREGUNTAS -->
+    <section id="preguntas" class="sec">
+        <div class="sec-title"><span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Repaso</h2>
+                <p>Verificá tu comprensión de los conceptos SQL</p>
+            </div>
+        </div>
+        <div class="pb-w">
+            <div class="pb-f" id="pf"></div>
+        </div>
+        <div class="pb-l" id="pl">0 de 12 preguntas leídas</div>
+        <div id="qc"></div>
+    </section>
+
+    <footer>Base de Datos II · Primer Cuatrimestre &nbsp;›&nbsp; SQL Básico</footer>
+
+    <script>
+        function sh(id) { document.querySelectorAll('.sec').forEach(s => s.classList.remove('active')); document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); document.getElementById('tab-' + id).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        const GROUPS = [
+            { id: 'dql', em: '🔍', label: 'DQL', color: '#0e7490', bg: '#e0f2fe', desc: 'Consultar datos. Principal: SELECT' },
+            { id: 'ddl', em: '🏗️', label: 'DDL', color: '#5b21b6', bg: '#ede9fe', desc: 'Definir estructura: CREATE, ALTER, DROP' },
+            { id: 'dml', em: '✏️', label: 'DML', color: '#065f46', bg: '#d1fae5', desc: 'Manipular datos: INSERT, UPDATE, DELETE' },
+            { id: 'dcl', em: '🔒', label: 'DCL', color: '#1d4ed8', bg: '#dbeafe', desc: 'Control de permisos: GRANT, REVOKE' },
+            { id: 'dcl', em: '🔄', label: 'TCL', color: '#9a3412', bg: '#ffedd5', desc: 'Transacciones: COMMIT, ROLLBACK' },
+        ];
+        (() => { const g = document.getElementById('groups-summary'); GROUPS.forEach(gr => { const d = document.createElement('div'); d.className = 'ib'; d.style.cursor = 'pointer'; d.style.transition = 'transform .2s'; d.innerHTML = `<div style="font-size:1.3rem;margin-bottom:.3rem">${gr.em}</div><strong style="display:block;margin-bottom:.2rem"><span style="background:${gr.bg};color:${gr.color};padding:.1rem .5rem;border-radius:5px;font-size:.78rem;font-family:'JetBrains Mono',monospace">${gr.label}</span></strong><span style="font-size:.8rem;color:var(--m)">${gr.desc}</span>`; d.onclick = () => sh(gr.id); d.onmouseenter = () => d.style.transform = 'translateY(-2px)'; d.onmouseleave = () => d.style.transform = ''; g.appendChild(d); }); })();
+
+        // ====== COMMAND DATA ======
+        const DQL = [
+            {
+                kw: 'SELECT', color: '#0e7490', bg: '#e0f2fe',
+                desc: 'Elige qué columnas mostrar en el resultado. Es el comando más usado en SQL.',
+                syntax: `<span class="kw">SELECT</span> columna1, columna2\n<span class="kw">FROM</span> nombre_tabla;`,
+                ex: { code: `SELECT nombre, precio FROM productos;`, note: 'Trae el nombre y precio de todos los productos.' },
+                quiz: { q: '¿Cómo traerías TODAS las columnas de la tabla clientes?', a: 'select * from clientes', hint: 'Usá el comodín * para todas las columnas' }
+            },
+            {
+                kw: 'FROM', color: '#0369a1', bg: '#e0f2fe',
+                desc: 'Indica de qué tabla se extraen los datos. Siempre va después de SELECT.',
+                syntax: `<span class="kw">SELECT</span> * <span class="kw">FROM</span> nombre_tabla;`,
+                ex: { code: `SELECT * FROM empleados;`, note: 'Trae todas las columnas de todos los empleados.' },
+                quiz: { q: 'Completá: SELECT nombre _____ productos;', a: 'from', hint: 'Palabra que indica la tabla origen' }
+            },
+            {
+                kw: 'WHERE', color: '#7c3aed', bg: '#ede9fe',
+                desc: 'Filtra filas según una condición. Solo devuelve las que cumplen el criterio.',
+                syntax: `<span class="kw">SELECT</span> * <span class="kw">FROM</span> tabla\n<span class="kw">WHERE</span> condicion;`,
+                ex: { code: `SELECT * FROM productos WHERE precio > 10000;`, note: 'Solo productos con precio mayor a $10.000.' },
+                quiz: { q: '¿Cómo filtrarías los clientes cuyo nombre sea "Ana"?', a: `select * from clientes where nombre = "ana"`, hint: "WHERE nombre = 'Ana'" }
+            },
+            {
+                kw: 'Operadores de comparación', color: '#059669', bg: '#d1fae5',
+                desc: `= igual · &lt; menor · &gt; mayor · &lt;= menor o igual · &gt;= mayor o igual · &lt;&gt; distinto. Con números comparan valor; con texto comparan alfabéticamente; con fechas comparan cronológicamente.`,
+                syntax: `<span class="kw">WHERE</span> precio <span class="op">&gt;=</span> <span class="val">5000</span> <span class="kw">AND</span> precio <span class="op">&lt;</span> <span class="val">20000</span>\n<span class="kw">WHERE</span> apellido <span class="op">=</span> <span class="str">'Gomez'</span>\n<span class="kw">WHERE</span> fecha_ingreso <span class="op">&lt;</span> <span class="str">'2024-01-01'</span>`,
+                ex: { code: `SELECT * FROM empleados WHERE salario >= 80000 AND salario <= 150000;`, note: 'Empleados con salario entre 80.000 y 150.000.' },
+                quiz: { q: '¿Qué operador usarías para "diferente de"?', a: '<>', hint: 'En SQL estándar es <> aunque algunos motores también aceptan !=' }
+            },
+            {
+                kw: 'LIKE', color: '#d97706', bg: '#fef3c7',
+                desc: "Busca patrones dentro de texto. % representa cualquier cantidad de caracteres; _ representa exactamente un carácter.",
+                syntax: `<span class="kw">WHERE</span> columna <span class="kw">LIKE</span> <span class="str">'patrón'</span>\n<span class="cm">-- % = varios chars · _ = un char</span>`,
+                ex: { code: `SELECT * FROM clientes WHERE nombre LIKE 'Mar%';`, note: "Clientes cuyo nombre empieza con 'Mar': María, Marcos, Martín…" },
+                quiz: { q: "¿Cómo buscarías productos cuyo nombre TERMINA en 'Pro'?", a: `select * from productos where nombre like "%pro"`, hint: "El % va antes del texto cuando buscás el final" }
+            },
+            {
+                kw: 'ORDER BY', color: '#0891b2', bg: '#e0f7fa',
+                desc: 'Ordena el resultado por una o más columnas. ASC (ascendente, por defecto) o DESC (descendente).',
+                syntax: `<span class="kw">SELECT</span> * <span class="kw">FROM</span> tabla\n<span class="kw">ORDER BY</span> columna <span class="kw">ASC</span>|<span class="kw">DESC</span>;`,
+                ex: { code: `SELECT nombre, precio FROM productos ORDER BY precio DESC;`, note: 'Productos ordenados de mayor a menor precio.' },
+                quiz: { q: '¿Cómo ordenarías empleados por apellido de A a Z?', a: 'select * from empleados order by apellido asc', hint: 'ASC es ascendente (A → Z)' }
+            },
+            {
+                kw: 'BETWEEN', color: '#be185d', bg: '#fce7f3',
+                desc: 'Filtra valores dentro de un rango (incluyendo los extremos). Es equivalente a >= X AND <= Y.',
+                syntax: `<span class="kw">WHERE</span> columna <span class="kw">BETWEEN</span> valor1 <span class="kw">AND</span> valor2`,
+                ex: { code: `SELECT * FROM ventas WHERE fecha BETWEEN '2024-01-01' AND '2024-12-31';`, note: 'Ventas realizadas durante todo el año 2024.' },
+                quiz: { q: '¿BETWEEN 10 AND 20 incluye los valores 10 y 20?', a: 'si', hint: 'BETWEEN incluye ambos extremos del rango' }
+            },
+            {
+                kw: 'COUNT / SUM', color: '#7c3aed', bg: '#f5f3ff',
+                desc: 'Funciones de agregación: COUNT cuenta filas (o valores no nulos); SUM suma valores numéricos.',
+                syntax: `<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> tabla;\n<span class="kw">SELECT</span> <span class="kw">SUM</span>(columna) <span class="kw">FROM</span> tabla <span class="kw">WHERE</span> condicion;`,
+                ex: { code: `SELECT COUNT(*) AS total_clientes FROM clientes;\nSELECT SUM(total) AS ventas_dia FROM pedidos WHERE fecha = '2024-03-01';`, note: 'Cuenta todos los clientes; suma las ventas del día.' },
+                quiz: { q: '¿Qué función usarías para sumar todos los precios de la tabla productos?', a: 'select sum(precio) from productos', hint: 'SUM(precio) suma todos los valores de esa columna' }
+            },
+            {
+                kw: 'JOIN (INNER)', color: '#047857', bg: '#ecfdf5',
+                desc: 'Combina filas de dos tablas cuando existe coincidencia en la columna relacionada. INNER JOIN solo devuelve registros que tienen coincidencia en ambas tablas.',
+                syntax: `<span class="kw">SELECT</span> a.col, b.col\n<span class="kw">FROM</span> tabla_a a\n<span class="kw">INNER JOIN</span> tabla_b b <span class="kw">ON</span> a.id = b.fk_id;`,
+                ex: { code: `SELECT clientes.nombre, pedidos.fecha, pedidos.total\nFROM clientes\nINNER JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente;`, note: 'Lista nombre del cliente junto con cada uno de sus pedidos.' },
+                quiz: { q: '¿Qué tipo de JOIN excluye los registros sin coincidencia en ambas tablas?', a: 'inner join', hint: 'INNER JOIN solo trae los que coinciden en las dos tablas' }
+            },
+        ];
+        const DDL = [
+            {
+                kw: 'CREATE DATABASE', color: '#5b21b6', bg: '#ede9fe',
+                desc: 'Crea una nueva base de datos en el servidor.',
+                syntax: `<span class="kw">CREATE DATABASE</span> nombre_bd;`,
+                ex: { code: `CREATE DATABASE tienda_online;`, note: 'Crea la base de datos llamada tienda_online.' },
+                quiz: { q: '¿Cuál es el comando para crear una base de datos llamada escuela?', a: 'create database escuela', hint: 'CREATE DATABASE seguido del nombre' }
+            },
+            {
+                kw: 'CREATE TABLE', color: '#6d28d9', bg: '#ede9fe',
+                desc: 'Crea una nueva tabla definiendo columnas, tipos de datos y restricciones (PK, FK, NOT NULL).',
+                syntax: `<span class="kw">CREATE TABLE</span> nombre (\n  columna tipo <span class="kw">restriccion</span>,\n  ...\n  <span class="kw">PRIMARY KEY</span>(col)\n);`,
+                ex: { code: `CREATE TABLE productos (\n  id_producto INT AUTO_INCREMENT,\n  nombre      VARCHAR(100) NOT NULL,\n  precio      DECIMAL(10,2) NOT NULL,\n  stock       INT DEFAULT 0,\n  PRIMARY KEY (id_producto)\n);`, note: 'Crea la tabla productos con PK autoincremental.' },
+                quiz: { q: '¿Qué restricción garantiza que una columna nunca esté vacía?', a: 'not null', hint: 'NOT NULL impide que el campo quede sin valor' }
+            },
+        ];
+        const DML = [
+            {
+                kw: 'INSERT', color: '#065f46', bg: '#d1fae5',
+                desc: 'Agrega un nuevo registro a una tabla.',
+                syntax: `<span class="kw">INSERT INTO</span> tabla (col1, col2)\n<span class="kw">VALUES</span> (val1, val2);`,
+                ex: { code: `INSERT INTO clientes (nombre, email, ciudad)\nVALUES ('María López', 'maria@mail.com', 'Córdoba');`, note: 'Agrega un nuevo cliente a la tabla.' },
+                quiz: { q: '¿Qué cláusula acompaña a INSERT INTO para escribir los valores?', a: 'values', hint: 'INSERT INTO tabla (...) VALUES (...)' }
+            },
+            {
+                kw: 'UPDATE', color: '#166534', bg: '#d1fae5',
+                desc: 'Modifica valores en filas existentes. ¡Siempre usá WHERE para no actualizar todas las filas!',
+                syntax: `<span class="kw">UPDATE</span> tabla\n<span class="kw">SET</span> col1 = val1\n<span class="kw">WHERE</span> condicion;`,
+                ex: { code: `UPDATE productos SET precio = 18500 WHERE id_producto = 3;`, note: 'Actualiza el precio solo del producto con id=3.' },
+                quiz: { q: '¿Qué pasa si hacés UPDATE sin WHERE?', a: 'actualiza todas las filas', hint: 'Sin WHERE se modifican TODOS los registros de la tabla' }
+            },
+            {
+                kw: 'DELETE', color: '#991b1b', bg: '#fee2e2',
+                desc: 'Elimina filas de una tabla. Igual que UPDATE, si omitís WHERE se borran TODOS los registros.',
+                syntax: `<span class="kw">DELETE FROM</span> tabla\n<span class="kw">WHERE</span> condicion;`,
+                ex: { code: `DELETE FROM pedidos WHERE fecha < '2020-01-01';`, note: 'Elimina todos los pedidos anteriores a 2020.' },
+                quiz: { q: '¿Cuál es el comando para borrar registros de una tabla?', a: 'delete', hint: 'DELETE FROM tabla WHERE condicion' }
+            },
+        ];
+
+        let qIdx = 0;
+        function mkCard(cmd, i) {
+            const d = document.createElement('div'); d.className = 'cmd-card'; d.id = 'cmd-' + i;
+            const qa = cmd.quiz ? `<div class="quiz-wrap"><p class="q-label">🧠 Intentalo: ${cmd.quiz.q}</p><input class="quiz-input" id="qi-${i}" placeholder="Escribí tu respuesta…" /><br><button class="quiz-btn" onclick="chkQ(${i})">Verificar</button><div class="quiz-fb" id="qf-${i}"></div></div>` : '';
+            d.innerHTML = `<div class="cmd-head" onclick="tgCmd(${i})"><span class="cmd-kw" style="background:${cmd.bg};color:${cmd.color}">${cmd.kw}</span><span class="cmd-desc">${cmd.desc.substring(0, 80)}…</span><span class="cmd-arr">▼</span></div><div class="cmd-body"><div class="cmd-inner"><p>${cmd.desc}</p><div class="syntax">${cmd.syntax}</div><div class="ex-box"><div class="ex-title">📝 Ejemplo práctico</div><div class="ex-code">${cmd.ex.code}</div><p style="font-size:.78rem;color:var(--m);margin:0">ℹ️ ${cmd.ex.note}</p></div>${qa}</div></div>`;
+            return d;
+        }
+        function tgCmd(i) { const c = document.getElementById('cmd-' + i); const w = c.classList.contains('open'); document.querySelectorAll('.cmd-card').forEach(x => x.classList.remove('open')); if (!w) c.classList.add('open'); }
+        function chkQ(i) {
+            const el = document.getElementById('qi-' + i); const fb = document.getElementById('qf-' + i);
+            const ans = el.value.trim().toLowerCase();
+            const allCmds = [...DQL, ...DDL, ...DML]; const cmd = allCmds.find((_, j) => j === i - 1000 || true);
+            const cmds = [...DQL, ...DDL, ...DML];
+            // Find cmd by index across all rendered
+            let found = null; let idx = 0;
+            for (const arr of [DQL, DDL, DML]) { for (const c of arr) { if (idx === i) { found = c; break; } idx++; } if (found) break; }
+            if (!found) { fb.textContent = '—'; fb.className = 'quiz-fb ok'; return; }
+            const correct = found.quiz.a.toLowerCase();
+            if (ans.includes(correct) || correct.includes(ans)) { fb.textContent = '✅ ¡Correcto! ' + found.quiz.hint; fb.className = 'quiz-fb ok'; }
+            else { fb.textContent = '❌ Revisá: ' + found.quiz.hint; fb.className = 'quiz-fb err'; }
+        }
+
+        (() => {
+            let gi = 0;
+            [[DQL, 'dql-list'], [DDL, 'ddl-list'], [DML, 'dml-list']].forEach(([arr, listId]) => {
+                const c = document.getElementById(listId);
+                arr.forEach(cmd => { c.appendChild(mkCard(cmd, gi)); gi++; });
+            });
+        })();
+
+        // FIX quiz check: rewrite with closure
+        document.querySelectorAll('.quiz-btn').forEach(btn => {
+            btn.onclick = function () {
+                const i = parseInt(this.getAttribute('onclick').match(/\d+/)[0]);
+                const el = document.getElementById('qi-' + i);
+                const fb = document.getElementById('qf-' + i);
+                if (!el || !fb) return;
+                const ans = el.value.trim().toLowerCase();
+                const all = [...DQL, ...DDL, ...DML];
+                const cmd = all[i];
+                if (!cmd || !cmd.quiz) return;
+                const correct = cmd.quiz.a.toLowerCase();
+                if (ans.replace(/\s+/g, ' ').includes(correct) || correct.includes(ans.replace(/\s+/g, ' '))) {
+                    fb.textContent = '✅ ¡Correcto! ' + cmd.quiz.hint; fb.className = 'quiz-fb ok';
+                } else { fb.textContent = '❌ Revisá: ' + cmd.quiz.hint; fb.className = 'quiz-fb err'; }
+            };
+        });
+
+        // ENGINES
+        const ENGS = [
+            { em: '🐬', name: 'MySQL / MariaDB', tag: 'Open Source', tagC: '#0369a1', tagBg: '#e0f2fe', desc: 'El más popular en aplicaciones web. Usado con PHP y WordPress. MariaDB es su fork libre.', difs: ['AUTO_INCREMENT para PK', 'GROUP BY más permisivo', 'LIMIT para paginar', 'Poco estricto con tipos'] },
+            { em: '🐘', name: 'PostgreSQL', tag: 'Avanzado', tagC: '#5b21b6', tagBg: '#ede9fe', desc: 'El más robusto y estándar. Soporta JSON, arrays, geografía. Preferido en sistemas empresariales.', difs: ['SERIAL o GENERATED para PK', 'Cumple estrictamente SQL', 'LIMIT/OFFSET', 'JSON nativo'] },
+            { em: '🏢', name: 'SQL Server', tag: 'Microsoft', tagC: '#1d4ed8', tagBg: '#dbeafe', desc: 'De Microsoft. Integrado con el ecosistema .NET y Azure. Muy usado en empresas Windows.', difs: ['IDENTITY para autonumérico', 'TOP en lugar de LIMIT', 'Schema dbo por defecto', 'T-SQL con extensiones'] },
+            { em: '☀️', name: 'Oracle DB', tag: 'Empresarial', tagC: '#9a3412', tagBg: '#ffedd5', desc: 'El motor más potente y costoso. Dominante en bancos y grandes corporaciones.', difs: ['SEQUENCE + TRIGGER para PK', 'ROWNUM / FETCH FIRST', 'PL/SQL como lenguaje propio', 'Sin AUTO_INCREMENT nativo'] },
+            { em: '🪶', name: 'SQLite', tag: 'Embebido', tagC: '#065f46', tagBg: '#d1fae5', desc: 'Sin servidor propio. Un solo archivo. Usado en apps móviles (Android, iOS) y dispositivos.', difs: ['Tipos de datos dinámicos', 'INTEGER PRIMARY KEY = autoincrement', 'Sin multiusuario concurrente', 'sqlite3 en Python/Node'] },
+        ];
+        (() => {
+            const g = document.getElementById('eng-grid');
+            ENGS.forEach(e => {
+                const d = document.createElement('div'); d.className = 'eng-card';
+                d.innerHTML = `<div class="em">${e.em}</div><h4>${e.name}</h4><p>${e.desc}</p><span class="eng-tag" style="background:${e.tagBg};color:${e.tagC}">${e.tag}</span>`;
+                g.appendChild(d);
+            });
+            const tb = document.getElementById('diff-body');
+            const ROWS = [
+                ['PK autoincr.', 'AUTO_INCREMENT', 'SERIAL / GENERATED', 'IDENTITY', 'SEQUENCE', 'INTEGER PK'],
+                ['Limitar filas', 'LIMIT n', 'LIMIT n', 'TOP n / FETCH FIRST', 'FETCH FIRST / ROWNUM', 'LIMIT n'],
+                ['Concatenar texto', 'CONCAT() o ||', '|| o CONCAT()', '+ o CONCAT()', '|| o CONCAT()', '||'],
+                ['Fecha actual', 'NOW()', 'NOW() / CURRENT_TIMESTAMP', 'GETDATE()', 'SYSDATE', 'datetime("now")'],
+                ['Diferenciar mayúsc.', 'No (por defecto)', 'Sí (case-sensitive)', 'No (colación)', 'Sí', 'No'],
+                ['Licencia', 'GPL / BSL', 'PostgreSQL (libre)', 'Comercial', 'Comercial', 'Dominio público'],
+            ];
+            ROWS.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = r.map((c, i) => `<td style="${i === 0 ? 'font-weight:600;color:var(--text)' : ''}">${c}</td>`).join('');
+                tb.appendChild(tr);
+            });
+        })();
+
+        // QUESTIONS
+        const Qs = [
+            { g: 'Conceptos', n: 1, t: '¿Cuál es la diferencia entre una fila y una columna en una tabla SQL?', h: 'Columna = campo/atributo (vertical, define el tipo de dato). Fila = registro/instancia (horizontal, contiene los valores reales de una entidad).', tags: ['Básico', 'Tabla'], c: ['cy', 'gr'] },
+            { g: 'Conceptos', n: 2, t: '¿Qué significa que una columna sea de tipo VARCHAR(100) vs INT?', h: 'VARCHAR(100) almacena texto de hasta 100 caracteres. INT almacena números enteros. Elegir el tipo correcto ahorra espacio y previene errores de datos.', tags: ['Tipos de dato', 'Diseño'], c: ['cy', 'am'] },
+            { g: 'DQL', n: 3, t: '¿Cuál es el orden OBLIGATORIO de las cláusulas en una consulta SELECT?', h: 'SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY. Aunque no todas son obligatorias, si las usás deben ir en ese orden.', tags: ['SELECT', 'Orden', 'DQL'], c: ['cy', 'gr', 'am'] },
+            { g: 'DQL', n: 4, t: '¿Qué diferencia hay entre WHERE y HAVING en SQL?', h: 'WHERE filtra filas ANTES de agrupar. HAVING filtra DESPUÉS de agrupar (se usa con GROUP BY). WHERE no puede usar funciones de agregación como COUNT o SUM.', tags: ['WHERE', 'HAVING', 'Aggregation'], c: ['cy', 'rd', 'am'] },
+            { g: 'DQL', n: 5, t: '¿Cuándo usarías LIKE en lugar de = en un WHERE?', h: 'LIKE cuando buscás por patrón parcial (ej: nombres que empiezan con "Mar"). El = exige igualdad exacta. LIKE es más lento en tablas grandes.', tags: ['LIKE', 'WHERE', 'Patrones'], c: ['am', 'cy', 'gr'] },
+            { g: 'DQL', n: 6, t: '¿Para qué sirve INNER JOIN y qué pasa si no hay coincidencia?', h: 'INNER JOIN combina filas que tienen correspondencia en ambas tablas. Si un cliente no tiene pedidos, se excluye del resultado. Para incluirlo habría que usar LEFT JOIN.', tags: ['JOIN', 'INNER', 'Relaciones'], c: ['gr', 'cy', 'am'] },
+            { g: 'DDL', n: 7, t: '¿Por qué es importante definir correctamente los tipos de dato al crear una tabla?', h: 'Afecta almacenamiento (un CHAR(255) vs VARCHAR), velocidad de búsqueda, integridad (no podés guardar "abc" en un INT) y operaciones posibles (suma de dinero en DECIMAL vs VARCHAR).', tags: ['CREATE TABLE', 'Tipos', 'Integridad'], c: ['am', 'cy', 'gr'] },
+            { g: 'DML', n: 8, t: '¿Por qué es PELIGROSO hacer un DELETE FROM tabla sin WHERE?', h: 'Elimina TODOS los registros de la tabla. En producción puede ser catastrófico. Siempre verificar con un SELECT previo y respaldar antes de borrar masivamente.', tags: ['DELETE', 'Peligro', 'Buenas prácticas'], c: ['rd', 'am', 'cy'] },
+            { g: 'DML', n: 9, t: '¿Cuál es la diferencia entre DELETE y TRUNCATE?', h: 'DELETE elimina fila por fila respetando restricciones y se puede deshacer con ROLLBACK. TRUNCATE vacía toda la tabla de golpe, es más rápido pero no se puede deshacer (en la mayoría de motores).', tags: ['DELETE', 'TRUNCATE', 'DML'], c: ['rd', 'gr', 'cy'] },
+            { g: 'Motores', n: 10, t: '¿Por qué MySQL usa AUTO_INCREMENT y PostgreSQL usa SERIAL o GENERATED?', h: 'Son implementaciones diferentes del mismo concepto (PK autoincremental). El estándar SQL:2003 define GENERATED ALWAYS AS IDENTITY. Cada motor adoptó su propia sintaxis antes de estandarizarse.', tags: ['MySQL', 'PostgreSQL', 'Auto PK'], c: ['cy', 'am', 'gr'] },
+            { g: 'Reflexión', n: 11, t: '¿En qué situación usarías COUNT(*) vs COUNT(columna)?', h: 'COUNT(*) cuenta todas las filas incluyendo nulls. COUNT(columna) solo cuenta filas donde esa columna no es NULL. Úsá COUNT(columna) cuando querés saber cuántos tienen un valor específico.', tags: ['COUNT', 'NULL', 'Aggregation'], c: ['am', 'cy', 'rd'] },
+            { g: 'Reflexión', n: 12, t: 'Si debés elegir entre MySQL y PostgreSQL para un proyecto nuevo, ¿qué considerarías?', h: 'MySQL: más fácil de configurar, amplio hosting gratuito, gran comunidad web. PostgreSQL: más estricto en estándares, mejor para datos complejos (JSON, arrays, GIS), más potente para consultas avanzadas.', tags: ['MySQL', 'PostgreSQL', 'Arquitectura'], c: ['cy', 'gr', 'am'] },
+        ];
+        let oQ = new Set();
+        function renderQ() {
+            const c = document.getElementById('qc'); let lg = '';
+            Qs.forEach(q => {
+                if (q.g !== lg) { lg = q.g; const d = document.createElement('div'); d.style.cssText = 'font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:1.6rem 0 .6rem;display:flex;align-items:center;gap:.5rem'; d.innerHTML = `${q.g}<span style="flex:1;height:1px;background:var(--bd);margin-left:.4rem"></span>`; c.appendChild(d); }
+                const b = document.createElement('div'); b.className = 'qb'; b.id = 'qq-' + q.n;
+                b.innerHTML = `<div class="qh" onclick="tq(${q.n})"><div class="qn">${q.n}</div><div class="qt">${q.t}</div><span class="qa">▼</span></div><div class="qbdy"><div class="qbi"><p>💡 <em>${q.h}</em></p><div class="qtgs">${q.tags.map((t, i) => `<span class="tg ${q.c[i]}">${t}</span>`).join('')}</div></div></div>`;
+                c.appendChild(b);
+            });
+        }
+        function tq(n) { const b = document.getElementById('qq-' + n); const w = b.classList.contains('open'); document.querySelectorAll('.qb').forEach(x => x.classList.remove('open')); if (!w) { b.classList.add('open'); oQ.add(n); const p = Math.round(oQ.size / Qs.length * 100); document.getElementById('pf').style.width = p + '%'; document.getElementById('pl').textContent = oQ.size + ' de ' + Qs.length + ' preguntas leídas'; } }
+        renderQ();
+    </script>
+</body>
+
+</html>
