@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inteligencia Artificial | Nuevas Tecnologías</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border: #1e2d45;
+            --accent: #6366f1;
+            --accent2: #8b5cf6;
+            --accent3: #06b6d4;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --card-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99, 102, 241, .25) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139, 92, 246, .2) 0%, transparent 60%);
+        }
+
+        .grid-lines {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(99, 102, 241, .05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, .05) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: rgba(99, 102, 241, .15);
+            border: 1px solid rgba(99, 102, 241, .4);
+            border-radius: 50px;
+            padding: .4rem 1.2rem;
+            font-size: .8rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: fadeDown .6s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #e2e8f0 0%, #6366f1 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            animation: fadeDown .7s ease .1s both;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            animation: fadeDown .7s ease .2s both;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeDown .7s ease .3s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .75rem 1.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: .95rem;
+            cursor: pointer;
+            transition: all .25s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, .5);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 14, 26, .85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            height: 64px;
+            transform: translateY(-100%);
+            transition: transform .4s;
+        }
+
+        nav.visible {
+            transform: translateY(0);
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            color: #a5b4fc;
+            margin-right: auto;
+            font-size: .95rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: .88rem;
+            font-weight: 500;
+            transition: color .2s;
+        }
+
+        .nav-links a:hover {
+            color: #a5b4fc;
+        }
+
+        /* ─── LAYOUT ─── */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #6366f1;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            max-width: 640px;
+            font-size: 1.05rem;
+        }
+
+        /* ─── CARDS ─── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: all .3s;
+            cursor: pointer;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .3s;
+            background: linear-gradient(135deg, rgba(99, 102, 241, .08), transparent);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-glow);
+            border-color: rgba(99, 102, 241, .4);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: .6rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: .92rem;
+        }
+
+        .card-tag {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: .25rem .75rem;
+            border-radius: 50px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+
+        /* ─── ACCORDION ─── */
+        .accordion {
+            margin-top: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .acc-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .acc-head {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            user-select: none;
+            transition: background .2s;
+        }
+
+        .acc-head:hover {
+            background: var(--surface2);
+        }
+
+        .acc-head .num {
+            font-family: 'JetBrains Mono', monospace;
+            color: #6366f1;
+            font-size: .85rem;
+        }
+
+        .acc-head .icon {
+            margin-left: auto;
+            transition: transform .3s;
+        }
+
+        .acc-head.open .icon {
+            transform: rotate(45deg);
+        }
+
+        .acc-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .4s ease;
+        }
+
+        .acc-body.open {
+            max-height: 1000px;
+        }
+
+        .acc-inner {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+        }
+
+        .acc-inner p {
+            margin-bottom: .75rem;
+        }
+
+        .acc-inner ul {
+            padding-left: 1.4rem;
+        }
+
+        .acc-inner li {
+            margin-bottom: .4rem;
+        }
+
+        .acc-inner strong {
+            color: var(--text);
+        }
+
+        /* ─── TIPOS ─── */
+        .tipos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.2rem;
+            margin-top: 2.5rem;
+        }
+
+        .tipo-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent);
+            transition: all .3s;
+        }
+
+        .tipo-card:hover {
+            transform: translateX(4px);
+            border-left-color: #a5b4fc;
+        }
+
+        .tipo-card h4 {
+            font-weight: 700;
+            margin-bottom: .5rem;
+            color: #a5b4fc;
+        }
+
+        .tipo-card p {
+            color: var(--text-muted);
+            font-size: .9rem;
+        }
+
+        /* ─── TIMELINE ─── */
+        .timeline {
+            margin-top: 3rem;
+            position: relative;
+            padding-left: 2.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: .7rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #6366f1, #8b5cf6, transparent);
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+
+        .tl-dot {
+            position: absolute;
+            left: -2.25rem;
+            top: .25rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #6366f1;
+            box-shadow: 0 0 12px rgba(99, 102, 241, .6);
+        }
+
+        .tl-label {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #6366f1;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: .4rem;
+        }
+
+        .tl-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+        }
+
+        .tl-desc {
+            color: var(--text-muted);
+            font-size: .92rem;
+        }
+
+        /* ─── SECTORES ─── */
+        .sectors {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .sector-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: all .3s;
+        }
+
+        .sector-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--g);
+        }
+
+        .sector-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, .3);
+        }
+
+        .s-icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .sector-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: .75rem;
+        }
+
+        .sector-card p {
+            color: var(--text-muted);
+            font-size: .9rem;
+            margin-bottom: 1rem;
+        }
+
+        .s-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .s-tag {
+            background: rgba(99, 102, 241, .12);
+            border: 1px solid rgba(99, 102, 241, .25);
+            color: #a5b4fc;
+            padding: .2rem .65rem;
+            border-radius: 50px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+
+        /* ─── ACTIVIDAD ─── */
+        .actividad {
+            background: linear-gradient(135deg, rgba(99, 102, 241, .1), rgba(139, 92, 246, .1));
+            border: 1px solid rgba(99, 102, 241, .3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .actividad::before {
+            content: '📋';
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            font-size: 4rem;
+            opacity: .1;
+        }
+
+        .act-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #a5b4fc;
+        }
+
+        .act-desc {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .act-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .act-item {
+            background: rgba(10, 14, 26, .5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem;
+        }
+
+        .act-item h4 {
+            font-size: .95rem;
+            font-weight: 700;
+            margin-bottom: .75rem;
+            color: var(--text);
+        }
+
+        .act-item .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        .kw {
+            background: rgba(6, 182, 212, .12);
+            border: 1px solid rgba(6, 182, 212, .3);
+            color: #67e8f9;
+            padding: .18rem .6rem;
+            border-radius: 50px;
+            font-size: .72rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .act-instrucciones {
+            margin-top: 2rem;
+            background: rgba(10, 14, 26, .6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .act-instrucciones h4 {
+            color: #a5b4fc;
+            font-weight: 700;
+            margin-bottom: .75rem;
+        }
+
+        .act-instrucciones ol {
+            padding-left: 1.4rem;
+            color: var(--text-muted);
+        }
+
+        .act-instrucciones li {
+            margin-bottom: .5rem;
+        }
+
+        /* ─── QUIZ ─── */
+        .quiz-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .quiz-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: .5rem;
+        }
+
+        .quiz-sub {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .quiz-q {
+            margin-bottom: 2rem;
+        }
+
+        .quiz-q p {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-opts {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+        }
+
+        .quiz-opt {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: 1rem 1.2rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all .2s;
+            font-size: .95rem;
+        }
+
+        .quiz-opt:hover {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, .08);
+        }
+
+        .quiz-opt.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, .12);
+        }
+
+        .quiz-opt.wrong {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, .1);
+        }
+
+        .quiz-opt .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: .75rem 1rem;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.ok {
+            background: rgba(16, 185, 129, .15);
+            color: #34d399;
+        }
+
+        .quiz-feedback.no {
+            background: rgba(239, 68, 68, .1);
+            color: #f87171;
+        }
+
+        .quiz-score {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .quiz-score.show {
+            display: block;
+        }
+
+        .score-num {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #a5b4fc;
+        }
+
+        .btn-quiz {
+            margin-top: 1.5rem;
+        }
+
+        /* ─── PROGRESS ─── */
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width .4s;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: .85rem;
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .6
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity .6s, transform .6s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* ─── FLOATING PARTICLES ─── */
+        .particles {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .p {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, .6), transparent);
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: .6
+            }
+
+            50% {
+                opacity: .2
+            }
+
+            100% {
+                transform: translateY(-120vh) scale(.3);
+                opacity: 0
+            }
+        }
+
+        /* responsive */
+        @media(max-width:640px) {
+            .hero h1 {
+                font-size: 2.2rem
+            }
+
+            section {
+                padding: 3.5rem 0
+            }
+
+            .actividad {
+                padding: 1.75rem
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav id="mainNav">
+        <span class="nav-logo">🧠 IA · Nuevas Tecnologías</span>
+        <ul class="nav-links">
+            <li><a href="#que-es">¿Qué es?</a></li>
+            <li><a href="#tipos">Tipos</a></li>
+            <li><a href="#futuro">Futuro</a></li>
+            <li><a href="#sectores">Sectores</a></li>
+            <li><a href="#actividad">Actividad</a></li>
+            <li><a href="#quiz">Quiz</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="top">
+        <div class="hero-bg"></div>
+        <div class="grid-lines"></div>
+        <div class="particles" id="particles"></div>
+        <div class="hero-content">
+            <div class="hero-badge">⚡ Nuevas Tecnologías · Unidad 1</div>
+            <h1>Inteligencia<br>Artificial</h1>
+            <p>Explorá los fundamentos, tipos, aplicaciones y el futuro de la tecnología que está transformando el
+                mundo.</p>
+            <div class="hero-cta">
+                <a href="#que-es" class="btn btn-primary">▶ Comenzar</a>
+                <a href="#actividad" class="btn btn-ghost">📋 Ver Actividad</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.1 QUÉ ES -->
+    <section id="que-es">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">📌 1.1</span>
+                <h2 class="section-title">¿Qué es la Inteligencia Artificial?</h2>
+                <p class="section-desc">La IA es la rama de la informática que busca crear sistemas capaces de realizar
+                    tareas que normalmente requieren inteligencia humana.</p>
+            </div>
+            <div class="accordion fade-in">
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span class="num">01</span> Definición y origen
+                        <span class="icon">+</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-inner">
+                            <p>El término <strong>Inteligencia Artificial</strong> fue acuñado por el científico
+                                <strong>John McCarthy</strong> en 1956, durante la Conferencia de Dartmouth. Se define
+                                como la capacidad de una máquina para imitar funciones cognitivas humanas como el
+                                aprendizaje, el razonamiento y la resolución de problemas.</p>
+                            <p>Hoy en día, la IA combina matemáticas, estadística, neurociencia y ciencias de la
+                                computación para crear sistemas cada vez más sofisticados.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span class="num">02</span> ¿Cómo aprende una máquina?
+                        <span class="icon">+</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-inner">
+                            <p>El aprendizaje automático (<strong>Machine Learning</strong>) permite a las máquinas
+                                aprender a partir de datos sin ser programadas explícitamente para cada tarea. El
+                                proceso general es:</p>
+                            <ul>
+                                <li>Se proporcionan grandes conjuntos de <strong>datos de entrenamiento</strong>.</li>
+                                <li>El modelo identifica <strong>patrones y correlaciones</strong>.</li>
+                                <li>Se ajustan los <strong>parámetros internos</strong> para mejorar predicciones.</li>
+                                <li>Se evalúa el rendimiento con datos no vistos.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">
+                        <span class="num">03</span> Componentes clave
+                        <span class="icon">+</span>
+                    </div>
+                    <div class="acc-body">
+                        <div class="acc-inner">
+                            <ul>
+                                <li><strong>Datos:</strong> El combustible de la IA. Sin datos de calidad, no hay modelo
+                                    efectivo.</li>
+                                <li><strong>Algoritmos:</strong> Los métodos matemáticos que procesan los datos.</li>
+                                <li><strong>Potencia de cómputo:</strong> GPUs y TPUs que aceleran los cálculos.</li>
+                                <li><strong>Modelos:</strong> La representación matemática resultante del entrenamiento.
+                                </li>
+                                <li><strong>Retroalimentación:</strong> Proceso continuo de mejora.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.2 TIPOS -->
+    <section id="tipos" style="background:var(--surface); padding: 5rem 0;">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">🔬 1.2</span>
+                <h2 class="section-title">Tipos de Inteligencia Artificial</h2>
+                <p class="section-desc">La IA se clasifica según su capacidad, funcionalidad y el enfoque técnico
+                    utilizado.</p>
+            </div>
+            <div class="tipos-grid fade-in" style="margin-top:2.5rem;">
+                <div class="tipo-card">
+                    <h4>IA Débil (Narrow AI)</h4>
+                    <p>Diseñada para realizar una tarea específica. Es la IA más común hoy en día. Ejemplos:
+                        reconocimiento facial, asistentes virtuales, recomendadores de Netflix.</p>
+                </div>
+                <div class="tipo-card" style="border-left-color:#8b5cf6">
+                    <h4>IA General (AGI)</h4>
+                    <p>Hipotética IA con capacidades cognitivas equivalentes a las humanas en cualquier dominio. Aún no
+                        existe, pero es el objetivo a largo plazo de la investigación.</p>
+                </div>
+                <div class="tipo-card" style="border-left-color:#06b6d4">
+                    <h4>IA Superinteligente (ASI)</h4>
+                    <p>Concepto teórico de una IA que supera a la inteligencia humana en todos los aspectos. Está en el
+                        terreno de la ciencia ficción y la especulación filosófica.</p>
+                </div>
+                <div class="tipo-card" style="border-left-color:#10b981">
+                    <h4>Machine Learning (ML)</h4>
+                    <p>Subcampo de la IA donde los sistemas aprenden de datos. Incluye aprendizaje supervisado, no
+                        supervisado y por refuerzo.</p>
+                </div>
+                <div class="tipo-card" style="border-left-color:#f59e0b">
+                    <h4>Deep Learning (DL)</h4>
+                    <p>Redes neuronales artificiales con múltiples capas. Muy efectivo para imágenes, voz y texto. Base
+                        de modelos como GPT y DALL-E.</p>
+                </div>
+                <div class="tipo-card" style="border-left-color:#ef4444">
+                    <h4>IA Generativa</h4>
+                    <p>Modelos capaces de crear contenido nuevo: textos, imágenes, música o código. Incluye LLMs como
+                        GPT-4 y modelos de difusión como Stable Diffusion.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.3 APLICACIONES -->
+    <section id="aplicaciones">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">🚀 1.3</span>
+                <h2 class="section-title">Aplicaciones de la IA</h2>
+                <p class="section-desc">La IA está presente en casi todos los sectores de la sociedad moderna.</p>
+            </div>
+            <div class="cards-grid fade-in">
+                <div class="card">
+                    <div class="card-icon" style="background:rgba(99,102,241,.15)">🗣️</div>
+                    <h3>Procesamiento de Lenguaje Natural</h3>
+                    <p>Permite a las máquinas entender y generar lenguaje humano. Chatbots, traductores automáticos,
+                        análisis de sentimientos.</p>
+                    <span class="card-tag" style="background:rgba(99,102,241,.15);color:#a5b4fc">NLP</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background:rgba(6,182,212,.15)">👁️</div>
+                    <h3>Visión por Computadora</h3>
+                    <p>Análisis de imágenes y videos: diagnóstico médico por imágenes, autos autónomos, reconocimiento
+                        facial, control de calidad industrial.</p>
+                    <span class="card-tag" style="background:rgba(6,182,212,.15);color:#67e8f9">Computer Vision</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background:rgba(16,185,129,.15)">🤖</div>
+                    <h3>Robótica Inteligente</h3>
+                    <p>Robots que perciben su entorno y toman decisiones. Aplicaciones en manufactura, logística,
+                        cirugía asistida y exploración espacial.</p>
+                    <span class="card-tag" style="background:rgba(16,185,129,.15);color:#34d399">Robótica</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background:rgba(245,158,11,.15)">📊</div>
+                    <h3>Analítica Predictiva</h3>
+                    <p>Modelos que analizan datos históricos para predecir tendencias futuras en finanzas, marketing,
+                        meteorología y epidemiología.</p>
+                    <span class="card-tag" style="background:rgba(245,158,11,.15);color:#fcd34d">Predicción</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background:rgba(139,92,246,.15)">🎮</div>
+                    <h3>Sistemas de Recomendación</h3>
+                    <p>Algoritmos que personalizan contenido: Netflix, Spotify, Amazon, YouTube usan IA para sugerir
+                        contenido relevante a cada usuario.</p>
+                    <span class="card-tag" style="background:rgba(139,92,246,.15);color:#c4b5fd">RecSys</span>
+                </div>
+                <div class="card">
+                    <div class="card-icon" style="background:rgba(239,68,68,.15)">🔒</div>
+                    <h3>Ciberseguridad</h3>
+                    <p>Detección de amenazas en tiempo real, análisis de comportamiento anómalo, respuesta automatizada
+                        a incidentes y protección contra fraudes.</p>
+                    <span class="card-tag" style="background:rgba(239,68,68,.15);color:#fca5a5">Seguridad</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.4 FUTURO -->
+    <section id="futuro" style="background:var(--surface);padding:5rem 0;">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">🔭 1.4</span>
+                <h2 class="section-title">Futuro de la IA: Agents y LLMs</h2>
+                <p class="section-desc">Las tendencias más disruptivas que están redefiniendo el panorama tecnológico
+                    global.</p>
+            </div>
+            <div class="timeline fade-in" style="margin-top:3rem;">
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-label">Hoy · LLMs</div>
+                    <div class="tl-title">Modelos de Lenguaje de Gran Escala</div>
+                    <div class="tl-desc">Los Large Language Models (LLMs) como GPT-4, Gemini y Claude son redes
+                        neuronales entrenadas con billones de palabras. Son capaces de redactar, razonar, programar y
+                        traducir con calidad cercana a la humana. Se usan vía APIs para integrar capacidades
+                        lingüísticas en cualquier aplicación.</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot" style="background:#8b5cf6;box-shadow:0 0 12px rgba(139,92,246,.6)"></div>
+                    <div class="tl-label">Emergente · Agents</div>
+                    <div class="tl-title">Agentes Autónomos de IA</div>
+                    <div class="tl-desc">Los AI Agents son sistemas que usan LLMs como "cerebro" para planificar y
+                        ejecutar tareas complejas de forma autónoma. Pueden navegar por la web, escribir código,
+                        ejecutar programas, leer documentos y encadenar múltiples acciones para lograr un objetivo.
+                        Frameworks como LangChain, AutoGen y CrewAI lideran este espacio.</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot" style="background:#06b6d4;box-shadow:0 0 12px rgba(6,182,212,.6)"></div>
+                    <div class="tl-label">Próximo · Multimodal</div>
+                    <div class="tl-title">IA Multimodal</div>
+                    <div class="tl-desc">Modelos que procesan simultáneamente texto, imágenes, audio y video. GPT-4o y
+                        Gemini 1.5 son ejemplos actuales. El futuro apunta a sistemas que perciben el mundo de forma
+                        similar a los humanos, integrando todos los sentidos en un único modelo.</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot" style="background:#10b981;box-shadow:0 0 12px rgba(16,185,129,.6)"></div>
+                    <div class="tl-label">Horizonte · AGI</div>
+                    <div class="tl-title">Inteligencia Artificial General</div>
+                    <div class="tl-desc">El objetivo final: una IA con capacidades cognitivas generales equiparables a
+                        las humanas. Los expertos debaten si es posible, cuándo ocurrirá y qué implicaciones éticas,
+                        económicas y sociales tendrá. OpenAI, DeepMind y Anthropic trabajan activamente en este
+                        horizonte.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 1.5-1.8 SECTORES -->
+    <section id="sectores">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">🌐 1.5 – 1.8</span>
+                <h2 class="section-title">IA en la Sociedad</h2>
+                <p class="section-desc">Cómo la inteligencia artificial está transformando los sectores más importantes
+                    de nuestra vida.</p>
+            </div>
+            <div class="sectors fade-in">
+                <div class="sector-card" style="--g: linear-gradient(90deg,#6366f1,#8b5cf6)">
+                    <div class="s-icon">🎓</div>
+                    <h3>IA en la Educación</h3>
+                    <p>La IA personaliza el aprendizaje adaptándose al ritmo y estilo de cada estudiante. Tutores
+                        virtuales, corrección automática, generación de contenido educativo y detección de dificultades
+                        de aprendizaje son algunas aplicaciones que están transformando las aulas.</p>
+                    <div class="s-examples">
+                        <span class="s-tag">Khan Academy AI</span>
+                        <span class="s-tag">Duolingo AI</span>
+                        <span class="s-tag">Aprendizaje adaptativo</span>
+                        <span class="s-tag">Tutores virtuales</span>
+                    </div>
+                </div>
+                <div class="sector-card" style="--g: linear-gradient(90deg,#06b6d4,#0284c7)">
+                    <div class="s-icon">🏥</div>
+                    <h3>IA en la Salud</h3>
+                    <p>Diagnóstico asistido por imágenes médicas, descubrimiento acelerado de fármacos, medicina
+                        personalizada basada en ADN y monitoreo continuo de pacientes. La IA reduce errores médicos y
+                        acelera investigaciones que antes tomaban décadas.</p>
+                    <div class="s-examples">
+                        <span class="s-tag">Diagnóstico por imágenes</span>
+                        <span class="s-tag">AlphaFold</span>
+                        <span class="s-tag">Wearables</span>
+                        <span class="s-tag">Telemedicina IA</span>
+                    </div>
+                </div>
+                <div class="sector-card" style="--g: linear-gradient(90deg,#f59e0b,#ef4444)">
+                    <div class="s-icon">🏭</div>
+                    <h3>IA en la Industria</h3>
+                    <p>La Industria 4.0 integra IA en manufactura: mantenimiento predictivo de maquinaria, control de
+                        calidad visual, optimización de cadenas de suministro y robots colaborativos (cobots) que
+                        trabajan junto a humanos.</p>
+                    <div class="s-examples">
+                        <span class="s-tag">Industria 4.0</span>
+                        <span class="s-tag">Cobots</span>
+                        <span class="s-tag">Mantenimiento predictivo</span>
+                        <span class="s-tag">Gemelos digitales</span>
+                    </div>
+                </div>
+                <div class="sector-card" style="--g: linear-gradient(90deg,#10b981,#06b6d4)">
+                    <div class="s-icon">🏙️</div>
+                    <h3>IA en la Sociedad</h3>
+                    <p>Ciudades inteligentes, sistemas de transporte autónomo, gestión de recursos naturales, combate a
+                        la desinformación y asistencia en emergencias. La IA también genera debates éticos sobre
+                        privacidad, sesgo algorítmico y el futuro del trabajo.</p>
+                    <div class="s-examples">
+                        <span class="s-tag">Smart Cities</span>
+                        <span class="s-tag">Vehículos autónomos</span>
+                        <span class="s-tag">Deepfakes</span>
+                        <span class="s-tag">IA ética</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ACTIVIDAD -->
+    <section id="actividad" style="background:var(--surface);padding:5rem 0;">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">📋 Actividad Integradora</span>
+                <h2 class="section-title">Investigación Guiada</h2>
+                <p class="section-desc">Actividad grupal o individual para explorar aplicaciones recientes de la IA en
+                    diferentes sectores.</p>
+            </div>
+            <div class="actividad fade-in">
+                <div class="act-title">🔍 Actividad Integradora: IA en Acción</div>
+                <div class="act-desc">
+                    <strong>Consigna:</strong> Buscá información <em>reciente</em> (del último año) sobre la aplicación
+                    de la Inteligencia Artificial en alguna de las siguientes instituciones o sectores. Elaborá un
+                    resumen de al menos una página (digital o impreso) que incluya: nombre de la herramienta o proyecto,
+                    institución que lo usa, qué problema resuelve y tu opinión personal sobre su impacto.
+                </div>
+                <div class="act-grid">
+                    <div class="act-item">
+                        <h4>🎓 IA en la Educación</h4>
+                        <div class="keywords">
+                            <span class="kw">aprendizaje adaptativo</span>
+                            <span class="kw">tutor IA</span>
+                            <span class="kw">ChatGPT aulas</span>
+                            <span class="kw">evaluación automática</span>
+                            <span class="kw">Khan Academy Khanmigo</span>
+                        </div>
+                    </div>
+                    <div class="act-item">
+                        <h4>🏥 IA en la Salud</h4>
+                        <div class="keywords">
+                            <span class="kw">diagnóstico IA</span>
+                            <span class="kw">AlphaFold proteínas</span>
+                            <span class="kw">radiología artificial</span>
+                            <span class="kw">fármacos IA</span>
+                            <span class="kw">salud mental chatbot</span>
+                        </div>
+                    </div>
+                    <div class="act-item">
+                        <h4>🏭 IA en la Industria</h4>
+                        <div class="keywords">
+                            <span class="kw">industria 4.0</span>
+                            <span class="kw">mantenimiento predictivo</span>
+                            <span class="kw">robots colaborativos</span>
+                            <span class="kw">control de calidad</span>
+                            <span class="kw">gemelo digital</span>
+                        </div>
+                    </div>
+                    <div class="act-item">
+                        <h4>🏙️ IA en la Sociedad</h4>
+                        <div class="keywords">
+                            <span class="kw">ciudad inteligente</span>
+                            <span class="kw">auto autónomo</span>
+                            <span class="kw">deepfake detección</span>
+                            <span class="kw">sesgo algoritmo</span>
+                            <span class="kw">ética IA 2024</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="act-instrucciones">
+                    <h4>📌 Instrucciones</h4>
+                    <ol>
+                        <li>Elegí <strong>uno o dos sectores</strong> de los mencionados arriba.</li>
+                        <li>Buscá en fuentes confiables: Google Scholar, MIT Technology Review, BBC Ciencia, Infobae
+                            Tecno, o sitios gubernamentales.</li>
+                        <li>Usá las <strong>palabras clave</strong> como punto de partida para tu búsqueda.</li>
+                        <li>Documentá la fuente (URL, fecha de publicación) de cada artículo que uses.</li>
+                        <li>Preparate para compartir un resumen oral de <strong>3 a 5 minutos</strong> con la clase.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz">
+        <div class="container">
+            <div class="fade-in">
+                <span class="section-label">🧩 Autoevaluación</span>
+                <h2 class="section-title">Quiz de Comprensión</h2>
+                <p class="section-desc">Verificá cuánto aprendiste sobre Inteligencia Artificial.</p>
+            </div>
+            <div class="quiz-section fade-in">
+                <div class="quiz-title">Quiz · IA Básica</div>
+                <div class="quiz-sub">Respondé las siguientes preguntas. Obtendrás retroalimentación inmediata.</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quizProgress" style="width:0%"></div>
+                </div>
+                <div id="quizContainer"></div>
+                <div class="quiz-score" id="quizScore">
+                    <div style="font-size:1.1rem;color:var(--text-muted);margin-bottom:.5rem">Tu puntaje final</div>
+                    <div class="score-num" id="scoreNum">0/5</div>
+                    <div style="color:var(--text-muted);margin-top:.5rem" id="scoreFeedback"></div>
+                    <button class="btn btn-primary btn-quiz" onclick="initQuiz()">🔄 Reintentar</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>📚 Nuevas Tecnologías · Unidad 1: Inteligencia Artificial &nbsp;|&nbsp; Material de estudio interactivo</p>
+    </footer>
+
+    <script>
+        // ─── PARTICLES ───
+        (function () {
+            const c = document.getElementById('particles');
+            for (let i = 0; i < 18; i++) {
+                const p = document.createElement('div');
+                p.className = 'p';
+                const s = Math.random() * 80 + 20;
+                p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random() * 100}%;top:${Math.random() * 100 + 100}%;opacity:${Math.random() * .4 + .1};animation-duration:${Math.random() * 20 + 15}s;animation-delay:${Math.random() * 10}s`;
+                c.appendChild(p);
+            }
+        })();
+
+        // ─── NAV SCROLL ───
+        window.addEventListener('scroll', () => {
+            document.getElementById('mainNav').classList.toggle('visible', window.scrollY > 80);
+        });
+
+        // ─── ACCORDION ───
+        function toggleAcc(head) {
+            const body = head.nextElementSibling;
+            const isOpen = head.classList.toggle('open');
+            body.classList.toggle('open', isOpen);
+        }
+
+        // ─── FADE IN ON SCROLL ───
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: .1 });
+        document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+        // ─── QUIZ ───
+        const questions = [
+            {
+                q: "¿Quién acuñó el término 'Inteligencia Artificial' en 1956?",
+                opts: ["Alan Turing", "John McCarthy", "Elon Musk", "Marvin Minsky"],
+                ans: 1,
+                feedback: "¡Correcto! John McCarthy lo usó en la Conferencia de Dartmouth de 1956."
+            },
+            {
+                q: "¿Qué tipo de IA es un asistente virtual como Siri o Alexa?",
+                opts: ["IA General (AGI)", "IA Superinteligente", "IA Débil (Narrow AI)", "Deep Learning autónomo"],
+                ans: 2,
+                feedback: "Los asistentes virtuales son IA Débil: realizan tareas específicas sin inteligencia general."
+            },
+            {
+                q: "¿Qué significan las siglas LLM?",
+                opts: ["Last Level Machine", "Large Language Model", "Learned Logic Module", "Linear Learning Method"],
+                ans: 1,
+                feedback: "LLM = Large Language Model. Modelos como GPT-4 o Gemini son ejemplos."
+            },
+            {
+                q: "¿Cuál de estas herramientas aplica IA en el ámbito educativo?",
+                opts: ["AlphaFold", "Stable Diffusion", "Khanmigo de Khan Academy", "Tesla Autopilot"],
+                ans: 2,
+                feedback: "Khanmigo es el tutor IA de Khan Academy, diseñado para personalizar el aprendizaje."
+            },
+            {
+                q: "¿Qué es un AI Agent?",
+                opts: ["Un robot físico autónomo", "Un sistema que usa LLMs para planificar y ejecutar tareas complejas", "Un tipo de base de datos inteligente", "Un antivirus con IA"],
+                ans: 1,
+                feedback: "Los AI Agents usan LLMs como 'cerebro' para encadenar acciones y lograr objetivos complejos de forma autónoma."
+            }
+        ];
+
+        let answers = [];
+        let current = 0;
+
+        function initQuiz() {
+            answers = [];
+            current = 0;
+            document.getElementById('quizScore').classList.remove('show');
+            document.getElementById('quizProgress').style.width = '0%';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qc = document.getElementById('quizContainer');
+            const q = questions[current];
+            qc.innerHTML = `
+    <div class="quiz-q" id="qBlock">
+      <p>${current + 1}. ${q.q}</p>
+      <div class="quiz-opts">${q.opts.map((o, i) => `
+          <div class="quiz-opt" onclick="selectOpt(this,${i})" data-idx="${i}">
+            <div class="dot">${String.fromCharCode(65 + i)}</div>${o}
+          </div>`).join('')
+                }</div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+    </div>`;
+        }
+
+        function selectOpt(el, idx) {
+            const q = questions[current];
+            const opts = document.querySelectorAll('.quiz-opt');
+            opts.forEach(o => o.onclick = null);
+            const fb = document.getElementById('qFeedback');
+            const correct = idx === q.ans;
+            answers.push(correct);
+            opts[q.ans].classList.add('correct');
+            if (!correct) el.classList.add('wrong');
+            fb.textContent = correct ? '✅ ' + q.feedback : '❌ La respuesta correcta es: ' + q.opts[q.ans] + '. ' + q.feedback;
+            fb.className = 'quiz-feedback show ' + (correct ? 'ok' : 'no');
+
+            const pct = ((current + 1) / questions.length) * 100;
+            document.getElementById('quizProgress').style.width = pct + '%';
+
+            setTimeout(() => {
+                current++;
+                if (current < questions.length) {
+                    renderQuestion();
+                } else {
+                    showScore();
+                }
+            }, 2200);
+        }
+
+        function showScore() {
+            const score = answers.filter(Boolean).length;
+            document.getElementById('quizContainer').innerHTML = '';
+            document.getElementById('scoreNum').textContent = score + '/' + questions.length;
+            const msgs = ['Seguí practicando. 💪', 'Buen comienzo. 📖', 'Muy bien. 🎯', '¡Excelente trabajo! 🌟', '¡Perfecto! Dominás el tema. 🏆'];
+            document.getElementById('scoreFeedback').textContent = msgs[Math.min(score, msgs.length - 1)];
+            document.getElementById('quizScore').classList.add('show');
+        }
+
+        initQuiz();
+    </script>
+</body>
+
+</html>
