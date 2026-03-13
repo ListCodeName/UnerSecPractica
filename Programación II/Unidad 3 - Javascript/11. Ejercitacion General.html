@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercitación General: JavaScript (Unidad 3)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-left: 5px solid #3498db;
+            padding-left: 10px;
+        }
+
+        .exercise-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .exercise-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .exercise-desc {
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result-box {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e8f6f3;
+            border: 1px solid #d4efdf;
+            border-radius: 4px;
+            display: none;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        /* Clases para ejercicios DOM */
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-mode .exercise-card {
+            background-color: #444;
+            border-color: #555;
+            color: #fff;
+        }
+
+        .dark-mode .exercise-title {
+            color: #fff;
+        }
+
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Ejercitación Progresiva - JavaScript</h1>
+    <p style="text-align: center;">Abre la consola del navegador (F12) para ver algunos resultados.</p>
+
+    <!-- VARIABLES Y DATOS -->
+    <h2>1. Variables y Datos</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 1.1: El Cambiazo</span>
+        <p class="exercise-desc">Objetivo: Intercambiar el valor de dos variables (Coca y Pepsi) sin perder ninguno.</p>
+        <button onclick="ejercicio1_1()">Ejecutar</button>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 1.2: Conversor de Edad</span>
+        <p class="exercise-desc">Objetivo: Calcular cuántos días has vivido aproximadamente basándose en tu edad.</p>
+        <input type="number" id="edadInput" placeholder="Tu edad en años">
+        <button onclick="ejercicio1_2()">Calcular Días</button>
+        <div id="result1_2" class="result-box"></div>
+    </div>
+
+    <!-- OPERACIONES -->
+    <h2>2. Operaciones Básicas</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 2.1: Presupuesto de Viaje</span>
+        <p class="exercise-desc">Objetivo: Calcular el costo de gasolina para un viaje. (300km, consumo 8L/100km, precio
+            $1500/L)</p>
+        <button onclick="ejercicio2_1()">Calcular Costo</button>
+        <div id="result2_1" class="result-box"></div>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 2.2: Repartiendo la Pizza</span>
+        <p class="exercise-desc">Objetivo: Si hay 8 porciones y 3 personas, ¿cuántas tocan a cada uno y cuántas sobran?
+        </p>
+        <button onclick="ejercicio2_2()">Repartir</button>
+        <div id="result2_2" class="result-box"></div>
+    </div>
+
+    <!-- CONDICIONALES -->
+    <h2>3. Condicionales</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 3.1: El Portero de la Discoteca</span>
+        <p class="exercise-desc">Objetivo: Validar entrada. Mayor de 18 Y (tener ticket O estar en lista VIP).</p>
+        <button onclick="ejercicio3_1()">Intentar Entrar</button>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 3.2: Piedra, Papel o Tijera (vs CPU Simple)</span>
+        <p class="exercise-desc">Objetivo: Elegir una opción y comparar con una elección fija o aleatoria de la CPU.</p>
+        <button onclick="ejercicio3_2('piedra')">Piedra</button>
+        <button onclick="ejercicio3_2('papel')">Papel</button>
+        <button onclick="ejercicio3_2('tijera')">Tijera</button>
+        <div id="result3_2" class="result-box"></div>
+    </div>
+
+    <!-- BUCLES -->
+    <h2>4. Bucles (Logs en Consola)</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 4.1: La Escalera</span>
+        <p class="exercise-desc">Objetivo: Dibujar en consola una escalera de asteriscos de tamaño N.</p>
+        <input type="number" id="escaleraInput" value="5" min="1" max="20">
+        <button onclick="ejercicio4_1()">Dibujar Escalera</button>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 4.2: Encontrar los Pares</span>
+        <p class="exercise-desc">Objetivo: Sumar todos los números pares entre 1 y un número dado.</p>
+        <input type="number" id="paresInput" value="10">
+        <button onclick="ejercicio4_2()">Sumar Pares</button>
+        <div id="result4_2" class="result-box"></div>
+    </div>
+
+    <!-- ARRAYS Y OBJETOS -->
+    <h2>5. Arrays y Objetos</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 5.1: Lista de Compras Inteligente</span>
+        <p class="exercise-desc">Objetivo: Agregar productos a una lista, pero evitar duplicados.</p>
+        <input type="text" id="productoInput" placeholder="Nombre producto">
+        <button onclick="ejercicio5_1()">Agregar</button>
+        <div id="result5_1" class="result-box">Lista: []</div>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 5.2: Inventario RPG (Objetos)</span>
+        <p class="exercise-desc">Objetivo: Calcular el peso total del inventario del héroe.</p>
+        <button onclick="ejercicio5_2()">Calcular Peso Inventario</button>
+        <div id="result5_2" class="result-box"></div>
+    </div>
+
+    <!-- FUNCIONES -->
+    <h2>6. Funciones</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 6.1: Generador de Contraseñas</span>
+        <p class="exercise-desc">Objetivo: Crear función que genere string aleatorio de longitud N.</p>
+        <button onclick="ejercicio6_1()">Generar Pass (8 chars)</button>
+        <div id="result6_1" class="result-box"></div>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 6.2: Detector de Palíndromos</span>
+        <p class="exercise-desc">Objetivo: Función que detecta si una palabra se lee igual al revés (ej: "neuquen").</p>
+        <input type="text" id="palindromoInput" placeholder="Ingresa texto">
+        <button onclick="ejercicio6_2()">Verificar</button>
+        <div id="result6_2" class="result-box"></div>
+    </div>
+
+    <!-- DOM -->
+    <h2>7. DOM y Eventos</h2>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 7.1: Modo Oscuro</span>
+        <p class="exercise-desc">Objetivo: Cambiar estilos del body usando clases CSS toggle.</p>
+        <button id="btnDarkMode">Activar/Desactivar Modo Oscuro</button>
+    </div>
+
+    <div class="exercise-card">
+        <span class="exercise-title">Ejercicio 7.2: Contador con Límites</span>
+        <p class="exercise-desc">Objetivo: Contador que no baje de 0 y cambie de color si es > 10.</p>
+        <h3 id="contadorDisplay">0</h3>
+        <button id="btnBajar">-</button>
+        <button id="btnSubir">+</button>
+    </div>
+
+    <script>
+        // --- 1. VARIABLES ---
+        function ejercicio1_1() {
+            let vaso1 = "Coca-Cola";
+            let vaso2 = "Pepsi";
+            console.log("Antes:", vaso1, vaso2);
+
+            // "El Ingenio": Usar variable auxiliar
+            let auxiliar = vaso1;
+            vaso1 = vaso2;
+            vaso2 = auxiliar;
+
+            alert(`Antes: Coca/Pepsi. Ahora Vaso 1: ${vaso1}, Vaso 2: ${vaso2}`);
+            console.log("Después:", vaso1, vaso2);
+        }
+
+        function ejercicio1_2() {
+            const edad = document.getElementById('edadInput').value;
+            // Ingenio: considerar años bisiestos aproximados (365.25)
+            const dias = Math.floor(edad * 365.25);
+            const horas = dias * 24;
+            document.getElementById('result1_2').style.display = 'block';
+            document.getElementById('result1_2').innerText = `Has vivido aprox ${dias} días (${horas} horas).`;
+        }
+
+        // --- 2. OPERACIONES ---
+        function ejercicio2_1() {
+            const distancia = 300; // km
+            const consumo = 8; // litros cada 100km
+            const precioLitro = 1500; // $
+
+            // Lógica: (distancia / 100) * consumo * precio
+            const litrosNecesarios = (distancia / 100) * consumo;
+            const costoTotal = litrosNecesarios * precioLitro;
+
+            document.getElementById('result2_1').style.display = 'block';
+            document.getElementById('result2_1').innerText = `Viaje de ${distancia}km. Litros: ${litrosNecesarios}. Costo: $${costoTotal}`;
+        }
+
+        function ejercicio2_2() {
+            const porciones = 8;
+            const personas = 3;
+            const tocan = Math.floor(porciones / personas);
+            const sobran = porciones % personas;
+
+            document.getElementById('result2_2').style.display = 'block';
+            document.getElementById('result2_2').innerText = `A cada uno le tocan ${tocan} porciones. Sobran ${sobran} para el perro.`;
+        }
+
+        // --- 3. CONDICIONALES ---
+        function ejercicio3_1() {
+            // Simulamos datos con prompt, requiere ingenio para probar casos
+            const edad = parseInt(prompt("¿Edad?"));
+            const tieneTicket = confirm("¿Tienes ticket?");
+            const listaVIP = confirm("¿Estás en la lista VIP?");
+
+            if (edad >= 18 && (tieneTicket || listaVIP)) {
+                alert("¡Bienvenido a la fiesta!");
+            } else {
+                alert("Lo siento, no puedes pasar. (Menor de edad o sin entrada/lista)");
+            }
+        }
+
+        function ejercicio3_2(eleccionUsuario) {
+            const opciones = ['piedra', 'papel', 'tijera'];
+            const eleccionCPU = opciones[Math.floor(Math.random() * 3)];
+
+            let resultado = "";
+
+            if (eleccionUsuario === eleccionCPU) {
+                resultado = "Empate";
+            } else if (
+                (eleccionUsuario === 'piedra' && eleccionCPU === 'tijera') ||
+                (eleccionUsuario === 'papel' && eleccionCPU === 'piedra') ||
+                (eleccionUsuario === 'tijera' && eleccionCPU === 'papel')
+            ) {
+                resultado = "¡Ganaste!";
+            } else {
+                resultado = "Perdiste...";
+            }
+
+            document.getElementById('result3_2').style.display = 'block';
+            document.getElementById('result3_2').innerText = `Tú: ${eleccionUsuario} vs CPU: ${eleccionCPU}. Resultado: ${resultado}`;
+        }
+
+        // --- 4. BUCLES ---
+        function ejercicio4_1() {
+            const n = document.getElementById('escaleraInput').value;
+            let escalera = "";
+            console.clear();
+            console.log("--- Escalera ---");
+            for (let i = 1; i <= n; i++) {
+                // Ingenio: repeat es útil, pero hagámoslo con bucle anidado si quisiéramos practicar lógica pura
+                let piso = "";
+                for (let j = 0; j < i; j++) {
+                    piso += "*";
+                }
+                console.log(piso);
+                escalera += piso + "<br>"; // Para el log visual si hiciera falta
+            }
+            alert(`Revisa la consola (F12) para ver la escalera de ${n} pisos.`);
+        }
+
+        function ejercicio4_2() {
+            const limite = parseInt(document.getElementById('paresInput').value);
+            let suma = 0;
+            // Ingenio: Se puede hacer el bucle saltando de 2 en 2 para optimizar
+            for (let i = 2; i <= limite; i += 2) {
+                suma += i;
+            }
+            document.getElementById('result4_2').style.display = 'block';
+            document.getElementById('result4_2').innerText = `La suma de pares hasta ${limite} es: ${suma}`;
+        }
+
+        // --- 5. ARRAYS Y OBJETOS ---
+        let listaCompras = [];
+
+        function ejercicio5_1() {
+            const item = document.getElementById('productoInput').value.trim();
+            if (!item) return;
+
+            // Ingenio: Validar duplicados (case insensitive)
+            const existe = listaCompras.some(prod => prod.toLowerCase() === item.toLowerCase());
+
+            if (!existe) {
+                listaCompras.push(item);
+            } else {
+                alert("¡Ese producto ya está en la lista!");
+            }
+
+            document.getElementById('result5_1').style.display = 'block';
+            document.getElementById('result5_1').innerText = `Lista (${listaCompras.length}): ${listaCompras.join(", ")}`;
+            document.getElementById('productoInput').value = '';
+            document.getElementById('productoInput').focus();
+        }
+
+        function ejercicio5_2() {
+            // Objeto Héroe con Array de Objetos (Items)
+            const heroe = {
+                nombre: "Aragorn",
+                nivel: 20,
+                inventario: [
+                    { nombre: "Espada", peso: 3.5 },
+                    { nombre: "Escudo", peso: 5.0 },
+                    { nombre: "Poción", peso: 0.5 },
+                    { nombre: "Poción", peso: 0.5 }, // Otro item
+                    { nombre: "Mapa", peso: 0.1 }
+                ]
+            };
+
+            // Ingenio: Usar reduce para ver el peso total
+            const pesoTotal = heroe.inventario.reduce((total, item) => total + item.peso, 0);
+
+            document.getElementById('result5_2').style.display = 'block';
+            document.getElementById('result5_2').innerText = `Héroe: ${heroe.nombre}. Items: ${heroe.inventario.length}. Peso Total: ${pesoTotal.toFixed(2)}kg`;
+        }
+
+        // --- 6. FUNCIONES ---
+        function ejercicio6_1() {
+            const longitud = 8;
+
+            // Función auxiliar interna
+            const generar = (len) => {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
+                let pass = "";
+                for (let i = 0; i < len; i++) {
+                    const randomIndex = Math.floor(Math.random() * chars.length);
+                    pass += chars[randomIndex];
+                }
+                return pass;
+            };
+
+            const password = generar(longitud);
+            document.getElementById('result6_1').style.display = 'block';
+            document.getElementById('result6_1').innerText = `Contraseña generada: ${password}`;
+        }
+
+        function ejercicio6_2() {
+            const texto = document.getElementById('palindromoInput').value;
+
+            const esPalindromo = (str) => {
+                // Ingenio: Limpiar espacios y simbolos, todo a minuscula
+                const limpio = str.toLowerCase().replace(/[\W_]/g, '');
+                const reverso = limpio.split('').reverse().join('');
+                return limpio === reverso;
+            };
+
+            const resultado = esPalindromo(texto);
+
+            document.getElementById('result6_2').style.display = 'block';
+            document.getElementById('result6_2').innerText = resultado ? "✅ Es palíndromo" : "❌ No es palíndromo";
+            if (resultado) document.getElementById('result6_2').style.backgroundColor = "#d4efdf";
+            else document.getElementById('result6_2').style.backgroundColor = "#fadbd8";
+        }
+
+        // --- 7. DOM ---
+        // 7.1 Modo Oscuro
+        const btnDark = document.getElementById('btnDarkMode');
+        btnDark.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // 7.2 Contador
+        let contador = 0;
+        const display = document.getElementById('contadorDisplay');
+
+        document.getElementById('btnSubir').addEventListener('click', () => {
+            contador++;
+            actualizarDisplay();
+        });
+
+        document.getElementById('btnBajar').addEventListener('click', () => {
+            if (contador > 0) { // Lógica: No negativos
+                contador--;
+                actualizarDisplay();
+            }
+        });
+
+        function actualizarDisplay() {
+            display.innerText = contador;
+            if (contador > 10) {
+                display.style.color = "red";
+                display.innerText += " 🔥";
+            } else {
+                display.style.color = "inherit";
+            }
+        }
+
+    </script>
+</body>
+
+</html>

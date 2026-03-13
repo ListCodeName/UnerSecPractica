@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Selectores de Tags en HTML</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #2c3e50; }
+        .tag-block { background: #f4f4f4; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        code { background: #e0e0e0; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        pre { background: #333; color: #fff; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example-output { border: 1px dashed #ccc; padding: 10px; margin-top: 10px; background: #fff; }
+        
+        /* Estilos para los ejemplos visuales */
+        .destacado { color: blue; font-weight: bold; }
+        .error { color: red; text-decoration: underline; }
+        #unico { background-color: yellow; padding: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Unidad 1: Selectores de Tags (Class, ID, Name, Custom)</h1>
+    <p>Para poder aplicar estilos CSS o manipular elementos con JavaScript, necesitamos una forma de identificar o "seleccionar" los elementos HTML específicos. Aquí están los atributos más comunes para esto.</p>
+
+    <div class="tag-block">
+        <h2>1. Selector de Clase (class)</h2>
+        <p>El atributo <code>class</code> se utiliza para identificar un <strong>grupo</strong> de elementos. Múltiples elementos pueden tener la misma clase, y un elemento puede tener múltiples clases (separadas por espacio).</p>
+        <p>En CSS se selecciona con un punto (<code>.nombreclase</code>).</p>
+        <pre>
+<!-- HTML -->
+<p class="destacado">Este párrafo es destacado.</p>
+<p>Este es un párrafo normal.</p>
+<p class="destacado error">Este párrafo es destacado y tiene error.</p>
+
+<!-- CSS -->
+.destacado { color: blue; font-weight: bold; }
+.error { color: red; }
+        </pre>
+        <div class="example-output">
+            <p class="destacado">Este párrafo es destacado.</p>
+            <p>Este es un párrafo normal.</p>
+            <p class="destacado error">Este párrafo es destacado y tiene error.</p>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>2. Selector de ID (id)</h2>
+        <p>El atributo <code>id</code> se utiliza para identificar un elemento <strong>único</strong> en toda la página. No debe haber dos elementos con el mismo ID.</p>
+        <p>En CSS se selecciona con un numeral/hash (<code>#nombreid</code>). Es muy útil también para enlaces internos (anclas).</p>
+        <pre>
+<!-- HTML -->
+<div id="unico">
+  Este div tiene un ID único.
+</div>
+
+<!-- CSS -->
+#unico {
+    background-color: yellow;
+    padding: 5px;
+}
+        </pre>
+        <div class="example-output">
+            <div id="unico">
+                Este div tiene un ID único.
+            </div>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>3. Atributo Name (name)</h2>
+        <p>El atributo <code>name</code> se usa principalmente en elementos de formulario (<code>input</code>, <code>select</code>, <code>textarea</code>). Es el nombre que se envía al servidor junto con el valor del campo cuando se envía el formulario.</p>
+        <p>A diferencia del ID, varios elementos pueden compartir el mismo <code>name</code> (por ejemplo, en radio buttons).</p>
+        <pre>
+<form>
+    <label>Nombre:</label>
+    <input type="text" name="nombre_usuario">
+    
+    <p>Genero:</p>
+    <input type="radio" name="genero" value="M"> Masculino
+    <input type="radio" name="genero" value="F"> Femenino
+</form>
+        </pre>
+        <div class="example-output">
+            <form onsubmit="event.preventDefault(); alert('Formulario enviado (simulado)');">
+                <label>Nombre:</label>
+                <input type="text" name="nombre_usuario" placeholder="Escribe aquí"><br><br>
+                
+                <label>Genero:</label>
+                <input type="radio" name="genero" value="M"> Masculino
+                <input type="radio" name="genero" value="F"> Femenino
+            </form>
+        </div>
+    </div>
+
+    <div class="tag-block">
+        <h2>4. Atributos Personalizados (data-*)</h2>
+        <p>Los atributos <code>data-*</code> nos permiten almacenar información extra en los elementos HTML estándar, sin necesidad de usar hacks ni atributos no válidos. Son muy útiles para guardar datos que JavaScript necesita usar.</p>
+        <p>Pueden tener cualquier nombre siempre que empiecen con <code>data-</code>.</p>
+        <pre>
+<!-- HTML -->
+<ul>
+    <li data-id="101" data-precio="500">Producto A</li>
+    <li data-id="102" data-precio="1200">Producto B</li>
+</ul>
+
+<!-- Javascript (ejemplo de uso) -->
+// elemento.dataset.precio devolvería "500"
+        </pre>
+        <div class="example-output">
+            <ul>
+                <li data-id="101" data-precio="500" onclick="alert('ID: 101, Precio: $500')">Producto A (Haz click)</li>
+                <li data-id="102" data-precio="1200" onclick="alert('ID: 102, Precio: $1200')">Producto B (Haz click)</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría: Funciones en JavaScript</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+        }
+
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        code {
+            background: #e0e0e0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #d63384;
+        }
+
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .note {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unidad 3: Funciones en JavaScript</h1>
+    <p>Las funciones son uno de los bloques de construcción fundamentales en JavaScript. Una función es un conjunto de
+        instrucciones que realiza una tarea o calcula un valor. Para usar una función, primero debes definirla y luego
+        llamarla (invocarla).</p>
+
+    <div class="code-block">
+        <h2>1. Declaración de Función (Function Declaration)</h2>
+        <p>Es la forma más clásica. Se utiliza la palabra clave <code>function</code> seguida del nombre de la función.
+        </p>
+        <pre>
+function saludar(nombre) {
+    return "Hola, " + nombre + "!";
+}
+
+// Invocación
+console.log(saludar("Ana")); // Salida: Hola, Ana!
+        </pre>
+        <div class="note">
+            <strong>Hoisting:</strong> Las funciones declaradas de esta forma se "elevan" al inicio, por lo que puedes
+            llamarlas antes de definirlas en el código.
+        </div>
+    </div>
+
+    <div class="code-block">
+        <h2>2. Expresión de Función (Function Expression)</h2>
+        <p>Aquí, una función se asigna a una variable. A menudo son funciones anónimas (sin nombre).</p>
+        <pre>
+const sumar = function(a, b) {
+    return a + b;
+};
+
+console.log(sumar(5, 3)); // Salida: 8
+        </pre>
+    </div>
+
+    <div class="code-block">
+        <h2>3. Funciones Flecha (Arrow Functions)</h2>
+        <p>Introducidas en ES6, son una sintaxis más corta y moderna. Son muy útiles para funciones simples.</p>
+        <pre>
+// Forma clásica
+const multiplicar = function(a, b) {
+    return a * b;
+};
+
+// Forma flecha
+const multiplicarFlecha = (a, b) => {
+    return a * b;
+};
+
+// Si es una sola línea, el return es implícito
+const dividir = (a, b) => a / b;
+
+console.log(multiplicarFlecha(4, 5)); // Salida: 20
+console.log(dividir(10, 2)); // Salida: 5
+        </pre>
+    </div>
+
+    <div class="code-block">
+        <h2>4. Parámetros y Argumentos</h2>
+        <p>Los <strong>parámetros</strong> son las variables listadas en la definición de la función. Los
+            <strong>argumentos</strong> son los valores reales que se pasan a la función cuando se invoca.</p>
+        <pre>
+function presentar(nombre, edad = 18) { // edad tiene un valor por defecto
+    console.log(`Soy ${nombre} y tengo ${edad} años.`);
+}
+
+presentar("Carlos", 25); // "Soy Carlos y tengo 25 años."
+presentar("Lucía");      // "Soy Lucía y tengo 18 años."
+        </pre>
+    </div>
+
+    <div class="code-block">
+        <h2>5. Usos Concretos y Buenas Prácticas</h2>
+
+        <h3>A. Modularización y Reutilización (DRY)</h3>
+        <p>El principio "Don't Repeat Yourself" (No te repitas). Si tienes código que se repite en varios lugares (por
+            ejemplo, calcular el IVA), crea una función.</p>
+        <pre>
+function calcularPrecioFinal(precio) {
+    const iva = 0.21;
+    return precio + (precio * iva);
+}
+
+// Usamos la misma lógica para diferentes productos
+let precioCamisa = calcularPrecioFinal(2000);
+let precioPantalon = calcularPrecioFinal(4500);
+        </pre>
+
+        <h3>B. Funciones Puras (Transformación de Datos)</h3>
+        <p>Funciones que, dada una misma entrada, siempre retornan la misma salida y no tienen efectos secundarios (no
+            modifican variables externas). Son predecibles y fáciles de testear.</p>
+        <pre>
+// Función Pura
+function cuadrado(n) {
+    return n * n;
+}
+
+// Función Impura (depende de algo externo)
+let total = 0;
+function agregarAlTotal(cantidad) {
+    total += cantidad; // Modifica una variable externa
+}
+        </pre>
+
+        <h3>C. Encapsulamiento de Lógica</h3>
+        <p>Ocultar la complejidad de una operación. El usuario de la función no necesita saber CÓMO se hace, solo qué
+            necesita pasarle y qué recibe.</p>
+        <pre>
+function obtenerNombreCompleto(usuario) {
+    // Lógica interna para formatear o capitalizar
+    let n = usuario.nombre.charAt(0).toUpperCase() + usuario.nombre.slice(1);
+    let a = usuario.apellido.charAt(0).toUpperCase() + usuario.apellido.slice(1);
+    return `${n} ${a}`;
+}
+        </pre>
+    </div>
+
+    <script>
+        // Espacio para probar funciones en la consola del navegador
+        console.log("Este archivo contiene ejemplos teóricos sobre funciones.");
+    </script>
+
+</body>
+
+</html>
