@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unidad 2 - Concurrencia en Javascript</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2234;
+  --accent-cyan: #00e5ff;
+  --accent-magenta: #e040fb;
+  --accent-gold: #ffd740;
+  --accent-green: #69f0ae;
+  --text-primary: #e8eaf6;
+  --text-secondary: #90a4ae;
+  --glass: rgba(26,34,52,0.75);
+  --glow-cyan: 0 0 20px rgba(0,229,255,0.3);
+  --glow-magenta: 0 0 20px rgba(224,64,251,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 50%,rgba(0,229,255,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 20%,rgba(224,64,251,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 80%,rgba(255,215,64,0.04) 0%,transparent 50%);
+  pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%2300e5ff' stroke-width='.5'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;}
+
+.floater{position:fixed;pointer-events:none;z-index:0;opacity:.12;}
+.floater-1{top:10%;left:5%;width:80px;height:80px;background:var(--accent-cyan);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);animation:floatA 8s ease-in-out infinite;}
+.floater-2{top:30%;right:8%;width:60px;height:60px;background:var(--accent-magenta);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);animation:floatB 10s ease-in-out infinite;}
+.floater-3{bottom:20%;left:10%;width:50px;height:50px;background:var(--accent-gold);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:floatA 12s ease-in-out infinite reverse;}
+.floater-4{top:60%;right:5%;width:70px;height:70px;background:var(--accent-green);clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);animation:floatB 9s ease-in-out infinite;}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-30px) rotate(15deg);}}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(20px) rotate(-10deg);}}
+
+.container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1;}
+
+.section-title{position:relative;display:inline-block;margin-bottom:30px;padding:14px 40px 14px 50px;
+  font-size:1.6em;font-weight:700;letter-spacing:1px;color:#fff;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);
+  text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.section-title i{margin-right:10px;}
+.section-title::after{content:'';position:absolute;inset:2px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(224,64,251,0.15));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);}
+
+.sub-title{position:relative;display:inline-block;margin:25px 0 15px;padding:8px 30px 8px 35px;
+  font-size:1.15em;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent-gold),#ff9100);
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);}
+
+.card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(0,229,255,0.12);
+  border-radius:16px;padding:30px;margin-bottom:30px;position:relative;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s;}
+.card:hover{border-color:rgba(0,229,255,0.3);box-shadow:var(--glow-cyan);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));}
+
+.code-block{background:#0d1117;border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:20px;
+  margin:15px 0;font-family:'Cascadia Code','Fira Code',monospace;font-size:.88em;
+  overflow-x:auto;line-height:1.8;position:relative;}
+.code-block::before{content:'JS';position:absolute;top:8px;right:12px;
+  font-size:.7em;color:var(--accent-gold);font-weight:700;letter-spacing:1px;
+  padding:2px 10px;border:1px solid rgba(255,215,64,0.3);border-radius:6px;}
+.kw{color:#ff7b72;}.str{color:#a5d6ff;}.cm{color:#8b949e;font-style:italic;}.fn{color:#d2a8ff;}.num{color:#79c0ff;}.cls{color:#ffa657;}.op{color:#ff7b72;}.prop{color:#7ee787;}
+
+.console-area{background:#0d1117;border:1px solid rgba(105,240,174,0.2);border-radius:10px;
+  padding:15px 20px;margin-top:10px;font-family:monospace;font-size:.9em;color:var(--accent-green);
+  min-height:45px;white-space:pre-wrap;position:relative;}
+.console-area::before{content:'▶ Consola';position:absolute;top:-10px;left:15px;
+  background:#0d1117;padding:0 8px;font-size:.75em;color:var(--accent-green);letter-spacing:1px;}
+
+.btn-run{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;margin:10px 5px;
+  background:linear-gradient(135deg,var(--accent-cyan),#0097a7);color:#000;font-weight:700;
+  border:none;border-radius:8px;cursor:pointer;font-size:.95em;
+  transition:transform .2s,box-shadow .2s;text-transform:uppercase;letter-spacing:1px;}
+.btn-run:hover{transform:translateY(-2px);box-shadow:var(--glow-cyan);}
+.btn-run:active{transform:scale(.97);}
+.btn-run i{font-size:.9em;}
+
+.concept-tag{display:inline-block;padding:6px 20px;margin:4px;font-size:.82em;font-weight:600;
+  color:#fff;background:var(--accent-magenta);
+  clip-path:polygon(10% 0%,90% 0%,100% 50%,90% 100%,10% 100%,0% 50%);
+  transition:transform .2s;}
+.concept-tag:hover{transform:scale(1.08);}
+.concept-tag.cyan{background:var(--accent-cyan);color:#000;}
+.concept-tag.gold{background:var(--accent-gold);color:#000;}
+.concept-tag.green{background:var(--accent-green);color:#000;}
+
+.quiz{background:rgba(26,34,52,0.9);border:1px solid rgba(255,215,64,0.2);border-radius:14px;padding:25px;margin-top:25px;}
+.quiz h3{color:var(--accent-gold);margin-bottom:15px;font-size:1.1em;}
+.quiz-q{margin-bottom:20px;padding:15px;border-radius:10px;background:rgba(0,0,0,0.3);border-left:3px solid var(--accent-magenta);}
+.quiz-q p{font-weight:600;margin-bottom:10px;}
+.quiz-q label{display:block;padding:7px 14px;margin:4px 0;border-radius:8px;cursor:pointer;transition:background .2s;font-size:.92em;}
+.quiz-q label:hover{background:rgba(0,229,255,0.08);}
+.quiz-q input[type="radio"]{margin-right:8px;accent-color:var(--accent-cyan);}
+.quiz-result{padding:12px 20px;border-radius:8px;margin-top:10px;font-weight:700;display:none;}
+.quiz-result.correct{background:rgba(105,240,174,0.15);color:var(--accent-green);display:block;}
+.quiz-result.wrong{background:rgba(255,82,82,0.15);color:#ff5252;display:block;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(15px);
+  border-bottom:1px solid rgba(0,229,255,0.15);padding:10px 0;}
+nav .nav-inner{max-width:960px;margin:0 auto;display:flex;gap:8px;padding:0 20px;flex-wrap:wrap;justify-content:center;}
+nav a{color:var(--text-secondary);text-decoration:none;font-size:.82em;padding:6px 14px;border-radius:8px;
+  transition:all .3s;font-weight:500;}
+nav a:hover,nav a.active{color:var(--accent-cyan);background:rgba(0,229,255,0.08);}
+
+.hero{text-align:center;padding:60px 20px 40px;position:relative;}
+.hero h1{font-size:2.5em;font-weight:800;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;animation:shimmer 3s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
+.hero p{color:var(--text-secondary);font-size:1.1em;max-width:650px;margin:0 auto;}
+.hero-shape{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;
+  opacity:.04;clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));animation:floatA 6s ease-in-out infinite;}
+
+.highlight{color:var(--accent-cyan);font-weight:600;}
+.highlight-m{color:var(--accent-magenta);font-weight:600;}
+.highlight-g{color:var(--accent-gold);font-weight:600;}
+p+p{margin-top:12px;}
+section{padding:20px 0;scroll-margin-top:60px;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* Diagram styles */
+.diagram{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:20px 0;padding:20px;
+  background:rgba(0,0,0,0.25);border-radius:12px;border:1px solid rgba(0,229,255,0.1);}
+.diagram-box{padding:12px 18px;border-radius:10px;font-weight:600;font-size:.85em;text-align:center;
+  min-width:100px;position:relative;}
+.diagram-box.thread{background:linear-gradient(135deg,rgba(0,229,255,0.2),rgba(0,229,255,0.05));border:1px solid rgba(0,229,255,0.3);color:var(--accent-cyan);}
+.diagram-box.resource{background:linear-gradient(135deg,rgba(255,215,64,0.2),rgba(255,215,64,0.05));border:1px solid rgba(255,215,64,0.3);color:var(--accent-gold);}
+.diagram-box.danger{background:linear-gradient(135deg,rgba(255,82,82,0.2),rgba(255,82,82,0.05));border:1px solid rgba(255,82,82,0.3);color:#ff5252;}
+.diagram-box.worker{background:linear-gradient(135deg,rgba(105,240,174,0.2),rgba(105,240,174,0.05));border:1px solid rgba(105,240,174,0.3);color:var(--accent-green);}
+.diagram-arrow{color:var(--text-secondary);font-size:1.3em;}
+
+/* Visual demo */
+.visual-demo{background:rgba(0,0,0,0.3);border-radius:14px;padding:25px;margin:15px 0;border:1px solid rgba(0,229,255,0.1);}
+.thread-lane{display:flex;align-items:center;gap:10px;margin:8px 0;padding:10px 15px;border-radius:8px;font-size:.85em;font-weight:500;}
+.thread-lane.main{background:rgba(0,229,255,0.08);border-left:3px solid var(--accent-cyan);}
+.thread-lane.worker-lane{background:rgba(105,240,174,0.08);border-left:3px solid var(--accent-green);}
+.thread-label{font-weight:700;min-width:120px;font-size:.82em;}
+.task-block{padding:5px 12px;border-radius:6px;font-size:.8em;animation:fadeIn .5s ease;}
+.task-block.active{background:var(--accent-cyan);color:#000;animation:pulse 1s infinite;}
+.task-block.done{background:rgba(105,240,174,0.2);color:var(--accent-green);border:1px solid rgba(105,240,174,0.3);}
+.task-block.blocked{background:rgba(255,82,82,0.2);color:#ff5252;border:1px solid rgba(255,82,82,0.3);}
+.task-block.waiting{background:rgba(255,215,64,0.15);color:var(--accent-gold);border:1px solid rgba(255,215,64,0.3);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+
+.warning-box{background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.25);border-radius:10px;
+  padding:15px 20px;margin:15px 0;font-size:.92em;}
+.warning-box i{color:#ff5252;margin-right:8px;}
+
+.info-box{background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:10px;
+  padding:15px 20px;margin:15px 0;font-size:.92em;}
+.info-box i{color:var(--accent-cyan);margin-right:8px;}
+
+.progress-bar{width:100%;height:24px;background:rgba(0,0,0,0.4);border-radius:12px;overflow:hidden;margin:8px 0;position:relative;}
+.progress-fill{height:100%;border-radius:12px;transition:width .3s ease;display:flex;align-items:center;justify-content:center;font-size:.75em;font-weight:700;color:#000;}
+.progress-fill.main-fill{background:linear-gradient(90deg,var(--accent-cyan),#0097a7);}
+.progress-fill.worker-fill{background:linear-gradient(90deg,var(--accent-green),#2e7d32);}
+</style>
+</head>
+<body>
+
+<div class="floater floater-1"></div>
+<div class="floater floater-2"></div>
+<div class="floater floater-3"></div>
+<div class="floater floater-4"></div>
+
+<nav><div class="nav-inner">
+  <a href="#concepto"><i class="fas fa-layer-group"></i> ¿Qué es?</a>
+  <a href="#problemas"><i class="fas fa-exclamation-triangle"></i> Problemas</a>
+  <a href="#js-single"><i class="fas fa-stream"></i> JS Single-Thread</a>
+  <a href="#workers"><i class="fas fa-cogs"></i> Web Workers</a>
+  <a href="#demo"><i class="fas fa-flask"></i> Demo Interactiva</a>
+</div></nav>
+
+<div class="container">
+<div class="hero">
+  <div class="hero-shape"></div>
+  <h1><i class="fas fa-arrows-split-up-and-left"></i> Concurrencia en JavaScript</h1>
+  <p>Unidad 2 — Programación III · Hilos, recursos compartidos y Web Workers</p>
+</div>
+
+<!-- ==================== SECCIÓN 1: CONCEPTO ==================== -->
+<section id="concepto">
+<div class="section-title"><i class="fas fa-layer-group"></i> ¿Qué es la Concurrencia?</div>
+
+<div class="card">
+<p>La <span class="highlight">concurrencia</span> es la capacidad de un sistema para gestionar <strong>múltiples tareas</strong> que progresan de forma simultánea o intercalada. No implica necesariamente que se ejecuten al mismo tiempo (eso es <span class="highlight-m">paralelismo</span>), sino que el sistema puede <em>alternar</em> entre tareas dando la ilusión de simultaneidad.</p>
+
+<p>Imaginá un cocinero que prepara dos platos: mientras uno se cocina en el horno, corta ingredientes para el otro. No está haciendo las dos cosas <em>al mismo tiempo</em>, pero ambas <em>progresan</em>. Eso es concurrencia. Si hubiera dos cocineros trabajando al mismo tiempo, eso sería <strong>paralelismo</strong>.</p>
+
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0;">
+  <span class="concept-tag cyan"><i class="fas fa-arrows-rotate"></i> Concurrencia</span>
+  <span class="concept-tag"><i class="fas fa-bolt"></i> Paralelismo</span>
+  <span class="concept-tag gold"><i class="fas fa-microchip"></i> Hilos (Threads)</span>
+  <span class="concept-tag green"><i class="fas fa-database"></i> Recurso Compartido</span>
+</div>
+
+<div class="sub-title"><i class="fas fa-microchip"></i> Hilos de Ejecución (Threads)</div>
+<p>Un <span class="highlight">hilo</span> (o <em>thread</em>) es la unidad mínima de ejecución dentro de un proceso. Un programa puede tener múltiples hilos que comparten el mismo espacio de memoria. Cada hilo ejecuta una secuencia de instrucciones de forma independiente, pero al compartir recursos con otros hilos surgen los problemas clásicos de la concurrencia.</p>
+
+<div class="diagram">
+  <div class="diagram-box thread"><i class="fas fa-stream"></i><br>Hilo A</div>
+  <div class="diagram-arrow"><i class="fas fa-arrows-left-right"></i></div>
+  <div class="diagram-box resource"><i class="fas fa-database"></i><br>Memoria Compartida</div>
+  <div class="diagram-arrow"><i class="fas fa-arrows-left-right"></i></div>
+  <div class="diagram-box thread"><i class="fas fa-stream"></i><br>Hilo B</div>
+</div>
+
+<div class="sub-title"><i class="fas fa-share-nodes"></i> Compartir Información</div>
+<p>Cuando múltiples hilos necesitan acceder a los mismos datos, estamos frente a un <span class="highlight-g">recurso compartido</span>. Esto es muy común en la práctica: pensá en un contador de visitas de una página web, donde cientos de solicitudes intentan leer y actualizar el mismo valor al mismo tiempo.</p>
+
+<p>El problema fundamental es que las operaciones que parecen simples (como <code>contador = contador + 1</code>) en realidad son <strong>múltiples pasos a nivel del procesador</strong>:</p>
+
+<div class="code-block">
+<span class="cm">// Parece una sola operación, pero internamente son 3 pasos:</span>
+
+<span class="cm">// 1. LEER → el hilo obtiene el valor actual (ej: 10)</span>
+<span class="kw">let</span> temp = contador;        <span class="cm">// temp = 10</span>
+
+<span class="cm">// 2. MODIFICAR → calcula el nuevo valor</span>
+temp = temp + <span class="num">1</span>;            <span class="cm">// temp = 11</span>
+
+<span class="cm">// 3. ESCRIBIR → guarda el resultado en memoria</span>
+contador = temp;             <span class="cm">// contador = 11</span>
+</div>
+
+<p>Si dos hilos ejecutan estas instrucciones de forma intercalada, pueden <strong>leer el mismo valor antes de que el otro escriba</strong>, causando que una actualización se pierda. A esto se le llama <span class="highlight-m">condición de carrera</span> (<em>race condition</em>).</p>
+</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-book-open-reader"></i> Acceso de Lectura</div>
+<p>La <span class="highlight">lectura</span> de un recurso compartido por sí sola <strong>no genera conflictos</strong>. Múltiples hilos pueden leer el mismo dato simultáneamente sin que se corrompa la información. Pensalo así: muchas personas pueden leer el mismo cartel al mismo tiempo sin que se borre.</p>
+
+<div class="info-box"><i class="fas fa-info-circle"></i> <strong>Lectura simultánea = segura.</strong> No hay riesgo mientras nadie modifique el recurso durante la lectura.</div>
+
+<div class="sub-title"><i class="fas fa-pen"></i> Acceso de Escritura</div>
+<p>El problema aparece cuando al menos un hilo necesita <span class="highlight-m">escribir</span> (modificar) el recurso compartido. Si un hilo está escribiendo mientras otro lee o escribe, los datos pueden quedar en un <strong>estado inconsistente</strong>.</p>
+
+<div class="warning-box"><i class="fas fa-exclamation-triangle"></i> <strong>Lectura + Escritura simultánea = peligrosa.</strong> El lector puede obtener un dato parcialmente actualizado. <strong>Escritura + Escritura simultánea = muy peligrosa.</strong> Ambos hilos pueden sobreescribir los cambios del otro.</div>
+
+<p>Para entender la gravedad, veamos un ejemplo concreto de una <strong>condición de carrera</strong>:</p>
+
+<div class="visual-demo">
+  <p style="font-weight:700;margin-bottom:12px;color:var(--accent-gold);"><i class="fas fa-warning"></i> Ejemplo: Race Condition con un contador (valor inicial: 10)</p>
+  <div class="thread-lane main">
+    <span class="thread-label" style="color:var(--accent-cyan);">Hilo A:</span>
+    <span class="task-block waiting">Lee: 10</span>
+    <span class="diagram-arrow">→</span>
+    <span class="task-block waiting">Suma: 10+1=11</span>
+    <span class="diagram-arrow">→</span>
+    <span class="task-block done">Escribe: 11</span>
+  </div>
+  <div class="thread-lane worker-lane">
+    <span class="thread-label" style="color:var(--accent-green);">Hilo B:</span>
+    <span class="task-block waiting">Lee: 10</span>
+    <span class="diagram-arrow">→</span>
+    <span class="task-block waiting">Suma: 10+1=11</span>
+    <span class="diagram-arrow">→</span>
+    <span class="task-block done">Escribe: 11</span>
+  </div>
+  <div class="warning-box" style="margin-top:12px;"><i class="fas fa-bug"></i> <strong>Resultado:</strong> Ambos leyeron 10. Ambos escribieron 11. El contador debería ser <strong>12</strong>, pero quedó en <strong>11</strong>. ¡Se perdió una operación!</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 2: PROBLEMAS ==================== -->
+<section id="problemas">
+<div class="section-title"><i class="fas fa-exclamation-triangle"></i> Problemas de la Concurrencia</div>
+
+<div class="card">
+<p>Los problemas de concurrencia son <strong>difíciles de detectar</strong> porque dependen del momento exacto en que cada hilo ejecuta sus instrucciones. Un programa puede funcionar correctamente 999 veces y fallar la vez 1000. Estos son los problemas clásicos:</p>
+
+<div class="sub-title"><i class="fas fa-flag-checkered"></i> Race Condition</div>
+<p>Como vimos, una <span class="highlight-m">condición de carrera</span> ocurre cuando el resultado de un programa depende del <strong>orden de ejecución</strong> de los hilos, un orden que no podemos controlar. El resultado se vuelve impredecible.</p>
+
+<div class="sub-title"><i class="fas fa-lock"></i> Deadlock (Interbloqueo)</div>
+<p>Un <span class="highlight">deadlock</span> ocurre cuando dos o más hilos quedan bloqueados esperando recursos que el otro tiene. Ninguno puede avanzar.</p>
+
+<div class="diagram">
+  <div class="diagram-box thread"><i class="fas fa-lock"></i><br>Hilo A<br><small>Tiene: Recurso 1</small><br><small>Espera: Recurso 2</small></div>
+  <div class="diagram-arrow"><i class="fas fa-arrows-left-right"></i></div>
+  <div class="diagram-box danger"><i class="fas fa-skull-crossbones"></i><br>DEADLOCK<br><small>Ambos esperan</small></div>
+  <div class="diagram-arrow"><i class="fas fa-arrows-left-right"></i></div>
+  <div class="diagram-box thread"><i class="fas fa-lock"></i><br>Hilo B<br><small>Tiene: Recurso 2</small><br><small>Espera: Recurso 1</small></div>
+</div>
+
+<div class="sub-title"><i class="fas fa-hourglass-half"></i> Starvation (Inanición)</div>
+<p>La <span class="highlight-g">inanición</span> sucede cuando un hilo nunca consigue acceder al recurso porque otros hilos de mayor prioridad lo acaparan constantemente. El hilo "hambriento" espera indefinidamente sin poder ejecutarse.</p>
+
+<div class="sub-title"><i class="fas fa-ghost"></i> Datos Inconsistentes</div>
+<p>Si las operaciones de lectura y escritura no se coordinan, los datos pueden quedar en un <strong>estado parcial o corrupto</strong>. Por ejemplo, transferir dinero entre cuentas requiere restar de una y sumar a otra: si el proceso se interrumpe a la mitad, el dinero se "pierde" o se "duplica".</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 3: JS SINGLE THREAD ==================== -->
+<section id="js-single">
+<div class="section-title"><i class="fas fa-stream"></i> JavaScript es Single-Thread</div>
+
+<div class="card">
+<p>JavaScript fue diseñado en 1995 por Brendan Eich para agregar interactividad simple a las páginas web. En ese contexto, se tomó una decisión fundamental: <span class="highlight">JavaScript correrá en un único hilo de ejecución</span>.</p>
+
+<p>¿Por qué? Porque si dos hilos intentaran modificar el DOM al mismo tiempo (uno agrega un elemento, otro lo elimina), el navegador entraría en un estado caótico. Un solo hilo elimina por completo los problemas de concurrencia clásicos como race conditions y deadlocks… pero introduce otro problema: <span class="highlight-m">el bloqueo</span>.</p>
+
+<div class="sub-title"><i class="fas fa-circle-notch"></i> El Event Loop</div>
+<p>JavaScript maneja las tareas asincrónicas (timers, fetch, eventos del usuario) mediante un sistema conocido como <span class="highlight-g">Event Loop</span>. Este mecanismo funciona así:</p>
+
+<div class="diagram" style="flex-direction:column;gap:8px;">
+  <div class="diagram-box thread" style="width:80%;"><i class="fas fa-list-ol"></i> <strong>Call Stack</strong> — Pila de funciones que se ejecutan de forma secuencial</div>
+  <div class="diagram-arrow" style="transform:rotate(90deg);"><i class="fas fa-arrow-down"></i></div>
+  <div class="diagram-box resource" style="width:80%;"><i class="fas fa-clock"></i> <strong>Task Queue</strong> — Cola de callbacks listos para ejecutarse cuando la pila esté vacía</div>
+  <div class="diagram-arrow" style="transform:rotate(90deg);"><i class="fas fa-arrow-down"></i></div>
+  <div class="diagram-box worker" style="width:80%;"><i class="fas fa-arrows-rotate"></i> <strong>Event Loop</strong> — Monitorea la pila; si está vacía, toma la siguiente tarea de la cola</div>
+</div>
+
+<p>El Event Loop permite que JavaScript sea <em>no-bloqueante</em> para operaciones de I/O (leer archivos, llamadas HTTP), pero las <strong>operaciones CPU-intensivas</strong> siguen bloqueando el hilo principal.</p>
+
+<div class="sub-title"><i class="fas fa-ban"></i> El Problema del Bloqueo</div>
+<p>Si ejecutamos una tarea pesada (procesar una imagen, ordenar millones de datos, calcular factoriales grandes), esa tarea <span class="highlight-m">congela completamente</span> la interfaz del usuario:</p>
+
+<div class="warning-box"><i class="fas fa-exclamation-triangle"></i> Mientras el hilo principal ejecuta una tarea pesada, el navegador <strong>no puede</strong>: responder a clicks, actualizar animaciones, desplazar la página, ni renderizar cambios. El usuario ve la temida <strong>"pestaña sin respuesta"</strong>.</div>
+
+<div class="code-block">
+<span class="cm">// ❌ Esto bloquea TODA la interfaz durante segundos:</span>
+<span class="kw">function</span> <span class="fn">calculoPesado</span>() {
+  <span class="kw">let</span> resultado = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">2_000_000_000</span>; i++) {
+    resultado += Math.sqrt(i);
+  }
+  <span class="kw">return</span> resultado;   <span class="cm">// la página estuvo congelada hasta llegar acá</span>
+}
+</div>
+
+<p>Este problema fue la razón directa por la cual se crearon los <span class="highlight">Web Workers</span>.</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 4: WEB WORKERS ==================== -->
+<section id="workers">
+<div class="section-title"><i class="fas fa-cogs"></i> Web Workers</div>
+
+<div class="card">
+<p>Los <span class="highlight">Web Workers</span> (especificados en HTML5, ~2009) son la solución de JavaScript para ejecutar código en un <strong>hilo separado</strong>, sin bloquear el hilo principal del navegador.</p>
+
+<p>Un Worker es esencialmente un archivo JavaScript que se ejecuta en su propio hilo. Se comunica con el hilo principal a través de un sistema de <span class="highlight-m">mensajes</span> (<code>postMessage</code> / <code>onmessage</code>), sin compartir memoria directamente.</p>
+
+<div class="info-box"><i class="fas fa-lightbulb"></i> <strong>Clave:</strong> Los Workers NO comparten memoria con el hilo principal. Se comunican copiando datos mediante mensajes. Esto elimina los problemas clásicos de concurrencia (race conditions, deadlocks) por diseño.</div>
+
+<div class="sub-title"><i class="fas fa-diagram-project"></i> Arquitectura</div>
+<div class="diagram" style="flex-direction:column;gap:8px;">
+  <div style="display:flex;gap:15px;align-items:center;justify-content:center;width:100%;flex-wrap:wrap;">
+    <div class="diagram-box thread" style="flex:1;min-width:180px;"><i class="fas fa-desktop"></i><br><strong>Hilo Principal</strong><br><small>UI · DOM · Eventos</small></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <span style="font-size:.75em;color:var(--accent-gold);">postMessage()</span>
+      <div class="diagram-arrow"><i class="fas fa-arrows-left-right"></i></div>
+      <span style="font-size:.75em;color:var(--accent-gold);">onmessage</span>
+    </div>
+    <div class="diagram-box worker" style="flex:1;min-width:180px;"><i class="fas fa-gear"></i><br><strong>Web Worker</strong><br><small>Cálculos · Sin DOM</small></div>
+  </div>
+</div>
+
+<div class="sub-title"><i class="fas fa-code"></i> Creación y Uso Básico</div>
+<div class="code-block">
+<span class="cm">// === main.js (hilo principal) ===</span>
+
+<span class="kw">const</span> worker = <span class="kw">new</span> <span class="cls">Worker</span>(<span class="str">"worker.js"</span>);
+
+<span class="cm">// Enviar datos al Worker</span>
+worker.<span class="fn">postMessage</span>({ tarea: <span class="str">"calcular"</span>, valor: <span class="num">1000000</span> });
+
+<span class="cm">// Recibir resultado del Worker</span>
+worker.<span class="prop">onmessage</span> = <span class="kw">function</span>(e) {
+  console.log(<span class="str">"Resultado:"</span>, e.data);
+};
+</div>
+
+<div class="code-block">
+<span class="cm">// === worker.js (hilo separado) ===</span>
+
+<span class="prop">onmessage</span> = <span class="kw">function</span>(e) {
+  <span class="kw">const</span> { valor } = e.data;
+  <span class="kw">let</span> suma = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < valor; i++) {
+    suma += Math.sqrt(i);
+  }
+  <span class="cm">// Enviar resultado de vuelta al hilo principal</span>
+  <span class="fn">postMessage</span>(suma);
+};
+</div>
+
+<div class="sub-title"><i class="fas fa-list-check"></i> Reglas Importantes</div>
+<p>Los Workers tienen restricciones que previenen los problemas de concurrencia:</p>
+<p>• <span class="highlight">No pueden acceder al DOM</span> — no pueden modificar la página directamente.</p>
+<p>• <span class="highlight-m">No comparten variables</span> — cada Worker tiene su propia memoria aislada.</p>
+<p>• <span class="highlight-g">Comunicación por mensajes</span> — los datos se <em>copian</em> (no se comparten), evitando race conditions.</p>
+<p>• <span class="highlight">Pueden usar</span>: <code>fetch()</code>, <code>setTimeout()</code>, <code>WebSockets</code>, y operaciones matemáticas.</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 5: DEMO INTERACTIVA ==================== -->
+<section id="demo">
+<div class="section-title"><i class="fas fa-flask"></i> Demo Interactiva</div>
+
+<div class="card">
+<p>Esta demo simula la diferencia entre ejecutar una tarea pesada en el <span class="highlight">hilo principal</span> (bloqueante) y en un <span class="highlight-g">Worker simulado</span> (no bloqueante). Observá cómo el contador de la interfaz se comporta en cada caso.</p>
+
+<div class="sub-title"><i class="fas fa-eye"></i> Visualización en Tiempo Real</div>
+
+<div class="visual-demo" id="demo-area">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <span style="font-weight:700;color:var(--accent-gold);font-size:1.1em;"><i class="fas fa-stopwatch"></i> Contador UI: </span>
+      <span id="ui-counter" style="font-size:1.4em;font-weight:800;color:var(--accent-cyan);">0</span>
+    </div>
+    <div style="font-size:.85em;color:var(--text-secondary);">El contador se incrementa cada 100ms — si se congela, el hilo está bloqueado.</div>
+  </div>
+
+  <div class="thread-lane main">
+    <span class="thread-label" style="color:var(--accent-cyan);"><i class="fas fa-desktop"></i> Hilo Principal:</span>
+    <span class="task-block" id="main-status" style="background:rgba(0,229,255,0.15);color:var(--accent-cyan);">Inactivo</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill main-fill" id="main-progress" style="width:0%"></div></div>
+
+  <div class="thread-lane worker-lane">
+    <span class="thread-label" style="color:var(--accent-green);"><i class="fas fa-gear"></i> Worker (simulado):</span>
+    <span class="task-block" id="worker-status" style="background:rgba(105,240,174,0.15);color:var(--accent-green);">Inactivo</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill worker-fill" id="worker-progress" style="width:0%"></div></div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:15px;">
+  <button class="btn-run" onclick="runBlocking()" id="btn-block">
+    <i class="fas fa-ban"></i> Ejecutar en Hilo Principal (Bloquea)</button>
+  <button class="btn-run" onclick="runWithWorker()" id="btn-worker" style="background:linear-gradient(135deg,var(--accent-green),#2e7d32);">
+    <i class="fas fa-gear"></i> Ejecutar en Worker (No Bloquea)</button>
+  <button class="btn-run" onclick="resetDemo()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+    <i class="fas fa-rotate-left"></i> Reiniciar</button>
+</div>
+
+<div class="console-area" id="console-demo"></div>
+</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-code"></i> Código de la Demo</div>
+<div class="code-block">
+<span class="cm">// Tarea pesada: suma de raíces cuadradas</span>
+<span class="kw">function</span> <span class="fn">tareaPesada</span>(<span class="prop">iteraciones</span>) {
+  <span class="kw">let</span> resultado = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < iteraciones; i++) {
+    resultado += Math.sqrt(i);
+  }
+  <span class="kw">return</span> resultado;
+}
+
+<span class="cm">// ❌ En el hilo principal: TODO se congela</span>
+<span class="kw">const</span> resultado = <span class="fn">tareaPesada</span>(<span class="num">50_000_000</span>);
+
+<span class="cm">// ✅ En un Worker: la UI sigue respondiendo</span>
+<span class="kw">const</span> w = <span class="kw">new</span> <span class="cls">Worker</span>(<span class="str">"heavy-worker.js"</span>);
+w.<span class="fn">postMessage</span>(<span class="num">50_000_000</span>);
+w.<span class="prop">onmessage</span> = (e) => console.log(e.data);
+</div>
+</div>
+</section>
+
+<!-- ==================== QUIZ FINAL ==================== -->
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario Final — Concurrencia en JavaScript</h3>
+
+<div class="quiz-q" data-correct="c">
+  <p>1. ¿Qué es la concurrencia?</p>
+  <label><input type="radio" name="q1" value="a"> Ejecutar una sola tarea a la vez</label>
+  <label><input type="radio" name="q1" value="b"> Ejecutar tareas exclusivamente en paralelo</label>
+  <label><input type="radio" name="q1" value="c"> Gestionar múltiples tareas que progresan de forma simultánea o intercalada</label>
+  <label><input type="radio" name="q1" value="d"> Un tipo de error en programas multihilo</label>
+  <div class="quiz-result" id="q1r"></div>
+</div>
+
+<div class="quiz-q" data-correct="a">
+  <p>2. ¿Por qué la lectura simultánea de un recurso compartido no genera conflictos?</p>
+  <label><input type="radio" name="q2" value="a"> Porque leer no modifica el dato, el valor permanece intacto</label>
+  <label><input type="radio" name="q2" value="b"> Porque solo un hilo puede leer a la vez</label>
+  <label><input type="radio" name="q2" value="c"> Porque los datos se copian automáticamente</label>
+  <label><input type="radio" name="q2" value="d"> Porque JavaScript impide la lectura simultánea</label>
+  <div class="quiz-result" id="q2r"></div>
+</div>
+
+<div class="quiz-q" data-correct="b">
+  <p>3. ¿Qué es una <em>race condition</em>?</p>
+  <label><input type="radio" name="q3" value="a"> Un error de sintaxis en código concurrente</label>
+  <label><input type="radio" name="q3" value="b"> Cuando el resultado depende del orden impredecible de ejecución de los hilos</label>
+  <label><input type="radio" name="q3" value="c"> Cuando un programa se ejecuta demasiado rápido</label>
+  <label><input type="radio" name="q3" value="d"> Un método de optimización de rendimiento</label>
+  <div class="quiz-result" id="q3r"></div>
+</div>
+
+<div class="quiz-q" data-correct="d">
+  <p>4. ¿Qué es un <em>deadlock</em>?</p>
+  <label><input type="radio" name="q4" value="a"> Cuando un hilo termina antes de tiempo</label>
+  <label><input type="radio" name="q4" value="b"> Cuando el programa se ejecuta muy lento</label>
+  <label><input type="radio" name="q4" value="c"> Cuando la memoria se agota</label>
+  <label><input type="radio" name="q4" value="d"> Cuando dos o más hilos quedan bloqueados esperándose mutuamente</label>
+  <div class="quiz-result" id="q4r"></div>
+</div>
+
+<div class="quiz-q" data-correct="b">
+  <p>5. ¿Por qué JavaScript es single-threaded?</p>
+  <label><input type="radio" name="q5" value="a"> Por limitaciones de hardware</label>
+  <label><input type="radio" name="q5" value="b"> Para evitar conflictos al manipular el DOM desde múltiples hilos</label>
+  <label><input type="radio" name="q5" value="c"> Porque los navegadores no soportan múltiples hilos</label>
+  <label><input type="radio" name="q5" value="d"> Por una limitación del lenguaje que nunca se corrigió</label>
+  <div class="quiz-result" id="q5r"></div>
+</div>
+
+<div class="quiz-q" data-correct="c">
+  <p>6. ¿Qué problema motivó la creación de los Web Workers?</p>
+  <label><input type="radio" name="q6" value="a"> La imposibilidad de hacer peticiones HTTP</label>
+  <label><input type="radio" name="q6" value="b"> La falta de soporte para objetos en JavaScript</label>
+  <label><input type="radio" name="q6" value="c"> El bloqueo de la interfaz al ejecutar tareas CPU-intensivas en el hilo principal</label>
+  <label><input type="radio" name="q6" value="d"> La necesidad de acceder al DOM desde múltiples hilos</label>
+  <div class="quiz-result" id="q6r"></div>
+</div>
+
+<div class="quiz-q" data-correct="a">
+  <p>7. ¿Cómo se comunican los Workers con el hilo principal?</p>
+  <label><input type="radio" name="q7" value="a"> Mediante postMessage() y onmessage (sistema de mensajes)</label>
+  <label><input type="radio" name="q7" value="b"> Compartiendo variables globales</label>
+  <label><input type="radio" name="q7" value="c"> Accediendo al mismo DOM</label>
+  <label><input type="radio" name="q7" value="d"> Mediante localStorage</label>
+  <div class="quiz-result" id="q7r"></div>
+</div>
+
+<div class="quiz-q" data-correct="c">
+  <p>8. ¿Qué restricción tienen los Web Workers?</p>
+  <label><input type="radio" name="q8" value="a"> No pueden hacer cálculos matemáticos</label>
+  <label><input type="radio" name="q8" value="b"> No pueden usar funciones</label>
+  <label><input type="radio" name="q8" value="c"> No pueden acceder ni modificar el DOM</label>
+  <label><input type="radio" name="q8" value="d"> No pueden recibir datos del hilo principal</label>
+  <div class="quiz-result" id="q8r"></div>
+</div>
+
+<button class="btn-run" onclick="checkQuiz()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Todas las Respuestas</button>
+</div>
+
+<footer style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:.85em;border-top:1px solid rgba(0,229,255,0.1);margin-top:40px;">
+  <p><i class="fas fa-graduation-cap"></i> Programación III — Unidad 2: Concurrencia en JavaScript</p>
+</footer>
+
+</div>
+
+<script>
+// ========== UI COUNTER ==========
+let counterVal = 0;
+let counterInterval = null;
+
+function startCounter() {
+  if (counterInterval) return;
+  counterInterval = setInterval(() => {
+    counterVal++;
+    document.getElementById('ui-counter').textContent = counterVal;
+  }, 100);
+}
+
+function stopCounter() {
+  clearInterval(counterInterval);
+  counterInterval = null;
+}
+
+startCounter();
+
+// ========== HELPER ==========
+function logDemo(text) {
+  const el = document.getElementById('console-demo');
+  el.textContent = text;
+  el.style.animation = 'none'; void el.offsetWidth; el.style.animation = 'fadeIn .4s ease';
+}
+
+function setStatus(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'task-block ' + cls;
+}
+
+// ========== BLOCKING DEMO ==========
+function runBlocking() {
+  document.getElementById('btn-block').disabled = true;
+  setStatus('main-status', '⏳ Procesando… (UI congelada)', 'blocked');
+  document.getElementById('main-progress').style.width = '0%';
+  logDemo('⏳ Ejecutando tarea pesada en el hilo principal…\n   (notá cómo el contador se congela)');
+
+  // Use setTimeout to allow the UI to render the "processing" state first
+  setTimeout(() => {
+    const start = performance.now();
+    let resultado = 0;
+    const ITERATIONS = 80_000_000;
+    for (let i = 0; i < ITERATIONS; i++) {
+      resultado += Math.sqrt(i);
+    }
+    const elapsed = ((performance.now() - start) / 1000).toFixed(2);
+
+    document.getElementById('main-progress').style.width = '100%';
+    document.getElementById('main-progress').textContent = '100%';
+    setStatus('main-status', '✔ Completado', 'done');
+    document.getElementById('btn-block').disabled = false;
+    logDemo(`✔ Resultado: ${resultado.toFixed(2)}\n⏱ Tiempo: ${elapsed}s\n\n⚠ La UI estuvo CONGELADA durante esos ${elapsed}s.\n  El contador se detuvo mientras se procesaba.`);
+  }, 50);
+}
+
+// ========== WORKER SIMULATION ==========
+function runWithWorker() {
+  document.getElementById('btn-worker').disabled = true;
+  setStatus('worker-status', '⚙ Procesando en Worker…', 'active');
+  setStatus('main-status', '✔ Libre (la UI responde)', 'done');
+  document.getElementById('worker-progress').style.width = '0%';
+  logDemo('⚙ Tarea delegada al Worker simulado…\n   (observá que el contador sigue funcionando normalmente)');
+
+  const TOTAL_CHUNKS = 20;
+  const CHUNK_SIZE = 4_000_000;
+  let currentChunk = 0;
+  let resultado = 0;
+  const start = performance.now();
+
+  function processChunk() {
+    const chunkStart = currentChunk * CHUNK_SIZE;
+    const chunkEnd = chunkStart + CHUNK_SIZE;
+    for (let i = chunkStart; i < chunkEnd; i++) {
+      resultado += Math.sqrt(i);
+    }
+    currentChunk++;
+    const pct = Math.round((currentChunk / TOTAL_CHUNKS) * 100);
+    document.getElementById('worker-progress').style.width = pct + '%';
+    document.getElementById('worker-progress').textContent = pct + '%';
+
+    if (currentChunk < TOTAL_CHUNKS) {
+      setTimeout(processChunk, 0);
+    } else {
+      const elapsed = ((performance.now() - start) / 1000).toFixed(2);
+      setStatus('worker-status', '✔ Completado', 'done');
+      document.getElementById('btn-worker').disabled = false;
+      logDemo(`✔ Resultado: ${resultado.toFixed(2)}\n⏱ Tiempo: ${elapsed}s\n\n✅ La UI se mantuvo RESPONSIVA durante todo el proceso.\n  El contador nunca se detuvo.`);
+    }
+  }
+
+  setTimeout(processChunk, 0);
+}
+
+// ========== RESET ==========
+function resetDemo() {
+  counterVal = 0;
+  document.getElementById('ui-counter').textContent = '0';
+  setStatus('main-status', 'Inactivo', '');
+  document.getElementById('main-status').style.background = 'rgba(0,229,255,0.15)';
+  document.getElementById('main-status').style.color = 'var(--accent-cyan)';
+  setStatus('worker-status', 'Inactivo', '');
+  document.getElementById('worker-status').style.background = 'rgba(105,240,174,0.15)';
+  document.getElementById('worker-status').style.color = 'var(--accent-green)';
+  document.getElementById('main-progress').style.width = '0%';
+  document.getElementById('main-progress').textContent = '';
+  document.getElementById('worker-progress').style.width = '0%';
+  document.getElementById('worker-progress').textContent = '';
+  document.getElementById('console-demo').textContent = '';
+  document.getElementById('btn-block').disabled = false;
+  document.getElementById('btn-worker').disabled = false;
+}
+
+// ========== QUIZ ==========
+function checkQuiz() {
+  const total = 8;
+  for (let i = 1; i <= total; i++) {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    const resultEl = document.getElementById(`q${i}r`);
+    const correct = document.querySelector(`input[name="q${i}"]`).closest('.quiz-q').dataset.correct;
+    if (!selected) { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '⚠ Seleccioná una opción.'; continue; }
+    if (selected.value === correct) { resultEl.className = 'quiz-result correct'; resultEl.textContent = '✔ ¡Correcto!'; }
+    else { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '✘ Incorrecto. Intentá de nuevo.'; }
+  }
+}
+
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+
+</body>
+</html>

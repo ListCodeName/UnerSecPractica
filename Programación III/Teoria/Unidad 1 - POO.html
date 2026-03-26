@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unidad 1 - Programación Orientada a Objetos</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2234;
+  --accent-cyan: #00e5ff;
+  --accent-magenta: #e040fb;
+  --accent-gold: #ffd740;
+  --accent-green: #69f0ae;
+  --text-primary: #e8eaf6;
+  --text-secondary: #90a4ae;
+  --glass: rgba(26,34,52,0.75);
+  --glow-cyan: 0 0 20px rgba(0,229,255,0.3);
+  --glow-magenta: 0 0 20px rgba(224,64,251,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 50%,rgba(0,229,255,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 20%,rgba(224,64,251,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 80%,rgba(255,215,64,0.04) 0%,transparent 50%);
+  pointer-events:none;z-index:0;}
+
+/* Texture overlay */
+body::after{content:'';position:fixed;inset:0;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%2300e5ff' stroke-width='.5'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;}
+
+/* Floating elements */
+.floater{position:fixed;pointer-events:none;z-index:0;opacity:.12;}
+.floater-1{top:10%;left:5%;width:80px;height:80px;background:var(--accent-cyan);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);animation:floatA 8s ease-in-out infinite;}
+.floater-2{top:30%;right:8%;width:60px;height:60px;background:var(--accent-magenta);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);animation:floatB 10s ease-in-out infinite;}
+.floater-3{bottom:20%;left:10%;width:50px;height:50px;background:var(--accent-gold);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:floatA 12s ease-in-out infinite reverse;}
+.floater-4{top:60%;right:5%;width:70px;height:70px;background:var(--accent-green);clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);animation:floatB 9s ease-in-out infinite;}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-30px) rotate(15deg);}}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(20px) rotate(-10deg);}}
+
+.container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1;}
+
+/* === TITLE PATTERN === */
+.section-title{position:relative;display:inline-block;margin-bottom:30px;padding:14px 40px 14px 50px;
+  font-size:1.6em;font-weight:700;letter-spacing:1px;color:#fff;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);
+  text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.section-title i{margin-right:10px;}
+.section-title::after{content:'';position:absolute;inset:2px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(224,64,251,0.15));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);}
+
+/* Sub-titles follow same pattern but smaller */
+.sub-title{position:relative;display:inline-block;margin:25px 0 15px;padding:8px 30px 8px 35px;
+  font-size:1.15em;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent-gold),#ff9100);
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);}
+
+/* Cards */
+.card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(0,229,255,0.12);
+  border-radius:16px;padding:30px;margin-bottom:30px;position:relative;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s;}
+.card:hover{border-color:rgba(0,229,255,0.3);box-shadow:var(--glow-cyan);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));}
+
+/* Code blocks */
+.code-block{background:#0d1117;border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:20px;
+  margin:15px 0;font-family:'Cascadia Code','Fira Code',monospace;font-size:.88em;
+  overflow-x:auto;line-height:1.8;position:relative;}
+.code-block::before{content:'JS';position:absolute;top:8px;right:12px;
+  font-size:.7em;color:var(--accent-gold);font-weight:700;letter-spacing:1px;
+  padding:2px 10px;border:1px solid rgba(255,215,64,0.3);border-radius:6px;}
+.code-block.java::before{content:'JAVA';color:var(--accent-magenta);border-color:rgba(224,64,251,0.3);}
+.kw{color:#ff7b72;}.str{color:#a5d6ff;}.cm{color:#8b949e;font-style:italic;}.fn{color:#d2a8ff;}.num{color:#79c0ff;}.cls{color:#ffa657;}.op{color:#ff7b72;}.prop{color:#7ee787;}
+
+/* Console output area */
+.console-area{background:#0d1117;border:1px solid rgba(105,240,174,0.2);border-radius:10px;
+  padding:15px 20px;margin-top:10px;font-family:monospace;font-size:.9em;color:var(--accent-green);
+  min-height:45px;white-space:pre-wrap;position:relative;}
+.console-area::before{content:'▶ Consola';position:absolute;top:-10px;left:15px;
+  background:#0d1117;padding:0 8px;font-size:.75em;color:var(--accent-green);letter-spacing:1px;}
+
+/* Interactive button */
+.btn-run{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;margin:10px 5px;
+  background:linear-gradient(135deg,var(--accent-cyan),#0097a7);color:#000;font-weight:700;
+  border:none;border-radius:8px;cursor:pointer;font-size:.95em;
+  transition:transform .2s,box-shadow .2s;text-transform:uppercase;letter-spacing:1px;}
+.btn-run:hover{transform:translateY(-2px);box-shadow:var(--glow-cyan);}
+.btn-run:active{transform:scale(.97);}
+.btn-run i{font-size:.9em;}
+
+/* Concept tags - hexagonal badges */
+.concept-tag{display:inline-block;padding:6px 20px;margin:4px;font-size:.82em;font-weight:600;
+  color:#fff;background:var(--accent-magenta);
+  clip-path:polygon(10% 0%,90% 0%,100% 50%,90% 100%,10% 100%,0% 50%);
+  transition:transform .2s;}
+.concept-tag:hover{transform:scale(1.08);}
+.concept-tag.cyan{background:var(--accent-cyan);color:#000;}
+.concept-tag.gold{background:var(--accent-gold);color:#000;}
+.concept-tag.green{background:var(--accent-green);color:#000;}
+
+/* Quiz */
+.quiz{background:rgba(26,34,52,0.9);border:1px solid rgba(255,215,64,0.2);border-radius:14px;padding:25px;margin-top:25px;}
+.quiz h3{color:var(--accent-gold);margin-bottom:15px;font-size:1.1em;}
+.quiz-q{margin-bottom:20px;padding:15px;border-radius:10px;background:rgba(0,0,0,0.3);border-left:3px solid var(--accent-magenta);}
+.quiz-q p{font-weight:600;margin-bottom:10px;}
+.quiz-q label{display:block;padding:7px 14px;margin:4px 0;border-radius:8px;cursor:pointer;
+  transition:background .2s;font-size:.92em;}
+.quiz-q label:hover{background:rgba(0,229,255,0.08);}
+.quiz-q input[type="radio"]{margin-right:8px;accent-color:var(--accent-cyan);}
+.quiz-result{padding:12px 20px;border-radius:8px;margin-top:10px;font-weight:700;display:none;}
+.quiz-result.correct{background:rgba(105,240,174,0.15);color:var(--accent-green);display:block;}
+.quiz-result.wrong{background:rgba(255,82,82,0.15);color:#ff5252;display:block;}
+
+/* Comparison layout */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0;}
+.compare>div>span{display:block;text-align:center;font-weight:700;margin-bottom:5px;
+  font-size:.85em;letter-spacing:1px;color:var(--accent-gold);}
+@media(max-width:768px){.compare{grid-template-columns:1fr;}}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(15px);
+  border-bottom:1px solid rgba(0,229,255,0.15);padding:10px 0;}
+nav .nav-inner{max-width:960px;margin:0 auto;display:flex;gap:8px;padding:0 20px;flex-wrap:wrap;justify-content:center;}
+nav a{color:var(--text-secondary);text-decoration:none;font-size:.82em;padding:6px 14px;border-radius:8px;
+  transition:all .3s;font-weight:500;}
+nav a:hover,nav a.active{color:var(--accent-cyan);background:rgba(0,229,255,0.08);}
+
+/* Header hero */
+.hero{text-align:center;padding:60px 20px 40px;position:relative;}
+.hero h1{font-size:2.5em;font-weight:800;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;animation:shimmer 3s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
+.hero p{color:var(--text-secondary);font-size:1.1em;max-width:650px;margin:0 auto;}
+.hero-shape{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;
+  opacity:.04;clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));animation:floatA 6s ease-in-out infinite;}
+
+.highlight{color:var(--accent-cyan);font-weight:600;}
+.highlight-m{color:var(--accent-magenta);font-weight:600;}
+.highlight-g{color:var(--accent-gold);font-weight:600;}
+p+p{margin-top:12px;}
+section{padding:20px 0;scroll-margin-top:60px;}
+</style>
+</head>
+<body>
+
+<!-- Floating geometric elements -->
+<div class="floater floater-1"></div>
+<div class="floater floater-2"></div>
+<div class="floater floater-3"></div>
+<div class="floater floater-4"></div>
+
+<nav><div class="nav-inner">
+  <a href="#intro"><i class="fas fa-cube"></i> Introducción</a>
+  <a href="#abstraccion"><i class="fas fa-layer-group"></i> Abstracción</a>
+  <a href="#encapsulamiento"><i class="fas fa-lock"></i> Encapsulamiento</a>
+  <a href="#herencia"><i class="fas fa-sitemap"></i> Herencia</a>
+  <a href="#polimorfismo"><i class="fas fa-shapes"></i> Polimorfismo</a>
+</div></nav>
+
+<div class="container">
+<div class="hero">
+  <div class="hero-shape"></div>
+  <h1><i class="fas fa-code"></i> Programación Orientada a Objetos</h1>
+  <p>Unidad 1 — Programación III · Fundamentos de OOP con JavaScript</p>
+</div>
+
+<!-- ==================== SECCIÓN 1: INTRODUCCIÓN ==================== -->
+<section id="intro">
+<div class="section-title"><i class="fas fa-cube"></i> Introducción a la OOP</div>
+
+<div class="card">
+<p>La <span class="highlight">Programación Orientada a Objetos</span> es un paradigma que organiza el código en torno a <strong>objetos</strong>: entidades que combinan datos (atributos) y comportamiento (métodos).</p>
+<p>En JavaScript, las clases (introducidas en ES6) permiten definir estos objetos de forma clara y estructurada.</p>
+
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0;">
+  <span class="concept-tag cyan"><i class="fas fa-tag"></i> Atributos</span>
+  <span class="concept-tag"><i class="fas fa-cogs"></i> Métodos</span>
+  <span class="concept-tag gold"><i class="fas fa-hammer"></i> Constructor</span>
+  <span class="concept-tag green"><i class="fas fa-arrow-right-arrow-left"></i> Get / Set</span>
+</div>
+
+<div class="sub-title"><i class="fas fa-puzzle-piece"></i> Conceptos Clave</div>
+<p><span class="highlight">Atributos:</span> Variables internas que almacenan el estado del objeto (nombre, edad, etc.).</p>
+<p><span class="highlight-m">Métodos:</span> Funciones que definen el comportamiento del objeto.</p>
+<p><span class="highlight-g">Constructor:</span> Método especial (<code>constructor()</code>) que se ejecuta al crear una instancia con <code>new</code>.</p>
+<p><span class="highlight">Get / Set:</span> Accesores que permiten leer y modificar atributos de forma controlada.</p>
+</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-code"></i> Ejemplo: Clase Persona</div>
+<div class="code-block">
+<span class="kw">class</span> <span class="cls">Persona</span> {
+  <span class="fn">constructor</span>(<span class="prop">nombre</span>, <span class="prop">edad</span>) {
+    <span class="kw">this</span>._nombre = nombre;    <span class="cm">// atributo (convención privado)</span>
+    <span class="kw">this</span>._edad = edad;
+  }
+
+  <span class="cm">// Getter</span>
+  <span class="kw">get</span> <span class="fn">nombre</span>() { <span class="kw">return</span> <span class="kw">this</span>._nombre; }
+
+  <span class="cm">// Setter con validación</span>
+  <span class="kw">set</span> <span class="fn">edad</span>(<span class="prop">valor</span>) {
+    <span class="kw">if</span> (valor > <span class="num">0</span>) <span class="kw">this</span>._edad = valor;
+    <span class="kw">else</span> console.log(<span class="str">"Edad inválida"</span>);
+  }
+
+  <span class="fn">saludar</span>() {
+    <span class="kw">return</span> <span class="str">`Hola, soy ${<span class="kw">this</span>._nombre} y tengo ${<span class="kw">this</span>._edad} años.`</span>;
+  }
+}
+</div>
+
+<button class="btn-run" onclick="runIntro()"><i class="fas fa-play"></i> Ejecutar Ejemplo</button>
+<button class="btn-run" onclick="runGetSet()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-arrows-rotate"></i> Probar Get/Set</button>
+<div class="console-area" id="console-intro"></div>
+</div>
+
+<!-- Quiz Sección 1 -->
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Introducción a la OOP</h3>
+<div class="quiz-q" data-correct="b">
+  <p>1. ¿Qué método se ejecuta automáticamente al crear un objeto con <code>new</code>?</p>
+  <label><input type="radio" name="q1" value="a"> init()</label>
+  <label><input type="radio" name="q1" value="b"> constructor()</label>
+  <label><input type="radio" name="q1" value="c"> create()</label>
+  <label><input type="radio" name="q1" value="d"> build()</label>
+  <div class="quiz-result" id="q1r"></div>
+</div>
+<div class="quiz-q" data-correct="c">
+  <p>2. ¿Para qué sirve un <em>setter</em>?</p>
+  <label><input type="radio" name="q2" value="a"> Eliminar un atributo</label>
+  <label><input type="radio" name="q2" value="b"> Leer el valor de un atributo</label>
+  <label><input type="radio" name="q2" value="c"> Modificar un atributo de forma controlada</label>
+  <label><input type="radio" name="q2" value="d"> Crear nuevos métodos</label>
+  <div class="quiz-result" id="q2r"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+  <p>3. ¿Qué palabra clave se usa para referirse a la instancia actual?</p>
+  <label><input type="radio" name="q3" value="a"> this</label>
+  <label><input type="radio" name="q3" value="b"> self</label>
+  <label><input type="radio" name="q3" value="c"> me</label>
+  <label><input type="radio" name="q3" value="d"> that</label>
+  <div class="quiz-result" id="q3r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz('intro')" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 2: ABSTRACCIÓN ==================== -->
+<section id="abstraccion">
+<div class="section-title"><i class="fas fa-layer-group"></i> Abstracción</div>
+
+<div class="card">
+<p>La <span class="highlight">abstracción</span> consiste en mostrar solo la información esencial y ocultar los detalles de implementación. Permite modelar objetos del mundo real enfocándonos en <em>qué hacen</em>, no en <em>cómo lo hacen</em>.</p>
+<p>JavaScript <strong>no tiene clases abstractas nativas</strong>, pero podemos simularlas lanzando errores en métodos que deben ser implementados por subclases.</p>
+
+<div class="sub-title"><i class="fas fa-code"></i> Simulación en JavaScript</div>
+<div class="code-block">
+<span class="kw">class</span> <span class="cls">Figura</span> {
+  <span class="fn">calcularArea</span>() {
+    <span class="kw">throw new</span> Error(<span class="str">"Método abstracto: implementar en subclase"</span>);
+  }
+}
+
+<span class="kw">class</span> <span class="cls">Circulo</span> <span class="kw">extends</span> <span class="cls">Figura</span> {
+  <span class="fn">constructor</span>(<span class="prop">radio</span>) { <span class="kw">super</span>(); <span class="kw">this</span>.radio = radio; }
+  <span class="fn">calcularArea</span>() { <span class="kw">return</span> (Math.PI * <span class="kw">this</span>.radio ** <span class="num">2</span>).toFixed(<span class="num">2</span>); }
+}
+</div>
+
+<div class="sub-title"><i class="fab fa-java"></i> Comparación con Java</div>
+<p>Java sí soporta clases abstractas de forma nativa con la keyword <code>abstract</code>:</p>
+<div class="compare">
+<div><span>JavaScript (simulado)</span>
+<div class="code-block">
+<span class="cm">// No hay keyword abstract</span>
+<span class="kw">class</span> <span class="cls">Figura</span> {
+  <span class="fn">calcularArea</span>() {
+    <span class="kw">throw new</span> Error(<span class="str">"Abstracto"</span>);
+  }
+}
+</div></div>
+<div><span>Java (nativo)</span>
+<div class="code-block java">
+<span class="kw">abstract class</span> <span class="cls">Figura</span> {
+  <span class="kw">abstract double</span> <span class="fn">calcularArea</span>();
+}
+
+<span class="kw">class</span> <span class="cls">Circulo</span> <span class="kw">extends</span> <span class="cls">Figura</span> {
+  <span class="kw">double</span> radio;
+  <span class="kw">double</span> <span class="fn">calcularArea</span>() {
+    <span class="kw">return</span> Math.PI * radio * radio;
+  }
+}
+</div></div></div>
+
+<button class="btn-run" onclick="runAbstraccion()"><i class="fas fa-play"></i> Ejecutar Ejemplo</button>
+<div class="console-area" id="console-abs"></div>
+</div>
+
+<!-- Quiz Sección 2 -->
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Abstracción</h3>
+<div class="quiz-q" data-correct="b">
+  <p>1. ¿Qué busca lograr la abstracción?</p>
+  <label><input type="radio" name="q4" value="a"> Duplicar código para reutilizar</label>
+  <label><input type="radio" name="q4" value="b"> Ocultar detalles y mostrar lo esencial</label>
+  <label><input type="radio" name="q4" value="c"> Hacer todo el código público</label>
+  <label><input type="radio" name="q4" value="d"> Eliminar las clases</label>
+  <div class="quiz-result" id="q4r"></div>
+</div>
+<div class="quiz-q" data-correct="c">
+  <p>2. ¿Cómo se simulan clases abstractas en JavaScript?</p>
+  <label><input type="radio" name="q5" value="a"> Con la keyword <code>abstract</code></label>
+  <label><input type="radio" name="q5" value="b"> Con <code>interface</code></label>
+  <label><input type="radio" name="q5" value="c"> Lanzando errores en métodos que deben ser sobreescritos</label>
+  <label><input type="radio" name="q5" value="d"> No se puede simular</label>
+  <div class="quiz-result" id="q5r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz('abs')" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 3: ENCAPSULAMIENTO ==================== -->
+<section id="encapsulamiento">
+<div class="section-title"><i class="fas fa-lock"></i> Encapsulamiento</div>
+
+<div class="card">
+<p>El <span class="highlight">encapsulamiento</span> protege los datos internos de un objeto, exponiendo solo lo necesario a través de una interfaz pública. Esto previene modificaciones accidentales y asegura la integridad del estado.</p>
+<p>Desde ES2022, JavaScript soporta campos privados reales usando el prefijo <code class="highlight-m">#</code>.</p>
+
+<div class="sub-title"><i class="fas fa-code"></i> Campos Privados en JS</div>
+<div class="code-block">
+<span class="kw">class</span> <span class="cls">CuentaBancaria</span> {
+  <span class="prop">#saldo</span>;  <span class="cm">// campo privado real</span>
+
+  <span class="fn">constructor</span>(<span class="prop">titular</span>, <span class="prop">saldoInicial</span>) {
+    <span class="kw">this</span>.titular = titular;
+    <span class="kw">this</span>.#saldo = saldoInicial;
+  }
+
+  <span class="fn">depositar</span>(<span class="prop">monto</span>) {
+    <span class="kw">if</span> (monto > <span class="num">0</span>) <span class="kw">this</span>.#saldo += monto;
+  }
+
+  <span class="fn">getSaldo</span>() { <span class="kw">return</span> <span class="kw">this</span>.#saldo; }
+}
+</div>
+
+<button class="btn-run" onclick="runEncapsulamiento()"><i class="fas fa-play"></i> Ejecutar Ejemplo</button>
+<div class="console-area" id="console-enc"></div>
+</div>
+
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Encapsulamiento</h3>
+<div class="quiz-q" data-correct="a">
+  <p>1. ¿Qué símbolo marca un campo como privado en JavaScript moderno?</p>
+  <label><input type="radio" name="q6" value="a"> #</label>
+  <label><input type="radio" name="q6" value="b"> _</label>
+  <label><input type="radio" name="q6" value="c"> private</label>
+  <label><input type="radio" name="q6" value="d"> @</label>
+  <div class="quiz-result" id="q6r"></div>
+</div>
+<div class="quiz-q" data-correct="b">
+  <p>2. ¿Cuál es el objetivo del encapsulamiento?</p>
+  <label><input type="radio" name="q7" value="a"> Permitir acceso libre a todos los datos</label>
+  <label><input type="radio" name="q7" value="b"> Proteger los datos y controlar su acceso</label>
+  <label><input type="radio" name="q7" value="c"> Eliminar todos los métodos</label>
+  <label><input type="radio" name="q7" value="d"> Hacer las clases más largas</label>
+  <div class="quiz-result" id="q7r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz('enc')" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 4: HERENCIA ==================== -->
+<section id="herencia">
+<div class="section-title"><i class="fas fa-sitemap"></i> Herencia</div>
+
+<div class="card">
+<p>La <span class="highlight">herencia</span> permite que una clase hija (<em>subclase</em>) adquiera los atributos y métodos de una clase padre (<em>superclase</em>). Esto promueve la <strong>reutilización de código</strong> y la jerarquía lógica.</p>
+<p>En JavaScript se usa <code class="highlight-m">extends</code> y <code class="highlight-g">super()</code> para invocar al constructor padre.</p>
+
+<div class="sub-title"><i class="fas fa-code"></i> Herencia en JS</div>
+<div class="code-block">
+<span class="kw">class</span> <span class="cls">Animal</span> {
+  <span class="fn">constructor</span>(<span class="prop">nombre</span>) { <span class="kw">this</span>.nombre = nombre; }
+  <span class="fn">hablar</span>() { <span class="kw">return</span> <span class="str">`${<span class="kw">this</span>.nombre} hace un sonido.`</span>; }
+}
+
+<span class="kw">class</span> <span class="cls">Perro</span> <span class="kw">extends</span> <span class="cls">Animal</span> {
+  <span class="fn">hablar</span>() { <span class="kw">return</span> <span class="str">`${<span class="kw">this</span>.nombre} ladra: ¡Guau!`</span>; }
+}
+
+<span class="kw">class</span> <span class="cls">Gato</span> <span class="kw">extends</span> <span class="cls">Animal</span> {
+  <span class="fn">hablar</span>() { <span class="kw">return</span> <span class="str">`${<span class="kw">this</span>.nombre} maulla: ¡Miau!`</span>; }
+}
+</div>
+
+<button class="btn-run" onclick="runHerencia()"><i class="fas fa-play"></i> Ejecutar Ejemplo</button>
+<div class="console-area" id="console-her"></div>
+</div>
+
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Herencia</h3>
+<div class="quiz-q" data-correct="c">
+  <p>1. ¿Qué keyword se usa para heredar de otra clase en JavaScript?</p>
+  <label><input type="radio" name="q8" value="a"> inherits</label>
+  <label><input type="radio" name="q8" value="b"> implements</label>
+  <label><input type="radio" name="q8" value="c"> extends</label>
+  <label><input type="radio" name="q8" value="d"> prototype</label>
+  <div class="quiz-result" id="q8r"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+  <p>2. ¿Para qué se usa <code>super()</code>?</p>
+  <label><input type="radio" name="q9" value="a"> Invocar el constructor de la clase padre</label>
+  <label><input type="radio" name="q9" value="b"> Crear una nueva clase</label>
+  <label><input type="radio" name="q9" value="c"> Eliminar la herencia</label>
+  <label><input type="radio" name="q9" value="d"> Declarar métodos estáticos</label>
+  <div class="quiz-result" id="q9r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz('her')" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 5: POLIMORFISMO ==================== -->
+<section id="polimorfismo">
+<div class="section-title"><i class="fas fa-shapes"></i> Polimorfismo</div>
+
+<div class="card">
+<p>El <span class="highlight">polimorfismo</span> permite que diferentes clases respondan al <strong>mismo método de formas distintas</strong>. En JS existe naturalmente gracias al tipado dinámico (<em>duck typing</em>).</p>
+<p>Java soporta también <span class="highlight-m">sobrecarga de métodos</span> (mismo nombre, distintos parámetros), algo que JavaScript no tiene de forma nativa.</p>
+
+<div class="sub-title"><i class="fas fa-code"></i> Polimorfismo en JS</div>
+<div class="code-block">
+<span class="kw">class</span> <span class="cls">Forma</span> {
+  <span class="fn">describir</span>() { <span class="kw">return</span> <span class="str">"Soy una forma genérica."</span>; }
+}
+<span class="kw">class</span> <span class="cls">Triangulo</span> <span class="kw">extends</span> <span class="cls">Forma</span> {
+  <span class="fn">describir</span>() { <span class="kw">return</span> <span class="str">"▲ Soy un Triángulo con 3 lados."</span>; }
+}
+<span class="kw">class</span> <span class="cls">Cuadrado</span> <span class="kw">extends</span> <span class="cls">Forma</span> {
+  <span class="fn">describir</span>() { <span class="kw">return</span> <span class="str">"■ Soy un Cuadrado con 4 lados iguales."</span>; }
+}
+
+<span class="cm">// Misma interfaz, distinto comportamiento:</span>
+[<span class="kw">new</span> <span class="cls">Triangulo</span>(), <span class="kw">new</span> <span class="cls">Cuadrado</span>()].forEach(
+  <span class="prop">f</span> => console.log(f.<span class="fn">describir</span>())
+);
+</div>
+
+<div class="sub-title"><i class="fab fa-java"></i> Sobrecarga en Java vs JS</div>
+<div class="compare">
+<div><span>JavaScript (sin sobrecarga)</span>
+<div class="code-block">
+<span class="cm">// JS no distingue por parámetros</span>
+<span class="kw">class</span> <span class="cls">Calc</span> {
+  <span class="fn">sumar</span>(a, b, c) {
+    <span class="kw">return</span> a + b + (c || <span class="num">0</span>);
+  }
+}
+</div></div>
+<div><span>Java (sobrecarga nativa)</span>
+<div class="code-block java">
+<span class="kw">class</span> <span class="cls">Calc</span> {
+  <span class="kw">int</span> <span class="fn">sumar</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="kw">return</span> a + b;
+  }
+  <span class="kw">int</span> <span class="fn">sumar</span>(<span class="kw">int</span> a, <span class="kw">int</span> b, <span class="kw">int</span> c) {
+    <span class="kw">return</span> a + b + c;
+  }
+}
+</div></div></div>
+
+<button class="btn-run" onclick="runPolimorfismo()"><i class="fas fa-play"></i> Ejecutar Ejemplo</button>
+<div class="console-area" id="console-pol"></div>
+</div>
+
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Polimorfismo</h3>
+<div class="quiz-q" data-correct="b">
+  <p>1. ¿Qué es el polimorfismo?</p>
+  <label><input type="radio" name="q10" value="a"> Crear muchas clases sin relación</label>
+  <label><input type="radio" name="q10" value="b"> Que distintas clases respondan distinto al mismo método</label>
+  <label><input type="radio" name="q10" value="c"> Ocultar datos privados</label>
+  <label><input type="radio" name="q10" value="d"> Copiar código entre clases</label>
+  <div class="quiz-result" id="q10r"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+  <p>2. ¿JavaScript soporta sobrecarga de métodos como Java?</p>
+  <label><input type="radio" name="q11" value="a"> No, JS no distingue métodos por cantidad de parámetros</label>
+  <label><input type="radio" name="q11" value="b"> Sí, funciona igual que Java</label>
+  <label><input type="radio" name="q11" value="c"> Sí, usando la keyword overload</label>
+  <label><input type="radio" name="q11" value="d"> Solo con TypeScript</label>
+  <div class="quiz-result" id="q11r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz('pol')" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<footer style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:.85em;border-top:1px solid rgba(0,229,255,0.1);margin-top:40px;">
+  <p><i class="fas fa-graduation-cap"></i> Programación III — Unidad 1: Programación Orientada a Objetos</p>
+</footer>
+
+</div>
+
+<script>
+// ========== DEMO FUNCTIONS ==========
+function log(id, text) {
+  document.getElementById(id).textContent = text;
+  document.getElementById(id).style.animation = 'none';
+  void document.getElementById(id).offsetWidth;
+  document.getElementById(id).style.animation = 'fadeIn .4s ease';
+}
+
+// Intro demos
+function runIntro() {
+  class Persona {
+    constructor(nombre, edad) { this._nombre = nombre; this._edad = edad; }
+    get nombre() { return this._nombre; }
+    set edad(valor) { if (valor > 0) this._edad = valor; }
+    saludar() { return `Hola, soy ${this._nombre} y tengo ${this._edad} años.`; }
+  }
+  const p = new Persona("Ana", 25);
+  log('console-intro', `> const p = new Persona("Ana", 25);\n> p.saludar()\n${p.saludar()}`);
+}
+
+function runGetSet() {
+  class Persona {
+    constructor(nombre, edad) { this._nombre = nombre; this._edad = edad; }
+    get nombre() { return this._nombre; }
+    set edad(valor) { if (valor > 0) this._edad = valor; else return "Edad inválida"; }
+    saludar() { return `Hola, soy ${this._nombre} y tengo ${this._edad} años.`; }
+  }
+  const p = new Persona("Carlos", 30);
+  let out = `> p.nombre  →  "${p.nombre}"\n`;
+  p.edad = 35;
+  out += `> p.edad = 35  →  OK\n> p.saludar()\n${p.saludar()}`;
+  log('console-intro', out);
+}
+
+// Abstracción demo
+function runAbstraccion() {
+  class Figura { calcularArea() { throw new Error("Abstracto"); } }
+  class Circulo extends Figura {
+    constructor(radio) { super(); this.radio = radio; }
+    calcularArea() { return (Math.PI * this.radio ** 2).toFixed(2); }
+  }
+  const c = new Circulo(5);
+  let out = `> const c = new Circulo(5);\n> c.calcularArea()\n${c.calcularArea()}\n\n`;
+  try { new Figura().calcularArea(); } catch(e) { out += `> new Figura().calcularArea()\n⚠ Error: ${e.message}`; }
+  log('console-abs', out);
+}
+
+// Encapsulamiento demo
+function runEncapsulamiento() {
+  class CuentaBancaria {
+    #saldo;
+    constructor(titular, saldoInicial) { this.titular = titular; this.#saldo = saldoInicial; }
+    depositar(monto) { if (monto > 0) this.#saldo += monto; }
+    getSaldo() { return this.#saldo; }
+  }
+  const cuenta = new CuentaBancaria("María", 1000);
+  let out = `> const cuenta = new CuentaBancaria("María", 1000)\n`;
+  out += `> cuenta.getSaldo()  →  $${cuenta.getSaldo()}\n`;
+  cuenta.depositar(500);
+  out += `> cuenta.depositar(500)\n> cuenta.getSaldo()  →  $${cuenta.getSaldo()}\n`;
+  try { out += `> cuenta.#saldo → `; eval('cuenta.#saldo'); } catch(e) { out += `⚠ Error: campo privado inaccesible`; }
+  log('console-enc', out);
+}
+
+// Herencia demo
+function runHerencia() {
+  class Animal { constructor(n) { this.nombre = n; } hablar() { return `${this.nombre} hace un sonido.`; } }
+  class Perro extends Animal { hablar() { return `${this.nombre} ladra: ¡Guau!`; } }
+  class Gato extends Animal { hablar() { return `${this.nombre} maulla: ¡Miau!`; } }
+  const animales = [new Animal("Genérico"), new Perro("Rex"), new Gato("Luna")];
+  const out = animales.map(a => `> ${a.constructor.name}.hablar() → ${a.hablar()}`).join('\n');
+  log('console-her', out);
+}
+
+// Polimorfismo demo
+function runPolimorfismo() {
+  class Forma { describir() { return "Soy una forma genérica."; } }
+  class Triangulo extends Forma { describir() { return "▲ Soy un Triángulo con 3 lados."; } }
+  class Cuadrado extends Forma { describir() { return "■ Soy un Cuadrado con 4 lados iguales."; } }
+  const formas = [new Forma(), new Triangulo(), new Cuadrado()];
+  const out = formas.map(f => `> ${f.constructor.name}.describir()\n  ${f.describir()}`).join('\n');
+  log('console-pol', out);
+}
+
+// ========== QUIZ SYSTEM ==========
+const quizMap = {
+  intro: { qs: ['q1','q2','q3'], rs: ['q1r','q2r','q3r'] },
+  abs:   { qs: ['q4','q5'],      rs: ['q4r','q5r'] },
+  enc:   { qs: ['q6','q7'],      rs: ['q6r','q7r'] },
+  her:   { qs: ['q8','q9'],      rs: ['q8r','q9r'] },
+  pol:   { qs: ['q10','q11'],    rs: ['q10r','q11r'] }
+};
+
+function checkQuiz(section) {
+  const { qs, rs } = quizMap[section];
+  qs.forEach((qName, i) => {
+    const selected = document.querySelector(`input[name="${qName}"]:checked`);
+    const resultEl = document.getElementById(rs[i]);
+    const correct = document.querySelector(`input[name="${qName}"]`).closest('.quiz-q').dataset.correct;
+    if (!selected) { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '⚠ Seleccioná una opción.'; return; }
+    if (selected.value === correct) { resultEl.className = 'quiz-result correct'; resultEl.textContent = '✔ ¡Correcto!'; }
+    else { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '✘ Incorrecto. Intentá de nuevo.'; }
+  });
+}
+
+// Add fadeIn animation
+const style = document.createElement('style');
+style.textContent = '@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(style);
+
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+
+</body>
+</html>
