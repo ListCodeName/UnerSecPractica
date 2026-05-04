@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingeniería de Prompts | Nuevas Tecnologías</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1e2d45;--accent:#6366f1;--accent2:#8b5cf6;--accent3:#06b6d4;--text:#e2e8f0;--text-muted:#94a3b8;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--card-glow:0 0 30px rgba(99,102,241,.15)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.7;overflow-x:hidden}
+        .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;text-align:center;padding:2rem}
+        .hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(99,102,241,.25) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(139,92,246,.2) 0%,transparent 60%)}
+        .grid-lines{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(99,102,241,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.05) 1px,transparent 1px);background-size:60px 60px}
+        .hero-content{position:relative;z-index:1;max-width:860px}
+        .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.4);border-radius:50px;padding:.4rem 1.2rem;font-size:.8rem;font-weight:600;color:#a5b4fc;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2rem;animation:fadeDown .6s ease}
+        .hero h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#e2e8f0 0%,#6366f1 50%,#8b5cf6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem;animation:fadeDown .7s ease .1s both}
+        .hero p{font-size:1.2rem;color:var(--text-muted);max-width:600px;margin:0 auto 3rem;animation:fadeDown .7s ease .2s both}
+        .hero-cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;animation:fadeDown .7s ease .3s both}
+        .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.8rem;border-radius:10px;font-weight:600;font-size:.95rem;cursor:pointer;transition:all .25s;border:none;text-decoration:none}
+        .btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.5)}
+        .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
+        .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+        nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,26,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:64px;transform:translateY(-100%);transition:transform .4s}
+        nav.visible{transform:translateY(0)}
+        .nav-logo{font-weight:700;color:#a5b4fc;margin-right:auto;font-size:.95rem}
+        .nav-links{display:flex;gap:1.5rem;list-style:none}
+        .nav-links a{color:var(--text-muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s}
+        .nav-links a:hover{color:#a5b4fc}
+        .container{max-width:1100px;margin:0 auto;padding:0 2rem}
+        section{padding:5rem 0}
+        .section-label{display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#6366f1;margin-bottom:1rem}
+        .section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:1rem}
+        .section-desc{color:var(--text-muted);max-width:640px;font-size:1.05rem}
+        .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;margin-top:3rem}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;position:relative;overflow:hidden;transition:all .3s}
+        .card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;background:linear-gradient(135deg,rgba(99,102,241,.08),transparent)}
+        .card:hover{transform:translateY(-4px);box-shadow:var(--card-glow);border-color:rgba(99,102,241,.4)}
+        .card:hover::before{opacity:1}
+        .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem}
+        .card h3{font-size:1.1rem;font-weight:700;margin-bottom:.6rem}
+        .card p{color:var(--text-muted);font-size:.92rem}
+        .card-tag{display:inline-block;margin-top:1rem;padding:.25rem .75rem;border-radius:50px;font-size:.75rem;font-weight:600}
+        .accordion{margin-top:2.5rem;display:flex;flex-direction:column;gap:1rem}
+        .acc-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+        .acc-head{display:flex;align-items:center;gap:1rem;padding:1.25rem 1.5rem;cursor:pointer;font-weight:600;font-size:1rem;user-select:none;transition:background .2s}
+        .acc-head:hover{background:var(--surface2)}
+        .acc-head .num{font-family:'JetBrains Mono',monospace;color:#6366f1;font-size:.85rem}
+        .acc-head .icon{margin-left:auto;transition:transform .3s}
+        .acc-head.open .icon{transform:rotate(45deg)}
+        .acc-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+        .acc-body.open{max-height:2000px}
+        .acc-inner{padding:0 1.5rem 1.5rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:1.25rem}
+        .acc-inner p{margin-bottom:.75rem}
+        .acc-inner ul,.acc-inner ol{padding-left:1.4rem}
+        .acc-inner li{margin-bottom:.4rem}
+        .acc-inner strong{color:var(--text)}
+        .tipos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;margin-top:2.5rem}
+        .tipo-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;border-left:4px solid var(--accent);transition:all .3s}
+        .tipo-card:hover{transform:translateX(4px);border-left-color:#a5b4fc}
+        .tipo-card h4{font-weight:700;margin-bottom:.5rem;color:#a5b4fc}
+        .tipo-card p{color:var(--text-muted);font-size:.9rem}
+
+        /* ─── COMPARADOR DE PROMPTS ─── */
+        .prompt-compare{margin-top:2.5rem;display:flex;flex-direction:column;gap:2rem}
+        .prompt-example{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden}
+        .prompt-example::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+        .prompt-example.bad::before{background:linear-gradient(90deg,#ef4444,#f87171)}
+        .prompt-example.good::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+        .prompt-example.excellent::before{background:linear-gradient(90deg,#10b981,#34d399)}
+        .prompt-level{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .9rem;border-radius:50px;font-size:.78rem;font-weight:700;letter-spacing:.05em;margin-bottom:1rem}
+        .prompt-level.bad{background:rgba(239,68,68,.15);color:#fca5a5}
+        .prompt-level.good{background:rgba(245,158,11,.15);color:#fcd34d}
+        .prompt-level.excellent{background:rgba(16,185,129,.15);color:#6ee7b7}
+        .prompt-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:#c4b5fd;margin:.75rem 0;line-height:1.6;position:relative}
+        .prompt-box::before{content:'PROMPT';position:absolute;top:-.5rem;left:1rem;background:var(--bg);padding:0 .5rem;font-size:.65rem;color:var(--text-muted);letter-spacing:.1em}
+        .prompt-analysis{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+        .prompt-analysis .tag{padding:.25rem .7rem;border-radius:50px;font-size:.72rem;font-weight:600}
+        .tag-missing{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+        .tag-present{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+        .tag-enhanced{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);color:#a5b4fc}
+
+        /* ─── CODE BLOCKS ─── */
+        .code-block{background:#0d1117;border:1px solid #21262d;border-radius:12px;padding:1.5rem;margin:1rem 0;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#c9d1d9;overflow-x:auto;line-height:1.7}
+        .code-block .comment{color:#8b949e}
+        .code-block .keyword{color:#ff7b72}
+        .code-block .string{color:#a5d6ff}
+        .code-block .accent{color:#d2a8ff}
+
+        /* ─── ACTIVIDAD ─── */
+        .actividad{background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.3);border-radius:20px;padding:3rem;margin-top:3rem;position:relative;overflow:hidden}
+        .actividad::before{content:'🧩';position:absolute;right:2rem;top:2rem;font-size:4rem;opacity:.1}
+        .act-title{font-size:1.5rem;font-weight:800;margin-bottom:1rem;color:#a5b4fc}
+        .act-desc{color:var(--text-muted);margin-bottom:2rem}
+        .act-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+        .act-item{background:rgba(10,14,26,.5);border:1px solid var(--border);border-radius:12px;padding:1.2rem}
+        .act-item h4{font-size:.95rem;font-weight:700;margin-bottom:.75rem;color:var(--text)}
+        .act-item p{color:var(--text-muted);font-size:.88rem;margin-bottom:.75rem}
+        .act-item .keywords{display:flex;flex-wrap:wrap;gap:.4rem}
+        .kw{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.3);color:#67e8f9;padding:.18rem .6rem;border-radius:50px;font-size:.72rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+        .act-instrucciones{margin-top:2rem;background:rgba(10,14,26,.6);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+        .act-instrucciones h4{color:#a5b4fc;font-weight:700;margin-bottom:.75rem}
+        .act-instrucciones ol{padding-left:1.4rem;color:var(--text-muted)}
+        .act-instrucciones li{margin-bottom:.5rem}
+
+        /* ─── QUIZ ─── */
+        .quiz-section{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;margin-top:3rem}
+        .quiz-title{font-size:1.3rem;font-weight:800;margin-bottom:.5rem}
+        .quiz-sub{color:var(--text-muted);margin-bottom:2rem}
+        .quiz-q{margin-bottom:2rem}
+        .quiz-q p{font-weight:600;margin-bottom:1rem}
+        .quiz-opts{display:flex;flex-direction:column;gap:.6rem}
+        .quiz-opt{display:flex;align-items:center;gap:.75rem;padding:1rem 1.2rem;background:var(--bg);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:.95rem}
+        .quiz-opt:hover{border-color:#6366f1;background:rgba(99,102,241,.08)}
+        .quiz-opt.correct{border-color:var(--success);background:rgba(16,185,129,.12)}
+        .quiz-opt.wrong{border-color:var(--danger);background:rgba(239,68,68,.1)}
+        .quiz-opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+        .quiz-feedback{margin-top:1rem;padding:.75rem 1rem;border-radius:8px;font-size:.9rem;font-weight:600;display:none}
+        .quiz-feedback.show{display:block}
+        .quiz-feedback.ok{background:rgba(16,185,129,.15);color:#34d399}
+        .quiz-feedback.no{background:rgba(239,68,68,.1);color:#f87171}
+        .quiz-score{text-align:center;padding:2rem;display:none}
+        .quiz-score.show{display:block}
+        .score-num{font-size:3rem;font-weight:800;color:#a5b4fc}
+        .btn-quiz{margin-top:1.5rem}
+        .progress-bar{height:6px;background:var(--border);border-radius:3px;margin-top:1rem;overflow:hidden}
+        .progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width .4s}
+        footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-muted);font-size:.85rem}
+        @keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+        .fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+        .fade-in.visible{opacity:1;transform:none}
+        .particles{position:absolute;inset:0;z-index:0;pointer-events:none}
+        .p{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.6),transparent);animation:float linear infinite}
+        @keyframes float{0%{transform:translateY(0) scale(1);opacity:.6}50%{opacity:.2}100%{transform:translateY(-120vh) scale(.3);opacity:0}}
+
+        /* ─── SECTOR CARDS (reutilizado para tips) ─── */
+        .sectors{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:2.5rem}
+        .sector-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;position:relative;overflow:hidden;transition:all .3s}
+        .sector-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--g)}
+        .sector-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+        .s-icon{font-size:2.2rem;margin-bottom:1rem}
+        .sector-card h3{font-size:1.1rem;font-weight:700;margin-bottom:.75rem}
+        .sector-card p{color:var(--text-muted);font-size:.9rem;margin-bottom:1rem}
+        .s-examples{display:flex;flex-wrap:wrap;gap:.5rem}
+        .s-tag{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#a5b4fc;padding:.2rem .65rem;border-radius:50px;font-size:.75rem;font-weight:600}
+        @media(max-width:640px){.hero h1{font-size:2.2rem}section{padding:3.5rem 0}.actividad{padding:1.75rem}.nav-links{display:none}}
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+    <span class="nav-logo">✨ Prompts · Nuevas Tecnologías</span>
+    <ul class="nav-links">
+        <li><a href="#que-es">Conceptos</a></li>
+        <li><a href="#ejemplos">Ejemplos</a></li>
+        <li><a href="#programacion">Programación</a></li>
+        <li><a href="#actividad">Actividad</a></li>
+        <li><a href="#quiz">Quiz</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+    <div class="hero-bg"></div>
+    <div class="grid-lines"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-content">
+        <div class="hero-badge">⚡ Nuevas Tecnologías · Unidad 2</div>
+        <h1>Ingeniería<br>de Prompts</h1>
+        <p>Dominá el arte de comunicarte con las IAs. Aprendé a formular instrucciones claras, precisas y eficientes para obtener los mejores resultados.</p>
+        <div class="hero-cta">
+            <a href="#que-es" class="btn btn-primary">▶ Comenzar</a>
+            <a href="#actividad" class="btn btn-ghost">🧩 Ver Actividad</a>
+        </div>
+    </div>
+</section>
+
+<!-- 2.1 QUÉ ES UN PROMPT -->
+<section id="que-es">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">📌 2.1</span>
+            <h2 class="section-title">¿Qué es un Prompt?</h2>
+            <p class="section-desc">Un prompt es la instrucción o mensaje que le enviamos a una Inteligencia Artificial para que genere una respuesta. Es nuestra forma de "hablar" con la máquina.</p>
+        </div>
+        <div class="accordion fade-in">
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">01</span> Definición de Prompt
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Un <strong>prompt</strong> (del inglés, "indicación" o "instrucción") es el texto que ingresamos en una herramienta de IA generativa para pedirle que realice una tarea. Puede ser una pregunta, una orden, una descripción o una combinación de todo eso.</p>
+                        <p>El prompt es el <strong>punto de partida</strong> de toda interacción con una IA. La calidad de lo que obtenemos depende directamente de la calidad de lo que pedimos.</p>
+                        <ul>
+                            <li><strong>Entrada:</strong> el texto que escribimos (el prompt).</li>
+                            <li><strong>Procesamiento:</strong> la IA interpreta, descompone y analiza nuestra instrucción.</li>
+                            <li><strong>Salida:</strong> la respuesta generada por la IA basándose en el prompt.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">02</span> ¿Por qué "Ingeniería" de Prompts?
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Se lo llama <strong>ingeniería</strong> porque no se trata de simplemente "preguntar algo", sino de <strong>diseñar, estructurar y optimizar</strong> las instrucciones de forma metódica para obtener el mejor resultado posible.</p>
+                        <p>Al igual que un ingeniero diseña un puente considerando materiales, fuerzas y contexto, un <strong>ingeniero de prompts</strong> diseña sus instrucciones considerando:</p>
+                        <ul>
+                            <li><strong>Claridad:</strong> que la IA entienda exactamente qué se pide.</li>
+                            <li><strong>Contexto:</strong> proveer la información de fondo necesaria.</li>
+                            <li><strong>Especificidad:</strong> delimitar el alcance de la respuesta.</li>
+                            <li><strong>Formato:</strong> indicar cómo queremos la respuesta (lista, tabla, código, etc.).</li>
+                            <li><strong>Iteración:</strong> refinar el prompt basándose en las respuestas obtenidas.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">03</span> El Contexto: la clave para las IAs
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Las IAs generativas <strong>no piensan ni tienen memoria persistente</strong> entre conversaciones. Cada interacción comienza desde cero. Por eso, el <strong>contexto</strong> que proporcionamos en el prompt es fundamental.</p>
+                        <p>El contexto le dice a la IA:</p>
+                        <ul>
+                            <li><strong>Quién sos:</strong> "Soy un estudiante de secundaria de 4to año..."</li>
+                            <li><strong>Qué necesitás:</strong> "Necesito entender el concepto de..."</li>
+                            <li><strong>Para qué:</strong> "Para un trabajo práctico de la materia..."</li>
+                            <li><strong>Restricciones:</strong> "La respuesta debe tener máximo 200 palabras..."</li>
+                            <li><strong>Rol de la IA:</strong> "Actuá como un profesor de programación..."</li>
+                        </ul>
+                        <p>Sin contexto, la IA "adivina" lo que querés y los resultados son genéricos. Con buen contexto, las respuestas son <strong>precisas, relevantes y útiles</strong>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">04</span> Los 5 Elementos de un buen Prompt
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Todo prompt efectivo combina estos elementos (no todos son obligatorios, pero cuantos más uses, mejor será el resultado):</p>
+                        <ol>
+                            <li><strong>Rol:</strong> Asignar una identidad a la IA → "Actuá como un experto en..."</li>
+                            <li><strong>Tarea:</strong> Describir claramente qué querés → "Explicame...", "Creá un...", "Compará..."</li>
+                            <li><strong>Contexto:</strong> Dar información de fondo → "Para una clase de 4to año de secundaria..."</li>
+                            <li><strong>Formato:</strong> Especificar cómo querés la respuesta → "En formato de lista con ejemplos..."</li>
+                            <li><strong>Restricciones:</strong> Definir límites → "Máximo 300 palabras, en español neutro..."</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2.2 EJEMPLOS COMPARATIVOS -->
+<section id="ejemplos" style="background:var(--surface);padding:5rem 0;">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🎯 2.2</span>
+            <h2 class="section-title">Anatomía de un Prompt: de Malo a Excelente</h2>
+            <p class="section-desc">Veamos el mismo tema — <strong>"crear una página web para un emprendimiento de pastelería"</strong> — abordado con tres niveles de calidad de prompt.</p>
+        </div>
+        <div class="prompt-compare fade-in">
+            <!-- MALO -->
+            <div class="prompt-example bad">
+                <span class="prompt-level bad">❌ Prompt Malo</span>
+                <h3>Sin dirección, sin contexto</h3>
+                <div class="prompt-box">haceme una pagina web de pasteleria</div>
+                <p style="color:var(--text-muted);font-size:.92rem;margin-top:.75rem">
+                    <strong style="color:#fca5a5">¿Qué pasa?</strong> La IA no sabe qué tipo de página, qué estilo visual, qué contenido incluir, ni para qué plataforma. Generará algo genérico, probablemente incompleto, que no se ajustará a ninguna necesidad real.
+                </p>
+                <div class="prompt-analysis">
+                    <span class="tag tag-missing">✗ Sin rol asignado</span>
+                    <span class="tag tag-missing">✗ Sin contexto</span>
+                    <span class="tag tag-missing">✗ Sin formato esperado</span>
+                    <span class="tag tag-missing">✗ Sin restricciones</span>
+                    <span class="tag tag-missing">✗ Tarea vaga</span>
+                </div>
+            </div>
+
+            <!-- BUENO -->
+            <div class="prompt-example good">
+                <span class="prompt-level good">⚡ Prompt Bueno</span>
+                <h3>Claro pero mejorable</h3>
+                <div class="prompt-box">Creá el código HTML y CSS de una página web para una pastelería llamada "Dulce María". Debe tener un header con el logo, una sección de productos con fotos y precios, y un formulario de contacto. Usá colores pastel rosados.</div>
+                <p style="color:var(--text-muted);font-size:.92rem;margin-top:.75rem">
+                    <strong style="color:#fcd34d">Mejor, pero...</strong> Incluye la tarea clara y algo de formato, pero no define el público objetivo, no asigna un rol a la IA, no indica nivel de complejidad técnica ni restricciones de extensión.
+                </p>
+                <div class="prompt-analysis">
+                    <span class="tag tag-missing">✗ Sin rol</span>
+                    <span class="tag tag-present">✓ Tarea clara</span>
+                    <span class="tag tag-present">✓ Formato parcial</span>
+                    <span class="tag tag-missing">✗ Sin contexto de nivel</span>
+                    <span class="tag tag-missing">✗ Sin restricciones técnicas</span>
+                </div>
+            </div>
+
+            <!-- EXCELENTE -->
+            <div class="prompt-example excellent">
+                <span class="prompt-level excellent">🏆 Prompt Excelente</span>
+                <h3>Completo, estructurado, eficiente</h3>
+                <div class="prompt-box">Actuá como un desarrollador web frontend senior.<br><br>Necesito que crees una landing page completa en HTML y CSS para una pastelería artesanal llamada "Dulce María", ubicada en Paraná, Entre Ríos.<br><br><strong style="color:#6ee7b7">Contexto:</strong> Es un emprendimiento familiar que vende tortas personalizadas, cupcakes y mesa dulce para eventos. El público objetivo son mujeres de 25 a 45 años.<br><br><strong style="color:#6ee7b7">Secciones requeridas:</strong><br>1. Hero con imagen de fondo y slogan<br>2. Catálogo de productos (6 items con nombre, descripción corta y precio)<br>3. Sección "Sobre Nosotros" con historia del emprendimiento<br>4. Formulario de pedidos (nombre, teléfono, tipo de producto, fecha del evento)<br>5. Footer con redes sociales y WhatsApp<br><br><strong style="color:#6ee7b7">Restricciones:</strong><br>- Diseño responsive (mobile-first)<br>- Paleta: rosa pastel (#f8b4c8), blanco y dorado<br>- Tipografía: Google Fonts (Playfair Display + Lato)<br>- Solo HTML + CSS, sin frameworks<br>- Código limpio y comentado</div>
+                <p style="color:var(--text-muted);font-size:.92rem;margin-top:.75rem">
+                    <strong style="color:#6ee7b7">Resultado óptimo.</strong> La IA tiene toda la información necesaria para generar exactamente lo que necesitás, a la primera. Ahorra tiempo, iteraciones y frustración.
+                </p>
+                <div class="prompt-analysis">
+                    <span class="tag tag-present">✓ Rol asignado</span>
+                    <span class="tag tag-present">✓ Tarea específica</span>
+                    <span class="tag tag-present">✓ Contexto completo</span>
+                    <span class="tag tag-present">✓ Formato detallado</span>
+                    <span class="tag tag-present">✓ Restricciones claras</span>
+                    <span class="tag tag-enhanced">★ Público objetivo</span>
+                    <span class="tag tag-enhanced">★ Datos reales</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2.3 PROMPTS PARA PROGRAMAR -->
+<section id="programacion">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">💻 2.3</span>
+            <h2 class="section-title">Prompts para Programación</h2>
+            <p class="section-desc">Cómo aprovechar la IA como asistente de desarrollo: conceptos básicos y recomendaciones prácticas.</p>
+        </div>
+
+        <div class="cards-grid fade-in">
+            <div class="card">
+                <div class="card-icon" style="background:rgba(99,102,241,.15)">🧱</div>
+                <h3>Divide y Vencerás</h3>
+                <p>No pidas "haceme una app completa". Dividí el problema en partes: primero la estructura HTML, luego los estilos, después la lógica. La IA trabaja mejor con tareas acotadas.</p>
+                <span class="card-tag" style="background:rgba(99,102,241,.15);color:#a5b4fc">Estrategia</span>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:rgba(6,182,212,.15)">📋</div>
+                <h3>Especificá el Lenguaje</h3>
+                <p>Siempre indicá el lenguaje y las tecnologías: "en JavaScript vanilla", "usando Python 3.11", "con HTML semántico y CSS Grid". La IA adapta las soluciones al stack indicado.</p>
+                <span class="card-tag" style="background:rgba(6,182,212,.15);color:#67e8f9">Precisión</span>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:rgba(16,185,129,.15)">🔍</div>
+                <h3>Pedí Explicaciones</h3>
+                <p>Agregá "explicame línea por línea" o "agregá comentarios al código". No solo obtenés la solución: aprendés <em>por qué</em> funciona. Ideal para estudiantes.</p>
+                <span class="card-tag" style="background:rgba(16,185,129,.15);color:#34d399">Aprendizaje</span>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:rgba(245,158,11,.15)">🐛</div>
+                <h3>Debugging con IA</h3>
+                <p>Pegá tu código con el error y decí: "Este código me da [error exacto]. Explicame por qué falla y corregilo manteniendo la misma lógica." Contexto + error = solución rápida.</p>
+                <span class="card-tag" style="background:rgba(245,158,11,.15);color:#fcd34d">Debug</span>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:rgba(139,92,246,.15)">🔄</div>
+                <h3>Iterá sobre la Respuesta</h3>
+                <p>Si la primera respuesta no es perfecta, refiná: "Ahora modificá la función para que también acepte números negativos" o "Cambiá el diseño a modo oscuro." La conversación es iterativa.</p>
+                <span class="card-tag" style="background:rgba(139,92,246,.15);color:#c4b5fd">Iteración</span>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:rgba(239,68,68,.15)">⚠️</div>
+                <h3>Verificá Siempre</h3>
+                <p>La IA puede generar código que "parece" correcto pero tiene errores lógicos. Siempre probá el código, entendé qué hace, y no copies sin comprender. La IA es tu asistente, no tu reemplazo.</p>
+                <span class="card-tag" style="background:rgba(239,68,68,.15);color:#fca5a5">Importante</span>
+            </div>
+        </div>
+
+        <!-- Ejemplo práctico de prompt de programación -->
+        <div class="fade-in" style="margin-top:3rem">
+            <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:1.5rem">📝 Ejemplo: Prompt de Programación Efectivo</h3>
+            <div class="prompt-example excellent" style="border-color:rgba(99,102,241,.3)">
+                <span class="prompt-level excellent">💻 Prompt para Código</span>
+                <div class="prompt-box">Actuá como profesor de programación web para alumnos de secundaria.<br><br>Necesito una función en JavaScript vanilla que:<br>1. Reciba un array de números<br>2. Filtre solo los números pares<br>3. Los ordene de menor a mayor<br>4. Devuelva el resultado<br><br>Requisitos:<br>- Usá arrow functions<br>- Agregá comentarios explicando cada paso<br>- Mostrá un ejemplo de uso con console.log<br>- Explicá brevemente qué hace cada método usado (filter, sort)</div>
+                <p style="color:var(--text-muted);font-size:.92rem;margin-top:1rem">Este prompt produce código limpio, educativo y reutilizable. El alumno no solo obtiene la solución, sino que <strong style="color:var(--text)">aprende los conceptos</strong> detrás de cada línea.</p>
+            </div>
+        </div>
+
+        <!-- Tips rápidos -->
+        <div class="tipos-grid fade-in" style="margin-top:3rem">
+            <div class="tipo-card">
+                <h4>🎭 Asigná un Rol Técnico</h4>
+                <p>"Actuá como desarrollador senior en React" produce código más profesional que un prompt genérico.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#8b5cf6">
+                <h4>📐 Definí la Arquitectura</h4>
+                <p>"Usá el patrón MVC", "Separar lógica de presentación", "Implementá con módulos ES6".</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#06b6d4">
+                <h4>🧪 Pedí Tests</h4>
+                <p>"Agregá 3 casos de prueba que validen la función" asegura que el código sea robusto.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#10b981">
+                <h4>📖 Pedí Alternativas</h4>
+                <p>"Mostrá 2 formas diferentes de resolver esto" amplía tu conocimiento de los enfoques posibles.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2.4 ACTIVIDAD INTEGRADORA -->
+<section id="actividad" style="background:var(--surface);padding:5rem 0;">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🧩 Actividad Integradora</span>
+            <h2 class="section-title">Desafío: Resolvé un Problema Real con Prompts</h2>
+            <p class="section-desc">En esta actividad vas a abordar una problemática real desde múltiples ángulos, refinando tus prompts progresivamente.</p>
+        </div>
+        <div class="actividad fade-in">
+            <div class="act-title">🎯 Caso: Sistema de Gestión para una Biblioteca Escolar</div>
+            <div class="act-desc">
+                <strong>Escenario:</strong> Tu escuela necesita un sistema digital para gestionar el préstamo de libros de la biblioteca. Actualmente todo se registra en papel y los libros se pierden, no se sabe quién los tiene, ni cuáles están disponibles. Tu tarea es <strong>diseñar la solución utilizando IA como asistente</strong>, dividiendo el problema en sub-problemas y atacando cada uno con prompts específicos.
+            </div>
+            <div class="act-grid">
+                <div class="act-item">
+                    <h4>📊 Ángulo 1: Análisis del Problema</h4>
+                    <p>Usá la IA para identificar todas las problemáticas del sistema actual y definir los requerimientos del nuevo sistema.</p>
+                    <div class="keywords">
+                        <span class="kw">relevamiento</span>
+                        <span class="kw">requerimientos</span>
+                        <span class="kw">usuarios</span>
+                        <span class="kw">problemas actuales</span>
+                    </div>
+                </div>
+                <div class="act-item">
+                    <h4>🗃️ Ángulo 2: Diseño de Datos</h4>
+                    <p>Pedile a la IA que diseñe la estructura de datos: ¿qué información guardar de cada libro, alumno, préstamo?</p>
+                    <div class="keywords">
+                        <span class="kw">base de datos</span>
+                        <span class="kw">entidades</span>
+                        <span class="kw">relaciones</span>
+                        <span class="kw">campos</span>
+                    </div>
+                </div>
+                <div class="act-item">
+                    <h4>🎨 Ángulo 3: Interfaz de Usuario</h4>
+                    <p>Diseñá con IA las pantallas principales: búsqueda de libros, registro de préstamo, panel del bibliotecario.</p>
+                    <div class="keywords">
+                        <span class="kw">wireframe</span>
+                        <span class="kw">HTML/CSS</span>
+                        <span class="kw">usabilidad</span>
+                        <span class="kw">responsive</span>
+                    </div>
+                </div>
+                <div class="act-item">
+                    <h4>⚙️ Ángulo 4: Lógica y Reglas</h4>
+                    <p>Definí con IA las reglas del negocio: ¿cuántos libros puede llevar un alumno? ¿Cuántos días tiene? ¿Qué pasa si no devuelve?</p>
+                    <div class="keywords">
+                        <span class="kw">reglas de negocio</span>
+                        <span class="kw">validaciones</span>
+                        <span class="kw">flujo de trabajo</span>
+                        <span class="kw">notificaciones</span>
+                    </div>
+                </div>
+            </div>
+            <div class="act-instrucciones">
+                <h4>📌 Instrucciones de Entrega</h4>
+                <ol>
+                    <li><strong>Elegí al menos 3 de los 4 ángulos</strong> para desarrollar.</li>
+                    <li>Para cada ángulo, escribí <strong>al menos 2 prompts progresivos</strong>: uno inicial y otro refinado basado en la respuesta obtenida.</li>
+                    <li>Documentá tanto tus prompts como las respuestas de la IA. Marcá qué elementos del prompt (rol, contexto, formato, restricciones) usaste en cada uno.</li>
+                    <li><strong>Identificá al menos 2 errores o respuestas insuficientes</strong> que la IA te haya dado, y explicá cómo refinaste el prompt para mejorar el resultado.</li>
+                    <li>Escribí una <strong>reflexión final</strong> (mínimo 10 líneas) sobre qué aprendiste del proceso de refinamiento de prompts y cómo cambió tu forma de interactuar con la IA.</li>
+                    <li>Formato de entrega: documento digital (Google Docs, PDF o HTML) con capturas de pantalla de las conversaciones.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🧪 Autoevaluación</span>
+            <h2 class="section-title">Quiz: Ingeniería de Prompts</h2>
+            <p class="section-desc">Verificá cuánto aprendiste sobre la creación de prompts efectivos.</p>
+        </div>
+        <div class="quiz-section fade-in">
+            <div class="quiz-title">Quiz · Prompts</div>
+            <div class="quiz-sub">Respondé las siguientes preguntas. Obtendrás retroalimentación inmediata.</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="quizProgress" style="width:0%"></div>
+            </div>
+            <div id="quizContainer"></div>
+            <div class="quiz-score" id="quizScore">
+                <div style="font-size:1.1rem;color:var(--text-muted);margin-bottom:.5rem">Tu puntaje final</div>
+                <div class="score-num" id="scoreNum">0/6</div>
+                <div style="color:var(--text-muted);margin-top:.5rem" id="scoreFeedback"></div>
+                <button class="btn btn-primary btn-quiz" onclick="initQuiz()">🔄 Reintentar</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>📚 Nuevas Tecnologías · Unidad 2: Ingeniería de Prompts &nbsp;|&nbsp; Material de estudio interactivo</p>
+</footer>
+
+<script>
+// ─── PARTICLES ───
+(function(){
+    const c=document.getElementById('particles');
+    for(let i=0;i<18;i++){
+        const p=document.createElement('div');
+        p.className='p';
+        const s=Math.random()*80+20;
+        p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100+100}%;opacity:${Math.random()*.4+.1};animation-duration:${Math.random()*20+15}s;animation-delay:${Math.random()*10}s`;
+        c.appendChild(p);
+    }
+})();
+
+// ─── NAV SCROLL ───
+window.addEventListener('scroll',()=>{
+    document.getElementById('mainNav').classList.toggle('visible',window.scrollY>80);
+});
+
+// ─── ACCORDION ───
+function toggleAcc(head){
+    const body=head.nextElementSibling;
+    const isOpen=head.classList.toggle('open');
+    body.classList.toggle('open',isOpen);
+}
+
+// ─── FADE IN ON SCROLL ───
+const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+// ─── QUIZ ───
+const questions=[
+    {
+        q:"¿Qué es un prompt en el contexto de la IA?",
+        opts:["Un programa de computación","La instrucción o mensaje que le enviamos a la IA","El resultado que nos devuelve la IA","Un tipo de lenguaje de programación"],
+        ans:1,
+        feedback:"El prompt es la entrada que le damos a la IA para que genere una respuesta."
+    },
+    {
+        q:"¿Por qué se lo llama 'ingeniería' de prompts?",
+        opts:["Porque requiere título de ingeniero","Porque implica diseñar y optimizar instrucciones de forma metódica","Porque solo sirve para programar","Porque lo inventó un ingeniero"],
+        ans:1,
+        feedback:"Se llama ingeniería porque requiere diseño, estructura y optimización metódica, igual que cualquier disciplina de ingeniería."
+    },
+    {
+        q:"¿Cuáles son los 5 elementos clave de un buen prompt?",
+        opts:["Título, cuerpo, firma, fecha, adjunto","Rol, tarea, contexto, formato, restricciones","Sujeto, verbo, predicado, complemento, adverbio","Entrada, proceso, salida, error, debug"],
+        ans:1,
+        feedback:"Los 5 elementos son: Rol, Tarea, Contexto, Formato y Restricciones."
+    },
+    {
+        q:"¿Cuál de estos es un ejemplo de prompt MALO?",
+        opts:["'Actuá como experto en nutrición y creá un plan semanal para un deportista de 25 años'","'haceme algo de comida'","'Listá 5 recetas vegetarianas con menos de 500 calorías, en formato de tabla'","'Explicame la diferencia entre proteínas y carbohidratos para un trabajo de biología de secundaria'"],
+        ans:1,
+        feedback:"'haceme algo de comida' es vago, sin contexto, sin formato y sin especificidad. La IA no tiene información para generar algo útil."
+    },
+    {
+        q:"Al pedir código a una IA, ¿cuál es la mejor estrategia?",
+        opts:["Pedir toda la aplicación de una vez para ahorrar tiempo","Dividir el problema en partes pequeñas y pedir cada una por separado","No dar detalles para que la IA sea más creativa","Copiar el código sin leerlo porque la IA no se equivoca"],
+        ans:1,
+        feedback:"Divide y Vencerás: la IA trabaja mucho mejor con tareas acotadas y específicas. Además, siempre debés verificar el código."
+    },
+    {
+        q:"¿Por qué es importante dar contexto a la IA?",
+        opts:["No es importante, la IA ya sabe todo","Porque las IAs no tienen memoria persistente y necesitan toda la info en cada conversación","Para que la IA tarde más en responder","Solo es necesario cuando se pide código"],
+        ans:1,
+        feedback:"Las IAs no tienen memoria entre conversaciones. El contexto les permite entender tu situación y generar respuestas relevantes."
+    }
+];
+
+let answers=[];
+let current=0;
+
+function initQuiz(){
+    answers=[];
+    current=0;
+    document.getElementById('quizScore').classList.remove('show');
+    document.getElementById('quizProgress').style.width='0%';
+    renderQuestion();
+}
+
+function renderQuestion(){
+    const qc=document.getElementById('quizContainer');
+    const q=questions[current];
+    qc.innerHTML=`
+    <div class="quiz-q" id="qBlock">
+      <p>${current+1}. ${q.q}</p>
+      <div class="quiz-opts">${q.opts.map((o,i)=>`
+          <div class="quiz-opt" onclick="selectOpt(this,${i})" data-idx="${i}">
+            <div class="dot">${String.fromCharCode(65+i)}</div>${o}
+          </div>`).join('')
+    }</div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+    </div>`;
+}
+
+function selectOpt(el,idx){
+    const q=questions[current];
+    const opts=document.querySelectorAll('.quiz-opt');
+    opts.forEach(o=>o.onclick=null);
+    const fb=document.getElementById('qFeedback');
+    const correct=idx===q.ans;
+    answers.push(correct);
+    opts[q.ans].classList.add('correct');
+    if(!correct)el.classList.add('wrong');
+    fb.textContent=correct?'✅ '+q.feedback:'❌ La respuesta correcta es: '+q.opts[q.ans]+'. '+q.feedback;
+    fb.className='quiz-feedback show '+(correct?'ok':'no');
+    const pct=((current+1)/questions.length)*100;
+    document.getElementById('quizProgress').style.width=pct+'%';
+    setTimeout(()=>{
+        current++;
+        if(current<questions.length){renderQuestion();}else{showScore();}
+    },2200);
+}
+
+function showScore(){
+    const score=answers.filter(Boolean).length;
+    document.getElementById('quizContainer').innerHTML='';
+    document.getElementById('scoreNum').textContent=score+'/'+questions.length;
+    const msgs=['Seguí practicando. 💪','Buen comienzo. 📖','Vas bien, repasá los conceptos. 🔄','Muy bien. 🎯','¡Excelente trabajo! 🌟','¡Perfecto! Dominás el tema. 🏆'];
+    document.getElementById('scoreFeedback').textContent=msgs[Math.min(score,msgs.length-1)];
+    document.getElementById('quizScore').classList.add('show');
+}
+
+initQuiz();
+</script>
+</body>
+</html>
