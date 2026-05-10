@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unidad 3 - Manejo de Errores en JavaScript</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2234;
+  --accent-cyan: #00e5ff;
+  --accent-magenta: #e040fb;
+  --accent-gold: #ffd740;
+  --accent-green: #69f0ae;
+  --text-primary: #e8eaf6;
+  --text-secondary: #90a4ae;
+  --glass: rgba(26,34,52,0.75);
+  --glow-cyan: 0 0 20px rgba(0,229,255,0.3);
+  --glow-magenta: 0 0 20px rgba(224,64,251,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 50%,rgba(0,229,255,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 20%,rgba(224,64,251,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 80%,rgba(255,215,64,0.04) 0%,transparent 50%);
+  pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%2300e5ff' stroke-width='.5'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;}
+
+.floater{position:fixed;pointer-events:none;z-index:0;opacity:.12;}
+.floater-1{top:10%;left:5%;width:80px;height:80px;background:var(--accent-cyan);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);animation:floatA 8s ease-in-out infinite;}
+.floater-2{top:30%;right:8%;width:60px;height:60px;background:var(--accent-magenta);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);animation:floatB 10s ease-in-out infinite;}
+.floater-3{bottom:20%;left:10%;width:50px;height:50px;background:var(--accent-gold);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:floatA 12s ease-in-out infinite reverse;}
+.floater-4{top:60%;right:5%;width:70px;height:70px;background:var(--accent-green);clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);animation:floatB 9s ease-in-out infinite;}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-30px) rotate(15deg);}}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(20px) rotate(-10deg);}}
+
+.container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1;}
+.section-title{position:relative;display:inline-block;margin-bottom:30px;padding:14px 40px 14px 50px;
+  font-size:1.6em;font-weight:700;letter-spacing:1px;color:#fff;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);
+  text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.section-title i{margin-right:10px;}
+.section-title::after{content:'';position:absolute;inset:2px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(224,64,251,0.15));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);}
+.sub-title{position:relative;display:inline-block;margin:25px 0 15px;padding:8px 30px 8px 35px;
+  font-size:1.15em;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent-gold),#ff9100);
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);}
+.card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(0,229,255,0.12);
+  border-radius:16px;padding:30px;margin-bottom:30px;position:relative;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s;}
+.card:hover{border-color:rgba(0,229,255,0.3);box-shadow:var(--glow-cyan);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));}
+.code-block{background:#0d1117;border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:20px;
+  margin:15px 0;font-family:'Cascadia Code','Fira Code',monospace;font-size:.88em;
+  overflow-x:auto;line-height:1.8;position:relative;}
+.code-block::before{content:'JS';position:absolute;top:8px;right:12px;
+  font-size:.7em;color:var(--accent-gold);font-weight:700;letter-spacing:1px;
+  padding:2px 10px;border:1px solid rgba(255,215,64,0.3);border-radius:6px;}
+.code-block.error-block::before{content:'ERROR';color:#ff5252;border-color:rgba(255,82,82,0.3);}
+.kw{color:#ff7b72;}.str{color:#a5d6ff;}.cm{color:#8b949e;font-style:italic;}.fn{color:#d2a8ff;}.num{color:#79c0ff;}.cls{color:#ffa657;}.op{color:#ff7b72;}.prop{color:#7ee787;}
+.console-area{background:#0d1117;border:1px solid rgba(105,240,174,0.2);border-radius:10px;
+  padding:15px 20px;margin-top:10px;font-family:monospace;font-size:.9em;color:var(--accent-green);
+  min-height:45px;white-space:pre-wrap;position:relative;}
+.console-area::before{content:'▶ Consola';position:absolute;top:-10px;left:15px;
+  background:#0d1117;padding:0 8px;font-size:.75em;color:var(--accent-green);letter-spacing:1px;}
+.console-area.error-out{border-color:rgba(255,82,82,0.3);}
+.console-area.error-out::before{color:#ff5252;content:'⚠ Error';}
+.btn-run{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;margin:10px 5px;
+  background:linear-gradient(135deg,var(--accent-cyan),#0097a7);color:#000;font-weight:700;
+  border:none;border-radius:8px;cursor:pointer;font-size:.95em;
+  transition:transform .2s,box-shadow .2s;text-transform:uppercase;letter-spacing:1px;}
+.btn-run:hover{transform:translateY(-2px);box-shadow:var(--glow-cyan);}
+.btn-run:active{transform:scale(.97);}
+.btn-run i{font-size:.9em;}
+.concept-tag{display:inline-block;padding:6px 20px;margin:4px;font-size:.82em;font-weight:600;
+  color:#fff;background:var(--accent-magenta);
+  clip-path:polygon(10% 0%,90% 0%,100% 50%,90% 100%,10% 100%,0% 50%);transition:transform .2s;}
+.concept-tag:hover{transform:scale(1.08);}
+.concept-tag.cyan{background:var(--accent-cyan);color:#000;}
+.concept-tag.gold{background:var(--accent-gold);color:#000;}
+.concept-tag.green{background:var(--accent-green);color:#000;}
+
+/* Ranking */
+.rank-list{margin-top:20px;display:flex;flex-direction:column;gap:12px;}
+.rank-item{display:flex;align-items:flex-start;gap:16px;padding:18px;background:rgba(0,0,0,0.25);
+  border:1px solid rgba(0,229,255,0.1);border-radius:12px;transition:all .3s;}
+.rank-item:hover{border-color:rgba(0,229,255,0.3);transform:translateX(4px);}
+.rank-num{min-width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:1.1em;flex-shrink:0;}
+.rank-num.r1{background:linear-gradient(135deg,#ff5252,#d32f2f);color:#fff;}
+.rank-num.r2{background:linear-gradient(135deg,#ff7043,#e64a19);color:#fff;}
+.rank-num.r3{background:linear-gradient(135deg,#ffa726,#f57c00);color:#fff;}
+.rank-num.r4{background:linear-gradient(135deg,var(--accent-gold),#ffab00);color:#000;}
+.rank-num.r5{background:linear-gradient(135deg,var(--accent-cyan),#0097a7);color:#000;}
+.rank-num.r6{background:linear-gradient(135deg,var(--accent-green),#00c853);color:#000;}
+.rank-num.r7{background:linear-gradient(135deg,#7c4dff,#651fff);color:#fff;}
+.rank-num.r8{background:linear-gradient(135deg,var(--accent-magenta),#9c27b0);color:#fff;}
+.rank-body h4{font-size:1em;margin-bottom:4px;}
+.rank-body p{color:var(--text-secondary);font-size:.88em;}
+.rank-body code{background:rgba(0,229,255,0.1);padding:2px 7px;border-radius:4px;font-size:.85em;color:var(--accent-cyan);}
+
+.quiz{background:rgba(26,34,52,0.9);border:1px solid rgba(255,215,64,0.2);border-radius:14px;padding:25px;margin-top:25px;}
+.quiz h3{color:var(--accent-gold);margin-bottom:15px;font-size:1.1em;}
+.quiz-q{margin-bottom:20px;padding:15px;border-radius:10px;background:rgba(0,0,0,0.3);border-left:3px solid var(--accent-magenta);}
+.quiz-q p{font-weight:600;margin-bottom:10px;}
+.quiz-q label{display:block;padding:7px 14px;margin:4px 0;border-radius:8px;cursor:pointer;transition:background .2s;font-size:.92em;}
+.quiz-q label:hover{background:rgba(0,229,255,0.08);}
+.quiz-q input[type="radio"]{margin-right:8px;accent-color:var(--accent-cyan);}
+.quiz-result{padding:12px 20px;border-radius:8px;margin-top:10px;font-weight:700;display:none;}
+.quiz-result.correct{background:rgba(105,240,174,0.15);color:var(--accent-green);display:block;}
+.quiz-result.wrong{background:rgba(255,82,82,0.15);color:#ff5252;display:block;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(15px);
+  border-bottom:1px solid rgba(0,229,255,0.15);padding:10px 0;}
+nav .nav-inner{max-width:960px;margin:0 auto;display:flex;gap:8px;padding:0 20px;flex-wrap:wrap;justify-content:center;}
+nav a{color:var(--text-secondary);text-decoration:none;font-size:.82em;padding:6px 14px;border-radius:8px;
+  transition:all .3s;font-weight:500;}
+nav a:hover,nav a.active{color:var(--accent-cyan);background:rgba(0,229,255,0.08);}
+.hero{text-align:center;padding:60px 20px 40px;position:relative;}
+.hero h1{font-size:2.5em;font-weight:800;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;animation:shimmer 3s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
+.hero p{color:var(--text-secondary);font-size:1.1em;max-width:650px;margin:0 auto;}
+.hero-shape{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;
+  opacity:.04;clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));animation:floatA 6s ease-in-out infinite;}
+.highlight{color:var(--accent-cyan);font-weight:600;}
+.highlight-m{color:var(--accent-magenta);font-weight:600;}
+.highlight-g{color:var(--accent-gold);font-weight:600;}
+p+p{margin-top:12px;}
+section{padding:20px 0;scroll-margin-top:60px;}
+@media(max-width:768px){.section-title{font-size:1.2em;padding:10px 30px 10px 35px;}}
+</style>
+</head>
+<body>
+
+<div class="floater floater-1"></div>
+<div class="floater floater-2"></div>
+<div class="floater floater-3"></div>
+<div class="floater floater-4"></div>
+
+<nav><div class="nav-inner">
+  <a href="#intro"><i class="fas fa-bug"></i> ¿Qué es un error?</a>
+  <a href="#tipos"><i class="fas fa-layer-group"></i> Tipos</a>
+  <a href="#ranking"><i class="fas fa-ranking-star"></i> Ranking</a>
+  <a href="#trycatch"><i class="fas fa-shield-halved"></i> Try/Catch</a>
+  <a href="#custom"><i class="fas fa-hammer"></i> Errores Custom</a>
+  <a href="#quiz-section"><i class="fas fa-question-circle"></i> Quiz</a>
+</div></nav>
+
+<div class="container">
+<div class="hero">
+  <div class="hero-shape"></div>
+  <h1><i class="fas fa-bug"></i> Manejo de Errores</h1>
+  <p>Unidad 3 — Programación III · Errores en tiempo de ejecución en JavaScript</p>
+</div>
+
+<!-- ==================== SECCIÓN 1: ¿QUÉ ES UN ERROR? ==================== -->
+<section id="intro">
+<div class="section-title"><i class="fas fa-bug"></i> ¿Qué es un Error?</div>
+
+<div class="card">
+<p>Un <span class="highlight">error</span> es una situación inesperada que interrumpe el flujo normal de un programa. Cuando JavaScript encuentra algo que no puede procesar, lanza (<em>throws</em>) un objeto <code>Error</code> que contiene información sobre qué salió mal y dónde.</p>
+<p>Entender los errores no es solo «arreglar bugs»: es una habilidad fundamental para escribir código <span class="highlight-m">robusto, confiable y profesional</span>. Un programa que no maneja errores puede fallar silenciosamente o dar resultados incorrectos sin que nadie se entere.</p>
+
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0;">
+  <span class="concept-tag cyan"><i class="fas fa-bug"></i> Error</span>
+  <span class="concept-tag"><i class="fas fa-shield-halved"></i> Try/Catch</span>
+  <span class="concept-tag gold"><i class="fas fa-triangle-exclamation"></i> Throw</span>
+  <span class="concept-tag green"><i class="fas fa-broom"></i> Finally</span>
+</div>
+
+<div class="sub-title"><i class="fas fa-microscope"></i> Anatomía de un Error en JS</div>
+<p>Todo objeto <code>Error</code> en JavaScript tiene tres propiedades principales:</p>
+<div class="code-block">
+<span class="kw">try</span> {
+  <span class="kw">let</span> x = variableQueNoExiste;
+} <span class="kw">catch</span> (error) {
+  console.<span class="fn">log</span>(error.<span class="prop">name</span>);     <span class="cm">// "ReferenceError"</span>
+  console.<span class="fn">log</span>(error.<span class="prop">message</span>);  <span class="cm">// "variableQueNoExiste is not defined"</span>
+  console.<span class="fn">log</span>(error.<span class="prop">stack</span>);    <span class="cm">// traza completa del error</span>
+}
+</div>
+<p>📌 <span class="highlight">name:</span> el tipo de error (ReferenceError, TypeError, etc.).</p>
+<p>📌 <span class="highlight-m">message:</span> descripción legible de qué salió mal.</p>
+<p>📌 <span class="highlight-g">stack:</span> la «traza» que muestra la línea exacta y la cadena de llamadas que produjo el error.</p>
+
+<button class="btn-run" onclick="runAnatomia()"><i class="fas fa-play"></i> Ver Anatomía</button>
+<div class="console-area" id="console-anatomia"></div>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 2: TIPOS DE ERRORES ==================== -->
+<section id="tipos">
+<div class="section-title"><i class="fas fa-layer-group"></i> Tipos de Errores</div>
+
+<div class="card">
+<p>Los errores se clasifican en dos grandes categorías según <span class="highlight">cuándo</span> se detectan:</p>
+
+<div class="sub-title"><i class="fas fa-hammer"></i> Errores de Compilación (Syntax Errors)</div>
+<p>Se detectan <strong>antes de ejecutar</strong> el código. El motor de JavaScript analiza la sintaxis y, si encuentra algo mal escrito, rechaza el programa completo. Ninguna línea se ejecuta.</p>
+<div class="code-block error-block">
+<span class="cm">// ❌ Falta cerrar la llave</span>
+<span class="kw">function</span> <span class="fn">saludar</span>() {
+  console.<span class="fn">log</span>(<span class="str">"Hola"</span>);
+<span class="cm">// } ← falta esta llave</span>
+
+<span class="cm">// ❌ Keyword mal escrita</span>
+<span class="kw">funtion</span> <span class="fn">miFuncion</span>() { }  <span class="cm">// "funtion" en vez de "function"</span>
+
+<span class="cm">// ❌ Paréntesis sin cerrar</span>
+console.<span class="fn">log</span>(<span class="str">"Hola"</span>;  <span class="cm">// falta el )</span>
+</div>
+<p>⚠️ Los errores de sintaxis <span class="highlight-m">no se pueden capturar con try/catch</span> porque el código ni siquiera llega a ejecutarse.</p>
+
+<div class="sub-title"><i class="fas fa-bolt"></i> Errores de Ejecución (Runtime Errors)</div>
+<p>El código es sintácticamente correcto, pero <strong>falla durante la ejecución</strong>. Estos sí se pueden capturar y manejar con <code>try/catch</code>.</p>
+<div class="code-block error-block">
+<span class="cm">// ❌ Variable no definida → ReferenceError</span>
+console.<span class="fn">log</span>(variableQueNoExiste);
+
+<span class="cm">// ❌ Llamar algo que no es función → TypeError</span>
+<span class="kw">let</span> x = <span class="num">5</span>;
+x();  <span class="cm">// "x is not a function"</span>
+
+<span class="cm">// ❌ Acceder a propiedad de null → TypeError</span>
+<span class="kw">let</span> obj = <span class="kw">null</span>;
+obj.nombre;  <span class="cm">// "Cannot read properties of null"</span>
+</div>
+
+<button class="btn-run" onclick="runTipos()"><i class="fas fa-play"></i> Demostrar Errores</button>
+<div class="console-area" id="console-tipos"></div>
+
+<div class="sub-title"><i class="fas fa-brain"></i> Errores Lógicos (los más traicioneros)</div>
+<p>El código se ejecuta sin errores, pero <span class="highlight-m">produce resultados incorrectos</span>. JavaScript no lanza ninguna excepción porque técnicamente no hay nada «roto». Estos son los más difíciles de detectar.</p>
+<div class="code-block">
+<span class="cm">// ❌ Error lógico: quería sumar pero concatena</span>
+<span class="kw">function</span> <span class="fn">calcularTotal</span>(<span class="prop">precio</span>, <span class="prop">cantidad</span>) {
+  <span class="kw">return</span> precio + cantidad;  <span class="cm">// Si precio es "100" (string), concatena</span>
+}
+console.<span class="fn">log</span>(<span class="fn">calcularTotal</span>(<span class="str">"100"</span>, <span class="num">5</span>));  <span class="cm">// "1005" en vez de 105</span>
+</div>
+<p>💡 Solución: siempre validar tipos con <code>typeof</code> o convertir con <code>Number()</code>, <code>parseInt()</code>.</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 3: RANKING ==================== -->
+<section id="ranking">
+<div class="section-title"><i class="fas fa-ranking-star"></i> Ranking de Errores</div>
+
+<div class="card">
+<p>Estos son los errores más frecuentes que encontrarás como programador JavaScript, ordenados de <span class="highlight">más común</span> a menos frecuente:</p>
+
+<div class="rank-list">
+  <div class="rank-item">
+    <div class="rank-num r1">1°</div>
+    <div class="rank-body">
+      <h4>TypeError</h4>
+      <p>El rey de los errores. Ocurre al operar con un tipo incorrecto: llamar a un no-función, acceder propiedades de <code>null</code> o <code>undefined</code>, usar métodos inexistentes.</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r2">2°</div>
+    <div class="rank-body">
+      <h4>ReferenceError</h4>
+      <p>Intentar usar una variable que no fue declarada. El clásico <code>x is not defined</code>. Frecuente por typos o por usar variables fuera de su scope.</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r3">3°</div>
+    <div class="rank-body">
+      <h4>SyntaxError</h4>
+      <p>Código mal escrito: llaves sin cerrar, comas faltantes, keywords mal escritas. El motor ni siquiera ejecuta el archivo. Frecuente pero fácil de detectar con el editor.</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r4">4°</div>
+    <div class="rank-body">
+      <h4>RangeError</h4>
+      <p>Un valor numérico fuera del rango permitido. Ejemplos: <code>new Array(-1)</code>, recursión infinita que desborda la pila (<em>Maximum call stack size exceeded</em>).</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r5">5°</div>
+    <div class="rank-body">
+      <h4>URIError</h4>
+      <p>Error al usar funciones de codificación URI como <code>decodeURIComponent('%')</code>. Poco frecuente, aparece al manipular URLs mal formadas.</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r6">6°</div>
+    <div class="rank-body">
+      <h4>EvalError</h4>
+      <p>Históricamente relacionado con la función <code>eval()</code>. En JavaScript moderno casi no se usa y el error es muy raro. Existe principalmente por compatibilidad.</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r7">7°</div>
+    <div class="rank-body">
+      <h4>InternalError (no estándar)</h4>
+      <p>Error interno del motor JavaScript. El más conocido: <code>too much recursion</code> en Firefox. No es estándar ECMAScript, solo existe en algunos navegadores.</p>
+    </div>
+  </div>
+  <div class="rank-item">
+    <div class="rank-num r8">8°</div>
+    <div class="rank-body">
+      <h4>AggregateError (ES2021)</h4>
+      <p>Agrupa múltiples errores en uno solo. Se usa con <code>Promise.any()</code> cuando todas las promesas fallan. Es el más nuevo de la familia.</p>
+    </div>
+  </div>
+</div>
+
+<button class="btn-run" onclick="runRanking()"><i class="fas fa-play"></i> Ver Ejemplos en Vivo</button>
+<div class="console-area" id="console-ranking"></div>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 4: TRY/CATCH/FINALLY ==================== -->
+<section id="trycatch">
+<div class="section-title"><i class="fas fa-shield-halved"></i> Try / Catch / Finally</div>
+
+<div class="card">
+<p>La estructura <span class="highlight">try/catch/finally</span> es el mecanismo principal para manejar errores en tiempo de ejecución en JavaScript.</p>
+
+<div class="sub-title"><i class="fas fa-code"></i> Estructura básica</div>
+<div class="code-block">
+<span class="kw">try</span> {
+  <span class="cm">// Código que PUEDE fallar</span>
+  <span class="kw">const</span> <span class="prop">datos</span> = JSON.<span class="fn">parse</span>(<span class="str">"esto no es JSON"</span>);
+} <span class="kw">catch</span> (error) {
+  <span class="cm">// Se ejecuta SOLO si hubo error</span>
+  console.<span class="fn">log</span>(<span class="str">"Error capturado:"</span>, error.message);
+} <span class="kw">finally</span> {
+  <span class="cm">// Se ejecuta SIEMPRE (haya error o no)</span>
+  console.<span class="fn">log</span>(<span class="str">"Proceso finalizado."</span>);
+}
+</div>
+<p>📌 <span class="highlight">try:</span> envuelve el código que podría fallar.</p>
+<p>📌 <span class="highlight-m">catch(error):</span> captura el error y permite manejarlo sin romper el programa.</p>
+<p>📌 <span class="highlight-g">finally:</span> se ejecuta siempre, ideal para limpieza (cerrar conexiones, ocultar loaders).</p>
+
+<button class="btn-run" onclick="runTryCatch()"><i class="fas fa-play"></i> Try/Catch Básico</button>
+<button class="btn-run" onclick="runFinally()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-play"></i> Con Finally</button>
+<div class="console-area" id="console-tc"></div>
+</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-hand"></i> Lanzar errores con throw</div>
+<p>Podemos crear y lanzar nuestros propios errores con <code class="highlight-m">throw</code>:</p>
+<div class="code-block">
+<span class="kw">function</span> <span class="fn">dividir</span>(<span class="prop">a</span>, <span class="prop">b</span>) {
+  <span class="kw">if</span> (b === <span class="num">0</span>) {
+    <span class="kw">throw new</span> <span class="cls">Error</span>(<span class="str">"No se puede dividir por cero"</span>);
+  }
+  <span class="kw">return</span> a / b;
+}
+
+<span class="kw">try</span> {
+  console.<span class="fn">log</span>(<span class="fn">dividir</span>(<span class="num">10</span>, <span class="num">0</span>));
+} <span class="kw">catch</span> (e) {
+  console.<span class="fn">log</span>(<span class="str">"⚠"</span>, e.message);  <span class="cm">// "No se puede dividir por cero"</span>
+}
+</div>
+
+<button class="btn-run" onclick="runThrow()"><i class="fas fa-play"></i> Dividir por Cero</button>
+<button class="btn-run" onclick="runThrowOk()" style="background:linear-gradient(135deg,var(--accent-green),#00c853);">
+  <i class="fas fa-play"></i> División Válida</button>
+<div class="console-area" id="console-throw"></div>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 5: ERRORES CUSTOM ==================== -->
+<section id="custom">
+<div class="section-title"><i class="fas fa-hammer"></i> Errores Personalizados</div>
+
+<div class="card">
+<p>Podemos crear <span class="highlight">clases de error propias</span> extendiendo la clase <code>Error</code>. Esto permite diferenciar tipos de errores y manejar cada uno de forma específica.</p>
+
+<div class="sub-title"><i class="fas fa-code"></i> Clase de Error Personalizada</div>
+<div class="code-block">
+<span class="kw">class</span> <span class="cls">ValidacionError</span> <span class="kw">extends</span> <span class="cls">Error</span> {
+  <span class="fn">constructor</span>(<span class="prop">campo</span>, <span class="prop">mensaje</span>) {
+    <span class="kw">super</span>(mensaje);
+    <span class="kw">this</span>.name = <span class="str">"ValidacionError"</span>;
+    <span class="kw">this</span>.campo = campo;
+  }
+}
+
+<span class="kw">function</span> <span class="fn">registrarUsuario</span>(<span class="prop">nombre</span>, <span class="prop">edad</span>) {
+  <span class="kw">if</span> (!nombre) <span class="kw">throw new</span> <span class="cls">ValidacionError</span>(<span class="str">"nombre"</span>, <span class="str">"El nombre es obligatorio"</span>);
+  <span class="kw">if</span> (edad < <span class="num">0</span>) <span class="kw">throw new</span> <span class="cls">ValidacionError</span>(<span class="str">"edad"</span>, <span class="str">"La edad no puede ser negativa"</span>);
+  <span class="kw">return</span> { nombre, edad };
+}
+
+<span class="kw">try</span> {
+  <span class="fn">registrarUsuario</span>(<span class="str">""</span>, <span class="num">25</span>);
+} <span class="kw">catch</span> (e) {
+  <span class="kw">if</span> (e <span class="kw">instanceof</span> <span class="cls">ValidacionError</span>) {
+    console.<span class="fn">log</span>(<span class="str">`Campo: ${e.campo} → ${e.message}`</span>);
+  } <span class="kw">else</span> {
+    <span class="kw">throw</span> e;  <span class="cm">// re-lanzar errores desconocidos</span>
+  }
+}
+</div>
+
+<button class="btn-run" onclick="runCustom1()"><i class="fas fa-play"></i> Sin Nombre</button>
+<button class="btn-run" onclick="runCustom2()" style="background:linear-gradient(135deg,var(--accent-magenta),#9c27b0);">
+  <i class="fas fa-play"></i> Edad Negativa</button>
+<button class="btn-run" onclick="runCustom3()" style="background:linear-gradient(135deg,var(--accent-green),#00c853);">
+  <i class="fas fa-play"></i> Registro Válido</button>
+<div class="console-area" id="console-custom"></div>
+</div>
+</section>
+
+<!-- ==================== QUIZ ==================== -->
+<section id="quiz-section">
+<div class="section-title"><i class="fas fa-question-circle"></i> Cuestionario</div>
+
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Manejo de Errores</h3>
+<div class="quiz-q" data-correct="b">
+  <p>1. ¿Cuál es el error más frecuente en JavaScript?</p>
+  <label><input type="radio" name="q1" value="a"> SyntaxError</label>
+  <label><input type="radio" name="q1" value="b"> TypeError</label>
+  <label><input type="radio" name="q1" value="c"> RangeError</label>
+  <label><input type="radio" name="q1" value="d"> URIError</label>
+  <div class="quiz-result" id="q1r"></div>
+</div>
+<div class="quiz-q" data-correct="c">
+  <p>2. ¿Qué tipo de error NO se puede capturar con try/catch?</p>
+  <label><input type="radio" name="q2" value="a"> TypeError</label>
+  <label><input type="radio" name="q2" value="b"> ReferenceError</label>
+  <label><input type="radio" name="q2" value="c"> SyntaxError (errores de compilación)</label>
+  <label><input type="radio" name="q2" value="d"> RangeError</label>
+  <div class="quiz-result" id="q2r"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+  <p>3. ¿Qué bloque se ejecuta siempre, haya error o no?</p>
+  <label><input type="radio" name="q3" value="a"> finally</label>
+  <label><input type="radio" name="q3" value="b"> catch</label>
+  <label><input type="radio" name="q3" value="c"> try</label>
+  <label><input type="radio" name="q3" value="d"> throw</label>
+  <div class="quiz-result" id="q3r"></div>
+</div>
+<div class="quiz-q" data-correct="d">
+  <p>4. ¿Qué keyword se usa para lanzar un error manualmente?</p>
+  <label><input type="radio" name="q4" value="a"> error</label>
+  <label><input type="radio" name="q4" value="b"> raise</label>
+  <label><input type="radio" name="q4" value="c"> catch</label>
+  <label><input type="radio" name="q4" value="d"> throw</label>
+  <div class="quiz-result" id="q4r"></div>
+</div>
+<div class="quiz-q" data-correct="b">
+  <p>5. ¿Cuáles son las tres propiedades de un objeto Error?</p>
+  <label><input type="radio" name="q5" value="a"> type, info, line</label>
+  <label><input type="radio" name="q5" value="b"> name, message, stack</label>
+  <label><input type="radio" name="q5" value="c"> error, description, trace</label>
+  <label><input type="radio" name="q5" value="d"> code, text, origin</label>
+  <div class="quiz-result" id="q5r"></div>
+</div>
+<div class="quiz-q" data-correct="c">
+  <p>6. ¿Cómo se crea una clase de error personalizada en JS?</p>
+  <label><input type="radio" name="q6" value="a"> Con la keyword <code>custom error</code></label>
+  <label><input type="radio" name="q6" value="b"> Con <code>Error.create()</code></label>
+  <label><input type="radio" name="q6" value="c"> Extendiendo la clase Error con <code>extends</code></label>
+  <label><input type="radio" name="q6" value="d"> No se puede en JavaScript</label>
+  <div class="quiz-result" id="q6r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<footer style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:.85em;border-top:1px solid rgba(0,229,255,0.1);margin-top:40px;">
+  <p><i class="fas fa-graduation-cap"></i> Programación III — Unidad 3: Manejo de Errores en JavaScript</p>
+</footer>
+</div>
+
+<script>
+function log(id, text) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = 'fadeIn .4s ease';
+}
+
+// ========== ANATOMIA ==========
+function runAnatomia() {
+  try {
+    let x = variableQueNoExiste;
+  } catch (e) {
+    let out = `> Capturando un ReferenceError...\n\n`;
+    out += `📛 name:    "${e.name}"\n`;
+    out += `💬 message: "${e.message}"\n`;
+    out += `📍 stack:\n   ${e.stack.split('\n').slice(0,3).join('\n   ')}`;
+    log('console-anatomia', out);
+  }
+}
+
+// ========== TIPOS ==========
+function runTipos() {
+  let out = '';
+  // ReferenceError
+  try { eval('variableQueNoExiste'); } catch(e) {
+    out += `1️⃣ ${e.name}: "${e.message}"\n`;
+  }
+  // TypeError
+  try { let x = 5; x(); } catch(e) {
+    out += `2️⃣ ${e.name}: "${e.message}"\n`;
+  }
+  // TypeError null
+  try { let obj = null; obj.nombre; } catch(e) {
+    out += `3️⃣ ${e.name}: "${e.message}"\n`;
+  }
+  // Error lógico (no lanza excepción)
+  function calcularTotal(precio, cantidad) { return precio + cantidad; }
+  out += `\n🧠 Error lógico (sin excepción):\n`;
+  out += `  calcularTotal("100", 5) → "${calcularTotal("100", 5)}"  ← ¡Concatena!`;
+  log('console-tipos', out);
+}
+
+// ========== RANKING EXAMPLES ==========
+function runRanking() {
+  let out = '🏆 Ejemplos en vivo de cada tipo:\n\n';
+  // TypeError
+  try { null.foo; } catch(e) { out += `1° TypeError:      ${e.message}\n`; }
+  // ReferenceError
+  try { eval('noExiste'); } catch(e) { out += `2° ReferenceError:  ${e.message}\n`; }
+  // SyntaxError (via eval)
+  try { eval('if('); } catch(e) { out += `3° SyntaxError:     ${e.message}\n`; }
+  // RangeError
+  try { new Array(-1); } catch(e) { out += `4° RangeError:      ${e.message}\n`; }
+  // URIError
+  try { decodeURIComponent('%'); } catch(e) { out += `5° URIError:        ${e.message}\n`; }
+  out += `\n✅ Todos capturados con try/catch sin romper el programa.`;
+  log('console-ranking', out);
+}
+
+// ========== TRY/CATCH ==========
+function runTryCatch() {
+  let out = '';
+  try {
+    out += `> try: Intentando parsear JSON inválido...\n`;
+    const datos = JSON.parse("esto no es JSON");
+    out += `> Esto nunca se ejecuta.\n`;
+  } catch (error) {
+    out += `> catch: ⚠ ${error.name}: "${error.message}"\n`;
+    out += `> El programa sigue funcionando normalmente.`;
+  }
+  log('console-tc', out);
+}
+
+function runFinally() {
+  let out = '';
+  try {
+    out += `> try: Procesando datos...\n`;
+    JSON.parse('{"valido": true}');
+    out += `> try: ✔ Datos válidos, sin error.\n`;
+  } catch (e) {
+    out += `> catch: ⚠ ${e.message}\n`;
+  } finally {
+    out += `> finally: 🧹 Limpieza ejecutada (siempre se ejecuta).\n`;
+    out += `\n💡 finally es ideal para:\n`;
+    out += `   • Cerrar conexiones a BD\n`;
+    out += `   • Ocultar spinners/loaders\n`;
+    out += `   • Liberar recursos`;
+  }
+  log('console-tc', out);
+}
+
+// ========== THROW ==========
+function dividir(a, b) {
+  if (b === 0) throw new Error("No se puede dividir por cero");
+  return a / b;
+}
+
+function runThrow() {
+  try {
+    let out = `> dividir(10, 0)\n`;
+    dividir(10, 0);
+  } catch (e) {
+    log('console-throw', `> dividir(10, 0)\n  ⚠ Error capturado: "${e.message}"\n\n💡 El throw lanzó el error y catch lo atrapó.`);
+  }
+}
+
+function runThrowOk() {
+  try {
+    const resultado = dividir(10, 3);
+    log('console-throw', `> dividir(10, 3)\n  ✔ Resultado: ${resultado.toFixed(4)}\n\n✅ Sin errores, ejecución normal.`);
+  } catch (e) {
+    log('console-throw', `⚠ ${e.message}`);
+  }
+}
+
+// ========== CUSTOM ERRORS ==========
+class ValidacionError extends Error {
+  constructor(campo, mensaje) {
+    super(mensaje);
+    this.name = "ValidacionError";
+    this.campo = campo;
+  }
+}
+
+function registrarUsuario(nombre, edad) {
+  if (!nombre) throw new ValidacionError("nombre", "El nombre es obligatorio");
+  if (edad < 0) throw new ValidacionError("edad", "La edad no puede ser negativa");
+  return { nombre, edad };
+}
+
+function runCustom1() {
+  try {
+    registrarUsuario("", 25);
+  } catch (e) {
+    let out = `> registrarUsuario("", 25)\n\n`;
+    out += `⚠ ${e.name}\n`;
+    out += `  Campo:   "${e.campo}"\n`;
+    out += `  Mensaje: "${e.message}"\n`;
+    out += `  ¿Es ValidacionError? ${e instanceof ValidacionError}`;
+    log('console-custom', out);
+  }
+}
+
+function runCustom2() {
+  try {
+    registrarUsuario("Ana", -5);
+  } catch (e) {
+    let out = `> registrarUsuario("Ana", -5)\n\n`;
+    out += `⚠ ${e.name}\n`;
+    out += `  Campo:   "${e.campo}"\n`;
+    out += `  Mensaje: "${e.message}"\n`;
+    out += `  ¿Es ValidacionError? ${e instanceof ValidacionError}`;
+    log('console-custom', out);
+  }
+}
+
+function runCustom3() {
+  try {
+    const user = registrarUsuario("Ana García", 25);
+    let out = `> registrarUsuario("Ana García", 25)\n\n`;
+    out += `✔ Registro exitoso:\n`;
+    out += `  ${JSON.stringify(user, null, 2)}`;
+    log('console-custom', out);
+  } catch (e) {
+    log('console-custom', `⚠ ${e.message}`);
+  }
+}
+
+// ========== QUIZ ==========
+function checkQuiz() {
+  for (let i = 1; i <= 6; i++) {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    const resultEl = document.getElementById(`q${i}r`);
+    const correct = document.querySelector(`input[name="q${i}"]`).closest('.quiz-q').dataset.correct;
+    if (!selected) { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '⚠ Seleccioná una opción.'; continue; }
+    if (selected.value === correct) { resultEl.className = 'quiz-result correct'; resultEl.textContent = '✔ ¡Correcto!'; }
+    else { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '✘ Incorrecto. Intentá de nuevo.'; }
+  }
+}
+
+const style = document.createElement('style');
+style.textContent = '@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(style);
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>

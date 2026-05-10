@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Data · Datos Masivos | Nuevas Tecnologías</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1e2d45;--accent:#06b6d4;--accent2:#0891b2;--accent3:#0e7490;--text:#e2e8f0;--text-muted:#94a3b8;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--card-glow:0 0 30px rgba(6,182,212,.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.7;overflow-x:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;text-align:center;padding:2rem}
+.hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(6,182,212,.25) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(8,145,178,.2) 0%,transparent 60%)}
+.grid-lines{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(6,182,212,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,.05) 1px,transparent 1px);background-size:60px 60px}
+.hero-content{position:relative;z-index:1;max-width:860px}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.4);border-radius:50px;padding:.4rem 1.2rem;font-size:.8rem;font-weight:600;color:#67e8f9;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2rem;animation:fadeDown .6s ease}
+.hero h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#e2e8f0 0%,#06b6d4 50%,#0891b2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem;animation:fadeDown .7s ease .1s both}
+.hero p{font-size:1.2rem;color:var(--text-muted);max-width:600px;margin:0 auto 3rem;animation:fadeDown .7s ease .2s both}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;animation:fadeDown .7s ease .3s both}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.8rem;border-radius:10px;font-weight:600;font-size:.95rem;cursor:pointer;transition:all .25s;border:none;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(6,182,212,.5)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,26,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:64px;transform:translateY(-100%);transition:transform .4s}
+nav.visible{transform:translateY(0)}
+.nav-logo{font-weight:700;color:#67e8f9;margin-right:auto;font-size:.95rem}
+.nav-links{display:flex;gap:1.5rem;list-style:none}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:#67e8f9}
+.container{max-width:1100px;margin:0 auto;padding:0 2rem}
+section{padding:5rem 0}
+.section-label{display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#06b6d4;margin-bottom:1rem}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:1rem}
+.section-desc{color:var(--text-muted);max-width:640px;font-size:1.05rem}
+.accordion{margin-top:2.5rem;display:flex;flex-direction:column;gap:1rem}
+.acc-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.acc-head{display:flex;align-items:center;gap:1rem;padding:1.25rem 1.5rem;cursor:pointer;font-weight:600;font-size:1rem;user-select:none;transition:background .2s}
+.acc-head:hover{background:var(--surface2)}
+.acc-head .num{font-family:'JetBrains Mono',monospace;color:#06b6d4;font-size:.85rem}
+.acc-head .icon{margin-left:auto;transition:transform .3s}
+.acc-head.open .icon{transform:rotate(45deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.acc-body.open{max-height:2000px}
+.acc-inner{padding:0 1.5rem 1.5rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:1.25rem}
+.acc-inner p{margin-bottom:.75rem}
+.acc-inner ul,.acc-inner ol{padding-left:1.4rem}
+.acc-inner li{margin-bottom:.4rem}
+.acc-inner strong{color:var(--text)}
+.tipos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;margin-top:2.5rem}
+.tipo-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;border-left:4px solid var(--accent);transition:all .3s}
+.tipo-card:hover{transform:translateX(4px);border-left-color:#67e8f9}
+.tipo-card h4{font-weight:700;margin-bottom:.5rem;color:#67e8f9}
+.tipo-card p{color:var(--text-muted);font-size:.9rem}
+.sectors{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:2.5rem}
+.sector-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;position:relative;overflow:hidden;transition:all .3s}
+.sector-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--g)}
+.sector-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.s-icon{font-size:2.2rem;margin-bottom:1rem}
+.sector-card h3{font-size:1.1rem;font-weight:700;margin-bottom:.75rem}
+.sector-card p{color:var(--text-muted);font-size:.9rem;margin-bottom:1rem}
+.s-examples{display:flex;flex-wrap:wrap;gap:.5rem}
+.s-tag{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);color:#67e8f9;padding:.2rem .65rem;border-radius:50px;font-size:.75rem;font-weight:600}
+.timeline{margin-top:3rem;position:relative;padding-left:2.5rem}
+.timeline::before{content:'';position:absolute;left:.7rem;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#06b6d4,#0891b2,transparent)}
+.tl-item{position:relative;margin-bottom:2.5rem}
+.tl-dot{position:absolute;left:-2.25rem;top:.25rem;width:14px;height:14px;border-radius:50%;background:#06b6d4;box-shadow:0 0 12px rgba(6,182,212,.6)}
+.tl-label{font-size:.8rem;font-weight:700;color:#06b6d4;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.tl-title{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
+.tl-desc{color:var(--text-muted);font-size:.92rem}
+.callout{background:linear-gradient(135deg,rgba(6,182,212,.1),rgba(8,145,178,.1));border:1px solid rgba(6,182,212,.3);border-radius:16px;padding:1.75rem;margin-top:2.5rem;position:relative}
+.callout::before{content:'🔗';position:absolute;right:1.5rem;top:1.5rem;font-size:2rem;opacity:.15}
+.callout h4{color:#67e8f9;font-weight:700;margin-bottom:.5rem;font-size:1.05rem}
+.callout p{color:var(--text-muted);font-size:.92rem}
+.quiz-section{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;margin-top:3rem}
+.quiz-title{font-size:1.3rem;font-weight:800;margin-bottom:.5rem}
+.quiz-sub{color:var(--text-muted);margin-bottom:2rem}
+.quiz-q{margin-bottom:2rem}
+.quiz-q p{font-weight:600;margin-bottom:1rem}
+.quiz-opts{display:flex;flex-direction:column;gap:.6rem}
+.quiz-opt{display:flex;align-items:center;gap:.75rem;padding:1rem 1.2rem;background:var(--bg);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:.95rem}
+.quiz-opt:hover{border-color:#06b6d4;background:rgba(6,182,212,.08)}
+.quiz-opt.correct{border-color:var(--success);background:rgba(16,185,129,.12)}
+.quiz-opt.wrong{border-color:var(--danger);background:rgba(239,68,68,.1)}
+.quiz-opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.quiz-feedback{margin-top:1rem;padding:.75rem 1rem;border-radius:8px;font-size:.9rem;font-weight:600;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:rgba(16,185,129,.15);color:#34d399}
+.quiz-feedback.no{background:rgba(239,68,68,.1);color:#f87171}
+.quiz-score{text-align:center;padding:2rem;display:none}
+.quiz-score.show{display:block}
+.score-num{font-size:3rem;font-weight:800;color:#67e8f9}
+.btn-quiz{margin-top:1.5rem}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-top:1rem;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#06b6d4,#0891b2);transition:width .4s}
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-muted);font-size:.85rem}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.fade-in.visible{opacity:1;transform:none}
+.particles{position:absolute;inset:0;z-index:0;pointer-events:none}
+.p{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,.6),transparent);animation:float linear infinite}
+@keyframes float{0%{transform:translateY(0) scale(1);opacity:.6}50%{opacity:.2}100%{transform:translateY(-120vh) scale(.3);opacity:0}}
+@media(max-width:640px){.hero h1{font-size:2.2rem}section{padding:3.5rem 0}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+    <span class="nav-logo">📊 Big Data · Nuevas Tecnologías</span>
+    <ul class="nav-links">
+        <li><a href="#que-es">¿Qué es?</a></li>
+        <li><a href="#tipos">Tipos</a></li>
+        <li><a href="#aplicaciones">Aplicaciones</a></li>
+        <li><a href="#futuro">Futuro</a></li>
+        <li><a href="#quiz">Quiz</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+    <div class="hero-bg"></div>
+    <div class="grid-lines"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-content">
+        <div class="hero-badge">⚡ Nuevas Tecnologías · Unidad 4</div>
+        <h1>Big Data<br>Datos Masivos</h1>
+        <p>Explorá cómo el análisis de enormes volúmenes de datos está revolucionando la toma de decisiones en empresas, gobiernos y la ciencia.</p>
+        <div class="hero-cta">
+            <a href="#que-es" class="btn btn-primary">▶ Comenzar</a>
+            <a href="#quiz" class="btn btn-ghost">🧩 Ir al Quiz</a>
+        </div>
+    </div>
+</section>
+
+<!-- 4.1 QUÉ ES BIG DATA -->
+<section id="que-es">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">📌 4.1</span>
+            <h2 class="section-title">¿Qué es el Big Data?</h2>
+            <p class="section-desc">Big Data se refiere a conjuntos de datos tan grandes, variados y generados tan rápidamente que superan la capacidad de las herramientas tradicionales para capturarlos, almacenarlos y analizarlos.</p>
+        </div>
+        <div class="accordion fade-in">
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">01</span> Definición y las 5 «V» del Big Data
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>El concepto de <strong>Big Data</strong> no se refiere solo a «muchos datos», sino a datos que cumplen con características específicas conocidas como las <strong>5 V</strong>:</p>
+                        <ol>
+                            <li><strong>Volumen:</strong> Cantidades masivas de datos. Se habla de terabytes, petabytes y exabytes. Solo YouTube recibe más de 500 horas de video por minuto.</li>
+                            <li><strong>Velocidad:</strong> Los datos se generan y deben procesarse en tiempo real o casi real. Transacciones bancarias, redes sociales y sensores IoT producen datos constantemente.</li>
+                            <li><strong>Variedad:</strong> Los datos vienen en múltiples formatos: textos, imágenes, videos, logs de servidores, datos de sensores, ubicaciones GPS y más.</li>
+                            <li><strong>Veracidad:</strong> No todos los datos son confiables. Es crucial validar la calidad, precisión y consistencia de los datos antes de analizarlos.</li>
+                            <li><strong>Valor:</strong> El objetivo final: extraer información útil que permita tomar mejores decisiones. Datos sin análisis son solo ruido.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">02</span> Orígenes e historia del Big Data
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>La humanidad siempre recopiló datos, pero la escala cambió radicalmente con la era digital:</p>
+                        <ul>
+                            <li><strong>1960s-70s:</strong> Los primeros centros de datos y bases de datos relacionales (IBM) sentaron las bases del almacenamiento digital masivo.</li>
+                            <li><strong>1997 — Michael Cox y David Ellsworth:</strong> Investigadores de NASA usaron por primera vez el término «big data» en un paper académico para describir el desafío de visualizar conjuntos de datos demasiado grandes para la memoria de las computadoras.</li>
+                            <li><strong>2001 — Doug Laney y las 3 V:</strong> El analista de Gartner definió el modelo de las <strong>3 V</strong> (Volumen, Velocidad, Variedad) que se convirtió en el marco estándar para entender Big Data.</li>
+                            <li><strong>2004 — Google publica MapReduce:</strong> El paper que revolucionó el procesamiento distribuido de datos masivos, base de Hadoop y toda la industria moderna de Big Data.</li>
+                            <li><strong>2006 — Nace Hadoop:</strong> Framework open-source creado por Doug Cutting (Yahoo!) basado en las ideas de Google. Democratizó el análisis de Big Data.</li>
+                            <li><strong>2010s-actualidad:</strong> Explosión del IoT, redes sociales y la nube. Hoy se generan más de <strong>2.5 quintillones de bytes diarios</strong> de datos a nivel mundial.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-head" onclick="toggleAcc(this)">
+                    <span class="num">03</span> Componentes de un ecosistema Big Data
+                    <span class="icon">+</span>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-inner">
+                        <p>Un sistema de Big Data tiene varias capas que trabajan juntas:</p>
+                        <ul>
+                            <li><strong>Fuentes de datos:</strong> Redes sociales, sensores IoT, transacciones, logs de sistemas, datos gubernamentales abiertos.</li>
+                            <li><strong>Almacenamiento:</strong> Data lakes (lagos de datos), data warehouses, sistemas distribuidos como HDFS (Hadoop Distributed File System).</li>
+                            <li><strong>Procesamiento:</strong> Frameworks como Apache Spark, Hadoop MapReduce, o servicios en la nube como BigQuery (Google) y Redshift (AWS).</li>
+                            <li><strong>Análisis:</strong> Estadística, machine learning, minería de datos. Herramientas como Python (Pandas, Scikit-learn), R y SQL.</li>
+                            <li><strong>Visualización:</strong> Dashboards y gráficos interactivos con Tableau, Power BI, Google Data Studio o D3.js para comunicar los resultados.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="callout fade-in">
+            <h4>🔗 Conexión con IoT</h4>
+            <p>El Internet de las Cosas es una de las <strong>mayores fuentes de Big Data</strong> del mundo. Miles de millones de sensores IoT generan datos continuamente: temperatura, ubicación, movimiento, consumo energético. Sin herramientas de Big Data sería imposible almacenar, procesar y extraer valor de toda esa información. IoT genera los datos; Big Data les da sentido.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 4.2 TIPOS DE BIG DATA -->
+<section id="tipos" style="background:var(--surface);padding:5rem 0;">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🔬 4.2</span>
+            <h2 class="section-title">Tipos de Big Data</h2>
+            <p class="section-desc">Los datos masivos se clasifican según su formato, estructura y origen.</p>
+        </div>
+        <div class="tipos-grid fade-in">
+            <div class="tipo-card">
+                <h4>Datos Estructurados</h4>
+                <p>Datos organizados en tablas con filas y columnas (bases de datos SQL). Ejemplo: planillas de Excel, registros de ventas, datos bancarios. Fáciles de consultar y analizar.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#0891b2">
+                <h4>Datos No Estructurados</h4>
+                <p>Sin formato predefinido: videos, imágenes, audios, correos electrónicos, publicaciones en redes sociales. Representan el 80% de los datos generados hoy. Requieren técnicas avanzadas de análisis.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#0e7490">
+                <h4>Datos Semi-estructurados</h4>
+                <p>Tienen cierta organización pero no encajan en tablas rígidas: archivos JSON, XML, logs de servidores, emails con metadatos. Son un punto intermedio entre los anteriores.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#10b981">
+                <h4>Datos en Tiempo Real (Streaming)</h4>
+                <p>Flujos continuos de datos que deben procesarse al instante: feeds de redes sociales, datos de sensores IoT, transacciones financieras, telemetría de vehículos.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#f59e0b">
+                <h4>Datos por Lotes (Batch)</h4>
+                <p>Grandes volúmenes almacenados que se procesan periódicamente (cada hora, día o semana). Reportes contables, análisis históricos, entrenamiento de modelos de IA.</p>
+            </div>
+            <div class="tipo-card" style="border-left-color:#ef4444">
+                <h4>Datos Abiertos (Open Data)</h4>
+                <p>Datos públicos publicados por gobiernos e instituciones: censos, datos meteorológicos, estadísticas de salud. Cualquier persona puede acceder y analizarlos libremente.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4.3 APLICACIONES -->
+<section id="aplicaciones">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🚀 4.3</span>
+            <h2 class="section-title">Aplicaciones del Big Data</h2>
+            <p class="section-desc">El análisis de datos masivos está transformando cómo operan las organizaciones y cómo vivimos.</p>
+        </div>
+        <div class="sectors fade-in">
+            <div class="sector-card" style="--g: linear-gradient(90deg,#06b6d4,#0891b2)">
+                <div class="s-icon">🏪</div>
+                <h3>Comercio y Marketing</h3>
+                <p>Las empresas analizan el comportamiento de compra de millones de clientes para personalizar ofertas, predecir tendencias y optimizar inventarios. Netflix, Spotify y Amazon basan su éxito en algoritmos alimentados por Big Data.</p>
+                <div class="s-examples">
+                    <span class="s-tag">Recomendaciones</span>
+                    <span class="s-tag">Predicción de demanda</span>
+                    <span class="s-tag">Segmentación</span>
+                </div>
+            </div>
+            <div class="sector-card" style="--g: linear-gradient(90deg,#10b981,#06b6d4)">
+                <div class="s-icon">🏥</div>
+                <h3>Salud y Medicina</h3>
+                <p>Análisis de historiales médicos masivos para detectar patrones de enfermedades, optimizar tratamientos y acelerar el descubrimiento de fármacos. Durante el COVID-19, Big Data fue clave para rastrear la propagación del virus.</p>
+                <div class="s-examples">
+                    <span class="s-tag">Epidemiología</span>
+                    <span class="s-tag">Genómica</span>
+                    <span class="s-tag">Ensayos clínicos</span>
+                </div>
+            </div>
+            <div class="sector-card" style="--g: linear-gradient(90deg,#f59e0b,#ef4444)">
+                <div class="s-icon">🏙️</div>
+                <h3>Ciudades y Gobierno</h3>
+                <p>Gobiernos usan datos abiertos para planificar transporte público, gestionar servicios urbanos, combatir el crimen con análisis predictivo y mejorar la respuesta ante emergencias naturales.</p>
+                <div class="s-examples">
+                    <span class="s-tag">Smart Cities</span>
+                    <span class="s-tag">Open Data</span>
+                    <span class="s-tag">Planificación urbana</span>
+                </div>
+            </div>
+            <div class="sector-card" style="--g: linear-gradient(90deg,#6366f1,#8b5cf6)">
+                <div class="s-icon">🌾</div>
+                <h3>Agricultura y Medio Ambiente</h3>
+                <p>Datos satelitales, de sensores IoT en campo y estaciones meteorológicas se combinan para optimizar cosechas, predecir sequías y monitorear la deforestación a escala global.</p>
+                <div class="s-examples">
+                    <span class="s-tag">Agricultura de precisión</span>
+                    <span class="s-tag">Cambio climático</span>
+                    <span class="s-tag">Datos satelitales</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4.4 FUTURO DEL BIG DATA -->
+<section id="futuro" style="background:var(--surface);padding:5rem 0;">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🔭 4.4</span>
+            <h2 class="section-title">Futuro del Big Data</h2>
+            <p class="section-desc">Las tendencias que marcarán la evolución de los datos masivos en la próxima década.</p>
+        </div>
+        <div class="timeline fade-in">
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-label">Hoy · Escala</div>
+                <div class="tl-title">2.5 quintillones de bytes por día</div>
+                <div class="tl-desc">El volumen de datos global crece exponencialmente. Se estima que el 90% de todos los datos del mundo fueron creados en los últimos 2 años. La capacidad de almacenamiento y procesamiento crece, pero también el desafío de darles sentido.</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot" style="background:#0891b2;box-shadow:0 0 12px rgba(8,145,178,.6)"></div>
+                <div class="tl-label">Emergente · IA + Big Data</div>
+                <div class="tl-title">Machine Learning automatizado sobre datos masivos</div>
+                <div class="tl-desc">La IA necesita Big Data para entrenarse, y Big Data necesita IA para ser analizado. El AutoML permite que sistemas entrenen modelos automáticamente sobre datasets enormes, democratizando el análisis predictivo para empresas sin equipos de data science.</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot" style="background:#0e7490;box-shadow:0 0 12px rgba(14,116,144,.6)"></div>
+                <div class="tl-label">Próximo · Data Mesh</div>
+                <div class="tl-title">Descentralización del gobierno de datos</div>
+                <div class="tl-desc">En lugar de centralizar todos los datos en un único lago, las organizaciones adoptan arquitecturas «Data Mesh»: cada equipo es responsable de sus propios datos como producto, con estándares compartidos de calidad y acceso.</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot" style="background:#10b981;box-shadow:0 0 12px rgba(16,185,129,.6)"></div>
+                <div class="tl-label">Futuro · Privacidad y Ética</div>
+                <div class="tl-title">Regulaciones y datos soberanos</div>
+                <div class="tl-desc">Leyes como el GDPR europeo y la Ley de Protección de Datos de Argentina regulan cómo se recopilan, almacenan y usan los datos personales. El futuro exige equilibrar el poder del análisis con el derecho a la privacidad individual.</div>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot" style="background:#f59e0b;box-shadow:0 0 12px rgba(245,158,11,.6)"></div>
+                <div class="tl-label">Horizonte · Computación Cuántica</div>
+                <div class="tl-title">Análisis de datos a velocidades imposibles</div>
+                <div class="tl-desc">Las computadoras cuánticas prometen resolver en minutos problemas de análisis que a las computadoras clásicas les tomaría miles de años. Esto revolucionará campos como la criptografía, la simulación molecular y el análisis financiero a escala global.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+    <div class="container">
+        <div class="fade-in">
+            <span class="section-label">🧩 Autoevaluación</span>
+            <h2 class="section-title">Quiz: Big Data</h2>
+            <p class="section-desc">Verificá cuánto aprendiste sobre datos masivos con este cuestionario interactivo.</p>
+        </div>
+        <div class="quiz-section fade-in">
+            <div class="quiz-title">Quiz · Big Data</div>
+            <div class="quiz-sub">Respondé las siguientes preguntas. Obtendrás retroalimentación inmediata.</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="quizProgress" style="width:0%"></div>
+            </div>
+            <div id="quizContainer"></div>
+            <div class="quiz-score" id="quizScore">
+                <div style="font-size:1.1rem;color:var(--text-muted);margin-bottom:.5rem">Tu puntaje final</div>
+                <div class="score-num" id="scoreNum">0/8</div>
+                <div style="color:var(--text-muted);margin-top:.5rem" id="scoreFeedback"></div>
+                <button class="btn btn-primary btn-quiz" onclick="initQuiz()">🔄 Reintentar</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>📚 Nuevas Tecnologías · Unidad 4: Big Data &nbsp;|&nbsp; Material de estudio interactivo · Segundo Cuatrimestre</p>
+</footer>
+
+<script>
+// ─── PARTICLES ───
+(function(){
+    const c=document.getElementById('particles');
+    for(let i=0;i<18;i++){
+        const p=document.createElement('div');
+        p.className='p';
+        const s=Math.random()*80+20;
+        p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100+100}%;opacity:${Math.random()*.4+.1};animation-duration:${Math.random()*20+15}s;animation-delay:${Math.random()*10}s`;
+        c.appendChild(p);
+    }
+})();
+window.addEventListener('scroll',()=>{
+    document.getElementById('mainNav').classList.toggle('visible',window.scrollY>80);
+});
+function toggleAcc(head){
+    const body=head.nextElementSibling;
+    const isOpen=head.classList.toggle('open');
+    body.classList.toggle('open',isOpen);
+}
+const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+// ─── QUIZ ───
+const questions=[
+    {
+        q:"¿Cuáles son las 5 «V» del Big Data?",
+        opts:["Volumen, Velocidad, Variedad, Veracidad, Valor","Virtual, Visual, Verbal, Viral, Válido","Volumen, Velocidad, Virtual, Versátil, Viral","Verificación, Validación, Variedad, Volumen, Versión"],
+        ans:0,
+        feedback:"Las 5 V son: Volumen (cantidad), Velocidad (rapidez), Variedad (formatos), Veracidad (calidad) y Valor (utilidad)."
+    },
+    {
+        q:"¿Quién definió el modelo original de las 3 V del Big Data en 2001?",
+        opts:["Tim Berners-Lee","Doug Laney (Gartner)","Jeff Bezos","Larry Page"],
+        ans:1,
+        feedback:"Doug Laney, analista de Gartner, definió las 3 V originales (Volumen, Velocidad, Variedad) en 2001."
+    },
+    {
+        q:"¿Qué porcentaje aproximado de los datos generados hoy son no estructurados?",
+        opts:["20%","50%","80%","95%"],
+        ans:2,
+        feedback:"Aproximadamente el 80% de los datos son no estructurados: videos, imágenes, audios, textos libres y publicaciones en redes sociales."
+    },
+    {
+        q:"¿Cuál es la relación entre IoT y Big Data?",
+        opts:["No tienen relación","IoT es un tipo de Big Data","IoT es una de las mayores fuentes de datos para Big Data","Big Data reemplaza al IoT"],
+        ans:2,
+        feedback:"Miles de millones de sensores IoT generan datos continuamente. IoT produce los datos; Big Data los almacena, procesa y les extrae valor."
+    },
+    {
+        q:"¿Qué es Apache Hadoop?",
+        opts:["Un lenguaje de programación","Un framework open-source para procesar datos masivos de forma distribuida","Una base de datos SQL","Un servicio de almacenamiento en la nube"],
+        ans:1,
+        feedback:"Hadoop es un framework open-source creado en 2006 por Doug Cutting, basado en las ideas de Google MapReduce, para procesar Big Data."
+    },
+    {
+        q:"¿Qué tipo de datos son los archivos JSON y XML?",
+        opts:["Estructurados","No estructurados","Semi-estructurados","Datos en tiempo real"],
+        ans:2,
+        feedback:"JSON y XML son semi-estructurados: tienen cierta organización (etiquetas, claves) pero no encajan en tablas rígidas como las bases de datos SQL."
+    },
+    {
+        q:"¿Qué es un Data Lake (lago de datos)?",
+        opts:["Una base de datos SQL tradicional","Un repositorio que almacena datos en su formato original sin procesarlos previamente","Un tipo de red social","Un centro de datos físico"],
+        ans:1,
+        feedback:"Un Data Lake almacena datos crudos en su formato original (estructurados, semi y no estructurados) para ser procesados cuando se necesiten."
+    },
+    {
+        q:"¿Qué regulación europea protege los datos personales en la era del Big Data?",
+        opts:["HIPAA","GDPR","ISO 9001","HTTP/2"],
+        ans:1,
+        feedback:"El GDPR (General Data Protection Regulation) es la regulación europea que establece normas estrictas sobre recopilación y uso de datos personales."
+    }
+];
+
+let answers=[];
+let current=0;
+
+function initQuiz(){
+    answers=[];
+    current=0;
+    document.getElementById('quizScore').classList.remove('show');
+    document.getElementById('quizProgress').style.width='0%';
+    renderQuestion();
+}
+
+function renderQuestion(){
+    const qc=document.getElementById('quizContainer');
+    const q=questions[current];
+    qc.innerHTML=`
+    <div class="quiz-q" id="qBlock">
+      <p>${current+1}. ${q.q}</p>
+      <div class="quiz-opts">${q.opts.map((o,i)=>`
+          <div class="quiz-opt" onclick="selectOpt(this,${i})" data-idx="${i}">
+            <div class="dot">${String.fromCharCode(65+i)}</div>${o}
+          </div>`).join('')
+    }</div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+    </div>`;
+}
+
+function selectOpt(el,idx){
+    const q=questions[current];
+    const opts=document.querySelectorAll('.quiz-opt');
+    opts.forEach(o=>o.onclick=null);
+    const fb=document.getElementById('qFeedback');
+    const correct=idx===q.ans;
+    answers.push(correct);
+    opts[q.ans].classList.add('correct');
+    if(!correct)el.classList.add('wrong');
+    fb.textContent=correct?'✅ '+q.feedback:'❌ La respuesta correcta es: '+q.opts[q.ans]+'. '+q.feedback;
+    fb.className='quiz-feedback show '+(correct?'ok':'no');
+    const pct=((current+1)/questions.length)*100;
+    document.getElementById('quizProgress').style.width=pct+'%';
+    setTimeout(()=>{
+        current++;
+        if(current<questions.length){renderQuestion();}else{showScore();}
+    },2500);
+}
+
+function showScore(){
+    const score=answers.filter(Boolean).length;
+    document.getElementById('quizContainer').innerHTML='';
+    document.getElementById('scoreNum').textContent=score+'/'+questions.length;
+    const msgs=['Seguí practicando. 💪','Buen comienzo. 📖','Vas bien, repasá los conceptos. 🔄','Bien, un poco más. 📚','Muy bien. 🎯','¡Muy buen trabajo! ⭐','¡Excelente! 🌟','¡Casi perfecto! 🎉','¡Perfecto! Dominás el tema. 🏆'];
+    document.getElementById('scoreFeedback').textContent=msgs[Math.min(score,msgs.length-1)];
+    document.getElementById('quizScore').classList.add('show');
+}
+
+initQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unidad 2 - Manejo de Archivos JSON con JavaScript</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2234;
+  --accent-cyan: #00e5ff;
+  --accent-magenta: #e040fb;
+  --accent-gold: #ffd740;
+  --accent-green: #69f0ae;
+  --text-primary: #e8eaf6;
+  --text-secondary: #90a4ae;
+  --glass: rgba(26,34,52,0.75);
+  --glow-cyan: 0 0 20px rgba(0,229,255,0.3);
+  --glow-magenta: 0 0 20px rgba(224,64,251,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 50%,rgba(0,229,255,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 20%,rgba(224,64,251,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 80%,rgba(255,215,64,0.04) 0%,transparent 50%);
+  pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%2300e5ff' stroke-width='.5'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;}
+
+.floater{position:fixed;pointer-events:none;z-index:0;opacity:.12;}
+.floater-1{top:10%;left:5%;width:80px;height:80px;background:var(--accent-cyan);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);animation:floatA 8s ease-in-out infinite;}
+.floater-2{top:30%;right:8%;width:60px;height:60px;background:var(--accent-magenta);clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);animation:floatB 10s ease-in-out infinite;}
+.floater-3{bottom:20%;left:10%;width:50px;height:50px;background:var(--accent-gold);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:floatA 12s ease-in-out infinite reverse;}
+.floater-4{top:60%;right:5%;width:70px;height:70px;background:var(--accent-green);clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);animation:floatB 9s ease-in-out infinite;}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-30px) rotate(15deg);}}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(20px) rotate(-10deg);}}
+
+.container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1;}
+
+.section-title{position:relative;display:inline-block;margin-bottom:30px;padding:14px 40px 14px 50px;
+  font-size:1.6em;font-weight:700;letter-spacing:1px;color:#fff;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);
+  text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.section-title i{margin-right:10px;}
+.section-title::after{content:'';position:absolute;inset:2px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(224,64,251,0.15));
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);}
+
+.sub-title{position:relative;display:inline-block;margin:25px 0 15px;padding:8px 30px 8px 35px;
+  font-size:1.15em;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent-gold),#ff9100);
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);}
+
+.card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(0,229,255,0.12);
+  border-radius:16px;padding:30px;margin-bottom:30px;position:relative;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s;}
+.card:hover{border-color:rgba(0,229,255,0.3);box-shadow:var(--glow-cyan);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));}
+
+.code-block{background:#0d1117;border:1px solid rgba(0,229,255,0.15);border-radius:10px;padding:20px;
+  margin:15px 0;font-family:'Cascadia Code','Fira Code',monospace;font-size:.88em;
+  overflow-x:auto;line-height:1.8;position:relative;}
+.code-block::before{content:'JS';position:absolute;top:8px;right:12px;
+  font-size:.7em;color:var(--accent-gold);font-weight:700;letter-spacing:1px;
+  padding:2px 10px;border:1px solid rgba(255,215,64,0.3);border-radius:6px;}
+.code-block.json::before{content:'JSON';color:var(--accent-cyan);border-color:rgba(0,229,255,0.3);}
+.kw{color:#ff7b72;}.str{color:#a5d6ff;}.cm{color:#8b949e;font-style:italic;}.fn{color:#d2a8ff;}.num{color:#79c0ff;}.cls{color:#ffa657;}.op{color:#ff7b72;}.prop{color:#7ee787;}
+
+.console-area{background:#0d1117;border:1px solid rgba(105,240,174,0.2);border-radius:10px;
+  padding:15px 20px;margin-top:10px;font-family:monospace;font-size:.9em;color:var(--accent-green);
+  min-height:45px;white-space:pre-wrap;position:relative;}
+.console-area::before{content:'▶ Consola';position:absolute;top:-10px;left:15px;
+  background:#0d1117;padding:0 8px;font-size:.75em;color:var(--accent-green);letter-spacing:1px;}
+
+.btn-run{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;margin:10px 5px;
+  background:linear-gradient(135deg,var(--accent-cyan),#0097a7);color:#000;font-weight:700;
+  border:none;border-radius:8px;cursor:pointer;font-size:.95em;
+  transition:transform .2s,box-shadow .2s;text-transform:uppercase;letter-spacing:1px;}
+.btn-run:hover{transform:translateY(-2px);box-shadow:var(--glow-cyan);}
+.btn-run:active{transform:scale(.97);}
+.btn-run i{font-size:.9em;}
+
+.concept-tag{display:inline-block;padding:6px 20px;margin:4px;font-size:.82em;font-weight:600;
+  color:#fff;background:var(--accent-magenta);
+  clip-path:polygon(10% 0%,90% 0%,100% 50%,90% 100%,10% 100%,0% 50%);
+  transition:transform .2s;}
+.concept-tag:hover{transform:scale(1.08);}
+.concept-tag.cyan{background:var(--accent-cyan);color:#000;}
+.concept-tag.gold{background:var(--accent-gold);color:#000;}
+.concept-tag.green{background:var(--accent-green);color:#000;}
+
+.quiz{background:rgba(26,34,52,0.9);border:1px solid rgba(255,215,64,0.2);border-radius:14px;padding:25px;margin-top:25px;}
+.quiz h3{color:var(--accent-gold);margin-bottom:15px;font-size:1.1em;}
+.quiz-q{margin-bottom:20px;padding:15px;border-radius:10px;background:rgba(0,0,0,0.3);border-left:3px solid var(--accent-magenta);}
+.quiz-q p{font-weight:600;margin-bottom:10px;}
+.quiz-q label{display:block;padding:7px 14px;margin:4px 0;border-radius:8px;cursor:pointer;transition:background .2s;font-size:.92em;}
+.quiz-q label:hover{background:rgba(0,229,255,0.08);}
+.quiz-q input[type="radio"]{margin-right:8px;accent-color:var(--accent-cyan);}
+.quiz-result{padding:12px 20px;border-radius:8px;margin-top:10px;font-weight:700;display:none;}
+.quiz-result.correct{background:rgba(105,240,174,0.15);color:var(--accent-green);display:block;}
+.quiz-result.wrong{background:rgba(255,82,82,0.15);color:#ff5252;display:block;}
+
+.fun-fact{background:linear-gradient(135deg,rgba(224,64,251,0.08),rgba(0,229,255,0.08));border:1px solid rgba(224,64,251,0.2);border-radius:12px;padding:20px 24px;margin:20px 0;position:relative;}
+.fun-fact::before{content:'💡';position:absolute;top:-12px;left:16px;font-size:1.4rem;background:var(--bg-primary);padding:0 6px;}
+.fun-fact h4{color:var(--accent-magenta);font-size:.95em;margin-bottom:6px;}
+.fun-fact p{color:var(--text-secondary);font-size:.9em;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(15px);
+  border-bottom:1px solid rgba(0,229,255,0.15);padding:10px 0;}
+nav .nav-inner{max-width:960px;margin:0 auto;display:flex;gap:8px;padding:0 20px;flex-wrap:wrap;justify-content:center;}
+nav a{color:var(--text-secondary);text-decoration:none;font-size:.82em;padding:6px 14px;border-radius:8px;
+  transition:all .3s;font-weight:500;}
+nav a:hover,nav a.active{color:var(--accent-cyan);background:rgba(0,229,255,0.08);}
+
+.hero{text-align:center;padding:60px 20px 40px;position:relative;}
+.hero h1{font-size:2.5em;font-weight:800;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta),var(--accent-gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;animation:shimmer 3s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
+.hero p{color:var(--text-secondary);font-size:1.1em;max-width:650px;margin:0 auto;}
+.hero-shape{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;
+  opacity:.04;clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-magenta));animation:floatA 6s ease-in-out infinite;}
+
+.highlight{color:var(--accent-cyan);font-weight:600;}
+.highlight-m{color:var(--accent-magenta);font-weight:600;}
+.highlight-g{color:var(--accent-gold);font-weight:600;}
+p+p{margin-top:12px;}
+section{padding:20px 0;scroll-margin-top:60px;}
+@media(max-width:768px){.section-title{font-size:1.2em;padding:10px 30px 10px 35px;}}
+</style>
+</head>
+<body>
+
+<div class="floater floater-1"></div>
+<div class="floater floater-2"></div>
+<div class="floater floater-3"></div>
+<div class="floater floater-4"></div>
+
+<nav><div class="nav-inner">
+  <a href="#intro"><i class="fas fa-file-code"></i> ¿Qué es JSON?</a>
+  <a href="#sintaxis"><i class="fas fa-code"></i> Sintaxis</a>
+  <a href="#operaciones"><i class="fas fa-cogs"></i> Operaciones</a>
+  <a href="#curiosidades"><i class="fas fa-lightbulb"></i> Curiosidades</a>
+  <a href="#practica"><i class="fas fa-laptop-code"></i> Práctica</a>
+  <a href="#quiz-section"><i class="fas fa-question-circle"></i> Quiz</a>
+</div></nav>
+
+<div class="container">
+<div class="hero">
+  <div class="hero-shape"></div>
+  <h1><i class="fas fa-file-code"></i> Manejo de Archivos JSON</h1>
+  <p>Unidad 2 — Programación III · Almacenamiento, lectura y manipulación de datos con JavaScript</p>
+</div>
+
+<!-- ==================== SECCIÓN 1: ¿QUÉ ES JSON? ==================== -->
+<section id="intro">
+<div class="section-title"><i class="fas fa-file-code"></i> ¿Qué es JSON?</div>
+
+<div class="card">
+<p><span class="highlight">JSON</span> (JavaScript Object Notation) es un formato ligero de intercambio de datos. Aunque nació de JavaScript, hoy es el estándar universal para transmitir información entre servidores, APIs y aplicaciones.</p>
+<p>Fue creado por <span class="highlight-m">Douglas Crockford</span> a principios de los años 2000 como alternativa más simple a XML. Su sintaxis es fácil de leer para humanos y simple de interpretar para las máquinas.</p>
+
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin:18px 0;">
+  <span class="concept-tag cyan"><i class="fas fa-tag"></i> Ligero</span>
+  <span class="concept-tag"><i class="fas fa-exchange-alt"></i> Intercambio</span>
+  <span class="concept-tag gold"><i class="fas fa-globe"></i> Universal</span>
+  <span class="concept-tag green"><i class="fas fa-check"></i> Legible</span>
+</div>
+
+<div class="sub-title"><i class="fas fa-history"></i> Origen y contexto</div>
+<p>Antes de JSON, el formato dominante era <strong>XML</strong>, mucho más verboso y pesado. Crockford propuso JSON como un subconjunto de la notación de objetos de JavaScript, logrando un formato más compacto.</p>
+<p>En 2013, JSON fue estandarizado como <span class="highlight-g">ECMA-404</span> y luego como <strong>RFC 8259</strong>. Hoy lo usan el 99% de las APIs web modernas (REST APIs), archivos de configuración (package.json, tsconfig.json) y bases de datos como MongoDB.</p>
+</div>
+
+<div class="fun-fact">
+<h4>Dato curioso — JSON vs XML</h4>
+<p>El mismo dato en XML ocupa aproximadamente un <strong>30-40% más de espacio</strong> que en JSON. Por eso las APIs modernas migraron masivamente a JSON: menos bytes = más velocidad = menos costo de transferencia.</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 2: SINTAXIS ==================== -->
+<section id="sintaxis">
+<div class="section-title"><i class="fas fa-code"></i> Sintaxis de JSON</div>
+
+<div class="card">
+<p>JSON se compone de dos estructuras básicas: <span class="highlight">objetos</span> (pares clave-valor entre llaves) y <span class="highlight-m">arrays</span> (listas ordenadas entre corchetes).</p>
+
+<div class="sub-title"><i class="fas fa-file-code"></i> Estructura de un archivo JSON</div>
+<div class="code-block json">
+{
+  <span class="prop">"nombre"</span>: <span class="str">"María López"</span>,
+  <span class="prop">"edad"</span>: <span class="num">28</span>,
+  <span class="prop">"activo"</span>: <span class="kw">true</span>,
+  <span class="prop">"cursos"</span>: [<span class="str">"JavaScript"</span>, <span class="str">"Python"</span>, <span class="str">"SQL"</span>],
+  <span class="prop">"direccion"</span>: {
+    <span class="prop">"ciudad"</span>: <span class="str">"Paraná"</span>,
+    <span class="prop">"provincia"</span>: <span class="str">"Entre Ríos"</span>
+  },
+  <span class="prop">"telefono"</span>: <span class="kw">null</span>
+}
+</div>
+
+<div class="sub-title"><i class="fas fa-list-check"></i> Reglas de sintaxis</div>
+<p>📌 Las claves <strong>siempre van entre comillas dobles</strong> (<code>"clave"</code>).</p>
+<p>📌 Los valores pueden ser: <span class="highlight">string</span>, <span class="highlight-m">number</span>, <span class="highlight-g">boolean</span> (<code>true</code>/<code>false</code>), <code>null</code>, <span class="highlight">object</span> o <span class="highlight-m">array</span>.</p>
+<p>📌 <strong>No se permiten</strong>: comentarios, comas finales (trailing commas), comillas simples ni funciones.</p>
+<p>📌 JSON no es igual a un objeto JS: un objeto JS es más flexible (admite funciones, claves sin comillas, etc.).</p>
+
+<div class="sub-title"><i class="fas fa-arrows-rotate"></i> JSON.parse() y JSON.stringify()</div>
+<p>Estas son las dos funciones clave para trabajar con JSON en JavaScript:</p>
+<div class="code-block">
+<span class="cm">// Convertir string JSON → Objeto JavaScript</span>
+<span class="kw">const</span> <span class="prop">jsonTexto</span> = <span class="str">'{"nombre":"Ana","edad":22}'</span>;
+<span class="kw">const</span> <span class="prop">objeto</span> = JSON.<span class="fn">parse</span>(jsonTexto);
+console.<span class="fn">log</span>(objeto.nombre);  <span class="cm">// "Ana"</span>
+
+<span class="cm">// Convertir Objeto JavaScript → string JSON</span>
+<span class="kw">const</span> <span class="prop">persona</span> = { nombre: <span class="str">"Carlos"</span>, edad: <span class="num">30</span> };
+<span class="kw">const</span> <span class="prop">jsonString</span> = JSON.<span class="fn">stringify</span>(persona);
+console.<span class="fn">log</span>(jsonString);  <span class="cm">// '{"nombre":"Carlos","edad":30}'</span>
+
+<span class="cm">// Con formato legible (indentado)</span>
+console.<span class="fn">log</span>(JSON.<span class="fn">stringify</span>(persona, <span class="kw">null</span>, <span class="num">2</span>));
+</div>
+
+<button class="btn-run" onclick="runParse()"><i class="fas fa-play"></i> Ejecutar Parse</button>
+<button class="btn-run" onclick="runStringify()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-play"></i> Ejecutar Stringify</button>
+<div class="console-area" id="console-syntax"></div>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 3: OPERACIONES CRUD ==================== -->
+<section id="operaciones">
+<div class="section-title"><i class="fas fa-cogs"></i> Operaciones con JSON</div>
+
+<div class="card">
+<p>Cuando trabajamos con JSON como una <span class="highlight">mini base de datos</span> en el navegador, las operaciones principales son: <strong>leer, agregar, modificar y eliminar</strong> elementos.</p>
+
+<div class="sub-title"><i class="fas fa-database"></i> Datos iniciales</div>
+<div class="code-block json">
+<span class="cm">// Simulamos una "base de datos" de alumnos en JSON</span>
+<span class="kw">let</span> <span class="prop">alumnos</span> = [
+  { <span class="prop">"id"</span>: <span class="num">1</span>, <span class="prop">"nombre"</span>: <span class="str">"Ana García"</span>, <span class="prop">"nota"</span>: <span class="num">8.5</span> },
+  { <span class="prop">"id"</span>: <span class="num">2</span>, <span class="prop">"nombre"</span>: <span class="str">"Luis Pérez"</span>, <span class="prop">"nota"</span>: <span class="num">7.0</span> },
+  { <span class="prop">"id"</span>: <span class="num">3</span>, <span class="prop">"nombre"</span>: <span class="str">"María López"</span>, <span class="prop">"nota"</span>: <span class="num">9.2</span> }
+];
+</div>
+
+<div class="sub-title"><i class="fas fa-search"></i> Leer / Buscar datos</div>
+<div class="code-block">
+<span class="cm">// Listar todos</span>
+alumnos.<span class="fn">forEach</span>(<span class="prop">a</span> => console.<span class="fn">log</span>(<span class="str">`${a.nombre} - Nota: ${a.nota}`</span>));
+
+<span class="cm">// Buscar por ID</span>
+<span class="kw">const</span> <span class="prop">buscado</span> = alumnos.<span class="fn">find</span>(<span class="prop">a</span> => a.id === <span class="num">2</span>);
+console.<span class="fn">log</span>(buscado);  <span class="cm">// {id:2, nombre:"Luis Pérez", nota:7.0}</span>
+
+<span class="cm">// Filtrar aprobados (nota >= 7)</span>
+<span class="kw">const</span> <span class="prop">aprobados</span> = alumnos.<span class="fn">filter</span>(<span class="prop">a</span> => a.nota >= <span class="num">7</span>);
+</div>
+
+<button class="btn-run" onclick="runLeer()"><i class="fas fa-play"></i> Listar Alumnos</button>
+<button class="btn-run" onclick="runBuscar()" style="background:linear-gradient(135deg,var(--accent-magenta),#9c27b0);">
+  <i class="fas fa-search"></i> Buscar ID 2</button>
+<div class="console-area" id="console-leer"></div>
+</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-plus-circle"></i> Insertar un nuevo elemento</div>
+<div class="code-block">
+<span class="cm">// Crear un nuevo alumno</span>
+<span class="kw">const</span> <span class="prop">nuevo</span> = { id: <span class="num">4</span>, nombre: <span class="str">"Pedro Ruiz"</span>, nota: <span class="num">6.8</span> };
+
+<span class="cm">// Agregarlo al array</span>
+alumnos.<span class="fn">push</span>(nuevo);
+
+<span class="cm">// Verificar</span>
+console.<span class="fn">log</span>(JSON.<span class="fn">stringify</span>(alumnos, <span class="kw">null</span>, <span class="num">2</span>));
+</div>
+
+<div class="sub-title"><i class="fas fa-pen"></i> Modificar un elemento existente</div>
+<div class="code-block">
+<span class="cm">// Actualizar la nota del alumno con ID 2</span>
+<span class="kw">const</span> <span class="prop">alumno</span> = alumnos.<span class="fn">find</span>(<span class="prop">a</span> => a.id === <span class="num">2</span>);
+<span class="kw">if</span> (alumno) {
+  alumno.nota = <span class="num">8.0</span>;  <span class="cm">// actualizar directamente</span>
+  console.<span class="fn">log</span>(<span class="str">"Nota actualizada:"</span>, alumno);
+}
+</div>
+
+<div class="sub-title"><i class="fas fa-trash"></i> Eliminar un elemento</div>
+<div class="code-block">
+<span class="cm">// Eliminar alumno con ID 3</span>
+alumnos = alumnos.<span class="fn">filter</span>(<span class="prop">a</span> => a.id !== <span class="num">3</span>);
+
+<span class="cm">// El array ahora no contiene a María López</span>
+console.<span class="fn">log</span>(alumnos);
+</div>
+
+<button class="btn-run" onclick="runInsertar()"><i class="fas fa-plus"></i> Insertar</button>
+<button class="btn-run" onclick="runModificar()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-pen"></i> Modificar</button>
+<button class="btn-run" onclick="runEliminar()" style="background:linear-gradient(135deg,var(--accent-magenta),#9c27b0);">
+  <i class="fas fa-trash"></i> Eliminar</button>
+<button class="btn-run" onclick="runReset()" style="background:linear-gradient(135deg,#78909c,#546e7a);">
+  <i class="fas fa-undo"></i> Reset</button>
+<div class="console-area" id="console-crud"></div>
+</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-save"></i> Persistir en localStorage</div>
+<p>En el navegador, podemos usar <span class="highlight">localStorage</span> para guardar datos JSON de forma persistente (sobrevive al cerrar el navegador):</p>
+<div class="code-block">
+<span class="cm">// Guardar en localStorage</span>
+localStorage.<span class="fn">setItem</span>(<span class="str">"alumnos"</span>, JSON.<span class="fn">stringify</span>(alumnos));
+
+<span class="cm">// Recuperar de localStorage</span>
+<span class="kw">const</span> <span class="prop">datos</span> = JSON.<span class="fn">parse</span>(localStorage.<span class="fn">getItem</span>(<span class="str">"alumnos"</span>));
+
+<span class="cm">// Eliminar del localStorage</span>
+localStorage.<span class="fn">removeItem</span>(<span class="str">"alumnos"</span>);
+</div>
+<p>💡 <span class="highlight-g">localStorage</span> solo almacena strings, por eso necesitamos <code>JSON.stringify()</code> al guardar y <code>JSON.parse()</code> al leer.</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 4: CURIOSIDADES ==================== -->
+<section id="curiosidades">
+<div class="section-title"><i class="fas fa-lightbulb"></i> Datos Curiosos sobre JSON</div>
+
+<div class="card">
+<div class="fun-fact">
+<h4>🌍 JSON domina las APIs del mundo</h4>
+<p>Más del <strong>99% de las APIs REST</strong> modernas usan JSON como formato de intercambio. Servicios como Twitter/X, GitHub, Spotify, Google Maps y prácticamente toda aplicación web que usás envía y recibe JSON.</p>
+</div>
+
+<div class="fun-fact">
+<h4>📦 package.json: el corazón de todo proyecto Node.js</h4>
+<p>Cada proyecto JavaScript/Node.js tiene un archivo <code>package.json</code> que define nombre, versión, dependencias y scripts. <strong>npm</strong> (con más de 2 millones de paquetes) depende enteramente de JSON para funcionar.</p>
+</div>
+
+<div class="fun-fact">
+<h4>🔐 JSON Web Tokens (JWT) en seguridad</h4>
+<p>Los <strong>JWT</strong> son tokens de autenticación usados por millones de aplicaciones. Están compuestos por tres partes codificadas en Base64, y el <em>payload</em> (la parte central con los datos del usuario) es un objeto JSON. Es el estándar para login con OAuth, APIs protegidas y sesiones sin cookies.</p>
+</div>
+
+<div class="fun-fact">
+<h4>🗄️ MongoDB: una base de datos JSON</h4>
+<p>MongoDB, una de las bases de datos más populares del mundo, almacena sus documentos en <strong>BSON</strong> (Binary JSON). Básicamente, toda tu base de datos es una colección gigante de objetos JSON. Empresas como Uber, eBay y Forbes la usan.</p>
+</div>
+
+<div class="fun-fact">
+<h4>⚙️ Archivos de configuración en todas partes</h4>
+<p>VS Code (<code>settings.json</code>), TypeScript (<code>tsconfig.json</code>), ESLint (<code>.eslintrc.json</code>), Chrome extensions (<code>manifest.json</code>), GitHub Actions... Casi toda herramienta moderna usa JSON para su configuración.</p>
+</div>
+
+<div class="fun-fact">
+<h4>📡 JSON + IoT</h4>
+<p>Los dispositivos IoT (sensores, cámaras, wearables) envían datos en formato JSON a través de protocolos como <strong>MQTT</strong>. Un sensor de temperatura podría enviar: <code>{"sensor":"temp01","valor":23.5,"unidad":"°C"}</code>. Así de simple es el lenguaje de las «cosas conectadas».</p>
+</div>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 5: EJERCICIO PRÁCTICO ==================== -->
+<section id="practica">
+<div class="section-title"><i class="fas fa-laptop-code"></i> Ejercicio Práctico</div>
+
+<div class="card">
+<div class="sub-title"><i class="fas fa-database"></i> Mini Base de Datos: Gestión de Productos</div>
+<p>En este ejercicio vas a crear un sistema simple de gestión de productos usando JSON y JavaScript puro. El objetivo es practicar las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) que aprendimos.</p>
+
+<div class="sub-title"><i class="fas fa-clipboard-list"></i> Consigna</div>
+<p>Partiendo de los siguientes datos iniciales, implementá las funciones pedidas:</p>
+
+<div class="code-block json">
+<span class="kw">const</span> <span class="prop">productos</span> = [
+  { <span class="prop">"id"</span>: <span class="num">1</span>, <span class="prop">"nombre"</span>: <span class="str">"Cuaderno A4"</span>, <span class="prop">"precio"</span>: <span class="num">1500</span>, <span class="prop">"stock"</span>: <span class="num">25</span> },
+  { <span class="prop">"id"</span>: <span class="num">2</span>, <span class="prop">"nombre"</span>: <span class="str">"Lapicera azul"</span>, <span class="prop">"precio"</span>: <span class="num">350</span>, <span class="prop">"stock"</span>: <span class="num">100</span> },
+  { <span class="prop">"id"</span>: <span class="num">3</span>, <span class="prop">"nombre"</span>: <span class="str">"Resaltador amarillo"</span>, <span class="prop">"precio"</span>: <span class="num">800</span>, <span class="prop">"stock"</span>: <span class="num">40</span> },
+  { <span class="prop">"id"</span>: <span class="num">4</span>, <span class="prop">"nombre"</span>: <span class="str">"Mochila escolar"</span>, <span class="prop">"precio"</span>: <span class="num">15000</span>, <span class="prop">"stock"</span>: <span class="num">8</span> },
+  { <span class="prop">"id"</span>: <span class="num">5</span>, <span class="prop">"nombre"</span>: <span class="str">"Calculadora científica"</span>, <span class="prop">"precio"</span>: <span class="num">12000</span>, <span class="prop">"stock"</span>: <span class="num">12</span> }
+];
+</div>
+
+<div class="sub-title"><i class="fas fa-tasks"></i> Funciones a implementar</div>
+<p><span class="highlight">1. listarProductos()</span> — Mostrar todos los productos en consola con formato: <code>"[ID] Nombre - $Precio (Stock: X)"</code></p>
+<p><span class="highlight-m">2. buscarPorNombre(texto)</span> — Recibir un texto y devolver todos los productos cuyo nombre contenga ese texto (búsqueda parcial, sin distinguir mayúsculas).</p>
+<p><span class="highlight-g">3. agregarProducto(nombre, precio, stock)</span> — Agregar un nuevo producto con ID autoincremental (el siguiente al último ID existente).</p>
+<p><span class="highlight">4. actualizarPrecio(id, nuevoPrecio)</span> — Encontrar un producto por ID y actualizar su precio. Si no existe, mostrar error.</p>
+<p><span class="highlight-m">5. eliminarProducto(id)</span> — Eliminar un producto por ID. Retornar el producto eliminado o un mensaje de error.</p>
+<p><span class="highlight-g">6. productosMasCaros(limite)</span> — Devolver los productos ordenados de mayor a menor precio, limitados a la cantidad indicada.</p>
+<p><span class="highlight">7. guardarEnLocalStorage()</span> — Guardar el array de productos en localStorage.</p>
+<p><span class="highlight-m">8. cargarDesdeLocalStorage()</span> — Recuperar los productos desde localStorage (si existen) y cargarlos en el array.</p>
+
+<div class="sub-title"><i class="fas fa-star"></i> Bonus (opcional)</div>
+<p>Implementá una función <span class="highlight-g">exportarJSON()</span> que genere un archivo JSON descargable con los datos actuales. Tip: usá <code>Blob</code> y <code>URL.createObjectURL()</code>.</p>
+</div>
+</section>
+
+<!-- ==================== SECCIÓN 6: QUIZ ==================== -->
+<section id="quiz-section">
+<div class="section-title"><i class="fas fa-question-circle"></i> Cuestionario</div>
+
+<div class="quiz">
+<h3><i class="fas fa-question-circle"></i> Cuestionario — Manejo de JSON</h3>
+<div class="quiz-q" data-correct="b">
+  <p>1. ¿Qué función convierte un string JSON en un objeto JavaScript?</p>
+  <label><input type="radio" name="q1" value="a"> JSON.stringify()</label>
+  <label><input type="radio" name="q1" value="b"> JSON.parse()</label>
+  <label><input type="radio" name="q1" value="c"> JSON.convert()</label>
+  <label><input type="radio" name="q1" value="d"> JSON.toObject()</label>
+  <div class="quiz-result" id="q1r"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+  <p>2. ¿Qué función convierte un objeto JavaScript en un string JSON?</p>
+  <label><input type="radio" name="q2" value="a"> JSON.stringify()</label>
+  <label><input type="radio" name="q2" value="b"> JSON.parse()</label>
+  <label><input type="radio" name="q2" value="c"> JSON.toString()</label>
+  <label><input type="radio" name="q2" value="d"> JSON.encode()</label>
+  <div class="quiz-result" id="q2r"></div>
+</div>
+<div class="quiz-q" data-correct="c">
+  <p>3. ¿Cuál de estas NO es una regla válida de JSON?</p>
+  <label><input type="radio" name="q3" value="a"> Las claves van entre comillas dobles</label>
+  <label><input type="radio" name="q3" value="b"> No se permiten comentarios</label>
+  <label><input type="radio" name="q3" value="c"> Se pueden usar funciones como valor</label>
+  <label><input type="radio" name="q3" value="d"> Los valores pueden ser null</label>
+  <div class="quiz-result" id="q3r"></div>
+</div>
+<div class="quiz-q" data-correct="b">
+  <p>4. ¿Qué método de array usamos para eliminar un elemento por condición?</p>
+  <label><input type="radio" name="q4" value="a"> .splice()</label>
+  <label><input type="radio" name="q4" value="b"> .filter()</label>
+  <label><input type="radio" name="q4" value="c"> .delete()</label>
+  <label><input type="radio" name="q4" value="d"> .remove()</label>
+  <div class="quiz-result" id="q4r"></div>
+</div>
+<div class="quiz-q" data-correct="d">
+  <p>5. ¿Quién creó el formato JSON?</p>
+  <label><input type="radio" name="q5" value="a"> Brendan Eich</label>
+  <label><input type="radio" name="q5" value="b"> Tim Berners-Lee</label>
+  <label><input type="radio" name="q5" value="c"> Linus Torvalds</label>
+  <label><input type="radio" name="q5" value="d"> Douglas Crockford</label>
+  <div class="quiz-result" id="q5r"></div>
+</div>
+<div class="quiz-q" data-correct="a">
+  <p>6. ¿Por qué localStorage necesita JSON.stringify() para guardar objetos?</p>
+  <label><input type="radio" name="q6" value="a"> Porque localStorage solo almacena strings</label>
+  <label><input type="radio" name="q6" value="b"> Porque es más seguro</label>
+  <label><input type="radio" name="q6" value="c"> Porque comprime los datos</label>
+  <label><input type="radio" name="q6" value="d"> No es necesario, es opcional</label>
+  <div class="quiz-result" id="q6r"></div>
+</div>
+<button class="btn-run" onclick="checkQuiz()" style="background:linear-gradient(135deg,var(--accent-gold),#ff9100);">
+  <i class="fas fa-check-circle"></i> Verificar Respuestas</button>
+</div>
+</section>
+
+<footer style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:.85em;border-top:1px solid rgba(0,229,255,0.1);margin-top:40px;">
+  <p><i class="fas fa-graduation-cap"></i> Programación III — Unidad 2: Manejo de Archivos JSON con JavaScript</p>
+</footer>
+
+</div>
+
+<script>
+function log(id, text) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = 'fadeIn .4s ease';
+}
+
+// ========== DATA ==========
+let alumnos = [
+  { id: 1, nombre: "Ana García", nota: 8.5 },
+  { id: 2, nombre: "Luis Pérez", nota: 7.0 },
+  { id: 3, nombre: "María López", nota: 9.2 }
+];
+const datosOriginales = JSON.parse(JSON.stringify(alumnos));
+
+// ========== SYNTAX DEMOS ==========
+function runParse() {
+  const jsonTexto = '{"nombre":"Ana","edad":22,"ciudad":"Paraná"}';
+  const obj = JSON.parse(jsonTexto);
+  let out = `> const jsonTexto = '{"nombre":"Ana","edad":22,"ciudad":"Paraná"}';\n`;
+  out += `> const obj = JSON.parse(jsonTexto);\n`;
+  out += `> obj.nombre  →  "${obj.nombre}"\n`;
+  out += `> obj.edad    →  ${obj.edad}\n`;
+  out += `> obj.ciudad  →  "${obj.ciudad}"\n`;
+  out += `> typeof obj  →  "${typeof obj}"`;
+  log('console-syntax', out);
+}
+
+function runStringify() {
+  const persona = { nombre: "Carlos", edad: 30, activo: true };
+  const json = JSON.stringify(persona);
+  const jsonPretty = JSON.stringify(persona, null, 2);
+  let out = `> const persona = { nombre: "Carlos", edad: 30, activo: true };\n`;
+  out += `> JSON.stringify(persona)\n  '${json}'\n\n`;
+  out += `> JSON.stringify(persona, null, 2)\n${jsonPretty}`;
+  log('console-syntax', out);
+}
+
+// ========== CRUD DEMOS ==========
+function runLeer() {
+  let out = "📋 Lista de alumnos:\n";
+  alumnos.forEach(a => { out += `  [${a.id}] ${a.nombre} - Nota: ${a.nota}\n`; });
+  out += `\n📊 Total: ${alumnos.length} alumnos`;
+  log('console-leer', out);
+}
+
+function runBuscar() {
+  const b = alumnos.find(a => a.id === 2);
+  let out = `> alumnos.find(a => a.id === 2)\n`;
+  if (b) out += `  ✔ Encontrado: ${JSON.stringify(b)}`;
+  else out += `  ✘ No encontrado`;
+  log('console-leer', out);
+}
+
+function runInsertar() {
+  const maxId = Math.max(...alumnos.map(a => a.id));
+  const nuevo = { id: maxId + 1, nombre: "Pedro Ruiz", nota: 6.8 };
+  alumnos.push(nuevo);
+  let out = `> Insertando: ${JSON.stringify(nuevo)}\n`;
+  out += `  ✔ Agregado correctamente\n\n`;
+  out += `📋 Array actualizado:\n`;
+  alumnos.forEach(a => { out += `  [${a.id}] ${a.nombre} - ${a.nota}\n`; });
+  log('console-crud', out);
+}
+
+function runModificar() {
+  const a = alumnos.find(a => a.id === 2);
+  if (a) {
+    const old = a.nota;
+    a.nota = 8.0;
+    let out = `> Modificando alumno ID 2...\n`;
+    out += `  Nota anterior: ${old}  →  Nueva nota: ${a.nota}\n`;
+    out += `  ✔ ${JSON.stringify(a)}`;
+    log('console-crud', out);
+  } else {
+    log('console-crud', '  ✘ Alumno ID 2 no encontrado');
+  }
+}
+
+function runEliminar() {
+  const eliminado = alumnos.find(a => a.id === 3);
+  if (eliminado) {
+    alumnos = alumnos.filter(a => a.id !== 3);
+    let out = `> Eliminando alumno ID 3...\n`;
+    out += `  ✔ Eliminado: ${JSON.stringify(eliminado)}\n\n`;
+    out += `📋 Array actualizado:\n`;
+    alumnos.forEach(a => { out += `  [${a.id}] ${a.nombre} - ${a.nota}\n`; });
+    log('console-crud', out);
+  } else {
+    log('console-crud', '  ✘ Alumno ID 3 no encontrado (ya fue eliminado?)');
+  }
+}
+
+function runReset() {
+  alumnos = JSON.parse(JSON.stringify(datosOriginales));
+  let out = `> 🔄 Datos restablecidos al estado original\n\n`;
+  alumnos.forEach(a => { out += `  [${a.id}] ${a.nombre} - ${a.nota}\n`; });
+  log('console-crud', out);
+}
+
+// ========== QUIZ SYSTEM ==========
+function checkQuiz() {
+  for (let i = 1; i <= 6; i++) {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    const resultEl = document.getElementById(`q${i}r`);
+    const correct = document.querySelector(`input[name="q${i}"]`).closest('.quiz-q').dataset.correct;
+    if (!selected) { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '⚠ Seleccioná una opción.'; continue; }
+    if (selected.value === correct) { resultEl.className = 'quiz-result correct'; resultEl.textContent = '✔ ¡Correcto!'; }
+    else { resultEl.className = 'quiz-result wrong'; resultEl.textContent = '✘ Incorrecto. Intentá de nuevo.'; }
+  }
+}
+
+// Add fadeIn animation
+const style = document.createElement('style');
+style.textContent = '@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(style);
+
+// Active nav
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>
