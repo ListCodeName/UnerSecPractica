@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Paso a Paso – Divs & Selectores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==================== RESET & BASE ==================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0d0f1a;
+      --surface:     #13162b;
+      --surface2:    #1c2040;
+      --border:      #2a2f5a;
+      --accent:      #7c5cfc;
+      --accent2:     #e040fb;
+      --accent3:     #00e5ff;
+      --success:     #00e676;
+      --text:        #e8eaf6;
+      --text-muted:  #8891bb;
+      --code-bg:     #090b16;
+      --step-done:   #1a3a2a;
+      --radius:      14px;
+      --radius-sm:   8px;
+      --font:        'Inter', sans-serif;
+      --mono:        'Fira Code', monospace;
+      --shadow:      0 8px 32px rgba(0,0,0,.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ==================== ANIMATED BACKGROUND ==================== */
+    .bg-orbs {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: .18;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    .orb:nth-child(1) { width:520px; height:520px; background: var(--accent);  top:-100px; left:-120px; animation-delay:0s; }
+    .orb:nth-child(2) { width:380px; height:380px; background: var(--accent2); top:40%;  right:-80px;  animation-delay:3s; }
+    .orb:nth-child(3) { width:300px; height:300px; background: var(--accent3); bottom:0; left:30%;     animation-delay:6s; }
+    @keyframes drift { from{transform:translate(0,0) scale(1);} to{transform:translate(30px,40px) scale(1.08);} }
+
+    /* ==================== LAYOUT ==================== */
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ==================== HEADER ==================== */
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #fff 30%, var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-top: 14px;
+      max-width: 560px;
+      margin-inline: auto;
+      line-height: 1.7;
+    }
+
+    /* ==================== PROGRESS BAR ==================== */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .progress-bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      transition: width .5s ease;
+    }
+    .progress-label {
+      font-size: .8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ==================== STEP CARDS ==================== */
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 28px;
+      overflow: hidden;
+      transition: border-color .3s;
+      box-shadow: var(--shadow);
+    }
+    .step-card.active  { border-color: var(--accent); }
+    .step-card.done    { border-color: var(--success); background: var(--step-done); }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 22px 26px;
+      cursor: pointer;
+      user-select: none;
+      transition: background .2s;
+    }
+    .step-header:hover { background: rgba(124,92,252,.07); }
+
+    .step-num {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .9rem;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      color: var(--text-muted);
+      background: var(--surface2);
+      transition: all .3s;
+    }
+    .step-card.active .step-num {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 18px rgba(124,92,252,.55);
+    }
+    .step-card.done .step-num {
+      background: var(--success);
+      border-color: transparent;
+      color: #000;
+    }
+
+    .step-title {
+      flex: 1;
+    }
+    .step-title h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .step-title p {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .step-arrow {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: transform .3s;
+    }
+    .step-card.active .step-arrow { transform: rotate(90deg); color: var(--accent); }
+
+    /* ==================== STEP BODY ==================== */
+    .step-body {
+      display: none;
+      padding: 0 26px 28px;
+      animation: fadeIn .3s ease;
+    }
+    .step-body.open { display: block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(-8px);} to{opacity:1;transform:translateY(0);} }
+
+    .explanation {
+      font-size: .95rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+    .explanation strong { color: var(--accent3); }
+    .explanation em { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+    /* ==================== CALLOUT BOX ==================== */
+    .callout {
+      border-left: 3px solid var(--accent2);
+      background: rgba(224,64,251,.07);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 14px 18px;
+      margin: 18px 0;
+      font-size: .9rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .callout .callout-title {
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 4px;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    /* ==================== CODE BLOCK ==================== */
+    .code-wrap {
+      position: relative;
+      margin: 18px 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+    }
+    .code-label {
+      background: var(--surface2);
+      padding: 6px 16px;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .code-label span.dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block;
+    }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    pre {
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: .85rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      tab-size: 2;
+    }
+    /* Syntax highlight classes (manual) */
+    .kw  { color: #c792ea; }  /* keyword */
+    .sel { color: #82aaff; }  /* selector / tag */
+    .prop{ color: #80cbc4; }  /* property */
+    .val { color: #f78c6c; }  /* value */
+    .str { color: #c3e88d; }  /* string */
+    .cmt { color: #546e7a; font-style: italic; } /* comment */
+    .tag { color: #f07178; }  /* html tag */
+    .attr{ color: #ffcb6b; }  /* attribute */
+    .num { color: #f78c6c; }  /* number */
+
+    .copy-btn {
+      position: absolute;
+      top: 38px; right: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: .72rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ==================== LIVE PREVIEW ==================== */
+    .preview-section {
+      margin-top: 24px;
+    }
+    .preview-section h3 {
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .preview-section h3::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .preview-box {
+      background: #fff;
+      border-radius: var(--radius-sm);
+      min-height: 120px;
+      padding: 24px;
+      border: 2px dashed var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .preview-box label {
+      position: absolute;
+      top: 6px; left: 10px;
+      font-size: .65rem;
+      color: #bbb;
+      font-family: var(--mono);
+    }
+
+    /* Divs that appear inside previews */
+    .prev-div-basic {
+      width: 200px;
+      height: 80px;
+      background: #7c5cfc;
+      border: 1px solid #ccc;
+    }
+    .prev-div-styled {
+      width: 200px;
+      height: 80px;
+      background: #e040fb;
+      border-radius: 8px;
+    }
+    .tarjeta {
+      width: 180px;
+      height: 70px;
+      background: #00e5ff;
+      border-radius: 8px;
+      margin: 6px;
+      display: inline-block;
+    }
+    /* Nesting preview */
+    .padre {
+      width: 280px;
+      height: 160px;
+      background: #7c5cfc22;
+      border: 3px solid #7c5cfc;
+      border-radius: 8px;
+      padding: 14px;
+      position: relative;
+    }
+    .hijo-a {
+      width: 100px; height: 50px;
+      background: #e040fb;
+      border-radius: 6px;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .hijo-b {
+      width: 100px; height: 50px;
+      background: #00e5ff;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .hermano {
+      width: 280px;
+      height: 54px;
+      background: #00e67622;
+      border: 2px solid #00e676;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    /* ==================== INTERACTIVE SLIDERS ==================== */
+    .interactive-section {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .interactive-section h3 {
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent3);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .slider-row label {
+      font-size: .82rem;
+      color: var(--text-muted);
+      min-width: 80px;
+      font-family: var(--mono);
+    }
+    .slider-row input[type=range] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+    .slider-row .val-display {
+      font-family: var(--mono);
+      font-size: .82rem;
+      color: var(--accent3);
+      min-width: 54px;
+      text-align: right;
+    }
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .color-row label { font-size: .82rem; color: var(--text-muted); min-width: 80px; font-family: var(--mono); }
+    .color-row input[type=color] {
+      width: 40px; height: 32px;
+      border: none; background: none; cursor: pointer; border-radius: 4px;
+    }
+
+    .live-box-wrapper {
+      background: #f3f3f8;
+      border-radius: var(--radius-sm);
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      border: 2px dashed #ccc;
+      padding: 20px;
+    }
+    #live-div {
+      background: #7c5cfc;
+      width: 200px;
+      height: 100px;
+      border-radius: 0px;
+      transition: all .25s ease;
+    }
+
+    /* ==================== NAVIGATION BUTTONS ==================== */
+    .nav-btns {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      justify-content: flex-end;
+    }
+    .btn {
+      padding: 10px 24px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(124,92,252,.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(124,92,252,.5); }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); color: var(--text); }
+
+    /* ==================== FINISH ==================== */
+    .finish-card {
+      display: none;
+      background: linear-gradient(135deg, rgba(124,92,252,.15), rgba(0,229,255,.1));
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+      margin-top: 32px;
+      box-shadow: var(--shadow);
+    }
+    .finish-card.visible { display: block; animation: fadeIn .5s ease; }
+    .finish-icon { font-size: 3rem; margin-bottom: 16px; }
+    .finish-card h2 { font-size: 1.8rem; font-weight: 800; color: var(--accent3); margin-bottom: 10px; }
+    .finish-card p { color: var(--text-muted); line-height: 1.7; max-width: 480px; margin-inline: auto; }
+
+    /* ==================== TOOLTIP ==================== */
+    [data-tip] { position: relative; cursor: help; border-bottom: 1px dashed var(--accent3); color: var(--accent3); }
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: .75rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 10;
+    }
+    [data-tip]:hover::after { opacity: 1; }
+
+    /* ==================== TAG LABELS IN PREVIEW ==================== */
+    .tag-label {
+      position: absolute;
+      background: var(--accent);
+      color: #fff;
+      font-size: .62rem;
+      font-family: var(--mono);
+      padding: 2px 7px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    /* ==================== SCROLLBAR ==================== */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 600px) {
+      .wrapper { padding: 32px 16px 60px; }
+      .step-header { padding: 16px; }
+      .step-body { padding: 0 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Animated background orbs -->
+<div class="bg-orbs">
+  <div class="orb"></div>
+  <div class="orb"></div>
+  <div class="orb"></div>
+</div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge">Programación II · Práctica CSS</div>
+    <h1>Divs &amp; Selectores CSS<br />Paso a Paso</h1>
+    <p>Un recorrido interactivo para entender cómo funcionan los <code style="color:var(--accent3)">div</code>, los selectores de clase y el anidamiento en HTML y CSS.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 / 4 pasos</div>
+  </div>
+
+  <!-- ================================================
+       PASO 1 – CREAR UN DIV
+  ================================================ -->
+  <div class="step-card active" id="step-1" data-step="1">
+    <div class="step-header" onclick="toggleStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-title">
+        <h2>Crear un <code>&lt;div&gt;</code></h2>
+        <p>El bloque fundamental del layout en HTML</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body open" id="body-1">
+
+      <p class="explanation">
+        Un <strong>&lt;div&gt;</strong> (abreviatura de <em>division</em>) es un elemento de bloque genérico
+        que sirve como <strong>contenedor</strong>. Por sí solo no muestra nada especial, pero es la base
+        sobre la que construimos toda estructura visual con CSS.
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">💡 ¿Por qué &lt;div&gt;?</div>
+        A diferencia de elementos semánticos como <code>&lt;section&gt;</code> o <code>&lt;article&gt;</code>,
+        el <code>&lt;div&gt;</code> no tiene significado propio: es un lienzo en blanco que podemos darle forma con CSS.
+        Ideal para agrupar contenido sin implicar ningún significado adicional.
+      </div>
+
+      <!-- Código HTML -->
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          HTML
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">&lt;!-- Un div básico --&gt;</span>
+<span class="tag">&lt;div&gt;</span>
+  Hola, soy un div.
+<span class="tag">&lt;/div&gt;</span></pre>
+      </div>
+
+      <div class="preview-section">
+        <h3>🖥 Vista previa</h3>
+        <div class="preview-box">
+          <label>navegador</label>
+          <div style="border:1px solid #ccc; padding:8px; font-family:serif; font-size:14px; color:#333; width:fit-content;">
+            Hola, soy un div.
+          </div>
+          <p style="color:#999; font-size:12px; margin-top:10px; font-family:monospace;">
+            ↑ Sin CSS el div es invisible. Solo muestra su contenido.
+          </p>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="completeStep(1)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       PASO 2 – SELECTOR CLASS
+  ================================================ -->
+  <div class="step-card" id="step-2" data-step="2">
+    <div class="step-header" onclick="toggleStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-title">
+        <h2>Agregar un selector <code>.class</code></h2>
+        <p>Agrupando estilos para reutilizarlos</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-2">
+
+      <p class="explanation">
+        Para darle estilos a un div usamos el atributo <strong>class</strong>.
+        CSS tiene tres tipos principales de selectores:
+        <em>etiqueta</em> (<code>div</code>), <em>id</em> (<code>#mi-id</code>) y <em>clase</em> (<code>.mi-clase</code>).
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">🤔 ¿Por qué clase y no id?</div>
+        Un <code>id</code> debe ser <strong>único</strong> en toda la página: sirve para identificar
+        <em>un solo</em> elemento. Una <code>class</code>, en cambio, puede aplicarse a
+        <strong>múltiples elementos a la vez</strong>, lo que permite reutilizar el mismo bloque de
+        estilos sin repetirlo. Esto es el principio <em>DRY</em> (Don't Repeat Yourself).
+        Además, las clases tienen menor especificidad que los ids, facilitando el mantenimiento.
+      </div>
+
+      <!-- Código HTML -->
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          HTML
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">&lt;!-- Agregamos la clase "tarjeta" --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"tarjeta"</span><span class="tag">&gt;</span>
+  Soy una tarjeta
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- Podemos aplicarla a OTRO div también --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"tarjeta"</span><span class="tag">&gt;</span>
+  Soy otra tarjeta con el mismo estilo
+<span class="tag">&lt;/div&gt;</span></pre>
+      </div>
+
+      <!-- Código CSS -->
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          CSS
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* El punto (.) indica "selector de clase" */</span>
+<span class="sel">.tarjeta</span> {
+  <span class="prop">background-color</span>: <span class="val">#00e5ff</span>;
+  <span class="prop">padding</span>: <span class="num">12px</span>;
+  <span class="prop">border-radius</span>: <span class="num">8px</span>;
+}</pre>
+      </div>
+
+      <div class="preview-section">
+        <h3>🖥 Vista previa</h3>
+        <div class="preview-box">
+          <label>navegador</label>
+          <div class="tarjeta" style="width:200px;height:50px;border-radius:8px;background:#00e5ff;margin:6px;display:flex;align-items:center;justify-content:center;color:#111;font-size:13px;font-weight:600;">Soy una tarjeta</div>
+          <div class="tarjeta" style="width:200px;height:50px;border-radius:8px;background:#00e5ff;margin:6px;display:flex;align-items:center;justify-content:center;color:#111;font-size:13px;font-weight:600;">Soy otra tarjeta</div>
+          <p style="color:#999; font-size:12px; margin-top:8px; font-family:monospace;">↑ Ambos divs comparten el mismo estilo .tarjeta</p>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(1)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(2)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       PASO 3 – WIDTH, HEIGHT, BACKGROUND
+  ================================================ -->
+  <div class="step-card" id="step-3" data-step="3">
+    <div class="step-header" onclick="toggleStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-title">
+        <h2>Width, Height &amp; Background</h2>
+        <p>Controlando las dimensiones y el fondo del elemento</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-3">
+
+      <p class="explanation">
+        Con CSS podemos controlar el <strong>tamaño</strong> y el <strong>color/imagen de fondo</strong>
+        de cualquier elemento. Las propiedades clave son:
+        <strong>width</strong> (ancho), <strong>height</strong> (alto) y
+        <strong>background-color</strong> (color de fondo).
+      </p>
+
+      <!-- Código CSS -->
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          CSS – Sintaxis de propiedades de caja
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.caja</span> {
+  <span class="prop">width</span>:            <span class="num">200px</span>;   <span class="cmt">/* ancho fijo en píxeles */</span>
+  <span class="prop">height</span>:           <span class="num">100px</span>;   <span class="cmt">/* alto fijo en píxeles  */</span>
+  <span class="prop">background-color</span>: <span class="val">#7c5cfc</span>; <span class="cmt">/* color de fondo HEX    */</span>
+
+  <span class="cmt">/* También podemos usar porcentaje o rem: */</span>
+  <span class="prop">width</span>:  <span class="num">50%</span>;   <span class="cmt">/* 50% del contenedor padre */</span>
+  <span class="prop">width</span>:  <span class="num">10rem</span>; <span class="cmt">/* 10 × tamaño base (16px) = 160px */</span>
+
+  <span class="cmt">/* border-radius redondea las esquinas */</span>
+  <span class="prop">border-radius</span>: <span class="num">8px</span>;
+}</pre>
+      </div>
+
+      <!-- INTERACTIVE PLAYGROUND -->
+      <div class="interactive-section">
+        <h3>🎮 Probá en tiempo real</h3>
+
+        <div class="slider-row">
+          <label>width</label>
+          <input type="range" id="sl-width" min="60" max="340" value="200"
+                 oninput="updateLiveDiv()">
+          <span class="val-display" id="lbl-width">200px</span>
+        </div>
+        <div class="slider-row">
+          <label>height</label>
+          <input type="range" id="sl-height" min="40" max="220" value="100"
+                 oninput="updateLiveDiv()">
+          <span class="val-display" id="lbl-height">100px</span>
+        </div>
+        <div class="slider-row">
+          <label>border-radius</label>
+          <input type="range" id="sl-radius" min="0" max="100" value="0"
+                 oninput="updateLiveDiv()">
+          <span class="val-display" id="lbl-radius">0px</span>
+        </div>
+        <div class="color-row">
+          <label>background</label>
+          <input type="color" id="sl-color" value="#7c5cfc" oninput="updateLiveDiv()">
+          <span class="val-display" id="lbl-color" style="font-size:.8rem;">#7c5cfc</span>
+        </div>
+
+        <!-- Live CSS output -->
+        <div class="code-wrap" style="margin-top:14px;">
+          <div class="code-label">
+            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+            CSS generado en vivo
+          </div>
+          <pre id="live-css-output" style="font-size:.78rem;line-height:1.9;">
+<span class="sel">.caja</span> {
+  <span class="prop">width</span>:            <span id="out-width"  class="num">200px</span>;
+  <span class="prop">height</span>:           <span id="out-height" class="num">100px</span>;
+  <span class="prop">background-color</span>: <span id="out-color"  class="val">#7c5cfc</span>;
+  <span class="prop">border-radius</span>:    <span id="out-radius" class="num">0px</span>;
+}</pre>
+        </div>
+
+        <div class="live-box-wrapper">
+          <div id="live-div"></div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(2)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(3)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       PASO 4 – ANIDAMIENTO
+  ================================================ -->
+  <div class="step-card" id="step-4" data-step="4">
+    <div class="step-header" onclick="toggleStep(4)">
+      <div class="step-num">4</div>
+      <div class="step-title">
+        <h2>Anidamiento de Divs</h2>
+        <p>Hermanos vs. Padre-Hijo</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-4">
+
+      <p class="explanation">
+        Los divs pueden <strong>anidarse</strong>: un div puede contener otros divs dentro.
+        Esto crea dos tipos de relaciones que es fundamental distinguir:
+        <em>padre-hijo</em> (un div dentro de otro) y <em>hermanos</em> (divs al mismo nivel).
+      </p>
+
+      <!-- SUB-SECCIÓN: PADRE-HIJO -->
+      <div class="callout">
+        <div class="callout-title">👨‍👦 Relación Padre → Hijo</div>
+        Cuando un div está <strong>dentro</strong> de otro, el externo es el
+        <em>padre</em> y el interno es el <em>hijo</em>. El hijo hereda algunas propiedades
+        del padre y, en CSS, el padre puede afectar al hijo con selectores descendientes.
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          HTML – Padre e Hijos
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"padre"</span><span class="tag">&gt;</span>       <span class="cmt">&lt;!-- PADRE --&gt;</span>
+
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"hijo-a"</span><span class="tag">&gt;</span>  <span class="cmt">&lt;!-- HIJO A --&gt;</span>
+    Hijo A
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"hijo-b"</span><span class="tag">&gt;</span>  <span class="cmt">&lt;!-- HIJO B (hermano de A) --&gt;</span>
+    Hijo B
+  <span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;/div&gt;</span></pre>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          CSS – Estilos de la jerarquía
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.padre</span> {
+  <span class="prop">width</span>: <span class="num">300px</span>;
+  <span class="prop">height</span>: <span class="num">160px</span>;
+  <span class="prop">background-color</span>: <span class="val">#7c5cfc33</span>; <span class="cmt">/* semitransparente */</span>
+  <span class="prop">border</span>: <span class="num">3px</span> <span class="val">solid</span> <span class="val">#7c5cfc</span>;
+  <span class="prop">padding</span>: <span class="num">14px</span>;
+}
+
+<span class="sel">.hijo-a</span> {
+  <span class="prop">width</span>: <span class="num">100px</span>;  <span class="prop">height</span>: <span class="num">50px</span>;
+  <span class="prop">background-color</span>: <span class="val">#e040fb</span>;  <span class="cmt">/* violeta */</span>
+  <span class="prop">display</span>: <span class="val">inline-block</span>;
+}
+
+<span class="sel">.hijo-b</span> {
+  <span class="prop">width</span>: <span class="num">100px</span>;  <span class="prop">height</span>: <span class="num">50px</span>;
+  <span class="prop">background-color</span>: <span class="val">#00e5ff</span>;  <span class="cmt">/* cyan */</span>
+  <span class="prop">display</span>: <span class="val">inline-block</span>;
+}
+
+<span class="cmt">/* Selector descendiente: solo hijos dentro de .padre */</span>
+<span class="sel">.padre .hijo-a</span> {
+  <span class="prop">border-radius</span>: <span class="num">6px</span>;
+}</pre>
+      </div>
+
+      <div class="preview-section">
+        <h3>🖥 Vista previa – Padre con Hijos</h3>
+        <div class="preview-box" style="background:#f7f7fc;">
+          <label>navegador</label>
+          <div style="margin-top:10px;">
+            <div class="padre" style="position:relative;">
+              <span style="position:absolute;top:3px;left:6px;font-size:10px;color:#7c5cfc;font-family:monospace;font-weight:700;">.padre</span>
+              <div style="margin-top:12px;">
+                <div class="hijo-a" style="position:relative;display:inline-flex;align-items:center;justify-content:center;">
+                  <span style="font-size:10px;color:#fff;font-weight:600;">.hijo-a</span>
+                </div>
+                <div class="hijo-b" style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-left:8px;">
+                  <span style="font-size:10px;color:#111;font-weight:600;">.hijo-b</span>
+                </div>
+              </div>
+              <p style="font-size:10px;color:#888;margin-top:8px;font-family:monospace;">hijo-a y hijo-b son HERMANOS entre sí</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-SECCIÓN: HERMANOS -->
+      <div class="callout" style="border-color: var(--success); background: rgba(0,230,118,.07); margin-top:24px;">
+        <div class="callout-title" style="color:var(--success);">🤝 Relación Hermanos (siblings)</div>
+        Dos divs son <strong>hermanos</strong> cuando están al <em>mismo nivel</em> dentro del mismo padre.
+        No están uno dentro del otro; conviven lado a lado en la jerarquía HTML.
+        En CSS podemos seleccionar al hermano adyacente con <code>+</code> o a todos los hermanos con <code>~</code>.
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          HTML – Dos divs hermanos
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">&lt;!-- Hermano 1 --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"seccion"</span><span class="tag">&gt;</span>
+  Primera sección
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- Hermano 2 – al mismo nivel que el anterior --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"seccion"</span><span class="tag">&gt;</span>
+  Segunda sección
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- Selector de hermano adyacente en CSS: --&gt;</span>
+<span class="cmt">&lt;!-- .seccion + .seccion { margin-top: 10px; } --&gt;</span></pre>
+      </div>
+
+      <div class="preview-section">
+        <h3>🖥 Vista previa – Hermanos</h3>
+        <div class="preview-box" style="background:#f7f7fc;">
+          <label>navegador</label>
+          <div style="margin-top:10px;">
+            <div class="hermano" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:#00e676;font-family:monospace;font-weight:700;">.seccion (hermano 1)</div>
+            <div class="hermano" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:#00e676;font-family:monospace;font-weight:700;margin-top:10px;">.seccion (hermano 2)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMEN VISUAL -->
+      <div class="callout" style="margin-top:24px; border-color:var(--accent3); background:rgba(0,229,255,.06);">
+        <div class="callout-title" style="color:var(--accent3);">📊 Resumen: ¿cuándo es Padre-Hijo y cuándo Hermanos?</div>
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px;">
+          <thead>
+            <tr style="color:var(--accent3);">
+              <th style="text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);">Concepto</th>
+              <th style="text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);">Descripción</th>
+              <th style="text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);">Selector CSS</th>
+            </tr>
+          </thead>
+          <tbody style="color:var(--text-muted);">
+            <tr>
+              <td style="padding:6px 10px;"><strong style="color:#e040fb;">Padre → Hijo</strong></td>
+              <td style="padding:6px 10px;">Un div dentro de otro</td>
+              <td style="padding:6px 10px;font-family:monospace;">.padre .hijo</td>
+            </tr>
+            <tr style="background:rgba(255,255,255,.02);">
+              <td style="padding:6px 10px;"><strong style="color:#00e676;">Hermanos</strong></td>
+              <td style="padding:6px 10px;">Divs al mismo nivel</td>
+              <td style="padding:6px 10px;font-family:monospace;">.a + .b &nbsp; .a ~ .b</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 10px;"><strong style="color:var(--accent3);">Hijo directo</strong></td>
+              <td style="padding:6px 10px;">Solo el primer nivel hijo</td>
+              <td style="padding:6px 10px;font-family:monospace;">.padre > .hijo</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(3)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(4)">✅ Finalizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINISH CARD -->
+  <div class="finish-card" id="finishCard">
+    <div class="finish-icon">🎉</div>
+    <h2>¡Práctica completada!</h2>
+    <p>
+      Repasaste cómo crear un <code style="color:var(--accent3)">div</code>, asignarle una
+      <code style="color:var(--accent3)">.clase</code>, controlar sus dimensiones con
+      <code style="color:var(--accent3)">width</code>, <code style="color:var(--accent3)">height</code> y
+      <code style="color:var(--accent3)">background-color</code>, y entender la diferencia entre
+      relaciones <strong>padre-hijo</strong> y <strong>hermanos</strong> en el árbol HTML.
+    </p>
+    <br>
+    <button class="btn btn-primary" onclick="resetAll()" style="margin-top:8px;">🔄 Reiniciar práctica</button>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+  /* ============================
+     STATE
+  ============================ */
+  const TOTAL = 4;
+  const done  = new Set();
+
+  /* ============================
+     TOGGLE / OPEN / CLOSE
+  ============================ */
+  function toggleStep(n) {
+    const card = document.getElementById('step-' + n);
+    const body = document.getElementById('body-' + n);
+    const isOpen = body.classList.contains('open');
+
+    // Close all
+    for (let i = 1; i <= TOTAL; i++) {
+      document.getElementById('body-' + i).classList.remove('open');
+      if (!done.has(i)) document.getElementById('step-' + i).classList.remove('active');
+    }
+
+    if (!isOpen) {
+      body.classList.add('open');
+      card.classList.add('active');
+    }
+  }
+
+  function goToStep(n) {
+    // Close all bodies
+    for (let i = 1; i <= TOTAL; i++) {
+      const b = document.getElementById('body-' + i);
+      b.classList.remove('open');
+    }
+    const body = document.getElementById('body-' + n);
+    const card = document.getElementById('step-' + n);
+    body.classList.add('open');
+    card.classList.add('active');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ============================
+     COMPLETE A STEP
+  ============================ */
+  function completeStep(n) {
+    done.add(n);
+    const card = document.getElementById('step-' + n);
+    card.classList.remove('active');
+    card.classList.add('done');
+    document.getElementById('body-' + n).classList.remove('open');
+
+    updateProgress();
+
+    if (n < TOTAL) {
+      // Open next step after short delay for visual effect
+      setTimeout(() => goToStep(n + 1), 320);
+    } else {
+      // All done
+      document.getElementById('finishCard').classList.add('visible');
+      document.getElementById('finishCard').scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  /* ============================
+     PROGRESS BAR
+  ============================ */
+  function updateProgress() {
+    const pct = (done.size / TOTAL) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = done.size + ' / ' + TOTAL + ' pasos';
+  }
+
+  /* ============================
+     RESET
+  ============================ */
+  function resetAll() {
+    done.clear();
+    updateProgress();
+    for (let i = 1; i <= TOTAL; i++) {
+      const card = document.getElementById('step-' + i);
+      const body = document.getElementById('body-' + i);
+      card.classList.remove('done', 'active');
+      body.classList.remove('open');
+    }
+    document.getElementById('finishCard').classList.remove('visible');
+    document.getElementById('step-1').classList.add('active');
+    document.getElementById('body-1').classList.add('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ============================
+     LIVE DIV PLAYGROUND (Step 3)
+  ============================ */
+  function updateLiveDiv() {
+    const w = document.getElementById('sl-width').value;
+    const h = document.getElementById('sl-height').value;
+    const r = document.getElementById('sl-radius').value;
+    const c = document.getElementById('sl-color').value;
+
+    const div = document.getElementById('live-div');
+    div.style.width          = w + 'px';
+    div.style.height         = h + 'px';
+    div.style.borderRadius   = r + 'px';
+    div.style.backgroundColor = c;
+
+    document.getElementById('lbl-width').textContent  = w + 'px';
+    document.getElementById('lbl-height').textContent = h + 'px';
+    document.getElementById('lbl-radius').textContent = r + 'px';
+    document.getElementById('lbl-color').textContent  = c;
+
+    document.getElementById('out-width').textContent  = w + 'px';
+    document.getElementById('out-height').textContent = h + 'px';
+    document.getElementById('out-radius').textContent = r + 'px';
+    document.getElementById('out-color').textContent  = c;
+    document.getElementById('out-color').style.color  = c;
+  }
+
+  /* ============================
+     COPY CODE BUTTON
+  ============================ */
+  function copyCode(btn) {
+    const pre = btn.nextElementSibling;
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copiado';
+      btn.style.background = 'var(--success)';
+      btn.style.color = '#000';
+      setTimeout(() => {
+        btn.textContent = 'Copiar';
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 1800);
+    }).catch(() => {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = '✓ Copiado';
+      setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Estilos – Color, Bordes, Espaciado &amp; Backgrounds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==================== RESET & TOKENS ==================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d0f1a;
+      --surface:    #13162b;
+      --surface2:   #1c2040;
+      --border:     #2a2f5a;
+      --accent:     #7c5cfc;
+      --accent2:    #e040fb;
+      --accent3:    #00e5ff;
+      --success:    #00e676;
+      --warn:       #ffab40;
+      --text:       #e8eaf6;
+      --muted:      #8891bb;
+      --code-bg:    #090b16;
+      --step-done:  #1a3a2a;
+      --radius:     14px;
+      --rsm:        8px;
+      --font:       'Inter', sans-serif;
+      --mono:       'Fira Code', monospace;
+      --shadow:     0 8px 32px rgba(0,0,0,.55);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ==================== ANIMATED BG ==================== */
+    .bg-orbs { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .orb {
+      position:absolute; border-radius:50%; filter:blur(90px); opacity:.15;
+      animation: drift 16s ease-in-out infinite alternate;
+    }
+    .orb:nth-child(1){ width:560px;height:560px;background:var(--accent); top:-140px;left:-140px;animation-delay:0s; }
+    .orb:nth-child(2){ width:420px;height:420px;background:var(--accent2);top:35%;right:-100px; animation-delay:4s; }
+    .orb:nth-child(3){ width:320px;height:320px;background:var(--accent3);bottom:-60px;left:28%; animation-delay:8s; }
+    .orb:nth-child(4){ width:260px;height:260px;background:var(--warn);   top:60%;left:5%;     animation-delay:2s; }
+    @keyframes drift{ from{transform:translate(0,0) scale(1);} to{transform:translate(28px,36px) scale(1.07);} }
+
+    /* ==================== LAYOUT ==================== */
+    .wrapper { position:relative;z-index:1; max-width:940px; margin:0 auto; padding:48px 24px 80px; }
+
+    /* ==================== HEADER ==================== */
+    header { text-align:center; margin-bottom:56px; }
+    .badge {
+      display:inline-block;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff; font-size:.72rem; font-weight:700; letter-spacing:.12em;
+      text-transform:uppercase; padding:5px 16px; border-radius:99px; margin-bottom:20px;
+    }
+    header h1 {
+      font-size:clamp(2rem,5vw,3.2rem); font-weight:800; line-height:1.15;
+      background:linear-gradient(135deg,#fff 30%,var(--accent3));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    header p { color:var(--muted); font-size:1.05rem; margin-top:14px; max-width:580px; margin-inline:auto; line-height:1.7; }
+    .back-link {
+      display:inline-flex; align-items:center; gap:6px;
+      color:var(--muted); font-size:.82rem; text-decoration:none;
+      border:1px solid var(--border); border-radius:99px; padding:5px 14px;
+      margin-bottom:24px; transition:all .2s;
+    }
+    .back-link:hover { color:var(--accent3); border-color:var(--accent3); }
+
+    /* ==================== PROGRESS ==================== */
+    .progress-wrap { display:flex; align-items:center; gap:10px; margin-bottom:48px; }
+    .progress-bar-track { flex:1; height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
+    .progress-bar-fill {
+      height:100%; width:0%;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      border-radius:99px; transition:width .5s ease;
+    }
+    .progress-label { font-size:.8rem; color:var(--muted); white-space:nowrap; }
+
+    /* ==================== STEP CARDS ==================== */
+    .step-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); margin-bottom:28px; overflow:hidden;
+      box-shadow:var(--shadow); transition:border-color .3s;
+    }
+    .step-card.active { border-color:var(--accent); }
+    .step-card.done   { border-color:var(--success); background:var(--step-done); }
+
+    .step-header {
+      display:flex; align-items:center; gap:18px; padding:22px 26px;
+      cursor:pointer; user-select:none; transition:background .2s;
+    }
+    .step-header:hover { background:rgba(124,92,252,.07); }
+
+    .step-num {
+      width:42px; height:42px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:.9rem; flex-shrink:0;
+      border:2px solid var(--border); color:var(--muted); background:var(--surface2);
+      transition:all .3s;
+    }
+    .step-card.active .step-num {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border-color:transparent; color:#fff;
+      box-shadow:0 0 18px rgba(124,92,252,.55);
+    }
+    .step-card.done .step-num { background:var(--success); border-color:transparent; color:#000; }
+
+    .step-title { flex:1; }
+    .step-title h2 { font-size:1.05rem; font-weight:700; }
+    .step-title p  { font-size:.82rem; color:var(--muted); margin-top:2px; }
+    .step-arrow { font-size:1.2rem; color:var(--muted); transition:transform .3s; }
+    .step-card.active .step-arrow { transform:rotate(90deg); color:var(--accent); }
+
+    /* ==================== STEP BODY ==================== */
+    .step-body { display:none; padding:0 26px 32px; animation:fadeIn .3s ease; }
+    .step-body.open { display:block; }
+    @keyframes fadeIn{ from{opacity:0;transform:translateY(-8px);} to{opacity:1;transform:translateY(0);} }
+
+    /* ==================== TYPOGRAPHY ==================== */
+    .explanation { font-size:.95rem; line-height:1.85; color:var(--text); margin-bottom:20px; }
+    .explanation strong { color:var(--accent3); }
+    .explanation em    { color:var(--accent2); font-style:normal; font-weight:600; }
+
+    h3.section-title {
+      font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted);
+      margin:28px 0 14px; display:flex; align-items:center; gap:8px;
+    }
+    h3.section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+    h3.section-title span { font-size:.95rem; }
+
+    /* ==================== CALLOUT ==================== */
+    .callout {
+      border-left:3px solid var(--accent2);
+      background:rgba(224,64,251,.07);
+      border-radius:0 var(--rsm) var(--rsm) 0;
+      padding:14px 18px; margin:18px 0;
+      font-size:.9rem; line-height:1.75;
+    }
+    .callout.info   { border-color:var(--accent3); background:rgba(0,229,255,.07); }
+    .callout.warn   { border-color:var(--warn);    background:rgba(255,171,64,.07); }
+    .callout.ok     { border-color:var(--success); background:rgba(0,230,118,.07); }
+    .callout-title  { font-weight:700; font-size:.76rem; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; color:var(--accent2); }
+    .callout.info .callout-title  { color:var(--accent3); }
+    .callout.warn .callout-title  { color:var(--warn); }
+    .callout.ok   .callout-title  { color:var(--success); }
+
+    /* ==================== CODE BLOCK ==================== */
+    .code-wrap {
+      position:relative; margin:16px 0; border-radius:var(--rsm);
+      overflow:hidden; background:var(--code-bg); border:1px solid var(--border);
+    }
+    .code-label {
+      background:var(--surface2); padding:6px 16px;
+      font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted);
+      border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px;
+    }
+    .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .dot-r{ background:#ff5f57; } .dot-y{ background:#febc2e; } .dot-g{ background:#28c840; }
+
+    pre {
+      padding:20px; font-family:var(--mono); font-size:.83rem;
+      line-height:1.85; overflow-x:auto; tab-size:2;
+    }
+    .kw  { color:#c792ea; }
+    .sel { color:#82aaff; }
+    .prop{ color:#80cbc4; }
+    .val { color:#f78c6c; }
+    .str { color:#c3e88d; }
+    .cmt { color:#546e7a; font-style:italic; }
+    .tag { color:#f07178; }
+    .attr{ color:#ffcb6b; }
+    .num { color:#f78c6c; }
+    .unit{ color:#ff9800; }
+
+    .copy-btn {
+      position:absolute; top:36px; right:12px;
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--muted); font-family:var(--font); font-size:.72rem;
+      padding:4px 10px; border-radius:var(--rsm); cursor:pointer; transition:all .2s;
+    }
+    .copy-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+    /* ==================== INTERACTIVE PANELS ==================== */
+    .playground {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:var(--rsm); padding:20px; margin-top:20px;
+    }
+    .playground h4 {
+      font-size:.76rem; text-transform:uppercase; letter-spacing:.1em;
+      color:var(--accent3); margin-bottom:16px; display:flex; align-items:center; gap:6px;
+    }
+    .ctrl-row {
+      display:flex; align-items:center; gap:14px; margin-bottom:11px; flex-wrap:wrap;
+    }
+    .ctrl-row label {
+      font-size:.8rem; color:var(--muted); min-width:120px; font-family:var(--mono);
+    }
+    .ctrl-row input[type=range]  { flex:1; min-width:100px; accent-color:var(--accent); }
+    .ctrl-row input[type=color]  { width:38px; height:30px; border:none; background:none; cursor:pointer; border-radius:4px; }
+    .ctrl-row select {
+      flex:1; background:var(--code-bg); border:1px solid var(--border);
+      color:var(--text); font-family:var(--mono); font-size:.8rem;
+      padding:5px 8px; border-radius:var(--rsm); cursor:pointer;
+    }
+    .vdisp {
+      font-family:var(--mono); font-size:.8rem; color:var(--accent3);
+      min-width:80px; text-align:right;
+    }
+
+    /* Preview area (white bg to simulate browser) */
+    .preview-area {
+      background:#f0f2f8; border-radius:var(--rsm);
+      min-height:140px; padding:24px;
+      display:flex; align-items:center; justify-content:center;
+      margin-top:16px; border:2px dashed var(--border); position:relative; overflow:hidden;
+    }
+    .preview-area.dark { background:#1a1a2e; }
+    .preview-area.grid {
+      background-image: linear-gradient(rgba(100,100,200,.12) 1px,transparent 1px),
+                        linear-gradient(90deg,rgba(100,100,200,.12) 1px,transparent 1px);
+      background-size:20px 20px;
+    }
+
+    /* Live CSS readout inside playground */
+    .live-css {
+      background:var(--code-bg); border:1px solid var(--border);
+      border-radius:var(--rsm); padding:14px 18px; margin-top:14px;
+      font-family:var(--mono); font-size:.78rem; line-height:1.85;
+      overflow-x:auto;
+    }
+
+    /* ==================== COLOR SWATCHES ==================== */
+    .swatch-grid {
+      display:flex; flex-wrap:wrap; gap:10px; margin:14px 0;
+    }
+    .swatch {
+      width:56px; height:56px; border-radius:var(--rsm);
+      display:flex; align-items:flex-end; justify-content:center;
+      padding-bottom:4px; font-size:.6rem; font-family:var(--mono);
+      font-weight:600; cursor:default; border:1px solid rgba(255,255,255,.08);
+      transition:transform .15s;
+    }
+    .swatch:hover { transform:scale(1.12); }
+
+    /* ==================== BORDER DEMO GRID ==================== */
+    .border-demo-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+      gap:14px; margin:16px 0;
+    }
+    .border-demo-item {
+      background:var(--surface2); border-radius:var(--rsm);
+      padding:18px 10px; text-align:center; font-size:.7rem;
+      font-family:var(--mono); color:var(--muted);
+    }
+    .border-demo-item .box {
+      width:60px; height:44px; margin:0 auto 10px; background:transparent;
+    }
+
+    /* ==================== BOX MODEL VIZ ==================== */
+    .box-model-viz {
+      position:relative; display:flex; align-items:center; justify-content:center;
+      font-family:var(--mono); font-size:.68rem;
+      margin:20px auto; width:fit-content;
+    }
+    .bm-margin  { background:rgba(255,171,64,.18); border:2px dashed var(--warn);    padding:18px; border-radius:var(--rsm); position:relative; }
+    .bm-border  { background:rgba(0,229,255,.12);  border:2px dashed var(--accent3); padding:14px; border-radius:4px; position:relative; }
+    .bm-padding { background:rgba(0,230,118,.12);  border:2px dashed var(--success); padding:14px; border-radius:2px; position:relative; }
+    .bm-content { background:var(--accent); color:#fff; padding:12px 24px; font-weight:700; font-size:.85rem; border-radius:2px; white-space:nowrap; }
+    .bm-label {
+      position:absolute; font-size:.62rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    }
+    .bm-margin  > .bm-label { top:3px; left:6px; color:var(--warn); }
+    .bm-border  > .bm-label { top:3px; left:6px; color:var(--accent3); }
+    .bm-padding > .bm-label { top:3px; left:6px; color:var(--success); }
+
+    /* ==================== GRADIENT PREVIEW ==================== */
+    #grad-preview {
+      width:100%; height:120px; border-radius:var(--rsm);
+      margin-top:14px; transition:background .2s;
+      border:1px solid var(--border);
+    }
+
+    /* ==================== BG IMAGE DEMO ==================== */
+    .bg-img-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+      gap:14px; margin:14px 0;
+    }
+    .bg-img-item {
+      border-radius:var(--rsm); height:110px;
+      border:2px solid var(--border);
+      position:relative; overflow:hidden;
+    }
+    .bg-img-item .lbl {
+      position:absolute; bottom:0; left:0; right:0;
+      background:rgba(0,0,0,.65); padding:5px 8px;
+      font-family:var(--mono); font-size:.65rem; color:#fff; text-align:center;
+    }
+
+    /* ==================== NAV BUTTONS ==================== */
+    .nav-btns { display:flex; gap:12px; margin-top:30px; justify-content:flex-end; }
+    .btn {
+      padding:10px 24px; border-radius:var(--rsm);
+      font-family:var(--font); font-size:.88rem; font-weight:600;
+      cursor:pointer; border:none; transition:all .2s;
+    }
+    .btn-primary {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff; box-shadow:0 4px 18px rgba(124,92,252,.35);
+    }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(124,92,252,.5); }
+    .btn-secondary { background:var(--surface2); color:var(--muted); border:1px solid var(--border); }
+    .btn-secondary:hover { background:var(--border); color:var(--text); }
+
+    /* ==================== FINISH ==================== */
+    .finish-card {
+      display:none; background:linear-gradient(135deg,rgba(124,92,252,.15),rgba(0,229,255,.1));
+      border:1px solid var(--accent); border-radius:var(--radius);
+      padding:40px; text-align:center; margin-top:32px; box-shadow:var(--shadow);
+    }
+    .finish-card.visible { display:block; animation:fadeIn .5s ease; }
+    .finish-icon { font-size:3rem; margin-bottom:16px; }
+    .finish-card h2 { font-size:1.8rem; font-weight:800; color:var(--accent3); margin-bottom:10px; }
+    .finish-card p  { color:var(--muted); line-height:1.7; max-width:520px; margin-inline:auto; }
+
+    /* ==================== TABLE ==================== */
+    .prop-table { width:100%; border-collapse:collapse; font-size:.83rem; margin:14px 0; }
+    .prop-table th { text-align:left; padding:7px 10px; border-bottom:1px solid var(--border); color:var(--accent3); font-weight:600; }
+    .prop-table td { padding:7px 10px; border-bottom:1px solid rgba(255,255,255,.04); color:var(--muted); vertical-align:top; }
+    .prop-table td:first-child { font-family:var(--mono); color:var(--text); white-space:nowrap; }
+    .prop-table tr:hover td { background:rgba(255,255,255,.02); }
+
+    /* ==================== CHIPS ==================== */
+    .chip-row { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+    .chip {
+      background:var(--surface2); border:1px solid var(--border);
+      padding:4px 12px; border-radius:99px; font-family:var(--mono); font-size:.75rem; color:var(--accent3);
+    }
+
+    /* ==================== SCROLLBAR ==================== */
+    ::-webkit-scrollbar{ width:8px; height:8px; }
+    ::-webkit-scrollbar-track{ background:var(--bg); }
+    ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:99px; }
+    ::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
+
+    @media(max-width:600px){
+      .wrapper{ padding:32px 16px 60px; }
+      .step-header{ padding:16px; }
+      .step-body{ padding:0 16px 24px; }
+      .ctrl-row label{ min-width:90px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb"></div><div class="orb"></div>
+  <div class="orb"></div><div class="orb"></div>
+</div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <a href="paso-a-paso-divs.html" class="back-link">← Práctica anterior: Divs &amp; Selectores</a>
+    <div class="badge">Programación II · Práctica CSS</div>
+    <h1>Estilos Visuales CSS<br/>Paso a Paso</h1>
+    <p>Domina el <strong>color</strong>, los <strong>bordes</strong>, el <strong>espaciado</strong> y los <strong>fondos</strong> — con playgrounds interactivos en cada paso.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 5 pasos</div>
+  </div>
+
+  <!-- ==================================================
+       PASO 1 – COLOR
+  ================================================== -->
+  <div class="step-card active" id="step-1">
+    <div class="step-header" onclick="toggleStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-title">
+        <h2>🎨 Color</h2>
+        <p>Formatos de color en CSS: named, HEX, RGB, HSL y transparencia</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body open" id="body-1">
+
+      <p class="explanation">
+        CSS acepta el color en <strong>múltiples formatos</strong>. Todos son equivalentes: elegí el que
+        mejor se adapte al contexto. Los más usados son <em>HEX</em> (diseño) y <em>HSL</em> (control
+        intuitivo de tono/saturación/luminosidad).
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Todos los formatos de color</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.elemento</span> {
+  <span class="cmt">/* 1. Nombre de color (148 nombres disponibles) */</span>
+  <span class="prop">color</span>: <span class="val">tomato</span>;
+  <span class="prop">color</span>: <span class="val">cornflowerblue</span>;
+
+  <span class="cmt">/* 2. HEX – #RRGGBB o abreviado #RGB */</span>
+  <span class="prop">color</span>: <span class="val">#e040fb</span>;      <span class="cmt">/* 6 dígitos */</span>
+  <span class="prop">color</span>: <span class="val">#f0b</span>;         <span class="cmt">/* abreviado = #ff00bb */</span>
+  <span class="prop">color</span>: <span class="val">#e040fb88</span>;    <span class="cmt">/* + 2 dígitos de alpha */</span>
+
+  <span class="cmt">/* 3. RGB / RGBA – canales rojo, verde, azul (0-255) */</span>
+  <span class="prop">color</span>: <span class="val">rgb</span>(<span class="num">224</span>, <span class="num">64</span>, <span class="num">251</span>);
+  <span class="prop">color</span>: <span class="val">rgba</span>(<span class="num">224</span>, <span class="num">64</span>, <span class="num">251</span>, <span class="num">0.5</span>); <span class="cmt">/* alpha: 0=transparente 1=sólido */</span>
+
+  <span class="cmt">/* 4. HSL – tono (0-360°) saturación% luminosidad% */</span>
+  <span class="prop">color</span>: <span class="val">hsl</span>(<span class="num">291</span>, <span class="num">96%</span>, <span class="num">62%</span>);
+  <span class="prop">color</span>: <span class="val">hsla</span>(<span class="num">291</span>, <span class="num">96%</span>, <span class="num">62%</span>, <span class="num">0.4</span>);
+
+  <span class="cmt">/* 5. Sintaxis moderna (CSS Color Level 4) */</span>
+  <span class="prop">color</span>: <span class="val">rgb</span>(<span class="num">224</span> <span class="num">64</span> <span class="num">251</span> / <span class="num">50%</span>); <span class="cmt">/* sin comas */</span>
+}</pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-title">💡 ¿Cuándo usar HSL?</div>
+        HSL brilla cuando necesitás crear <strong>variaciones</strong> de un mismo color: solo cambiás la
+        luminosidad para obtener versiones más claras u oscuras.
+        Ej: <code>hsl(291,96%,62%)</code> → oscuro: <code>hsl(291,96%,30%)</code> → claro: <code>hsl(291,96%,85%)</code>.
+      </div>
+
+      <h3 class="section-title"><span>🖌</span> Paleta de referencia rápida</h3>
+      <div class="swatch-grid" id="swatchGrid"></div>
+
+      <!-- PLAYGROUND -->
+      <div class="playground">
+        <h4>🎮 Explorador de color en tiempo real</h4>
+        <div class="ctrl-row">
+          <label>Formato</label>
+          <select id="colorFormat" onchange="updateColor()">
+            <option value="hex">HEX</option>
+            <option value="rgb">RGB / RGBA</option>
+            <option value="hsl">HSL / HSLA</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label>Color base</label>
+          <input type="color" id="colorPicker" value="#7c5cfc" oninput="updateColor()">
+          <span class="vdisp" id="colorDisp">#7c5cfc</span>
+        </div>
+        <div class="ctrl-row">
+          <label>Opacidad (alpha)</label>
+          <input type="range" id="alphaSlider" min="0" max="100" value="100" oninput="updateColor()">
+          <span class="vdisp" id="alphaDisp">100%</span>
+        </div>
+        <div class="live-css" id="colorCss"></div>
+        <div class="preview-area" style="background:#1a1a2e; gap:14px; flex-wrap:wrap;">
+          <div id="colorSampleBg" style="width:90px;height:64px;border-radius:8px;"></div>
+          <div id="colorSampleBorder" style="width:90px;height:64px;border-radius:8px;border:4px solid;"></div>
+          <div id="colorSampleText" style="font-size:1.4rem;font-weight:800;">Texto CSS</div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="completeStep(1)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       PASO 2 – BORDES & BORDER-RADIUS
+  ================================================== -->
+  <div class="step-card" id="step-2">
+    <div class="step-header" onclick="toggleStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-title">
+        <h2>🔲 Bordes &amp; Border-Radius</h2>
+        <p>Grosor, estilo, color y redondeo de esquinas</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-2">
+
+      <p class="explanation">
+        La propiedad <strong>border</strong> controla el contorno visible de un elemento.
+        Se compone de <em>tres partes</em> que se pueden declarar juntas o por separado:
+        <strong>grosor · estilo · color</strong>.
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Anatomía del border</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── Shorthand: grosor | estilo | color ── */</span>
+<span class="sel">.caja</span> {
+  <span class="prop">border</span>: <span class="num">3px</span> <span class="val">solid</span> <span class="val">#7c5cfc</span>;
+}
+
+<span class="cmt">/* ── Propiedades individuales ── */</span>
+<span class="sel">.caja</span> {
+  <span class="prop">border-width</span>: <span class="num">3px</span>;          <span class="cmt">/* grosor */</span>
+  <span class="prop">border-style</span>: <span class="val">solid</span>;        <span class="cmt">/* estilo (ver abajo) */</span>
+  <span class="prop">border-color</span>: <span class="val">#7c5cfc</span>;      <span class="cmt">/* color */</span>
+}
+
+<span class="cmt">/* ── Por lado: top | right | bottom | left ── */</span>
+<span class="sel">.caja</span> {
+  <span class="prop">border-top</span>:    <span class="num">4px</span> <span class="val">solid</span>  <span class="val">#e040fb</span>;
+  <span class="prop">border-right</span>:  <span class="num">2px</span> <span class="val">dashed</span> <span class="val">#00e5ff</span>;
+  <span class="prop">border-bottom</span>: <span class="num">4px</span> <span class="val">solid</span>  <span class="val">#00e676</span>;
+  <span class="prop">border-left</span>:   <span class="num">0</span>;               <span class="cmt">/* sin borde */</span>
+}
+
+<span class="cmt">/* ── outline: similar al border pero NO ocupa espacio ── */</span>
+<span class="sel">.caja:focus</span> {
+  <span class="prop">outline</span>: <span class="num">2px</span> <span class="val">solid</span> <span class="val">#7c5cfc</span>;
+  <span class="prop">outline-offset</span>: <span class="num">4px</span>;   <span class="cmt">/* separación del elemento */</span>
+}</pre>
+      </div>
+
+      <h3 class="section-title"><span>🎨</span> Estilos de borde disponibles</h3>
+      <div class="border-demo-grid" id="borderStyleGrid"></div>
+
+      <h3 class="section-title"><span>⭕</span> Border-radius</h3>
+      <p class="explanation">
+        <strong>border-radius</strong> redondea las esquinas. Acepta de 1 a 4 valores (como el padding/margin)
+        y también admite valores distintos para radio horizontal y vertical con <code>/</code>.
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Border-radius</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.caja</span> {
+  <span class="cmt">/* Un valor → todas las esquinas iguales */</span>
+  <span class="prop">border-radius</span>: <span class="num">8px</span>;
+
+  <span class="cmt">/* Dos valores → TL+BR  |  TR+BL */</span>
+  <span class="prop">border-radius</span>: <span class="num">8px</span> <span class="num">24px</span>;
+
+  <span class="cmt">/* Cuatro valores → TL | TR | BR | BL (agujas del reloj) */</span>
+  <span class="prop">border-radius</span>: <span class="num">8px</span> <span class="num">24px</span> <span class="num">8px</span> <span class="num">0</span>;
+
+  <span class="cmt">/* Círculo perfecto */</span>
+  <span class="prop">border-radius</span>: <span class="num">50%</span>;
+
+  <span class="cmt">/* Forma "píldora" */</span>
+  <span class="prop">border-radius</span>: <span class="num">999px</span>;
+
+  <span class="cmt">/* Radio elíptico: horizontal / vertical */</span>
+  <span class="prop">border-radius</span>: <span class="num">40%</span> <span class="num">60%</span> / <span class="num">60%</span> <span class="num">40%</span>;
+}</pre>
+      </div>
+
+      <!-- PLAYGROUND BORDES -->
+      <div class="playground">
+        <h4>🎮 Constructor de border en tiempo real</h4>
+        <div class="ctrl-row">
+          <label>border-width</label>
+          <input type="range" id="bw" min="0" max="20" value="3" oninput="updateBorder()">
+          <span class="vdisp" id="bwD">3px</span>
+        </div>
+        <div class="ctrl-row">
+          <label>border-style</label>
+          <select id="bs" onchange="updateBorder()">
+            <option>solid</option><option>dashed</option><option>dotted</option>
+            <option>double</option><option>groove</option><option>ridge</option>
+            <option>inset</option><option>outset</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label>border-color</label>
+          <input type="color" id="bc" value="#7c5cfc" oninput="updateBorder()">
+          <span class="vdisp" id="bcD">#7c5cfc</span>
+        </div>
+        <div class="ctrl-row">
+          <label>border-radius</label>
+          <input type="range" id="br" min="0" max="100" value="8" oninput="updateBorder()">
+          <span class="vdisp" id="brD">8px</span>
+        </div>
+        <div class="ctrl-row">
+          <label>background</label>
+          <input type="color" id="bbg" value="#1c2040" oninput="updateBorder()">
+        </div>
+        <div class="live-css" id="borderCss"></div>
+        <div class="preview-area grid">
+          <div id="borderBox" style="width:140px;height:90px;transition:all .2s;"></div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(1)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(2)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       PASO 3 – PADDING & MARGIN
+  ================================================== -->
+  <div class="step-card" id="step-3">
+    <div class="step-header" onclick="toggleStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-title">
+        <h2>📦 Padding &amp; Margin</h2>
+        <p>El modelo de caja: espaciado interior vs. exterior</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-3">
+
+      <p class="explanation">
+        Todo elemento HTML es una <strong>caja</strong> compuesta de capas.
+        <em>Padding</em> es el espacio <strong>interior</strong> (entre el contenido y el borde).
+        <em>Margin</em> es el espacio <strong>exterior</strong> (entre el borde y otros elementos).
+      </p>
+
+      <!-- Box model diagram -->
+      <div class="box-model-viz">
+        <div class="bm-margin">
+          <span class="bm-label">margin</span>
+          <div class="bm-border">
+            <span class="bm-label">border</span>
+            <div class="bm-padding">
+              <span class="bm-label">padding</span>
+              <div class="bm-content">contenido</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">⚠️ Diferencia clave</div>
+        El <strong>padding</strong> tiene el <em>mismo fondo</em> que el elemento y es clickeable.
+        El <strong>margin</strong> es siempre transparente y colapsa verticalmente entre elementos (margin collapsing).
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Padding &amp; Margin: sintaxis completa</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── Shorthand: un valor → los 4 lados ── */</span>
+<span class="prop">padding</span>: <span class="num">16px</span>;
+
+<span class="cmt">/* ── Dos valores: vertical | horizontal ── */</span>
+<span class="prop">padding</span>: <span class="num">12px</span> <span class="num">24px</span>;
+
+<span class="cmt">/* ── Tres valores: top | horizontal | bottom ── */</span>
+<span class="prop">padding</span>: <span class="num">8px</span> <span class="num">16px</span> <span class="num">24px</span>;
+
+<span class="cmt">/* ── Cuatro valores: top | right | bottom | left ── */</span>
+<span class="prop">padding</span>: <span class="num">8px</span> <span class="num">16px</span> <span class="num">24px</span> <span class="num">32px</span>;
+
+<span class="cmt">/* ── Propiedades individuales ── */</span>
+<span class="prop">padding-top</span>:    <span class="num">8px</span>;
+<span class="prop">padding-right</span>:  <span class="num">16px</span>;
+<span class="prop">padding-bottom</span>: <span class="num">8px</span>;
+<span class="prop">padding-left</span>:   <span class="num">16px</span>;
+
+<span class="cmt">/* ── Exactamente igual para margin ── */</span>
+<span class="prop">margin</span>: <span class="num">0</span> <span class="val">auto</span>;   <span class="cmt">/* centrar horizontalmente */</span>
+<span class="prop">margin-top</span>: <span class="num">24px</span>;
+
+<span class="cmt">/* ── box-sizing: incluye padding+border en el width ── */</span>
+<span class="sel">*</span> { <span class="prop">box-sizing</span>: <span class="val">border-box</span>; } <span class="cmt">/* ¡recomendado siempre! */</span></pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-title">📐 box-sizing: border-box</div>
+        Por defecto (<code>content-box</code>) si un elemento tiene <code>width:200px</code> y <code>padding:20px</code>,
+        su ancho total es <strong>240px</strong>. Con <code>border-box</code> el ancho total sigue siendo
+        <strong>200px</strong> (el padding se resta del espacio interior). Esto es <em>mucho más predecible</em>
+        y por eso casi todos los proyectos aplican <code>* &#123; box-sizing: border-box &#125;</code> globalmente.
+      </div>
+
+      <!-- PLAYGROUND -->
+      <div class="playground">
+        <h4>🎮 Visualizador de Box Model</h4>
+        <div class="ctrl-row">
+          <label>padding (todos)</label>
+          <input type="range" id="pad" min="0" max="60" value="16" oninput="updateBoxModel()">
+          <span class="vdisp" id="padD">16px</span>
+        </div>
+        <div class="ctrl-row">
+          <label>margin (todos)</label>
+          <input type="range" id="mar" min="0" max="60" value="16" oninput="updateBoxModel()">
+          <span class="vdisp" id="marD">16px</span>
+        </div>
+        <div class="ctrl-row">
+          <label>border-width</label>
+          <input type="range" id="bwBM" min="0" max="16" value="3" oninput="updateBoxModel()">
+          <span class="vdisp" id="bwBMD">3px</span>
+        </div>
+        <div class="ctrl-row">
+          <label>box-sizing</label>
+          <select id="boxSizing" onchange="updateBoxModel()">
+            <option value="border-box">border-box</option>
+            <option value="content-box">content-box</option>
+          </select>
+        </div>
+        <div class="live-css" id="boxModelCss"></div>
+        <div class="preview-area dark" style="min-height:200px;">
+          <!-- Margin layer -->
+          <div id="bm-wrap" style="transition:all .2s;position:relative;">
+            <div style="position:absolute;inset:0;pointer-events:none;border:2px dashed rgba(255,171,64,.5);border-radius:4px;"></div>
+            <span style="position:absolute;top:-18px;left:0;font-size:.62rem;font-family:monospace;color:rgba(255,171,64,.8);">margin</span>
+            <div id="bm-el" style="background:#7c5cfc;color:#fff;font-family:monospace;font-size:.8rem;font-weight:700;transition:all .2s;display:flex;align-items:center;justify-content:center;position:relative;border:3px solid #00e5ff;">
+              contenido
+              <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,230,118,.15);"></div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);margin-top:8px;text-align:center;font-family:var(--mono);">
+          🟠 margin &nbsp;|&nbsp; 🔵 border &nbsp;|&nbsp; 🟢 padding (tinte sobre el contenido)
+        </p>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(2)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(3)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       PASO 4 – BACKGROUND: COLORES & GRADIENTES
+  ================================================== -->
+  <div class="step-card" id="step-4">
+    <div class="step-header" onclick="toggleStep(4)">
+      <div class="step-num">4</div>
+      <div class="step-title">
+        <h2>🌈 Background: Colores &amp; Gradientes</h2>
+        <p>Fondos sólidos, lineales, radiales y cónicos</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-4">
+
+      <p class="explanation">
+        La propiedad <strong>background</strong> (o <strong>background-color</strong>) define el fondo de un elemento.
+        Puede ser un color sólido, una imagen, o un <em>gradiente</em> — un degradado suave entre dos o más colores
+        generado directamente en CSS, sin necesitar una imagen.
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Background color</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.caja</span> {
+  <span class="prop">background-color</span>: <span class="val">#7c5cfc</span>;    <span class="cmt">/* color sólido */</span>
+  <span class="prop">background-color</span>: <span class="val">transparent</span>; <span class="cmt">/* sin fondo     */</span>
+
+  <span class="cmt">/* shorthand "background" acepta múltiples capas */</span>
+  <span class="prop">background</span>: <span class="val">#7c5cfc</span>;
+}</pre>
+      </div>
+
+      <h3 class="section-title"><span>🌈</span> Gradientes</h3>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Tipos de gradiente</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── 1. Linear gradient ── */</span>
+<span class="prop">background</span>: <span class="val">linear-gradient</span>(<span class="num">135deg</span>, <span class="val">#7c5cfc</span>, <span class="val">#e040fb</span>);
+<span class="cmt">/*                          ↑ dirección   ↑ color inicio  ↑ color fin */</span>
+
+<span class="cmt">/* Dirección con palabras clave */</span>
+<span class="prop">background</span>: <span class="val">linear-gradient</span>(<span class="kw">to right</span>, <span class="val">#7c5cfc</span>, <span class="val">#00e5ff</span>);
+<span class="prop">background</span>: <span class="val">linear-gradient</span>(<span class="kw">to bottom right</span>, <span class="val">#7c5cfc</span>, <span class="val">#e040fb</span>);
+
+<span class="cmt">/* Múltiples colores (color stops) */</span>
+<span class="prop">background</span>: <span class="val">linear-gradient</span>(<span class="num">90deg</span>,
+  <span class="val">#7c5cfc</span> <span class="num">0%</span>,
+  <span class="val">#e040fb</span> <span class="num">50%</span>,
+  <span class="val">#00e5ff</span> <span class="num">100%</span>
+);
+
+<span class="cmt">/* ── 2. Radial gradient ── */</span>
+<span class="prop">background</span>: <span class="val">radial-gradient</span>(<span class="kw">circle</span>, <span class="val">#e040fb</span>, <span class="val">#0d0f1a</span>);
+<span class="prop">background</span>: <span class="val">radial-gradient</span>(<span class="kw">ellipse at top left</span>, <span class="val">#7c5cfc</span>, <span class="val">#0d0f1a</span>);
+
+<span class="cmt">/* ── 3. Conic gradient ── */</span>
+<span class="prop">background</span>: <span class="val">conic-gradient</span>(<span class="kw">from</span> <span class="num">0deg</span>, <span class="val">#e040fb</span>, <span class="val">#7c5cfc</span>, <span class="val">#00e5ff</span>, <span class="val">#e040fb</span>);
+
+<span class="cmt">/* ── 4. Capas múltiples (se apilan de arriba a abajo) ── */</span>
+<span class="prop">background</span>:
+  <span class="val">linear-gradient</span>(<span class="val">rgba</span>(<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>,<span class="num">.4</span>), <span class="val">rgba</span>(<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>,<span class="num">.4</span>)),  <span class="cmt">/* capa oscura */</span>
+  <span class="val">url</span>(<span class="str">'foto.jpg'</span>) <span class="kw">center/cover</span>;              <span class="cmt">/* imagen base */</span></pre>
+      </div>
+
+      <!-- PLAYGROUND GRADIENTES -->
+      <div class="playground">
+        <h4>🎮 Constructor de gradientes</h4>
+        <div class="ctrl-row">
+          <label>Tipo</label>
+          <select id="gradType" onchange="updateGradient()">
+            <option value="linear">linear-gradient</option>
+            <option value="radial">radial-gradient</option>
+            <option value="conic">conic-gradient</option>
+          </select>
+        </div>
+        <div id="linearCtrls">
+          <div class="ctrl-row">
+            <label>Dirección (deg)</label>
+            <input type="range" id="gradDeg" min="0" max="360" value="135" oninput="updateGradient()">
+            <span class="vdisp" id="gradDegD">135deg</span>
+          </div>
+        </div>
+        <div class="ctrl-row">
+          <label>Color 1</label>
+          <input type="color" id="gc1" value="#7c5cfc" oninput="updateGradient()">
+          <input type="range" id="gs1" min="0" max="100" value="0" oninput="updateGradient()" style="flex:1">
+          <span class="vdisp" id="gs1D">0%</span>
+        </div>
+        <div class="ctrl-row">
+          <label>Color 2</label>
+          <input type="color" id="gc2" value="#e040fb" oninput="updateGradient()">
+          <input type="range" id="gs2" min="0" max="100" value="50" oninput="updateGradient()" style="flex:1">
+          <span class="vdisp" id="gs2D">50%</span>
+        </div>
+        <div class="ctrl-row">
+          <label>Color 3</label>
+          <input type="color" id="gc3" value="#00e5ff" oninput="updateGradient()">
+          <input type="range" id="gs3" min="0" max="100" value="100" oninput="updateGradient()" style="flex:1">
+          <span class="vdisp" id="gs3D">100%</span>
+        </div>
+        <div class="live-css" id="gradientCss"></div>
+        <div id="grad-preview"></div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(3)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(4)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       PASO 5 – BACKGROUND IMÁGENES
+  ================================================== -->
+  <div class="step-card" id="step-5">
+    <div class="step-header" onclick="toggleStep(5)">
+      <div class="step-num">5</div>
+      <div class="step-title">
+        <h2>🖼 Background con Imágenes</h2>
+        <p>Posición, tamaño, repetición y trucos de adaptación</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-5">
+
+      <p class="explanation">
+        Para poner una imagen de fondo usamos <strong>background-image</strong>. Las propiedades complementarias
+        controlan cómo se <em>posiciona</em>, <em>repite</em> y <em>escala</em> esa imagen.
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Background image y sus compañeras</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.hero</span> {
+  <span class="prop">background-image</span>:    <span class="val">url</span>(<span class="str">'imagen.jpg'</span>);
+
+  <span class="cmt">/* ── background-size ── */</span>
+  <span class="prop">background-size</span>: <span class="val">cover</span>;    <span class="cmt">/* cubre TODO el contenedor (puede recortar) */</span>
+  <span class="prop">background-size</span>: <span class="val">contain</span>;  <span class="cmt">/* se ve COMPLETA (puede dejar espacio vacío) */</span>
+  <span class="prop">background-size</span>: <span class="num">300px</span> <span class="num">200px</span>; <span class="cmt">/* tamaño fijo */</span>
+  <span class="prop">background-size</span>: <span class="num">100%</span> <span class="val">auto</span>;  <span class="cmt">/* 100% ancho, alto proporcional */</span>
+
+  <span class="cmt">/* ── background-position ── */</span>
+  <span class="prop">background-position</span>: <span class="val">center</span>;        <span class="cmt">/* centrada */</span>
+  <span class="prop">background-position</span>: <span class="val">top left</span>;      <span class="cmt">/* esquina superior izquierda */</span>
+  <span class="prop">background-position</span>: <span class="num">50%</span> <span class="num">20%</span>;       <span class="cmt">/* x% y% */</span>
+
+  <span class="cmt">/* ── background-repeat ── */</span>
+  <span class="prop">background-repeat</span>: <span class="val">no-repeat</span>; <span class="cmt">/* sin repetición (más común) */</span>
+  <span class="prop">background-repeat</span>: <span class="val">repeat</span>;    <span class="cmt">/* repite en X e Y (patrón) */</span>
+  <span class="prop">background-repeat</span>: <span class="val">repeat-x</span>;  <span class="cmt">/* solo en horizontal */</span>
+
+  <span class="cmt">/* ── background-attachment ── */</span>
+  <span class="prop">background-attachment</span>: <span class="val">fixed</span>;  <span class="cmt">/* efecto parallax */</span>
+  <span class="prop">background-attachment</span>: <span class="val">scroll</span>; <span class="cmt">/* se mueve con la página (default) */</span>
+}
+
+<span class="cmt">/* ── Shorthand completo ── */</span>
+<span class="sel">.hero</span> {
+  <span class="prop">background</span>: <span class="val">url</span>(<span class="str">'imagen.jpg'</span>) <span class="val">center</span>/<span class="val">cover</span> <span class="val">no-repeat</span> <span class="val">fixed</span>;
+  <span class="cmt">/*           ↑url            ↑pos   ↑size  ↑repeat  ↑attach */</span>
+}</pre>
+      </div>
+
+      <h3 class="section-title"><span>🪄</span> Trucos de adaptación de imágenes</h3>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – object-fit para &lt;img&gt; en contenedor</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* object-fit: para imágenes &lt;img&gt; con ancho/alto fijo */</span>
+<span class="sel">img.avatar</span> {
+  <span class="prop">width</span>: <span class="num">120px</span>;
+  <span class="prop">height</span>: <span class="num">120px</span>;
+  <span class="prop">object-fit</span>: <span class="val">cover</span>;    <span class="cmt">/* recorta, no deforma ✓ */</span>
+  <span class="prop">object-fit</span>: <span class="val">contain</span>;  <span class="cmt">/* se ve completa */</span>
+  <span class="prop">object-fit</span>: <span class="val">fill</span>;     <span class="cmt">/* deforma (evitar) */</span>
+  <span class="prop">object-position</span>: <span class="val">top center</span>; <span class="cmt">/* elige qué parte mostrar */</span>
+
+  <span class="cmt">/* Esquinas redondeadas en imagen */</span>
+  <span class="prop">border-radius</span>: <span class="num">50%</span>; <span class="cmt">/* círculo */</span>
+}
+
+<span class="cmt">/* Imagen responsive que no desborda */</span>
+<span class="sel">img</span> {
+  <span class="prop">max-width</span>: <span class="num">100%</span>;  <span class="cmt">/* nunca más ancha que su contenedor */</span>
+  <span class="prop">height</span>: <span class="val">auto</span>;     <span class="cmt">/* mantiene proporción */</span>
+  <span class="prop">display</span>: <span class="val">block</span>;   <span class="cmt">/* elimina espacio inferior de inline */</span>
+}
+
+<span class="cmt">/* Aspecto ratio fijo independiente del tamaño */</span>
+<span class="sel">.card-image</span> {
+  <span class="prop">aspect-ratio</span>: <span class="num">16</span>/<span class="num">9</span>; <span class="cmt">/* mantiene 16:9 siempre */</span>
+  <span class="prop">object-fit</span>: <span class="val">cover</span>;
+  <span class="prop">width</span>: <span class="num">100%</span>;
+}</pre>
+      </div>
+
+      <!-- Demos comparativas -->
+      <h3 class="section-title"><span>🖼</span> background-size: cover vs contain</h3>
+      <div class="bg-img-grid" id="bgImgGrid">
+        <div class="bg-img-item" style="background:url('https://picsum.photos/seed/css1/400/300') center/cover no-repeat;">
+          <div class="lbl">cover</div>
+        </div>
+        <div class="bg-img-item" style="background:url('https://picsum.photos/seed/css1/400/300') center/contain no-repeat #111;">
+          <div class="lbl">contain</div>
+        </div>
+        <div class="bg-img-item" style="background:url('https://picsum.photos/seed/css1/400/300') center/100% auto no-repeat #111;">
+          <div class="lbl">100% auto</div>
+        </div>
+        <div class="bg-img-item" style="background:url('https://picsum.photos/seed/css2/60/60') repeat;">
+          <div class="lbl">repeat (patrón)</div>
+        </div>
+      </div>
+
+      <!-- PLAYGROUND BG IMAGE -->
+      <div class="playground">
+        <h4>🎮 Probá las propiedades de background-image</h4>
+        <div class="ctrl-row">
+          <label>background-size</label>
+          <select id="bgSize" onchange="updateBgImg()">
+            <option value="cover">cover</option>
+            <option value="contain">contain</option>
+            <option value="100% 100%">100% 100%</option>
+            <option value="50%">50%</option>
+            <option value="auto">auto</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label>background-position</label>
+          <select id="bgPos" onchange="updateBgImg()">
+            <option value="center">center</option>
+            <option value="top">top</option>
+            <option value="bottom">bottom</option>
+            <option value="left">left</option>
+            <option value="right">right</option>
+            <option value="top left">top left</option>
+            <option value="top right">top right</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label>background-repeat</label>
+          <select id="bgRepeat" onchange="updateBgImg()">
+            <option value="no-repeat">no-repeat</option>
+            <option value="repeat">repeat</option>
+            <option value="repeat-x">repeat-x</option>
+            <option value="repeat-y">repeat-y</option>
+          </select>
+        </div>
+        <div class="live-css" id="bgImgCss"></div>
+        <div class="preview-area" style="min-height:180px;padding:0;overflow:hidden;border-radius:var(--rsm);">
+          <div id="bgImgPreview" style="width:100%;height:180px;transition:all .3s;background-image:url('https://picsum.photos/seed/css3/600/400');background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+        </div>
+      </div>
+
+      <div class="callout ok" style="margin-top:20px;">
+        <div class="callout-title">✅ Resumen de trucos de imagen</div>
+        <table class="prop-table">
+          <thead><tr><th>Truco</th><th>Cuándo usarlo</th></tr></thead>
+          <tbody>
+            <tr><td>background-size: cover</td><td>Heros, banners — la imagen llena todo</td></tr>
+            <tr><td>object-fit: cover + border-radius:50%</td><td>Avatar / foto de perfil circular</td></tr>
+            <tr><td>max-width:100%; height:auto</td><td>Imágenes responsivas (siempre)</td></tr>
+            <tr><td>aspect-ratio: 16/9</td><td>Thumbnails de video, cards</td></tr>
+            <tr><td>background-attachment: fixed</td><td>Efecto parallax sencillo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(4)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(5)">✅ Finalizar práctica</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINISH -->
+  <div class="finish-card" id="finishCard">
+    <div class="finish-icon">🚀</div>
+    <h2>¡Práctica completada!</h2>
+    <p>
+      Dominaste los formatos de <strong>color</strong>, la anatomía de los <strong>bordes</strong>,
+      el modelo de caja con <strong>padding &amp; margin</strong>, los <strong>gradientes</strong>
+      CSS y los trucos de <strong>background</strong> con imágenes.
+      ¡Tu kit de estilos visuales está completo!
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;">
+      <button class="btn btn-secondary" onclick="resetAll()">🔄 Reiniciar</button>
+      <a href="paso-a-paso-divs.html" style="text-decoration:none;">
+        <button class="btn btn-primary">← Ver Práctica 1</button>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+/* ==============================
+   CONSTANTS
+============================== */
+const TOTAL = 5;
+const done  = new Set();
+
+/* ==============================
+   STEP LOGIC
+============================== */
+function toggleStep(n) {
+  const body = document.getElementById('body-' + n);
+  const isOpen = body.classList.contains('open');
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('body-' + i).classList.remove('open');
+    if (!done.has(i)) document.getElementById('step-' + i).classList.remove('active');
+  }
+  if (!isOpen) {
+    body.classList.add('open');
+    document.getElementById('step-' + n).classList.add('active');
+  }
+}
+
+function goToStep(n) {
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('body-' + i).classList.remove('open');
+  document.getElementById('body-' + n).classList.add('open');
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('step-' + n).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function completeStep(n) {
+  done.add(n);
+  const card = document.getElementById('step-' + n);
+  card.classList.remove('active');
+  card.classList.add('done');
+  document.getElementById('body-' + n).classList.remove('open');
+  updateProgress();
+  if (n < TOTAL) {
+    setTimeout(() => goToStep(n + 1), 320);
+  } else {
+    document.getElementById('finishCard').classList.add('visible');
+    document.getElementById('finishCard').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function updateProgress() {
+  const pct = (done.size / TOTAL) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done.size + ' / ' + TOTAL + ' pasos';
+}
+
+function resetAll() {
+  done.clear(); updateProgress();
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('step-' + i).classList.remove('done','active');
+    document.getElementById('body-' + i).classList.remove('open');
+  }
+  document.getElementById('finishCard').classList.remove('visible');
+  document.getElementById('step-1').classList.add('active');
+  document.getElementById('body-1').classList.add('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ==============================
+   COPY BUTTON
+============================== */
+function copyCode(btn) {
+  const pre = btn.nextElementSibling;
+  const text = pre.innerText;
+  const write = t => { btn.textContent = t; };
+  navigator.clipboard.writeText(text).then(() => {
+    write('✓ Copiado'); btn.style.background='var(--success)'; btn.style.color='#000';
+    setTimeout(() => { write('Copiar'); btn.style.background=''; btn.style.color=''; }, 1800);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    write('✓ Copiado'); setTimeout(() => write('Copiar'), 1800);
+  });
+}
+
+/* ==============================
+   STEP 1 – COLOR PLAYGROUND
+============================== */
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+function rgbToHsl(r,g,b) {
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){ h=s=0; } else {
+    const d=max-min; s=l>.5?d/(2-max-min):d/(max+min);
+    switch(max){ case r:h=(g-b)/d+(g<b?6:0);break; case g:h=(b-r)/d+2;break; case b:h=(r-g)/d+4;break; }
+    h/=6;
+  }
+  return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};
+}
+function updateColor() {
+  const hex = document.getElementById('colorPicker').value;
+  const alpha = document.getElementById('alphaSlider').value;
+  const fmt = document.getElementById('colorFormat').value;
+  const a = (alpha/100).toFixed(2);
+  const {r,g,b} = hexToRgb(hex);
+  const {h,s,l} = rgbToHsl(r,g,b);
+
+  let colorStr, bgColor, borderColor, textColor;
+  if (fmt === 'hex') {
+    const aa = Math.round(alpha/100*255).toString(16).padStart(2,'0');
+    colorStr  = alpha < 100 ? `${hex}${aa}` : hex;
+    bgColor   = colorStr; borderColor = colorStr; textColor = colorStr;
+  } else if (fmt === 'rgb') {
+    colorStr  = alpha < 100 ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`;
+    bgColor=borderColor=textColor = colorStr;
+  } else {
+    colorStr  = alpha < 100 ? `hsla(${h}, ${s}%, ${l}%, ${a})` : `hsl(${h}, ${s}%, ${l}%)`;
+    bgColor=borderColor=textColor = colorStr;
+  }
+
+  document.getElementById('colorDisp').textContent = hex;
+  document.getElementById('alphaDisp').textContent = alpha + '%';
+  document.getElementById('colorSampleBg').style.backgroundColor = colorStr;
+  document.getElementById('colorSampleBorder').style.borderColor = colorStr;
+  document.getElementById('colorSampleText').style.color = colorStr;
+
+  document.getElementById('colorCss').innerHTML =
+    `<span class="sel">.elemento</span> {\n` +
+    `  <span class="prop">color</span>: <span class="val">${colorStr}</span>;\n` +
+    `  <span class="prop">background-color</span>: <span class="val">${colorStr}</span>;\n` +
+    `  <span class="prop">border-color</span>: <span class="val">${colorStr}</span>;\n` +
+    `}`;
+}
+
+// Build swatch grid
+(function buildSwatches() {
+  const swatches = [
+    ['#ff5f57','#ff5f57'],['#febc2e','#a06000'],['#28c840','#fff'],
+    ['#7c5cfc','#fff'],['#e040fb','#fff'],['#00e5ff','#111'],
+    ['#00e676','#111'],['#ff6d00','#fff'],['#f06292','#fff'],
+    ['#4fc3f7','#111'],['#aed581','#111'],['#fff176','#333'],
+    ['#90a4ae','#111'],['#1a1a2e','#fff'],['#ffffff','#333'],
+  ];
+  const grid = document.getElementById('swatchGrid');
+  swatches.forEach(([bg, tc]) => {
+    const d = document.createElement('div');
+    d.className = 'swatch';
+    d.style.background = bg;
+    d.style.color = tc;
+    d.textContent = bg;
+    grid.appendChild(d);
+  });
+})();
+
+/* ==============================
+   STEP 2 – BORDER PLAYGROUND
+============================== */
+(function buildBorderStyles() {
+  const styles = ['solid','dashed','dotted','double','groove','ridge','inset','outset'];
+  const grid = document.getElementById('borderStyleGrid');
+  styles.forEach(s => {
+    grid.innerHTML += `
+      <div class="border-demo-item">
+        <div class="box" style="border:4px ${s} #7c5cfc; border-radius:4px;"></div>
+        <code>${s}</code>
+      </div>`;
+  });
+})();
+
+function updateBorder() {
+  const w  = document.getElementById('bw').value;
+  const s  = document.getElementById('bs').value;
+  const c  = document.getElementById('bc').value;
+  const r  = document.getElementById('br').value;
+  const bg = document.getElementById('bbg').value;
+
+  document.getElementById('bwD').textContent = w + 'px';
+  document.getElementById('bcD').textContent = c;
+  document.getElementById('brD').textContent = r + 'px';
+
+  const box = document.getElementById('borderBox');
+  box.style.borderWidth  = w + 'px';
+  box.style.borderStyle  = s;
+  box.style.borderColor  = c;
+  box.style.borderRadius = r + 'px';
+  box.style.backgroundColor = bg;
+
+  document.getElementById('borderCss').innerHTML =
+    `<span class="sel">.caja</span> {\n` +
+    `  <span class="prop">border-width</span>:  <span class="num">${w}px</span>;\n` +
+    `  <span class="prop">border-style</span>:  <span class="val">${s}</span>;\n` +
+    `  <span class="prop">border-color</span>:  <span class="val">${c}</span>;\n` +
+    `  <span class="prop">border-radius</span>: <span class="num">${r}px</span>;\n` +
+    `  <span class="cmt">/* shorthand: */</span>\n` +
+    `  <span class="prop">border</span>: <span class="num">${w}px</span> <span class="val">${s}</span> <span class="val">${c}</span>;\n` +
+    `}`;
+}
+updateBorder();
+
+/* ==============================
+   STEP 3 – BOX MODEL PLAYGROUND
+============================== */
+function updateBoxModel() {
+  const p  = document.getElementById('pad').value;
+  const m  = document.getElementById('mar').value;
+  const bw = document.getElementById('bwBM').value;
+  const bs = document.getElementById('boxSizing').value;
+
+  document.getElementById('padD').textContent = p + 'px';
+  document.getElementById('marD').textContent = m + 'px';
+  document.getElementById('bwBMD').textContent = bw + 'px';
+
+  const el   = document.getElementById('bm-el');
+  const wrap = document.getElementById('bm-wrap');
+  el.style.padding     = p + 'px';
+  el.style.borderWidth = bw + 'px';
+  el.style.boxSizing   = bs;
+  wrap.style.padding   = m + 'px';
+
+  document.getElementById('boxModelCss').innerHTML =
+    `<span class="sel">.elemento</span> {\n` +
+    `  <span class="prop">padding</span>:     <span class="num">${p}px</span>;\n` +
+    `  <span class="prop">margin</span>:      <span class="num">${m}px</span>;\n` +
+    `  <span class="prop">border-width</span>:<span class="num">${bw}px</span>;\n` +
+    `  <span class="prop">box-sizing</span>: <span class="val">${bs}</span>;\n` +
+    `}`;
+}
+updateBoxModel();
+
+/* ==============================
+   STEP 4 – GRADIENT PLAYGROUND
+============================== */
+function updateGradient() {
+  const type = document.getElementById('gradType').value;
+  const deg  = document.getElementById('gradDeg').value;
+  const c1   = document.getElementById('gc1').value;
+  const c2   = document.getElementById('gc2').value;
+  const c3   = document.getElementById('gc3').value;
+  const s1   = document.getElementById('gs1').value;
+  const s2   = document.getElementById('gs2').value;
+  const s3   = document.getElementById('gs3').value;
+
+  document.getElementById('gradDegD').textContent = deg + 'deg';
+  document.getElementById('gs1D').textContent = s1 + '%';
+  document.getElementById('gs2D').textContent = s2 + '%';
+  document.getElementById('gs3D').textContent = s3 + '%';
+
+  const stops = `${c1} ${s1}%, ${c2} ${s2}%, ${c3} ${s3}%`;
+  let grad, cssLine;
+  const linCtrl = document.getElementById('linearCtrls');
+
+  if (type === 'linear') {
+    linCtrl.style.display = '';
+    grad    = `linear-gradient(${deg}deg, ${stops})`;
+    cssLine = `<span class="val">linear-gradient</span>(<span class="num">${deg}deg</span>, ${c1} ${s1}%, ${c2} ${s2}%, ${c3} ${s3}%)`;
+  } else if (type === 'radial') {
+    linCtrl.style.display = 'none';
+    grad    = `radial-gradient(circle, ${stops})`;
+    cssLine = `<span class="val">radial-gradient</span>(<span class="kw">circle</span>, ${c1} ${s1}%, ${c2} ${s2}%, ${c3} ${s3}%)`;
+  } else {
+    linCtrl.style.display = 'none';
+    grad    = `conic-gradient(from 0deg, ${stops})`;
+    cssLine = `<span class="val">conic-gradient</span>(<span class="kw">from 0deg</span>, ${c1} ${s1}%, ${c2} ${s2}%, ${c3} ${s3}%)`;
+  }
+
+  document.getElementById('grad-preview').style.background = grad;
+  document.getElementById('gradientCss').innerHTML =
+    `<span class="sel">.elemento</span> {\n` +
+    `  <span class="prop">background</span>: ${cssLine};\n` +
+    `}`;
+}
+updateGradient();
+
+/* ==============================
+   STEP 5 – BG IMAGE PLAYGROUND
+============================== */
+function updateBgImg() {
+  const size   = document.getElementById('bgSize').value;
+  const pos    = document.getElementById('bgPos').value;
+  const repeat = document.getElementById('bgRepeat').value;
+
+  const el = document.getElementById('bgImgPreview');
+  el.style.backgroundSize     = size;
+  el.style.backgroundPosition = pos;
+  el.style.backgroundRepeat   = repeat;
+
+  document.getElementById('bgImgCss').innerHTML =
+    `<span class="sel">.hero</span> {\n` +
+    `  <span class="prop">background-image</span>:    <span class="val">url(</span><span class="str">'imagen.jpg'</span><span class="val">)</span>;\n` +
+    `  <span class="prop">background-size</span>:     <span class="val">${size}</span>;\n` +
+    `  <span class="prop">background-position</span>: <span class="val">${pos}</span>;\n` +
+    `  <span class="prop">background-repeat</span>:   <span class="val">${repeat}</span>;\n` +
+    `  <span class="cmt">/* shorthand: */</span>\n` +
+    `  <span class="prop">background</span>: <span class="val">url(</span><span class="str">'imagen.jpg'</span><span class="val">)</span> <span class="val">${pos}</span>/<span class="val">${size}</span> <span class="val">${repeat}</span>;\n` +
+    `}`;
+}
+updateBgImg();
+
+// Init color
+updateColor();
+</script>
+</body>
+</html>

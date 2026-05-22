@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Selectores, Eventos, Transiciones &amp; Animaciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&family=Outfit:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ════════════════════════════════════════════
+       TOKENS & RESET
+    ════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #0d0f1a; --surface:  #13162b; --surface2: #1c2040;
+      --border:  #2a2f5a; --accent:   #7c5cfc; --accent2:  #e040fb;
+      --accent3: #00e5ff; --success:  #00e676; --warn:     #ffab40;
+      --danger:  #ff5252; --text:     #e8eaf6; --muted:    #8891bb;
+      --code-bg: #090b16; --done-bg:  #1a3a2a;
+      --radius: 14px; --rsm: 8px;
+      --font: 'Inter', sans-serif; --mono: 'Fira Code', monospace;
+      --shadow: 0 8px 32px rgba(0,0,0,.55);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ════ ORBS ════ */
+    .bg-orbs { position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
+    .orb { position:absolute;border-radius:50%;filter:blur(90px);opacity:.13;animation:drift 16s ease-in-out infinite alternate; }
+    .orb:nth-child(1){width:580px;height:580px;background:var(--accent);top:-150px;left:-150px;animation-delay:0s;}
+    .orb:nth-child(2){width:460px;height:460px;background:var(--accent2);top:28%;right:-110px;animation-delay:4s;}
+    .orb:nth-child(3){width:360px;height:360px;background:var(--accent3);bottom:-90px;left:22%;animation-delay:8s;}
+    .orb:nth-child(4){width:300px;height:300px;background:#ff9800;top:60%;left:5%;animation-delay:2s;}
+    @keyframes drift{from{transform:translate(0,0)scale(1);}to{transform:translate(26px,34px)scale(1.07);}}
+
+    /* ════ LAYOUT ════ */
+    .wrapper{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:48px 24px 80px;}
+
+    /* ════ HEADER ════ */
+    header{text-align:center;margin-bottom:52px;}
+    .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.82rem;text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:5px 14px;margin-bottom:20px;transition:all .2s;}
+    .back-link:hover{color:var(--accent3);border-color:var(--accent3);}
+    .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 16px;border-radius:99px;margin-bottom:20px;}
+    header h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.15;background:linear-gradient(135deg,#fff 30%,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    header p{color:var(--muted);font-size:1.05rem;margin-top:14px;max-width:640px;margin-inline:auto;line-height:1.7;}
+
+    /* ════ PROGRESS ════ */
+    .progress-wrap{display:flex;align-items:center;gap:10px;margin-bottom:44px;}
+    .progress-bar-track{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .5s ease;}
+    .progress-label{font-size:.8rem;color:var(--muted);white-space:nowrap;}
+
+    /* ════ STEP CARDS ════ */
+    .step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:26px;overflow:hidden;box-shadow:var(--shadow);transition:border-color .3s;}
+    .step-card.active{border-color:var(--accent);}
+    .step-card.done{border-color:var(--success);background:var(--done-bg);}
+    .step-header{display:flex;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;user-select:none;transition:background .2s;}
+    .step-header:hover{background:rgba(124,92,252,.07);}
+    .step-num{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0;border:2px solid var(--border);color:var(--muted);background:var(--surface2);transition:all .3s;}
+    .step-card.active .step-num{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 0 18px rgba(124,92,252,.55);}
+    .step-card.done .step-num{background:var(--success);border-color:transparent;color:#000;}
+    .step-title{flex:1;} .step-title h2{font-size:1.05rem;font-weight:700;} .step-title p{font-size:.82rem;color:var(--muted);margin-top:2px;}
+    .step-arrow{font-size:1.2rem;color:var(--muted);transition:transform .3s;}
+    .step-card.active .step-arrow{transform:rotate(90deg);color:var(--accent);}
+    .step-body{display:none;padding:0 26px 32px;animation:fadeIn .3s ease;}
+    .step-body.open{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ════ TYPOGRAPHY ════ */
+    .explanation{font-size:.95rem;line-height:1.85;color:var(--text);margin-bottom:18px;}
+    .explanation strong{color:var(--accent3);} .explanation em{color:var(--accent2);font-style:normal;font-weight:600;}
+    h3.sec{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:26px 0 13px;display:flex;align-items:center;gap:8px;}
+    h3.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* ════ CALLOUT ════ */
+    .callout{border-left:3px solid var(--accent2);background:rgba(224,64,251,.07);border-radius:0 var(--rsm) var(--rsm) 0;padding:14px 18px;margin:16px 0;font-size:.88rem;line-height:1.75;}
+    .callout.info{border-color:var(--accent3);background:rgba(0,229,255,.07);}
+    .callout.warn{border-color:var(--warn);background:rgba(255,171,64,.07);}
+    .callout.ok{border-color:var(--success);background:rgba(0,230,118,.07);}
+    .callout.danger{border-color:var(--danger);background:rgba(255,82,82,.06);}
+    .ct{font-weight:700;font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;color:var(--accent2);}
+    .callout.info .ct{color:var(--accent3);} .callout.warn .ct{color:var(--warn);} .callout.ok .ct{color:var(--success);} .callout.danger .ct{color:var(--danger);}
+
+    /* ════ CODE ════ */
+    .code-wrap{position:relative;margin:14px 0;border-radius:var(--rsm);overflow:hidden;background:var(--code-bg);border:1px solid var(--border);}
+    .code-label{background:var(--surface2);padding:6px 16px;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+    .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}.dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+    pre{padding:20px;font-family:var(--mono);font-size:.82rem;line-height:1.85;overflow-x:auto;tab-size:2;}
+    .kw{color:#c792ea;}.sel{color:#82aaff;}.prop{color:#80cbc4;}.val{color:#f78c6c;}.str{color:#c3e88d;}.cmt{color:#546e7a;font-style:italic;}.num{color:#f78c6c;}.at{color:#89ddff;}
+    .copy-btn{position:absolute;top:36px;right:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:.72rem;padding:4px 10px;border-radius:var(--rsm);cursor:pointer;transition:all .2s;}
+    .copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+    /* ════ PLAYGROUND ════ */
+    .playground{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:20px;margin-top:18px;}
+    .playground h4{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent3);margin-bottom:16px;display:flex;align-items:center;gap:6px;}
+    .ctrl-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+    .ctrl-row label{font-size:.8rem;color:var(--muted);min-width:120px;font-family:var(--mono);}
+    .ctrl-row input[type=range]{flex:1;min-width:80px;accent-color:var(--accent);}
+    .ctrl-row select{flex:1;background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.8rem;padding:5px 8px;border-radius:var(--rsm);cursor:pointer;}
+    .vdisp{font-family:var(--mono);font-size:.8rem;color:var(--accent3);min-width:72px;text-align:right;}
+    .live-css{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--rsm);padding:13px 18px;margin-top:12px;font-family:var(--mono);font-size:.77rem;line-height:1.9;overflow-x:auto;}
+    .pg-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    @media(max-width:700px){.pg-cols{grid-template-columns:1fr;}}
+    .pg-controls{display:flex;flex-direction:column;gap:10px;}
+
+    /* ════ NAV ════ */
+    .nav-btns{display:flex;gap:12px;margin-top:28px;justify-content:flex-end;}
+    .btn{padding:10px 24px;border-radius:var(--rsm);font-family:var(--font);font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 18px rgba(124,92,252,.35);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,92,252,.5);}
+    .btn-secondary{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+    .btn-secondary:hover{background:var(--border);color:var(--text);}
+
+    /* ════ FINISH ════ */
+    .finish-card{display:none;background:linear-gradient(135deg,rgba(124,92,252,.15),rgba(0,229,255,.1));border:1px solid var(--accent);border-radius:var(--radius);padding:40px;text-align:center;margin-top:32px;box-shadow:var(--shadow);}
+    .finish-card.visible{display:block;animation:fadeIn .5s ease;}
+    .finish-icon{font-size:3rem;margin-bottom:16px;}
+    .finish-card h2{font-size:1.8rem;font-weight:800;color:var(--accent3);margin-bottom:10px;}
+    .finish-card p{color:var(--muted);line-height:1.7;max-width:540px;margin-inline:auto;}
+
+    /* ════ SCROLLBAR ════ */
+    ::-webkit-scrollbar{width:8px;height:8px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;} ::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+    @media(max-width:600px){.wrapper{padding:32px 16px 60px;}.step-header{padding:16px;}.step-body{padding:0 16px 24px;}}
+
+    /* ════════════════════════════════════
+       STEP 1 – SELECTORES: DOM TREE
+    ════════════════════════════════════ */
+    .sel-demo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+    @media(max-width:640px){.sel-demo-wrap{grid-template-columns:1fr;}}
+    .sel-btn-list{display:flex;flex-direction:column;gap:8px;}
+    .sel-btn{background:var(--code-bg);border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:var(--rsm);cursor:pointer;font-family:var(--mono);font-size:.78rem;text-align:left;transition:all .2s;line-height:1.5;}
+    .sel-btn:hover{border-color:var(--accent);color:var(--accent3);}
+    .sel-btn.active{border-color:var(--accent);background:rgba(124,92,252,.15);color:var(--accent3);}
+    .sel-btn .sel-code{display:block;font-weight:700;margin-bottom:2px;}
+    .sel-btn .sel-desc{font-size:.68rem;color:var(--muted);}
+
+    .dom-tree{background:#f0f2f8;border-radius:var(--rsm);padding:16px;font-family:var(--mono);font-size:.78rem;border:2px dashed var(--border);}
+    .dom-node{background:#e8eaf6;border:2px solid #c5cae9;border-radius:6px;padding:8px 12px;margin:5px 0;transition:all .3s;cursor:default;}
+    .dom-node.child{margin-left:24px;}
+    .dom-node.grandchild{margin-left:48px;}
+    .dom-node .dn-tag{color:#f07178;font-weight:700;}
+    .dom-node .dn-cls{color:#82aaff;}
+    .dom-node .dn-id{color:#ffcb6b;}
+    .dom-node .dn-cnt{color:#546e7a;font-size:.7rem;}
+    .dom-node.lit{background:rgba(0,230,118,.15);border-color:var(--success);box-shadow:0 0 12px rgba(0,230,118,.4);transform:scale(1.02);}
+    .dom-node.lit .dn-tag,.dom-node.lit .dn-cls,.dom-node.lit .dn-id,.dom-node.lit .dn-cnt{color:#222;}
+    .sel-explanation{font-size:.78rem;color:var(--muted);margin-top:8px;padding:8px 12px;background:var(--code-bg);border-radius:var(--rsm);font-family:var(--mono);min-height:40px;line-height:1.6;}
+
+    /* ════════════════════════════════════
+       STEP 2 – PSEUDO-CLASES DEMOS
+    ════════════════════════════════════ */
+    .pseudo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin:16px 0;}
+    .pseudo-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:18px;}
+    .pseudo-card h5{font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent3);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+    .pseudo-card code.ps-tag{font-family:var(--mono);font-size:.72rem;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);padding:1px 6px;border-radius:4px;color:var(--accent3);}
+
+    /* Demo elements */
+    .demo-btn{padding:10px 20px;border-radius:var(--rsm);border:2px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--font);font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s,color .2s,transform .1s;margin:4px;}
+    .demo-btn:hover{background:var(--accent);color:#fff;}
+    .demo-btn:active{transform:scale(.96);}
+
+    .demo-input{padding:9px 14px;border-radius:var(--rsm);border:2px solid var(--border);background:var(--code-bg);color:var(--text);font-family:var(--font);font-size:.88rem;width:100%;margin-top:6px;outline:none;transition:border-color .2s,box-shadow .2s;}
+    .demo-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,.25);}
+    .demo-input:valid{border-color:var(--success);}
+    .demo-input:invalid{border-color:var(--danger);}
+
+    .demo-check-label{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.88rem;color:var(--muted);margin:6px 0;}
+    .demo-check{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;}
+    .demo-check:checked + span{color:var(--accent3);font-weight:600;}
+
+    .nth-list{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+    .nth-list li{padding:6px 14px;border-radius:var(--rsm);border:1px solid var(--border);font-family:var(--mono);font-size:.75rem;color:var(--muted);background:var(--code-bg);transition:all .2s;}
+    .nth-list li:first-child{border-color:var(--success);color:var(--success);}
+    .nth-list li:last-child{border-color:var(--warn);color:var(--warn);}
+    .nth-list li:nth-child(2n){background:rgba(124,92,252,.1);border-color:var(--accent);color:var(--accent3);}
+
+    .has-demo{padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--border);margin-top:6px;transition:border-color .3s;}
+    .has-demo:has(input:checked){border-color:var(--accent3);background:rgba(0,229,255,.06);}
+    .has-label{font-size:.75rem;color:var(--muted);}
+
+    /* ════════════════════════════════════
+       STEP 3 – TRANSICIONES
+    ════════════════════════════════════ */
+    .timing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:14px 0;}
+    .timing-card{background:var(--surface2);border:2px solid var(--border);border-radius:var(--rsm);padding:12px;cursor:pointer;transition:border-color .2s;text-align:center;}
+    .timing-card:hover,.timing-card.selected{border-color:var(--accent);}
+    .timing-card .tc-name{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--accent3);margin-bottom:8px;}
+    .timing-card .tc-ball{width:20px;height:20px;border-radius:50%;background:var(--accent);margin:0 auto;}
+    .timing-card .tc-desc{font-size:.65rem;color:var(--muted);margin-top:6px;line-height:1.4;}
+
+    /* Transition playground card */
+    .tr-scene{background:#f0f2f8;border-radius:var(--rsm);padding:40px 20px;margin-top:14px;display:flex;align-items:center;justify-content:center;min-height:200px;border:2px dashed var(--border);position:relative;}
+    .tr-scene-hint{position:absolute;top:8px;right:12px;font-size:.68rem;color:#aaa;font-family:var(--mono);}
+    #trCard{
+      width:160px;height:110px;border-radius:12px;cursor:pointer;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;color:#fff;
+      box-shadow:0 4px 18px rgba(124,92,252,.35);
+    }
+    #trCard:hover{
+      background:linear-gradient(135deg,var(--accent3),#00b8d4);
+      border-radius:50px;
+      transform:scale(1.12) translateY(-12px) rotate(3deg);
+      box-shadow:0 24px 50px rgba(0,229,255,.4);
+      color:#0d0f1a;
+    }
+
+    /* prop checkboxes */
+    .prop-check-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+    .prop-chip{display:flex;align-items:center;gap:6px;background:var(--code-bg);border:1px solid var(--border);padding:5px 12px;border-radius:99px;cursor:pointer;transition:all .2s;font-family:var(--mono);font-size:.72rem;color:var(--muted);}
+    .prop-chip input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;}
+    .prop-chip:has(input:checked){border-color:var(--accent);color:var(--accent3);background:rgba(124,92,252,.1);}
+
+    /* ════════════════════════════════════
+       STEP 4 – ANIMACIONES
+    ════════════════════════════════════ */
+    .anim-preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:14px 0;}
+    .anim-preset-btn{background:var(--surface2);border:2px solid var(--border);border-radius:var(--rsm);padding:14px 10px;cursor:pointer;text-align:center;transition:all .2s;}
+    .anim-preset-btn:hover{border-color:var(--accent);background:rgba(124,92,252,.08);}
+    .anim-preset-btn.active{border-color:var(--accent2);background:rgba(224,64,251,.12);}
+    .anim-preset-btn .ap-icon{font-size:1.6rem;margin-bottom:6px;}
+    .anim-preset-btn .ap-name{font-size:.75rem;font-weight:700;color:var(--text);}
+    .anim-preset-btn .ap-desc{font-size:.65rem;color:var(--muted);margin-top:3px;}
+
+    /* Animation scene */
+    .anim-scene{background:#12131f;border-radius:var(--rsm);padding:50px 20px;margin-top:14px;display:flex;align-items:center;justify-content:center;min-height:180px;border:2px dashed var(--border);position:relative;overflow:hidden;}
+    #animTarget{
+      width:80px;height:80px;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex;align-items:center;justify-content:center;
+      font-size:2rem;
+    }
+    .anim-paused #animTarget{animation-play-state:paused!important;}
+
+    .anim-controls-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+    @media(max-width:580px){.anim-controls-row{grid-template-columns:1fr;}}
+
+    #animStyleTag{} /* injected style tag */
+
+    /* Play / Pause */
+    .play-pause-btn{
+      display:flex;align-items:center;gap:8px;justify-content:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none;color:#fff;padding:10px 24px;border-radius:99px;
+      font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;
+      box-shadow:0 4px 18px rgba(124,92,252,.35);transition:all .2s;
+      margin-top:14px;
+    }
+    .play-pause-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,92,252,.5);}
+
+    /* fill-mode visualizer */
+    .fill-demo{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;}
+    .fill-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:12px 16px;flex:1;min-width:120px;font-size:.75rem;}
+    .fill-item .fi-name{font-family:var(--mono);color:var(--accent3);font-weight:700;margin-bottom:4px;}
+    .fill-item .fi-desc{color:var(--muted);line-height:1.5;}
+
+    /* comparison table */
+    .comp-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:14px 0;}
+    .comp-table th{padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);font-weight:700;}
+    .comp-table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top;}
+    .comp-table td:first-child{font-family:var(--mono);color:var(--text);}
+    .comp-table tr:hover td{background:rgba(255,255,255,.02);}
+    .th-tr{color:var(--accent3);} .th-an{color:var(--accent2);}
+    .td-tr{color:var(--accent3)!important;} .td-an{color:var(--accent2)!important;}
+
+    /* perf chips */
+    .perf-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+    .chip-ok{background:rgba(0,230,118,.12);border:1px solid var(--success);color:var(--success);padding:4px 12px;border-radius:99px;font-size:.75rem;font-family:var(--mono);}
+    .chip-no{background:rgba(255,82,82,.1);border:1px solid var(--danger);color:var(--danger);padding:4px 12px;border-radius:99px;font-size:.75rem;font-family:var(--mono);}
+    .chip-warn{background:rgba(255,171,64,.1);border:1px solid var(--warn);color:var(--warn);padding:4px 12px;border-radius:99px;font-size:.75rem;font-family:var(--mono);}
+
+    /* Accessibility demo */
+    .a11y-box{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;font-family:var(--mono);font-size:.78rem;line-height:1.85;margin:14px 0;}
+
+    /* ════ INJECT ANIMATION STYLES ════ */
+    @keyframes anim-bounce{0%,100%{transform:translateY(0);animation-timing-function:ease-out;}50%{transform:translateY(-40px);animation-timing-function:ease-in;}}
+    @keyframes anim-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    @keyframes anim-pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.3);opacity:.65;}}
+    @keyframes anim-fadeInUp{from{opacity:0;transform:translateY(36px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes anim-shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-12px);}40%{transform:translateX(12px);}60%{transform:translateX(-8px);}80%{transform:translateX(8px);}}
+    @keyframes anim-neon{0%,95%,100%{opacity:1;box-shadow:0 0 6px var(--accent3),0 0 24px var(--accent3);}5%,30%{opacity:.15;box-shadow:none;}50%{opacity:.9;box-shadow:0 0 6px var(--accent3);}}
+    @keyframes anim-wave{0%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;}50%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%;}100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;}}
+  </style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <a href="paso-a-paso-layout.html" class="back-link">← Práctica anterior: Layout</a>
+    <div class="badge">Programación II · Práctica CSS</div>
+    <h1>Selectores, Eventos,<br/>Transiciones &amp; Animaciones</h1>
+    <p>Desde selectores anidados y pseudo-clases hasta transiciones suaves y animaciones con <code style="color:var(--accent3)">@keyframes</code> — con playgrounds completos.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 4 pasos</div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       PASO 1 – SELECTORES ANIDADOS
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card active" id="step-1">
+    <div class="step-header" onclick="toggleStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-title">
+        <h2>🎯 Selectores Anidados &amp; Combinadores</h2>
+        <p>Apuntar elementos exactos mediante cadenas de selectores</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body open" id="body-1">
+
+      <p class="explanation">
+        Los <strong>selectores anidados</strong> permiten apuntar a un elemento en función de su
+        contexto en el árbol HTML. Combinando etiquetas, clases e IDs con <em>combinadores</em>,
+        se puede seleccionar exactamente el elemento deseado sin añadir clases extra al HTML.
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Los 5 combinadores</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── Espacio " " → descendiente (cualquier nivel) ── */</span>
+<span class="sel">article p</span>          { <span class="prop">color</span>: <span class="val">blue</span>; }    <span class="cmt">/* todo &lt;p&gt; dentro de &lt;article&gt; */</span>
+<span class="sel">.card .titulo</span>       { <span class="prop">color</span>: <span class="val">red</span>; }     <span class="cmt">/* .titulo dentro de .card */</span>
+
+<span class="cmt">/* ── > → hijo DIRECTO (solo primer nivel) ── */</span>
+<span class="sel">ul > li</span>             { <span class="prop">color</span>: <span class="val">green</span>; }  <span class="cmt">/* li hijo directo de ul, no de ul anidado */</span>
+<span class="sel">.nav > a</span>            { <span class="prop">font-weight</span>: <span class="val">bold</span>; }
+
+<span class="cmt">/* ── + → hermano ADYACENTE (el de inmediato después) ── */</span>
+<span class="sel">h2 + p</span>              { <span class="prop">margin-top</span>: <span class="num">0</span>; }  <span class="cmt">/* p que viene justo después de h2 */</span>
+<span class="sel">input:checked + label</span>{ <span class="prop">color</span>: <span class="val">green</span>; }  <span class="cmt">/* label tras input checked */</span>
+
+<span class="cmt">/* ── ~ → hermanos GENERALES (todos los siguientes) ── */</span>
+<span class="sel">h2 ~ p</span>              { <span class="prop">font-size</span>: <span class="num">.9rem</span>; } <span class="cmt">/* todos los p que siguen a h2 */</span>
+
+<span class="cmt">/* ── , → múltiples selectores ── */</span>
+<span class="sel">h1, h2, h3</span>          { <span class="prop">font-weight</span>: <span class="val">800</span>; }
+
+<span class="cmt">/* ── Encadenados: clase + clase, etiqueta + clase ── */</span>
+<span class="sel">.card.featured</span>      { <span class="prop">border</span>: <span class="num">2px</span> <span class="val">solid gold</span>; } <span class="cmt">/* elemento con AMBAS clases */</span>
+<span class="sel">a.btn</span>               { <span class="prop">text-decoration</span>: <span class="val">none</span>; }  <span class="cmt">/* &lt;a&gt; con clase btn */</span>
+<span class="sel">#header .logo</span>       { <span class="prop">width</span>: <span class="num">120px</span>; }  <span class="cmt">/* .logo dentro de #header */</span>
+
+<span class="cmt">/* ── Atributo ── */</span>
+<span class="sel">input[type="email"]</span> { <span class="prop">border-color</span>: <span class="val">blue</span>; }
+<span class="sel">a[href^="https"]</span>    { <span class="prop">color</span>: <span class="val">green</span>; }   <span class="cmt">/* href que EMPIEZA con https */</span>
+<span class="sel">img[alt]</span>            { <span class="prop">outline</span>: <span class="num">2px</span> <span class="val">solid red</span>; } <span class="cmt">/* tiene atributo alt */</span>
+
+<span class="cmt">/* ── :is() y :where() – selectores modernos ── */</span>
+<span class="sel">:is(h1, h2, h3)</span>     { <span class="prop">line-height</span>: <span class="num">1.2</span>; }
+<span class="sel">:where(.card, .box) p</span>{ <span class="prop">font-size</span>: <span class="num">.9rem</span>; }  <span class="cmt">/* igual que :is pero sin especificidad */</span>
+
+<span class="cmt">/* ── CSS nativo nesting (moderno, sin preprocesador) ── */</span>
+<span class="sel">.card</span> {
+  <span class="prop">background</span>: <span class="val">white</span>;
+  <span class="cmt">/* Anidamiento nativo (navegadores modernos 2023+) */</span>
+  <span class="kw">&</span> <span class="sel">.titulo</span>  { <span class="prop">font-weight</span>: <span class="val">bold</span>; }
+  <span class="kw">&</span>:<span class="sel">hover</span>    { <span class="prop">box-shadow</span>: <span class="val">0 4px 12px rgba(0,0,0,.1)</span>; }
+  <span class="kw">& > p</span>     { <span class="prop">margin-top</span>: <span class="num">8px</span>; }
+}</pre>
+      </div>
+
+      <div class="callout warn">
+        <div class="ct">⚠️ Especificidad — el selector más específico gana</div>
+        <code>id</code> (100pts) &gt; <code>class / pseudo-clase / atributo</code> (10pts) &gt; <code>etiqueta</code> (1pt).
+        Un selector <code>#header .btn</code> vale 110pts y sobreescribe a <code>.btn</code> (10pts)
+        aunque aparezca después. Cuanto más anidado, más difícil de sobreescribir.
+        <strong>Consejo</strong>: preferí clases sobre IDs para evitar conflictos de especificidad.
+      </div>
+
+      <!-- DOM TREE PLAYGROUND -->
+      <div class="playground">
+        <h4>🎮 Visualizador de selectores — hacé clic en un selector</h4>
+        <div class="sel-demo-wrap">
+          <div class="sel-btn-list" id="selBtnList"></div>
+          <div>
+            <div class="dom-tree" id="domTree"></div>
+            <div class="sel-explanation" id="selExplanation">← Hacé clic en un selector para ver qué elementos apunta</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="completeStep(1)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       PASO 2 – PSEUDO-CLASES (EVENTOS CSS)
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="step-2">
+    <div class="step-header" onclick="toggleStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-title">
+        <h2>⚡ Pseudo-clases — Eventos CSS</h2>
+        <p>:hover, :focus, :checked, :valid, :nth-child y más</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-2">
+
+      <p class="explanation">
+        Las <strong>pseudo-clases</strong> son selectores que se activan en función del
+        <em>estado</em> de un elemento: si el mouse está encima, si tiene el foco,
+        si un formulario es válido. Son la forma en que CSS captura "eventos" sin JavaScript.
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Todas las pseudo-clases clave</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── INTERACCIÓN DEL USUARIO ── */</span>
+<span class="sel">.btn:hover</span>     { <span class="prop">background</span>: <span class="val">blue</span>; }     <span class="cmt">/* mouse encima */</span>
+<span class="sel">.btn:active</span>    { <span class="prop">transform</span>: <span class="val">scale(.96)</span>; }  <span class="cmt">/* durante el click */</span>
+<span class="sel">a:visited</span>      { <span class="prop">color</span>: <span class="val">purple</span>; }         <span class="cmt">/* link ya visitado */</span>
+<span class="sel">a:link</span>         { <span class="prop">color</span>: <span class="val">blue</span>; }           <span class="cmt">/* link no visitado */</span>
+
+<span class="cmt">/* ── FOCO (teclado / click) ── */</span>
+<span class="sel">input:focus</span>    { <span class="prop">border-color</span>: <span class="val">blue</span>; }
+<span class="sel">:focus-visible</span> { <span class="prop">outline</span>: <span class="num">3px</span> <span class="val">solid blue</span>; } <span class="cmt">/* solo con teclado */</span>
+<span class="sel">:focus-within</span>  { <span class="prop">background</span>: <span class="val">#f0f8ff</span>; }   <span class="cmt">/* padre con hijo enfocado */</span>
+
+<span class="cmt">/* ── FORMULARIOS ── */</span>
+<span class="sel">input:valid</span>    { <span class="prop">border-color</span>: <span class="val">green</span>; }
+<span class="sel">input:invalid</span>  { <span class="prop">border-color</span>: <span class="val">red</span>; }
+<span class="sel">input:required</span> { <span class="prop">border-left</span>: <span class="num">3px</span> <span class="val">solid orange</span>; }
+<span class="sel">input:disabled</span> { <span class="prop">opacity</span>: <span class="num">.4</span>; <span class="prop">cursor</span>: <span class="val">not-allowed</span>; }
+<span class="sel">input:checked</span>  { <span class="prop">accent-color</span>: <span class="val">purple</span>; }     <span class="cmt">/* checkbox/radio */</span>
+<span class="sel">input:placeholder-shown</span> { <span class="prop">background</span>: <span class="val">#fffde7</span>; } <span class="cmt">/* mientras muestra placeholder */</span>
+
+<span class="cmt">/* ── ESTRUCTURALES ── */</span>
+<span class="sel">li:first-child</span>     { <span class="prop">font-weight</span>: <span class="val">bold</span>; }
+<span class="sel">li:last-child</span>      { <span class="prop">border-bottom</span>: <span class="val">none</span>; }
+<span class="sel">li:nth-child(2)</span>    { <span class="prop">color</span>: <span class="val">blue</span>; }        <span class="cmt">/* el segundo */</span>
+<span class="sel">li:nth-child(even)</span> { <span class="prop">background</span>: <span class="val">#f9f9f9</span>; } <span class="cmt">/* pares */</span>
+<span class="sel">li:nth-child(3n+1)</span> { <span class="prop">color</span>: <span class="val">red</span>; }         <span class="cmt">/* 1°, 4°, 7°... */</span>
+<span class="sel">p:not(.intro)</span>      { <span class="prop">font-size</span>: <span class="num">.9rem</span>; }   <span class="cmt">/* p que NO tiene clase intro */</span>
+
+<span class="cmt">/* ── :has() — selector "padre" (moderno) ── */</span>
+<span class="sel">.card:has(img)</span>     { <span class="prop">padding-top</span>: <span class="num">0</span>; }  <span class="cmt">/* .card que contiene img */</span>
+<span class="sel">form:has(:invalid)</span> { <span class="prop">border-color</span>: <span class="val">red</span>; } <span class="cmt">/* form con algún campo inválido */</span></pre>
+      </div>
+
+      <h3 class="sec"><span>🧪</span> Demos interactivos — probá cada pseudo-clase</h3>
+
+      <div class="pseudo-grid">
+        <!-- hover + active -->
+        <div class="pseudo-card">
+          <h5><code class="ps-tag">:hover</code> <code class="ps-tag">:active</code></h5>
+          <button class="demo-btn">Pasá el mouse / hacé clic</button>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.5;">
+            <code>:hover</code> → al pasar el mouse<br>
+            <code>:active</code> → durante la pulsación
+          </p>
+        </div>
+
+        <!-- focus + valid/invalid -->
+        <div class="pseudo-card">
+          <h5><code class="ps-tag">:focus</code> <code class="ps-tag">:valid</code> <code class="ps-tag">:invalid</code></h5>
+          <input class="demo-input" type="email" placeholder="Escribí un email…" />
+          <p style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.5;">
+            Foco → borde violeta&nbsp;&nbsp;|&nbsp;&nbsp;Email válido → verde&nbsp;&nbsp;|&nbsp;&nbsp;Inválido → rojo
+          </p>
+        </div>
+
+        <!-- checked -->
+        <div class="pseudo-card">
+          <h5><code class="ps-tag">:checked</code></h5>
+          <label class="demo-check-label"><input type="checkbox" class="demo-check"><span>Opción A</span></label>
+          <label class="demo-check-label"><input type="checkbox" class="demo-check"><span>Opción B</span></label>
+          <label class="demo-check-label"><input type="radio" name="demo-r" class="demo-check"><span>Radio 1</span></label>
+          <label class="demo-check-label"><input type="radio" name="demo-r" class="demo-check"><span>Radio 2</span></label>
+        </div>
+
+        <!-- nth-child -->
+        <div class="pseudo-card">
+          <h5><code class="ps-tag">:first-child</code> <code class="ps-tag">:last-child</code> <code class="ps-tag">:nth-child(2n)</code></h5>
+          <ul class="nth-list">
+            <li>Item 1 ← first-child</li>
+            <li>Item 2 ← nth(even)</li>
+            <li>Item 3</li>
+            <li>Item 4 ← nth(even)</li>
+            <li>Item 5 ← last-child</li>
+          </ul>
+        </div>
+
+        <!-- disabled -->
+        <div class="pseudo-card">
+          <h5><code class="ps-tag">:disabled</code> <code class="ps-tag">:placeholder-shown</code></h5>
+          <input class="demo-input" type="text" placeholder="Campo habilitado" style="margin-bottom:8px;background:rgba(0,229,255,.04);" />
+          <input class="demo-input" type="text" placeholder="Campo deshabilitado" disabled style="opacity:.4;cursor:not-allowed;" />
+          <p style="font-size:.72rem;color:var(--muted);margin-top:8px;">El placeholder amarillo se activa con <code>:placeholder-shown</code></p>
+        </div>
+
+        <!-- :has() -->
+        <div class="pseudo-card">
+          <h5><code class="ps-tag">:has()</code> — selector padre</h5>
+          <div class="has-demo">
+            <label class="has-label">Este contenedor cambia si su checkbox está marcado:</label>
+            <label class="demo-check-label" style="margin-top:8px;"><input type="checkbox" class="demo-check"><span>Marcar para activar :has()</span></label>
+          </div>
+          <p style="font-size:.7rem;color:var(--muted);margin-top:8px;"><code>.contenedor:has(input:checked) { border-color: cyan; }</code></p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <div class="ct">💡 Orden de pseudo-clases en links (LoVeHAte)</div>
+        Para que los estilos de links funcionen correctamente, deben declararse en este orden:
+        <code>:link → :visited → :hover → :active</code> (mnemónico: <strong>L</strong>o<strong>V</strong>e<strong>HA</strong>te).
+        Si van en otro orden, la especificidad puede pisarlos.
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(1)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(2)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       PASO 3 – TRANSICIONES
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="step-3">
+    <div class="step-header" onclick="toggleStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-title">
+        <h2>🌊 Transiciones CSS</h2>
+        <p>transition: property · duration · timing · delay</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-3">
+
+      <p class="explanation">
+        Una <strong>transición</strong> es un cambio <em>suave y gradual</em> entre dos estados de CSS.
+        En lugar de que el cambio sea instantáneo (como en un <code>:hover</code> normal),
+        la propiedad evoluciona durante un tiempo definido.
+        Las transiciones son <em>reactivas</em>: necesitan un disparador (hover, focus, clase agregada con JS…).
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Anatomía de transition</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.elemento</span> {
+  <span class="cmt">/* Shorthand: propiedad | duración | timing | delay */</span>
+  <span class="prop">transition</span>: <span class="val">background-color</span> <span class="num">.3s</span> <span class="val">ease</span> <span class="num">0s</span>;
+
+  <span class="cmt">/* Múltiples propiedades separadas por coma */</span>
+  <span class="prop">transition</span>:
+    <span class="val">transform</span>   <span class="num">.4s</span> <span class="val">cubic-bezier(.34,1.56,.64,1)</span>,
+    <span class="val">opacity</span>     <span class="num">.3s</span> <span class="val">ease</span>,
+    <span class="val">box-shadow</span>  <span class="num">.4s</span> <span class="val">ease</span>;
+
+  <span class="cmt">/* "all" transiciona TODO — ⚠ cuidado con el rendimiento */</span>
+  <span class="prop">transition</span>: <span class="val">all</span> <span class="num">.3s</span> <span class="val">ease</span>;
+}
+
+<span class="cmt">/* Propiedades individuales */</span>
+<span class="sel">.elemento</span> {
+  <span class="prop">transition-property</span>:        <span class="val">transform, opacity</span>;
+  <span class="prop">transition-duration</span>:        <span class="num">.4s</span>;
+  <span class="prop">transition-timing-function</span>: <span class="val">ease-out</span>;
+  <span class="prop">transition-delay</span>:           <span class="num">.1s</span>;   <span class="cmt">/* esperar antes de empezar */</span>
+}
+
+<span class="cmt">/* ── Timing functions ── */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">ease</span>;             <span class="cmt">/* lento-rápido-lento (default) */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">linear</span>;          <span class="cmt">/* velocidad constante */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">ease-in</span>;         <span class="cmt">/* empieza lento */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">ease-out</span>;        <span class="cmt">/* termina lento */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">ease-in-out</span>;     <span class="cmt">/* lento-rápido-lento */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">cubic-bezier</span>(<span class="num">.34</span>,<span class="num">1.56</span>,<span class="num">.64</span>,<span class="num">1</span>); <span class="cmt">/* rebote */</span>
+<span class="prop">transition-timing-function</span>: <span class="val">steps(4)</span>;        <span class="cmt">/* escalonada (pixel art) */</span></pre>
+      </div>
+
+      <div class="callout ok">
+        <div class="ct">✅ Propiedades que conviene transicionar (GPU-friendly)</div>
+        <div class="perf-row">
+          <span class="chip-ok">transform</span><span class="chip-ok">opacity</span><span class="chip-ok">filter</span><span class="chip-ok">clip-path</span>
+        </div>
+        Estas propiedades son aceleradas por GPU y <strong>no generan reflow</strong>: la animación es suave aunque haya mucho contenido.
+      </div>
+      <div class="callout danger">
+        <div class="ct">🚫 Evitá transicionar estas propiedades</div>
+        <div class="perf-row">
+          <span class="chip-no">width / height</span><span class="chip-no">top / left</span><span class="chip-no">margin / padding</span><span class="chip-no">display</span>
+        </div>
+        Causan <strong>layout reflow</strong>: el navegador debe recalcular la posición de todos los elementos afectados. Usá <code>transform: scale()</code> en lugar de cambiar width, y <code>transform: translate()</code> en lugar de top/left.
+      </div>
+
+      <!-- TRANSITION PLAYGROUND -->
+      <div class="playground">
+        <h4>🎮 Playground — pasá el mouse sobre la tarjeta</h4>
+        <div class="pg-cols">
+          <div class="pg-controls">
+            <p style="font-size:.78rem;color:var(--muted);margin-bottom:6px;">Propiedades a transicionar:</p>
+            <div class="prop-check-grid" id="propCheckGrid">
+              <label class="prop-chip"><input type="checkbox" checked onchange="updateTransition()">background</label>
+              <label class="prop-chip"><input type="checkbox" checked onchange="updateTransition()">transform</label>
+              <label class="prop-chip"><input type="checkbox" checked onchange="updateTransition()">box-shadow</label>
+              <label class="prop-chip"><input type="checkbox" checked onchange="updateTransition()">border-radius</label>
+              <label class="prop-chip"><input type="checkbox" onchange="updateTransition()">color</label>
+              <label class="prop-chip"><input type="checkbox" onchange="updateTransition()">opacity</label>
+            </div>
+            <div class="ctrl-row">
+              <label>duration</label>
+              <input type="range" id="trDur" min="0.05" max="3" step="0.05" value="0.4" oninput="updateTransition()">
+              <span class="vdisp" id="trDurD">0.4s</span>
+            </div>
+            <div class="ctrl-row">
+              <label>delay</label>
+              <input type="range" id="trDelay" min="0" max="2" step="0.05" value="0" oninput="updateTransition()">
+              <span class="vdisp" id="trDelayD">0s</span>
+            </div>
+            <div class="ctrl-row">
+              <label>timing</label>
+              <select id="trTiming" onchange="updateTransition()">
+                <option value="ease">ease</option>
+                <option value="linear">linear</option>
+                <option value="ease-in">ease-in</option>
+                <option value="ease-out">ease-out</option>
+                <option value="ease-in-out">ease-in-out</option>
+                <option value="cubic-bezier(.34,1.56,.64,1)">bounce (cubic-bezier)</option>
+                <option value="steps(6)">steps(6) — escalonado</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <div class="live-css" id="trCss"></div>
+          </div>
+        </div>
+        <div class="tr-scene">
+          <span class="tr-scene-hint">↗ pasá el mouse</span>
+          <div id="trCard">Hover aquí</div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(2)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(3)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       PASO 4 – ANIMACIONES
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="step-4">
+    <div class="step-header" onclick="toggleStep(4)">
+      <div class="step-num">4</div>
+      <div class="step-title">
+        <h2>✨ Animaciones CSS — @keyframes</h2>
+        <p>Secuencias, propiedades, fill-mode y consideraciones finales</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-4">
+
+      <p class="explanation">
+        Las <strong>animaciones CSS</strong> permiten definir una secuencia de estados que el elemento
+        recorre automáticamente, sin necesitar interacción del usuario.
+        Se definen con <strong>@keyframes</strong> (la coreografía) y se aplican con la propiedad
+        <strong>animation</strong> (la configuración del reproductor).
+      </p>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – @keyframes + animation completo</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── 1. Definir la coreografía con @keyframes ── */</span>
+<span class="at">@keyframes</span> <span class="val">rebote</span> {
+  <span class="num">0%</span>   { <span class="prop">transform</span>: <span class="val">translateY(0)</span>;    }
+  <span class="num">50%</span>  { <span class="prop">transform</span>: <span class="val">translateY(-40px)</span>; }
+  <span class="num">100%</span> { <span class="prop">transform</span>: <span class="val">translateY(0)</span>;    }
+}
+
+<span class="cmt">/* Equivalente con from/to (solo 2 estados) */</span>
+<span class="at">@keyframes</span> <span class="val">fadeIn</span> {
+  <span class="kw">from</span> { <span class="prop">opacity</span>: <span class="num">0</span>; }
+  <span class="kw">to</span>   { <span class="prop">opacity</span>: <span class="num">1</span>; }
+}
+
+<span class="cmt">/* ── 2. Aplicar la animación ── */</span>
+<span class="sel">.elemento</span> {
+  <span class="cmt">/* Shorthand: nombre | duración | timing | delay | iteraciones | dirección | fill-mode */</span>
+  <span class="prop">animation</span>: <span class="val">rebote</span> <span class="num">0.8s</span> <span class="val">ease-in-out</span> <span class="num">0s</span> <span class="val">infinite</span> <span class="val">alternate</span> <span class="val">none</span>;
+}
+
+<span class="cmt">/* Propiedades individuales */</span>
+<span class="sel">.elemento</span> {
+  <span class="prop">animation-name</span>:            <span class="val">rebote</span>;
+  <span class="prop">animation-duration</span>:        <span class="num">0.8s</span>;
+  <span class="prop">animation-timing-function</span>: <span class="val">ease-in-out</span>;
+  <span class="prop">animation-delay</span>:           <span class="num">0.2s</span>;
+  <span class="prop">animation-iteration-count</span>: <span class="val">infinite</span>;  <span class="cmt">/* o un número: 3 */</span>
+  <span class="prop">animation-direction</span>:       <span class="val">alternate</span>; <span class="cmt">/* ver abajo */</span>
+  <span class="prop">animation-fill-mode</span>:       <span class="val">forwards</span>;  <span class="cmt">/* ver abajo */</span>
+  <span class="prop">animation-play-state</span>:      <span class="val">running</span>;   <span class="cmt">/* running | paused */</span>
+}
+
+<span class="cmt">/* ── animation-direction ── */</span>
+<span class="prop">animation-direction</span>: <span class="val">normal</span>;           <span class="cmt">/* from → to (siempre) */</span>
+<span class="prop">animation-direction</span>: <span class="val">reverse</span>;          <span class="cmt">/* to → from */</span>
+<span class="prop">animation-direction</span>: <span class="val">alternate</span>;        <span class="cmt">/* from→to, to→from, from→to... */</span>
+<span class="prop">animation-direction</span>: <span class="val">alternate-reverse</span>;<span class="cmt">/* to→from, from→to... */</span>
+
+<span class="cmt">/* ── animation-fill-mode — ¿qué estado queda al terminar? ── */</span>
+<span class="prop">animation-fill-mode</span>: <span class="val">none</span>;             <span class="cmt">/* vuelve al estado original */</span>
+<span class="prop">animation-fill-mode</span>: <span class="val">forwards</span>;         <span class="cmt">/* se queda en el último keyframe */</span>
+<span class="prop">animation-fill-mode</span>: <span class="val">backwards</span>;        <span class="cmt">/* aplica from desde el delay */</span>
+<span class="prop">animation-fill-mode</span>: <span class="val">both</span>;             <span class="cmt">/* backwards + forwards */</span>
+
+<span class="cmt">/* ── Múltiples animaciones ── */</span>
+<span class="sel">.elemento</span> {
+  <span class="prop">animation</span>: <span class="val">rebote</span> <span class="num">1s</span> <span class="val">infinite</span>, <span class="val">pulse</span> <span class="num">2s</span> <span class="val">infinite alternate</span>;
+}</pre>
+      </div>
+
+      <!-- Fill mode table -->
+      <div class="fill-demo">
+        <div class="fill-item"><div class="fi-name">none</div><div class="fi-desc">Vuelve al estado original al terminar. No aplica nada durante el delay.</div></div>
+        <div class="fill-item"><div class="fi-name">forwards</div><div class="fi-desc">Se queda en el estado del último keyframe. Útil para fadeIn que debe quedar visible.</div></div>
+        <div class="fill-item"><div class="fi-name">backwards</div><div class="fi-desc">Aplica el estado del from durante el delay (antes de empezar).</div></div>
+        <div class="fill-item"><div class="fi-name">both</div><div class="fi-desc">Combina forwards + backwards. La opción más completa.</div></div>
+      </div>
+
+      <!-- Preset buttons -->
+      <h3 class="sec"><span>🎬</span> Galería de animaciones — elegí un preset</h3>
+      <div class="anim-preset-grid" id="animPresetGrid"></div>
+
+      <!-- Controls + scene -->
+      <div class="playground" style="margin-top:8px;">
+        <h4>🎮 Playground de animación</h4>
+        <div class="anim-controls-row">
+          <div class="ctrl-row">
+            <label>duration</label>
+            <input type="range" id="anDur" min="0.1" max="4" step="0.1" value="1" oninput="applyAnimation()">
+            <span class="vdisp" id="anDurD">1s</span>
+          </div>
+          <div class="ctrl-row">
+            <label>iteration</label>
+            <select id="anIter" onchange="applyAnimation()">
+              <option value="1">1</option><option value="2">2</option>
+              <option value="3">3</option><option value="infinite" selected>infinite</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <label>direction</label>
+            <select id="anDir" onchange="applyAnimation()">
+              <option value="normal">normal</option><option value="reverse">reverse</option>
+              <option value="alternate">alternate</option><option value="alternate-reverse">alternate-reverse</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <label>fill-mode</label>
+            <select id="anFill" onchange="applyAnimation()">
+              <option value="none">none</option><option value="forwards">forwards</option>
+              <option value="backwards">backwards</option><option value="both">both</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <label>timing</label>
+            <select id="anTiming" onchange="applyAnimation()">
+              <option value="ease">ease</option><option value="linear">linear</option>
+              <option value="ease-in">ease-in</option><option value="ease-out">ease-out</option>
+              <option value="ease-in-out">ease-in-out</option>
+            </select>
+          </div>
+          <div class="ctrl-row">
+            <label>delay</label>
+            <input type="range" id="anDelay" min="0" max="2" step="0.1" value="0" oninput="applyAnimation()">
+            <span class="vdisp" id="anDelayD">0s</span>
+          </div>
+        </div>
+        <button class="play-pause-btn" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pausar</button>
+        <div class="live-css" id="anCss" style="margin-top:14px;"></div>
+        <div class="anim-scene" id="animScene">
+          <div id="animTarget">✨</div>
+        </div>
+      </div>
+
+      <!-- ═══ COMPARATIVA ═══ -->
+      <h3 class="sec" style="margin-top:36px;"><span>⚖️</span> Transiciones vs Animaciones</h3>
+      <table class="comp-table">
+        <thead>
+          <tr><th>Característica</th><th class="th-tr">🌊 Transición</th><th class="th-an">✨ Animación</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Disparador</td><td class="td-tr">Necesita un evento (:hover, clase JS, :focus…)</td><td class="td-an">Automática al cargar el elemento</td></tr>
+          <tr><td>Estados</td><td class="td-tr">Solo 2: inicio → fin</td><td class="td-an">Infinitos via @keyframes (0% → 50% → 100%)</td></tr>
+          <tr><td>Repetición</td><td class="td-tr">Solo mientras dure el estado activo</td><td class="td-an">Controlable: 1, N veces o infinite</td></tr>
+          <tr><td>Control de tiempo</td><td class="td-tr">Duración y delay por propiedad</td><td class="td-an">Control total: direction, fill-mode, play-state</td></tr>
+          <tr><td>Complejidad</td><td class="td-tr">Simple — una línea de CSS</td><td class="td-an">Requiere @keyframes separado</td></tr>
+          <tr><td>Uso típico</td><td class="td-tr">Hover effects, focus, estado activo/inactivo</td><td class="td-an">Loading spinners, efectos de entrada, llamadas de atención</td></tr>
+          <tr><td>Con JS</td><td class="td-tr">Toggle de clases para activar</td><td class="td-an">animation-play-state para pausar/reanudar</td></tr>
+        </tbody>
+      </table>
+
+      <!-- RESTRICCIONES Y CONSIDERACIONES -->
+      <h3 class="sec"><span>🧠</span> Restricciones y buenas prácticas</h3>
+
+      <div class="callout ok">
+        <div class="ct">✅ Cuándo usar TRANSICIÓN</div>
+        Usá <code>transition</code> cuando el cambio depende de una acción del usuario: hover, click,
+        focus. Es declarativa, simple y se "revierte" sola al salir del estado.
+        Ideal para micro-interacciones de UI: botones, cards, inputs, menús.
+      </div>
+
+      <div class="callout" style="border-color:var(--accent2);background:rgba(224,64,251,.07);">
+        <div class="ct" style="color:var(--accent2);">✅ Cuándo usar ANIMACIÓN</div>
+        Usá <code>@keyframes</code> cuando el efecto debe ocurrir <strong>sin interacción</strong>
+        (loading, intro de página, efecto de atención), cuando necesitás <strong>más de 2 estados</strong>,
+        o cuando la secuencia debe repetirse infinitamente.
+      </div>
+
+      <div class="callout warn">
+        <div class="ct">⚠️ Rendimiento — regla de oro</div>
+        Animá solo <strong>transform</strong> y <strong>opacity</strong> cuando sea posible.
+        Son aceleradas por GPU y no causan reflow.
+        <div class="perf-row" style="margin-top:8px;">
+          <span class="chip-ok">transform: translate/scale/rotate</span>
+          <span class="chip-ok">opacity</span>
+          <span class="chip-warn">filter (con cuidado)</span>
+          <span class="chip-no">width/height</span>
+          <span class="chip-no">top/left/margin</span>
+        </div>
+        Si necesitás animar posición, usá <code>transform: translate()</code> en lugar de <code>top/left</code>.
+      </div>
+
+      <!-- Accessibility block -->
+      <h3 class="sec"><span>♿</span> Accesibilidad — prefers-reduced-motion</h3>
+
+      <div class="callout danger">
+        <div class="ct">🚨 Muy importante — motion sickness</div>
+        Algunas personas tienen <strong>vértigo o sensibilidad al movimiento</strong> (vestibular disorders).
+        Las animaciones excesivas pueden causarles malestar real.
+        El sistema operativo permite configurar "reducir movimiento" y CSS puede detectarlo:
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – @media prefers-reduced-motion</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* Desactivar animaciones para usuarios que lo prefieren */</span>
+<span class="at">@media</span> (<span class="prop">prefers-reduced-motion</span>: <span class="val">reduce</span>) {
+  <span class="sel">*</span> {
+    <span class="prop">animation-duration</span>:   <span class="num">0.01ms</span> <span class="val">!important</span>;
+    <span class="prop">animation-iteration-count</span>: <span class="num">1</span> <span class="val">!important</span>;
+    <span class="prop">transition-duration</span>: <span class="num">0.01ms</span> <span class="val">!important</span>;
+  }
+}
+
+<span class="cmt">/* O aplicarlo solo a animaciones no esenciales */</span>
+<span class="at">@media</span> (<span class="prop">prefers-reduced-motion</span>: <span class="val">no-preference</span>) {
+  <span class="sel">.hero-elemento</span> {
+    <span class="prop">animation</span>: <span class="val">fadeInUp</span> <span class="num">0.6s</span> <span class="val">ease-out</span> <span class="val">both</span>;
+  }
+}
+
+<span class="cmt">/* will-change: avisa al navegador que un elemento va a animar */</span>
+<span class="sel">.animado</span> {
+  <span class="prop">will-change</span>: <span class="val">transform, opacity</span>;
+  <span class="cmt">/* ⚠ Usalo con moderación — consume memoria de GPU */</span>
+  <span class="cmt">/* Solo en elementos que realmente van a animar */</span>
+}</pre>
+      </div>
+
+      <div class="callout info">
+        <div class="ct">💡 Regla final de oro</div>
+        <strong>Menos es más.</strong> Una animación bien elegida mejora la UX; muchas animaciones simultáneas
+        la destruyen. Cada animación debe tener un <em>propósito comunicativo</em>: guiar la atención,
+        dar feedback, explicar un cambio de estado. Si no cumple ninguno de estos roles, eliminala.
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(3)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(4)">🎓 Finalizar curso CSS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINISH -->
+  <div class="finish-card" id="finishCard">
+    <div class="finish-icon">🎓</div>
+    <h2>¡Curso CSS completado!</h2>
+    <p>
+      Dominaste <strong>selectores anidados</strong>, <strong>pseudo-clases</strong>,
+      <strong>transiciones</strong> suaves con timing functions, animaciones con
+      <strong>@keyframes</strong>, fill-mode y buenas prácticas de rendimiento y accesibilidad.
+      Tu kit de CSS está completo — ahora a construir cosas increíbles.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;">
+      <button class="btn btn-secondary" onclick="resetAll()">🔄 Reiniciar</button>
+      <a href="paso-a-paso-layout.html" style="text-decoration:none;">
+        <button class="btn btn-primary">← Práctica 4: Layout</button>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+/* ════════════════════════════ STEP ENGINE ════════════════════════════ */
+const TOTAL = 4;
+const done  = new Set();
+function toggleStep(n) {
+  const body = document.getElementById('body-' + n);
+  const open = body.classList.contains('open');
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('body-' + i).classList.remove('open');
+    if (!done.has(i)) document.getElementById('step-' + i).classList.remove('active');
+  }
+  if (!open) { body.classList.add('open'); document.getElementById('step-' + n).classList.add('active'); }
+}
+function goToStep(n) {
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('body-' + i).classList.remove('open');
+  document.getElementById('body-' + n).classList.add('open');
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('step-' + n).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function completeStep(n) {
+  done.add(n);
+  const card = document.getElementById('step-' + n);
+  card.classList.remove('active'); card.classList.add('done');
+  document.getElementById('body-' + n).classList.remove('open');
+  updateProgress();
+  if (n < TOTAL) setTimeout(() => goToStep(n + 1), 320);
+  else { document.getElementById('finishCard').classList.add('visible'); document.getElementById('finishCard').scrollIntoView({ behavior: 'smooth' }); }
+}
+function updateProgress() {
+  document.getElementById('progressBar').style.width = (done.size / TOTAL * 100) + '%';
+  document.getElementById('progressLabel').textContent = done.size + ' / ' + TOTAL + ' pasos';
+}
+function resetAll() {
+  done.clear(); updateProgress();
+  for (let i = 1; i <= TOTAL; i++) { document.getElementById('step-' + i).classList.remove('done','active'); document.getElementById('body-' + i).classList.remove('open'); }
+  document.getElementById('finishCard').classList.remove('visible');
+  document.getElementById('step-1').classList.add('active');
+  document.getElementById('body-1').classList.add('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function copyCode(btn) {
+  const text = btn.nextElementSibling.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado'; btn.style.background = 'var(--success)'; btn.style.color = '#000';
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; btn.style.color = ''; }, 1800);
+  }).catch(() => { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = 'Copiar', 1800); });
+}
+
+/* ════════════════════════════════════════════════════
+   STEP 1 – SELECTOR PLAYGROUND
+════════════════════════════════════════════════════ */
+// DOM nodes: id → { tag, class?, id?, parent?, content }
+const domNodes = [
+  { id:'dn-article1', tag:'article', cls:'.card',          label:'article.card',          children:['dn-h2a','dn-pa-intro','dn-pa','dn-link'] },
+  { id:'dn-h2a',      tag:'h2',      parent:'dn-article1', label:'  h2',                  text:'Título' },
+  { id:'dn-pa-intro', tag:'p',       cls:'.intro',         parent:'dn-article1', label:'  p.intro', text:'Intro texto' },
+  { id:'dn-pa',       tag:'p',       parent:'dn-article1', label:'  p',                   text:'Párrafo normal' },
+  { id:'dn-link',     tag:'a',       parent:'dn-article1', label:'  a',                   text:'Link' },
+  { id:'dn-article2', tag:'article', cls:'.card.featured', label:'article.card.featured', children:['dn-h2b','dn-pb'] },
+  { id:'dn-h2b',      tag:'h2',      parent:'dn-article2', label:'  h2',                  text:'Título 2' },
+  { id:'dn-pb',       tag:'p',       parent:'dn-article2', label:'  p',                   text:'Párrafo 2' },
+];
+
+const selButtons = [
+  { code:'article p',       desc:'Todos los &lt;p&gt; dentro de article (cualquier nivel)', targets:['dn-pa-intro','dn-pa','dn-pb'] },
+  { code:'article > p',     desc:'Solo &lt;p&gt; hijos DIRECTOS de article', targets:['dn-pa-intro','dn-pa','dn-pb'] },
+  { code:'.card .intro',    desc:'.intro descendiente de .card', targets:['dn-pa-intro'] },
+  { code:'h2 + p',          desc:'&lt;p&gt; adyacente inmediato después de &lt;h2&gt;', targets:['dn-pa-intro','dn-pb'] },
+  { code:'h2 ~ p',          desc:'Todos los &lt;p&gt; hermanos después de &lt;h2&gt;', targets:['dn-pa-intro','dn-pa','dn-pb'] },
+  { code:'.card.featured',  desc:'Elemento con AMBAS clases .card y .featured', targets:['dn-article2'] },
+  { code:'article h2',      desc:'Todos los h2 dentro de article', targets:['dn-h2a','dn-h2b'] },
+  { code:'article a',       desc:'El &lt;a&gt; dentro del artículo', targets:['dn-link'] },
+  { code:'article:first-of-type', desc:'El primer article del DOM', targets:['dn-article1'] },
+  { code:':not(.intro)',    desc:'Elementos que NO tienen clase .intro', targets:['dn-article1','dn-h2a','dn-pa','dn-link','dn-article2','dn-h2b','dn-pb'] },
+];
+
+(function buildSelPlayground() {
+  // Build buttons
+  const list = document.getElementById('selBtnList');
+  selButtons.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'sel-btn';
+    btn.innerHTML = `<span class="sel-code">${s.code}</span><span class="sel-desc">${s.desc}</span>`;
+    btn.onclick = () => highlightSel(i, btn);
+    list.appendChild(btn);
+  });
+
+  // Build DOM tree
+  const tree = document.getElementById('domTree');
+  domNodes.forEach(n => {
+    const d = document.createElement('div');
+    d.className = 'dom-node' + (n.parent ? (n.parent.includes('article') && !n.children ? ' child' : ' child') : '');
+    d.id = n.id;
+    let html = `<span class="dn-tag">&lt;${n.tag}</span>`;
+    if (n.cls) html += ` <span class="dn-cls">${n.cls}</span>`;
+    html += `<span class="dn-tag">&gt;</span>`;
+    if (n.text) html += ` <span class="dn-cnt">${n.text}</span>`;
+    d.innerHTML = html;
+    tree.appendChild(d);
+  });
+})();
+
+function highlightSel(i, btn) {
+  // Reset
+  document.querySelectorAll('.dom-node').forEach(n => n.classList.remove('lit'));
+  document.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const s = selButtons[i];
+  s.targets.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('lit');
+  });
+  document.getElementById('selExplanation').innerHTML =
+    `<strong style="color:var(--accent3);">${s.code}</strong> — ${s.desc} <span style="color:var(--success);">(${s.targets.length} elemento/s)</span>`;
+}
+
+/* ════════════════════════════════════════════════════
+   STEP 3 – TRANSITION PLAYGROUND
+════════════════════════════════════════════════════ */
+const propNames = ['background','transform','box-shadow','border-radius','color','opacity'];
+
+function updateTransition() {
+  const dur   = parseFloat(document.getElementById('trDur').value);
+  const delay = parseFloat(document.getElementById('trDelay').value);
+  const timing= document.getElementById('trTiming').value;
+  document.getElementById('trDurD').textContent   = dur + 's';
+  document.getElementById('trDelayD').textContent = delay + 's';
+
+  const checks = document.querySelectorAll('#propCheckGrid input[type=checkbox]');
+  const props   = [];
+  checks.forEach((c, i) => { if (c.checked) props.push(propNames[i]); });
+
+  const trVal = props.length === 0 ? 'none'
+    : props.map(p => `${p} ${dur}s ${timing} ${delay}s`).join(', ');
+
+  document.getElementById('trCard').style.transition = trVal;
+
+  // Live CSS
+  const propsStr = props.length === 0 ? 'none'
+    : '\n    ' + props.map(p => `${p} ${dur}s ${timing} ${delay}s`).join(',\n    ') + ';';
+  document.getElementById('trCss').innerHTML =
+    `<span class="sel">.card</span> {\n` +
+    `  <span class="prop">transition</span>: ${propsStr}\n` +
+    `}\n\n` +
+    `<span class="sel">.card:hover</span> {\n` +
+    `  <span class="prop">background</span>:    <span class="val">linear-gradient(135deg,#00e5ff,#00b8d4)</span>;\n` +
+    `  <span class="prop">transform</span>:     <span class="val">scale(1.12) translateY(-12px) rotate(3deg)</span>;\n` +
+    `  <span class="prop">box-shadow</span>:    <span class="val">0 24px 50px rgba(0,229,255,.4)</span>;\n` +
+    `  <span class="prop">border-radius</span>: <span class="num">50px</span>;\n` +
+    `}`;
+}
+updateTransition();
+
+/* ════════════════════════════════════════════════════
+   STEP 4 – ANIMATION PLAYGROUND
+════════════════════════════════════════════════════ */
+const PRESETS = [
+  {
+    key:'bounce', icon:'🎾', name:'Bounce', desc:'rebote vertical',
+    css:`animation: anim-bounce`,
+    kf:`@keyframes anim-bounce {\n  0%, 100% { transform: translateY(0); }\n  50%       { transform: translateY(-40px); }\n}`,
+    defaults:{ iter:'infinite', dir:'normal', fill:'none', timing:'ease-in-out', dur:0.8 }
+  },
+  {
+    key:'spin', icon:'🔄', name:'Spin', desc:'rotación continua',
+    css:`animation: anim-spin`,
+    kf:`@keyframes anim-spin {\n  from { transform: rotate(0deg); }\n  to   { transform: rotate(360deg); }\n}`,
+    defaults:{ iter:'infinite', dir:'normal', fill:'none', timing:'linear', dur:1.2 }
+  },
+  {
+    key:'pulse', icon:'💓', name:'Pulse', desc:'latido de escala',
+    css:`animation: anim-pulse`,
+    kf:`@keyframes anim-pulse {\n  0%,100% { transform: scale(1); opacity:1; }\n  50%     { transform: scale(1.3); opacity:.65; }\n}`,
+    defaults:{ iter:'infinite', dir:'normal', fill:'none', timing:'ease-in-out', dur:1 }
+  },
+  {
+    key:'fadeInUp', icon:'⬆', name:'Fade In Up', desc:'aparición desde abajo',
+    css:`animation: anim-fadeInUp`,
+    kf:`@keyframes anim-fadeInUp {\n  from { opacity: 0; transform: translateY(36px); }\n  to   { opacity: 1; transform: translateY(0); }\n}`,
+    defaults:{ iter:'1', dir:'normal', fill:'forwards', timing:'ease-out', dur:0.6 }
+  },
+  {
+    key:'shake', icon:'📳', name:'Shake', desc:'vibración de atención',
+    css:`animation: anim-shake`,
+    kf:`@keyframes anim-shake {\n  0%,100% { transform: translateX(0); }\n  20%     { transform: translateX(-12px); }\n  40%     { transform: translateX(12px); }\n  60%     { transform: translateX(-8px); }\n  80%     { transform: translateX(8px); }\n}`,
+    defaults:{ iter:'3', dir:'normal', fill:'none', timing:'ease-in-out', dur:0.5 }
+  },
+  {
+    key:'neon', icon:'✨', name:'Neon Flicker', desc:'parpadeo de neón',
+    css:`animation: anim-neon`,
+    kf:`@keyframes anim-neon {\n  0%,95%,100% { opacity:1; box-shadow:0 0 6px #00e5ff,0 0 24px #00e5ff; }\n  5%,30%      { opacity:.15; box-shadow:none; }\n  50%         { opacity:.9; }\n}`,
+    defaults:{ iter:'infinite', dir:'normal', fill:'none', timing:'linear', dur:2 }
+  },
+  {
+    key:'wave', icon:'🌊', name:'Wave Morph', desc:'forma orgánica',
+    css:`animation: anim-wave`,
+    kf:`@keyframes anim-wave {\n  0%   { border-radius: 60% 40% 30% 70%/60% 30% 70% 40%; }\n  50%  { border-radius: 30% 60% 70% 40%/50% 60% 30% 60%; }\n  100% { border-radius: 60% 40% 30% 70%/60% 30% 70% 40%; }\n}`,
+    defaults:{ iter:'infinite', dir:'normal', fill:'none', timing:'ease-in-out', dur:3 }
+  },
+];
+
+let currentPreset = PRESETS[0];
+let isPaused = false;
+
+(function buildPresetGrid() {
+  const grid = document.getElementById('animPresetGrid');
+  PRESETS.forEach((p, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'anim-preset-btn' + (i===0?' active':'');
+    btn.dataset.key = p.key;
+    btn.innerHTML = `<div class="ap-icon">${p.icon}</div><div class="ap-name">${p.name}</div><div class="ap-desc">${p.desc}</div>`;
+    btn.onclick = () => selectPreset(p, btn);
+    grid.appendChild(btn);
+  });
+})();
+
+function selectPreset(p, btn) {
+  currentPreset = p;
+  document.querySelectorAll('.anim-preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Apply defaults
+  document.getElementById('anDur').value   = p.defaults.dur;
+  document.getElementById('anIter').value  = p.defaults.iter;
+  document.getElementById('anDir').value   = p.defaults.dir;
+  document.getElementById('anFill').value  = p.defaults.fill;
+  document.getElementById('anTiming').value= p.defaults.timing;
+  document.getElementById('anDelay').value = 0;
+  applyAnimation();
+}
+
+function applyAnimation() {
+  const dur   = parseFloat(document.getElementById('anDur').value);
+  const iter  = document.getElementById('anIter').value;
+  const dir   = document.getElementById('anDir').value;
+  const fill  = document.getElementById('anFill').value;
+  const timing= document.getElementById('anTiming').value;
+  const delay = parseFloat(document.getElementById('anDelay').value);
+
+  document.getElementById('anDurD').textContent   = dur + 's';
+  document.getElementById('anDelayD').textContent = delay + 's';
+
+  const target = document.getElementById('animTarget');
+  // Restart animation by removing and re-adding
+  target.style.animation = 'none';
+  target.offsetHeight; // reflow
+  target.style.animation = `${currentPreset.key} ${dur}s ${timing} ${delay}s ${iter} ${dir} ${fill}`;
+
+  // Live CSS
+  document.getElementById('anCss').innerHTML =
+    `<span class="cmt">/* Coreografía */</span>\n${escHtml(currentPreset.kf)}\n\n` +
+    `<span class="cmt">/* Aplicación */</span>\n` +
+    `<span class="sel">.elemento</span> {\n` +
+    `  <span class="prop">animation</span>: <span class="val">${currentPreset.key}</span> <span class="num">${dur}s</span> <span class="val">${timing}</span> <span class="num">${delay}s</span> <span class="val">${iter}</span> <span class="val">${dir}</span> <span class="val">${fill}</span>;\n` +
+    `}`;
+}
+
+function escHtml(str) {
+  return str
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/@keyframes (\S+)/g,'<span class="at">@keyframes</span> <span class="val">$1</span>')
+    .replace(/\{/g,'{').replace(/\}/g,'}')
+    .replace(/transform|opacity|border-radius|box-shadow/g,'<span class="prop">$&</span>')
+    .replace(/translateY\([^)]+\)|rotate\([^)]+\)|translateX\([^)]+\)|scale\([^)]+\)/g,'<span class="val">$&</span>')
+    .replace(/:\s*([\d.]+px|[\d.]+%|[\d.]+|none|1)\s*;/g,': <span class="num">$1</span>;');
+}
+
+function togglePlayPause() {
+  isPaused = !isPaused;
+  const scene = document.getElementById('animScene');
+  const btn   = document.getElementById('playPauseBtn');
+  scene.classList.toggle('anim-paused', isPaused);
+  btn.textContent = isPaused ? '▶ Reanudar' : '⏸ Pausar';
+}
+
+// Init
+selectPreset(PRESETS[0], document.querySelector('.anim-preset-btn'));
+</script>
+</body>
+</html>

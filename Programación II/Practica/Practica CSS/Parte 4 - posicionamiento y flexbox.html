@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Layout – Position &amp; Flexbox Paso a Paso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════ RESET & TOKENS ═══════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0d0f1a; --surface:  #13162b; --surface2: #1c2040;
+      --border:   #2a2f5a; --accent:   #7c5cfc; --accent2:  #e040fb;
+      --accent3:  #00e5ff; --success:  #00e676; --warn:     #ffab40;
+      --danger:   #ff5252; --text:     #e8eaf6; --muted:    #8891bb;
+      --code-bg:  #090b16; --done-bg:  #1a3a2a;
+      --radius: 14px; --rsm: 8px;
+      --font: 'Inter', sans-serif; --mono: 'Fira Code', monospace;
+      --shadow: 0 8px 32px rgba(0,0,0,.55);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+    /* ═══ ORBS ═══ */
+    .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .13; animation: drift 16s ease-in-out infinite alternate; }
+    .orb:nth-child(1){ width:580px;height:580px;background:var(--accent); top:-150px;left:-150px;animation-delay:0s; }
+    .orb:nth-child(2){ width:460px;height:460px;background:var(--accent2);top:30%;right:-110px;animation-delay:4s; }
+    .orb:nth-child(3){ width:360px;height:360px;background:var(--accent3);bottom:-90px;left:22%;animation-delay:8s; }
+    .orb:nth-child(4){ width:300px;height:300px;background:#ff6d00;top:58%;left:6%;animation-delay:2s; }
+    @keyframes drift{from{transform:translate(0,0)scale(1);}to{transform:translate(26px,34px)scale(1.07);}}
+
+    /* ═══ LAYOUT ═══ */
+    .wrapper { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* ═══ HEADER ═══ */
+    header { text-align: center; margin-bottom: 52px; }
+    .back-link { display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.82rem;text-decoration:none;border:1px solid var(--border);border-radius:99px;padding:5px 14px;margin-bottom:20px;transition:all .2s; }
+    .back-link:hover { color:var(--accent3);border-color:var(--accent3); }
+    .badge { display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 16px;border-radius:99px;margin-bottom:20px; }
+    header h1 { font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.15;background:linear-gradient(135deg,#fff 30%,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+    header p { color:var(--muted);font-size:1.05rem;margin-top:14px;max-width:620px;margin-inline:auto;line-height:1.7; }
+
+    /* ═══ PROGRESS ═══ */
+    .progress-wrap { display:flex;align-items:center;gap:10px;margin-bottom:44px; }
+    .progress-bar-track { flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden; }
+    .progress-bar-fill { height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .5s ease; }
+    .progress-label { font-size:.8rem;color:var(--muted);white-space:nowrap; }
+
+    /* ═══ STEP CARDS ═══ */
+    .step-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:26px;overflow:hidden;box-shadow:var(--shadow);transition:border-color .3s; }
+    .step-card.active { border-color:var(--accent); }
+    .step-card.done { border-color:var(--success);background:var(--done-bg); }
+    .step-header { display:flex;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;user-select:none;transition:background .2s; }
+    .step-header:hover { background:rgba(124,92,252,.07); }
+    .step-num { width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0;border:2px solid var(--border);color:var(--muted);background:var(--surface2);transition:all .3s; }
+    .step-card.active .step-num { background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 0 18px rgba(124,92,252,.55); }
+    .step-card.done .step-num { background:var(--success);border-color:transparent;color:#000; }
+    .step-title { flex:1; }
+    .step-title h2 { font-size:1.05rem;font-weight:700; }
+    .step-title p { font-size:.82rem;color:var(--muted);margin-top:2px; }
+    .step-arrow { font-size:1.2rem;color:var(--muted);transition:transform .3s; }
+    .step-card.active .step-arrow { transform:rotate(90deg);color:var(--accent); }
+    .step-body { display:none;padding:0 26px 32px;animation:fadeIn .3s ease; }
+    .step-body.open { display:block; }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ═══ TYPOGRAPHY ═══ */
+    .explanation { font-size:.95rem;line-height:1.85;color:var(--text);margin-bottom:18px; }
+    .explanation strong { color:var(--accent3); }
+    .explanation em { color:var(--accent2);font-style:normal;font-weight:600; }
+    h3.sec { font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:26px 0 13px;display:flex;align-items:center;gap:8px; }
+    h3.sec::after { content:'';flex:1;height:1px;background:var(--border); }
+
+    /* ═══ CALLOUT ═══ */
+    .callout { border-left:3px solid var(--accent2);background:rgba(224,64,251,.07);border-radius:0 var(--rsm) var(--rsm) 0;padding:14px 18px;margin:16px 0;font-size:.88rem;line-height:1.75; }
+    .callout.info   { border-color:var(--accent3);background:rgba(0,229,255,.07); }
+    .callout.warn   { border-color:var(--warn);background:rgba(255,171,64,.07); }
+    .callout.ok     { border-color:var(--success);background:rgba(0,230,118,.07); }
+    .callout.danger { border-color:var(--danger);background:rgba(255,82,82,.06); }
+    .ct { font-weight:700;font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;color:var(--accent2); }
+    .callout.info .ct { color:var(--accent3); }
+    .callout.warn .ct { color:var(--warn); }
+    .callout.ok .ct { color:var(--success); }
+    .callout.danger .ct { color:var(--danger); }
+
+    /* ═══ CODE ═══ */
+    .code-wrap { position:relative;margin:14px 0;border-radius:var(--rsm);overflow:hidden;background:var(--code-bg);border:1px solid var(--border); }
+    .code-label { background:var(--surface2);padding:6px 16px;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px; }
+    .dot{width:8px;height:8px;border-radius:50%;display:inline-block;} .dot-r{background:#ff5f57;} .dot-y{background:#febc2e;} .dot-g{background:#28c840;}
+    pre{padding:20px;font-family:var(--mono);font-size:.82rem;line-height:1.85;overflow-x:auto;tab-size:2;}
+    .kw{color:#c792ea;}.sel{color:#82aaff;}.prop{color:#80cbc4;}.val{color:#f78c6c;}.str{color:#c3e88d;}.cmt{color:#546e7a;font-style:italic;}.num{color:#f78c6c;}.at{color:#89ddff;}
+    .copy-btn{position:absolute;top:36px;right:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:.72rem;padding:4px 10px;border-radius:var(--rsm);cursor:pointer;transition:all .2s;}
+    .copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+    /* ═══ PLAYGROUND SHELL ═══ */
+    .playground { background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:20px;margin-top:18px; }
+    .playground h4 { font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent3);margin-bottom:16px;display:flex;align-items:center;gap:6px; }
+    .ctrl-row { display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap; }
+    .ctrl-row label { font-size:.8rem;color:var(--muted);min-width:110px;font-family:var(--mono); }
+    .ctrl-row input[type=range] { flex:1;min-width:80px;accent-color:var(--accent); }
+    .ctrl-row select { flex:1;background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.8rem;padding:5px 8px;border-radius:var(--rsm);cursor:pointer; }
+    .vdisp { font-family:var(--mono);font-size:.8rem;color:var(--accent3);min-width:70px;text-align:right; }
+    .live-css { background:var(--code-bg);border:1px solid var(--border);border-radius:var(--rsm);padding:13px 18px;margin-top:12px;font-family:var(--mono);font-size:.78rem;line-height:1.85;overflow-x:auto; }
+    .pg-cols { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+    @media(max-width:700px){ .pg-cols{grid-template-columns:1fr;} }
+    .pg-controls { display:flex;flex-direction:column;gap:10px; }
+
+    /* ═══ POSITION TYPE CARDS ═══ */
+    .pos-type-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin:16px 0; }
+    .pos-type-card { background:var(--surface2);border:2px solid var(--border);border-radius:var(--rsm);padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center; }
+    .pos-type-card:hover { border-color:var(--accent);background:rgba(124,92,252,.08); }
+    .pos-type-card.selected { border-color:var(--accent);background:rgba(124,92,252,.18); }
+    .pos-type-card .pos-keyword { font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--accent3);margin-bottom:6px; }
+    .pos-type-card .pos-desc { font-size:.72rem;color:var(--muted);line-height:1.5; }
+
+    /* ═══ POSITION PLAYGROUND SCENE ═══ */
+    .scene-outer {
+      background:#f0f2f8;border-radius:var(--rsm);border:2px dashed var(--border);
+      padding:16px;margin-top:14px;min-height:240px;
+      position:relative;overflow:hidden;
+    }
+    .scene-label { font-family:var(--mono);font-size:.62rem;color:#888;margin-bottom:8px; }
+    .scene-container {
+      background:rgba(124,92,252,.08);border:2px solid rgba(124,92,252,.35);
+      border-radius:6px;padding:14px;min-height:180px;
+      position:relative;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;
+    }
+    .scene-container-label { position:absolute;top:4px;left:8px;font-family:var(--mono);font-size:.6rem;color:rgba(124,92,252,.7);font-weight:700; }
+    .scene-box {
+      width:80px;height:64px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+      font-family:var(--mono);font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;
+    }
+    .scene-box-a   { background:#4caf50; }
+    .scene-box-b   { background:#2196f3; }
+    .scene-box-target {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:2px solid #fff;box-shadow:0 0 16px rgba(124,92,252,.6);
+      transition:all .25s ease;cursor:default;z-index:2;
+    }
+    .flow-badge {
+      display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+      font-size:.72rem;font-family:var(--mono);
+      padding:4px 12px;border-radius:99px;
+    }
+    .flow-badge.in-flow { background:rgba(0,230,118,.15);color:var(--success);border:1px solid var(--success); }
+    .flow-badge.out-flow { background:rgba(255,82,82,.15);color:var(--danger);border:1px solid var(--danger); }
+
+    /* pos info panel */
+    .pos-info-panel {
+      background:var(--code-bg);border:1px solid var(--border);border-radius:var(--rsm);
+      padding:14px 18px;margin-top:12px;font-size:.83rem;line-height:1.7;
+    }
+    .pos-info-panel strong { color:var(--accent3); }
+
+    /* ═══ POSITION OFFSET GRID (4 sliders arranged as TRBL cross) ═══ */
+    .offset-cross {
+      display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto auto;
+      gap:8px;align-items:center;justify-items:center;margin:14px 0;
+    }
+    .offset-cross .top-row   { grid-column:2;grid-row:1; }
+    .offset-cross .left-row  { grid-column:1;grid-row:2;width:100%; }
+    .offset-cross .center    { grid-column:2;grid-row:2; }
+    .offset-cross .right-row { grid-column:3;grid-row:2;width:100%; }
+    .offset-cross .bot-row   { grid-column:2;grid-row:3; }
+    .trbl-label { font-family:var(--mono);font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:2px; }
+    .trbl-val   { font-family:var(--mono);font-size:.75rem;color:var(--accent3);text-align:center;font-weight:700; }
+
+    /* disabled offset hint */
+    .offset-disabled { opacity:.35;pointer-events:none; }
+
+    /* ═══ FLEXBOX PLAYGROUND ═══ */
+    .box-count-row { display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap; }
+    .count-btn {
+      width:44px;height:44px;border-radius:var(--rsm);border:2px solid var(--border);
+      background:var(--code-bg);color:var(--muted);font-family:var(--mono);
+      font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .2s;
+    }
+    .count-btn:hover { border-color:var(--accent);color:var(--accent); }
+    .count-btn.active { border-color:var(--accent);background:rgba(124,92,252,.2);color:var(--accent3); }
+
+    .flex-scene {
+      background:#f0f2f8;border-radius:var(--rsm);border:2px solid var(--accent);
+      min-height:180px;padding:16px;margin-top:14px;
+      display:flex;transition:all .25s ease;
+      position:relative;overflow:auto;
+    }
+    .flex-scene-label {
+      position:absolute;top:4px;left:10px;
+      font-family:var(--mono);font-size:.6rem;color:rgba(124,92,252,.7);font-weight:700;
+    }
+    .flex-item {
+      min-width:70px;min-height:60px;border-radius:6px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--mono);font-size:.85rem;font-weight:700;color:#fff;
+      transition:all .3s ease;flex-shrink:0;
+    }
+    .fi-1{background:linear-gradient(135deg,#7c5cfc,#e040fb);}
+    .fi-2{background:linear-gradient(135deg,#00e5ff,#00b8d4);}
+    .fi-3{background:linear-gradient(135deg,#00e676,#00bfa5);}
+    .fi-4{background:linear-gradient(135deg,#ffab40,#ff6d00);}
+    .fi-5{background:linear-gradient(135deg,#ff5252,#e040fb);}
+    .flex-axis-info {
+      display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;
+    }
+    .axis-badge {
+      font-family:var(--mono);font-size:.72rem;padding:4px 12px;
+      border-radius:99px;
+    }
+    .axis-main  { background:rgba(0,229,255,.12);border:1px solid var(--accent3);color:var(--accent3); }
+    .axis-cross { background:rgba(224,64,251,.12);border:1px solid var(--accent2);color:var(--accent2); }
+
+    /* live css two-pane */
+    .live-css-flex { background:var(--code-bg);border:1px solid var(--border);border-radius:var(--rsm);padding:13px 18px;margin-top:12px;font-family:var(--mono);font-size:.77rem;line-height:1.9;overflow-x:auto; }
+
+    /* ═══ COMPARISON SECTION ═══ */
+    .vs-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0; }
+    @media(max-width:640px){ .vs-grid{grid-template-columns:1fr;} }
+    .vs-card { border-radius:var(--rsm);padding:20px; }
+    .vs-card.pos { background:rgba(0,229,255,.06);border:2px solid var(--accent3); }
+    .vs-card.flex { background:rgba(224,64,251,.06);border:2px solid var(--accent2); }
+    .vs-card h4 { font-size:1rem;font-weight:700;margin-bottom:12px; }
+    .vs-card.pos h4 { color:var(--accent3); }
+    .vs-card.flex h4 { color:var(--accent2); }
+    .vs-list { list-style:none;display:flex;flex-direction:column;gap:7px; }
+    .vs-list li { display:flex;align-items:flex-start;gap:8px;font-size:.83rem;line-height:1.5;color:var(--muted); }
+    .vs-list li::before { content:'▸';color:inherit;flex-shrink:0;margin-top:2px; }
+    .vs-card.pos .vs-list li::before { color:var(--accent3); }
+    .vs-card.flex .vs-list li::before { color:var(--accent2); }
+
+    .scenario-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:14px 0; }
+    .scenario-card { background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:14px;transition:border-color .2s; }
+    .scenario-card:hover { border-color:var(--accent); }
+    .scenario-icon { font-size:1.4rem;margin-bottom:8px; }
+    .scenario-title { font-size:.82rem;font-weight:700;margin-bottom:4px; }
+    .scenario-badge {
+      display:inline-block;font-family:var(--mono);font-size:.65rem;padding:2px 8px;border-radius:99px;margin-top:6px;
+    }
+    .sb-pos  { background:rgba(0,229,255,.12);border:1px solid var(--accent3);color:var(--accent3); }
+    .sb-flex { background:rgba(224,64,251,.12);border:1px solid var(--accent2);color:var(--accent2); }
+    .sb-both { background:rgba(255,171,64,.12);border:1px solid var(--warn);color:var(--warn); }
+
+    .comparison-table { width:100%;border-collapse:collapse;font-size:.82rem;margin:14px 0; }
+    .comparison-table th { padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);font-weight:700; }
+    .comparison-table td { padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:top; }
+    .comparison-table td:first-child { font-family:var(--mono);color:var(--text); }
+    .comparison-table tr:hover td { background:rgba(255,255,255,.02); }
+    .th-pos  { color:var(--accent3); }
+    .th-flex { color:var(--accent2); }
+    .td-pos  { color:var(--accent3) !important; }
+    .td-flex { color:var(--accent2) !important; }
+
+    /* ═══ NAV BUTTONS ═══ */
+    .nav-btns { display:flex;gap:12px;margin-top:28px;justify-content:flex-end; }
+    .btn { padding:10px 24px;border-radius:var(--rsm);font-family:var(--font);font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s; }
+    .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 18px rgba(124,92,252,.35); }
+    .btn-primary:hover { transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,92,252,.5); }
+    .btn-secondary { background:var(--surface2);color:var(--muted);border:1px solid var(--border); }
+    .btn-secondary:hover { background:var(--border);color:var(--text); }
+
+    /* ═══ FINISH ═══ */
+    .finish-card { display:none;background:linear-gradient(135deg,rgba(124,92,252,.15),rgba(0,229,255,.1));border:1px solid var(--accent);border-radius:var(--radius);padding:40px;text-align:center;margin-top:32px;box-shadow:var(--shadow); }
+    .finish-card.visible { display:block;animation:fadeIn .5s ease; }
+    .finish-icon { font-size:3rem;margin-bottom:16px; }
+    .finish-card h2 { font-size:1.8rem;font-weight:800;color:var(--accent3);margin-bottom:10px; }
+    .finish-card p { color:var(--muted);line-height:1.7;max-width:540px;margin-inline:auto; }
+
+    /* ═══ SCROLLBAR ═══ */
+    ::-webkit-scrollbar{width:8px;height:8px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;} ::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+    @media(max-width:600px){.wrapper{padding:32px 16px 60px;}.step-header{padding:16px;}.step-body{padding:0 16px 24px;}}
+  </style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<div class="wrapper">
+  <!-- HEADER -->
+  <header>
+    <a href="paso-a-paso-tipografia.html" class="back-link">← Práctica anterior: Tipografía</a>
+    <div class="badge">Programación II · Práctica CSS</div>
+    <h1>Layout CSS:<br/>Position &amp; Flexbox</h1>
+    <p>Los dos modelos fundamentales de posicionamiento — entendé cuándo usar cada uno y dominalos con playgrounds interactivos.</p>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 3 pasos</div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       PASO 1 – CSS POSITION
+  ══════════════════════════════════════════════════════════ -->
+  <div class="step-card active" id="step-1">
+    <div class="step-header" onclick="toggleStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-title">
+        <h2>📍 CSS Position — Los 5 tipos</h2>
+        <p>static, relative, absolute, fixed, sticky + trucos de centrado</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body open" id="body-1">
+
+      <p class="explanation">
+        <strong>position</strong> controla <em>cómo se coloca un elemento dentro del documento</em>.
+        Cambia si el elemento respeta el flujo normal del HTML o si flota por encima, anclado a otro elemento
+        o a la ventana del navegador. Es la base de los modales, menús flotantes, headers pegajosos y tooltips.
+      </p>
+
+      <!-- 5 tipo cards -->
+      <div class="pos-type-grid" id="posTypeGrid">
+        <div class="pos-type-card selected" data-pos="static" onclick="selectPosType(this,'static')">
+          <div class="pos-keyword">static</div>
+          <div class="pos-desc">Default. Flujo normal. Ignora top/left/right/bottom.</div>
+        </div>
+        <div class="pos-type-card" data-pos="relative" onclick="selectPosType(this,'relative')">
+          <div class="pos-keyword">relative</div>
+          <div class="pos-desc">Se desplaza desde su posición original. Sigue en el flujo.</div>
+        </div>
+        <div class="pos-type-card" data-pos="absolute" onclick="selectPosType(this,'absolute')">
+          <div class="pos-keyword">absolute</div>
+          <div class="pos-desc">Sale del flujo. Se posiciona respecto al ancestro posicionado más cercano.</div>
+        </div>
+        <div class="pos-type-card" data-pos="fixed" onclick="selectPosType(this,'fixed')">
+          <div class="pos-keyword">fixed</div>
+          <div class="pos-desc">Sale del flujo. Se ancla al viewport (la ventana). Permanece al scrollear.</div>
+        </div>
+        <div class="pos-type-card" data-pos="sticky" onclick="selectPosType(this,'sticky')">
+          <div class="pos-keyword">sticky</div>
+          <div class="pos-desc">Híbrido: flujo normal hasta un umbral de scroll, luego se "pega".</div>
+        </div>
+      </div>
+
+      <!-- Info panel que cambia -->
+      <div class="pos-info-panel" id="posInfoPanel">
+        <strong>static</strong> — Es el valor por defecto de todo elemento HTML. El elemento
+        se coloca exactamente donde le corresponde en el flujo normal del documento.
+        Las propiedades <code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code>
+        y <code>z-index</code> son <strong>ignoradas completamente</strong>.
+      </div>
+
+      <!-- FLUJO badge -->
+      <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
+        <span style="font-size:.8rem;color:var(--muted);">¿Ocupa espacio en el flujo?</span>
+        <span class="flow-badge in-flow" id="flowBadge">✓ En el flujo</span>
+      </div>
+
+      <div class="code-wrap" style="margin-top:18px;">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Los 5 tipos de position</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── static: valor por defecto, no necesita declararse ── */</span>
+<span class="sel">.caja</span> { <span class="prop">position</span>: <span class="val">static</span>; }
+
+<span class="cmt">/* ── relative: se desplaza DESDE su posición natural ── */</span>
+<span class="sel">.caja</span> {
+  <span class="prop">position</span>: <span class="val">relative</span>;
+  <span class="prop">top</span>: <span class="num">20px</span>;   <span class="cmt">/* 20px hacia ABAJO */</span>
+  <span class="prop">left</span>: <span class="num">30px</span>;  <span class="cmt">/* 30px hacia la DERECHA */</span>
+  <span class="cmt">/* El espacio original se CONSERVA (las otras cajas no se mueven) */</span>
+}
+
+<span class="cmt">/* ── absolute: se posiciona respecto al PADRE posicionado ── */</span>
+<span class="sel">.padre</span> { <span class="prop">position</span>: <span class="val">relative</span>; }  <span class="cmt">/* ← NECESARIO como referencia */</span>
+<span class="sel">.hijo</span> {
+  <span class="prop">position</span>: <span class="val">absolute</span>;
+  <span class="prop">top</span>: <span class="num">0</span>;  <span class="prop">right</span>: <span class="num">0</span>;  <span class="cmt">/* esquina superior derecha del padre */</span>
+  <span class="cmt">/* SALE del flujo — las otras cajas lo ignoran */</span>
+}
+
+<span class="cmt">/* ── fixed: se ancla al VIEWPORT (ventana del navegador) ── */</span>
+<span class="sel">.menu-flotante</span> {
+  <span class="prop">position</span>: <span class="val">fixed</span>;
+  <span class="prop">bottom</span>: <span class="num">24px</span>;  <span class="prop">right</span>: <span class="num">24px</span>;
+  <span class="cmt">/* Permanece visible aunque el usuario haga scroll */</span>
+}
+
+<span class="cmt">/* ── sticky: flujo normal + se "pega" al hacer scroll ── */</span>
+<span class="sel">.header</span> {
+  <span class="prop">position</span>: <span class="val">sticky</span>;
+  <span class="prop">top</span>: <span class="num">0</span>;  <span class="cmt">/* umbral: cuando top=0 respecto al viewport, se pega */</span>
+  <span class="cmt">/* NECESITA que el contenedor padre tenga altura suficiente */</span>
+}</pre>
+      </div>
+
+      <h3 class="sec"><span>🎯</span> Propiedades de desplazamiento</h3>
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – top, right, bottom, left, z-index</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="sel">.caja</span> {
+  <span class="prop">position</span>: <span class="val">absolute</span>;
+
+  <span class="cmt">/* Los 4 lados — solo aplican si position ≠ static */</span>
+  <span class="prop">top</span>:    <span class="num">20px</span>;  <span class="cmt">/* distancia desde el borde superior del referente */</span>
+  <span class="prop">right</span>:  <span class="num">10px</span>;  <span class="cmt">/* distancia desde el borde derecho  */</span>
+  <span class="prop">bottom</span>: <span class="num">0</span>;     <span class="cmt">/* distancia desde el borde inferior */</span>
+  <span class="prop">left</span>:   <span class="num">50%</span>;   <span class="cmt">/* acepta %, px, rem, vw… */</span>
+
+  <span class="cmt">/* inset: shorthand de top+right+bottom+left (moderno) */</span>
+  <span class="prop">inset</span>: <span class="num">0</span>;           <span class="cmt">/* todos = 0 */</span>
+  <span class="prop">inset</span>: <span class="num">10px</span> <span class="num">20px</span>;   <span class="cmt">/* vertical | horizontal */</span>
+
+  <span class="cmt">/* z-index: orden de apilamiento (más alto = encima) */</span>
+  <span class="prop">z-index</span>: <span class="num">10</span>;   <span class="cmt">/* solo funciona si position ≠ static */</span>
+  <span class="prop">z-index</span>: <span class="num">-1</span>;   <span class="cmt">/* detrás del contenido normal */</span>
+}</pre>
+      </div>
+
+      <h3 class="sec"><span>✦</span> Trucos de centrado con position</h3>
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Centrado con position: absolute</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ── Técnica 1: clásica con transform ── */</span>
+<span class="sel">.padre</span> { <span class="prop">position</span>: <span class="val">relative</span>; }
+<span class="sel">.centrado</span> {
+  <span class="prop">position</span>: <span class="val">absolute</span>;
+  <span class="prop">top</span>:  <span class="num">50%</span>;
+  <span class="prop">left</span>: <span class="num">50%</span>;
+  <span class="prop">transform</span>: <span class="val">translate</span>(<span class="num">-50%</span>, <span class="num">-50%</span>);
+  <span class="cmt">/* top/left mueven la esquina superior-izq al centro,  */</span>
+  <span class="cmt">/* transform:translate mueve el elemento -50% de SÍ MISMO */</span>
+}
+
+<span class="cmt">/* ── Técnica 2: moderna con inset + margin auto ── */</span>
+<span class="sel">.centrado</span> {
+  <span class="prop">position</span>: <span class="val">absolute</span>;
+  <span class="prop">inset</span>: <span class="num">0</span>;         <span class="cmt">/* ocupa toda la referencia */</span>
+  <span class="prop">margin</span>: <span class="val">auto</span>;     <span class="cmt">/* el navegador centra automáticamente */</span>
+  <span class="prop">width</span>: <span class="num">200px</span>;    <span class="cmt">/* DEBE tener dimensiones definidas */</span>
+  <span class="prop">height</span>: <span class="num">100px</span>;
+}
+
+<span class="cmt">/* ── Técnica 3: solo centrado vertical (para badges/tooltips) ── */</span>
+<span class="sel">.badge</span> {
+  <span class="prop">position</span>: <span class="val">absolute</span>;
+  <span class="prop">top</span>: <span class="num">50%</span>;
+  <span class="prop">transform</span>: <span class="val">translateY</span>(<span class="num">-50%</span>);
+  <span class="prop">right</span>: <span class="num">12px</span>;
+}</pre>
+      </div>
+
+      <!-- ═══ POSITION PLAYGROUND ═══ -->
+      <div class="playground" id="posPlayground">
+        <h4>🎮 Playground interactivo — mové el elemento</h4>
+
+        <div class="pg-cols">
+          <!-- Controls -->
+          <div class="pg-controls">
+            <div class="ctrl-row">
+              <label>position</label>
+              <select id="pgPosType" onchange="updatePositionScene()">
+                <option value="static">static</option>
+                <option value="relative">relative</option>
+                <option value="absolute" selected>absolute</option>
+                <option value="fixed">fixed *</option>
+                <option value="sticky">sticky *</option>
+              </select>
+            </div>
+            <div id="offsetControls">
+              <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px;font-family:var(--mono);">Arrastrá los valores ↕</p>
+              <div class="ctrl-row">
+                <label>top</label>
+                <input type="range" id="pgTop" min="-60" max="200" value="20" oninput="updatePositionScene()">
+                <span class="vdisp" id="pgTopD">20px</span>
+              </div>
+              <div class="ctrl-row">
+                <label>left</label>
+                <input type="range" id="pgLeft" min="-60" max="280" value="20" oninput="updatePositionScene()">
+                <span class="vdisp" id="pgLeftD">20px</span>
+              </div>
+              <div class="ctrl-row">
+                <label>right</label>
+                <input type="range" id="pgRight" min="-60" max="280" value="0" oninput="updatePositionScene()">
+                <span class="vdisp" id="pgRightD">—</span>
+              </div>
+              <div class="ctrl-row">
+                <label>bottom</label>
+                <input type="range" id="pgBottom" min="-60" max="200" value="0" oninput="updatePositionScene()">
+                <span class="vdisp" id="pgBottomD">—</span>
+              </div>
+              <div class="ctrl-row">
+                <label>z-index</label>
+                <input type="range" id="pgZ" min="-5" max="20" value="1" oninput="updatePositionScene()">
+                <span class="vdisp" id="pgZD">1</span>
+              </div>
+              <div class="ctrl-row" style="margin-top:8px;">
+                <label style="min-width:auto;font-size:.72rem;">Usar right/bottom</label>
+                <input type="checkbox" id="useRB" onchange="updatePositionScene()" style="width:16px;height:16px;accent-color:var(--accent);">
+              </div>
+            </div>
+          </div>
+
+          <!-- Live CSS -->
+          <div>
+            <div class="live-css" id="posCss" style="height:100%;min-height:180px;"></div>
+          </div>
+        </div>
+
+        <!-- SCENE -->
+        <div class="scene-outer">
+          <div class="scene-label">💻 Vista del navegador</div>
+          <div class="scene-container" id="sceneContainer">
+            <span class="scene-container-label">.contenedor { position: relative; }</span>
+            <div class="scene-box scene-box-a" id="boxA">A</div>
+            <div class="scene-box scene-box-target" id="boxTarget">🎯</div>
+            <div class="scene-box scene-box-b" id="boxB">B</div>
+          </div>
+          <div id="fixedStickyNote" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(255,171,64,.1);border:1px solid var(--warn);border-radius:var(--rsm);font-size:.8rem;color:var(--warn);"></div>
+        </div>
+
+        <!-- Flow badge -->
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;" id="playFlowWrap">
+          <span style="font-size:.78rem;color:var(--muted);">Estado en el flujo:</span>
+          <span class="flow-badge in-flow" id="playFlowBadge">✓ En el flujo (ocupa espacio)</span>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="completeStep(1)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       PASO 2 – FLEXBOX
+  ══════════════════════════════════════════════════════════ -->
+  <div class="step-card" id="step-2">
+    <div class="step-header" onclick="toggleStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-title">
+        <h2>📦 Flexbox — Distribución inteligente</h2>
+        <p>display:flex, ejes, justify-content, align-items, gap, flex-direction</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-2">
+
+      <p class="explanation">
+        <strong>Flexbox</strong> (Flexible Box Layout) es un modelo de layout unidimensional:
+        organiza elementos en una <em>fila</em> o <em>columna</em>.
+        A diferencia de <code>position</code>, Flexbox <strong>distribuye espacio automáticamente</strong>
+        entre los hijos de un contenedor, sin necesidad de conocer sus tamaños exactos.
+      </p>
+
+      <div class="callout info">
+        <div class="ct">💡 Dos niveles de propiedades</div>
+        Flexbox tiene propiedades para el <strong>contenedor</strong> (<code>display:flex</code>,
+        <code>justify-content</code>, <code>align-items</code>, <code>gap</code>, <code>flex-direction</code>…)
+        y propiedades para los <strong>hijos</strong> (<code>flex-grow</code>, <code>flex-shrink</code>,
+        <code>align-self</code>, <code>order</code>…).
+      </div>
+
+      <!-- Diagrama de ejes -->
+      <h3 class="sec"><span>↔</span> Los dos ejes</h3>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:20px;margin:14px 0;">
+        <!-- eje main -->
+        <div style="position:relative;margin-bottom:20px;">
+          <div style="display:flex;gap:8px;align-items:center;background:#f0f2f8;padding:12px 16px;border-radius:6px;position:relative;">
+            <div style="position:absolute;top:-18px;left:0;font-size:.7rem;font-family:var(--mono);color:var(--accent3);font-weight:700;">→ Eje principal (main axis) — controlado por justify-content</div>
+            <div class="fi-1 flex-item" style="min-width:60px;min-height:44px;font-size:.75rem;">1</div>
+            <div class="fi-2 flex-item" style="min-width:60px;min-height:44px;font-size:.75rem;">2</div>
+            <div class="fi-3 flex-item" style="min-width:60px;min-height:44px;font-size:.75rem;">3</div>
+            <div style="position:absolute;right:-8px;top:50%;transform:translateY(-50%);font-size:1.2rem;color:var(--accent3);">→</div>
+          </div>
+          <div style="position:absolute;left:-28px;top:0;bottom:0;display:flex;align-items:center;">
+            <div style="transform:rotate(-90deg);font-size:.65rem;font-family:var(--mono);color:var(--accent2);font-weight:700;white-space:nowrap;">↑ Eje cruzado<br/>(align-items)</div>
+          </div>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);line-height:1.7;margin-top:8px;">
+          Con <code style="color:var(--accent3);">flex-direction: row</code> (default): el eje principal va de izquierda a derecha, el cruzado de arriba a abajo.<br>
+          Con <code style="color:var(--accent2);">flex-direction: column</code>: el eje principal baja verticalmente, el cruzado va horizontal.
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span> CSS – Flexbox completo</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        <pre><span class="cmt">/* ═══ CONTENEDOR ═══ */</span>
+<span class="sel">.contenedor</span> {
+  <span class="prop">display</span>: <span class="val">flex</span>;             <span class="cmt">/* activa flexbox */</span>
+
+  <span class="cmt">/* Dirección del eje principal */</span>
+  <span class="prop">flex-direction</span>: <span class="val">row</span>;          <span class="cmt">/* ← default: izq → der */</span>
+  <span class="prop">flex-direction</span>: <span class="val">row-reverse</span>;  <span class="cmt">/* der → izq */</span>
+  <span class="prop">flex-direction</span>: <span class="val">column</span>;       <span class="cmt">/* arriba → abajo */</span>
+  <span class="prop">flex-direction</span>: <span class="val">column-reverse</span>;<span class="cmt">/* abajo → arriba */</span>
+
+  <span class="cmt">/* Distribución en el EJE PRINCIPAL */</span>
+  <span class="prop">justify-content</span>: <span class="val">flex-start</span>;   <span class="cmt">/* al inicio (default) */</span>
+  <span class="prop">justify-content</span>: <span class="val">flex-end</span>;     <span class="cmt">/* al final */</span>
+  <span class="prop">justify-content</span>: <span class="val">center</span>;       <span class="cmt">/* centrado */</span>
+  <span class="prop">justify-content</span>: <span class="val">space-between</span>;<span class="cmt">/* espacio entre items */</span>
+  <span class="prop">justify-content</span>: <span class="val">space-around</span>; <span class="cmt">/* espacio alrededor */</span>
+  <span class="prop">justify-content</span>: <span class="val">space-evenly</span>; <span class="cmt">/* espacio igual */</span>
+
+  <span class="cmt">/* Alineación en el EJE CRUZADO */</span>
+  <span class="prop">align-items</span>: <span class="val">stretch</span>;          <span class="cmt">/* estira (default) */</span>
+  <span class="prop">align-items</span>: <span class="val">flex-start</span>;        <span class="cmt">/* arriba */</span>
+  <span class="prop">align-items</span>: <span class="val">flex-end</span>;          <span class="cmt">/* abajo */</span>
+  <span class="prop">align-items</span>: <span class="val">center</span>;            <span class="cmt">/* centrado vertical */</span>
+  <span class="prop">align-items</span>: <span class="val">baseline</span>;          <span class="cmt">/* alineados por baseline de texto */</span>
+
+  <span class="cmt">/* Espacio entre items */</span>
+  <span class="prop">gap</span>: <span class="num">16px</span>;              <span class="cmt">/* igual en filas y columnas */</span>
+  <span class="prop">gap</span>: <span class="num">12px</span> <span class="num">24px</span>;         <span class="cmt">/* row-gap | column-gap */</span>
+  <span class="prop">row-gap</span>: <span class="num">12px</span>;
+  <span class="prop">column-gap</span>: <span class="num">24px</span>;
+
+  <span class="cmt">/* Salto de línea cuando no entra todo */</span>
+  <span class="prop">flex-wrap</span>: <span class="val">nowrap</span>;   <span class="cmt">/* una sola línea (default) */</span>
+  <span class="prop">flex-wrap</span>: <span class="val">wrap</span>;     <span class="cmt">/* salta a la siguiente línea */</span>
+}
+
+<span class="cmt">/* ═══ HIJOS (flex items) ═══ */</span>
+<span class="sel">.item</span> {
+  <span class="prop">flex-grow</span>:   <span class="num">1</span>;     <span class="cmt">/* cuánto crece para llenar espacio */</span>
+  <span class="prop">flex-shrink</span>: <span class="num">1</span>;     <span class="cmt">/* cuánto achica si no hay espacio */</span>
+  <span class="prop">flex-basis</span>:  <span class="val">auto</span>; <span class="cmt">/* tamaño base antes de flex */</span>
+
+  <span class="cmt">/* shorthand */</span>
+  <span class="prop">flex</span>: <span class="num">1</span>;            <span class="cmt">/* grow:1 shrink:1 basis:0 */</span>
+  <span class="prop">flex</span>: <span class="num">0 0 200px</span>;   <span class="cmt">/* no crece, no achica, 200px fijo */</span>
+
+  <span class="prop">align-self</span>: <span class="val">center</span>; <span class="cmt">/* override de align-items para este item */</span>
+  <span class="prop">order</span>: <span class="num">2</span>;            <span class="cmt">/* orden visual (default:0) */</span>
+}</pre>
+      </div>
+
+      <!-- ═══ FLEX PLAYGROUND ═══ -->
+      <div class="playground">
+        <h4>🎮 Playground — probá Flexbox con 1 a 5 cajas</h4>
+
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px;">Cantidad de cajas:</p>
+        <div class="box-count-row">
+          <button class="count-btn" data-n="1" onclick="setBoxCount(1)">1</button>
+          <button class="count-btn" data-n="2" onclick="setBoxCount(2)">2</button>
+          <button class="count-btn active" data-n="3" onclick="setBoxCount(3)">3</button>
+          <button class="count-btn" data-n="4" onclick="setBoxCount(4)">4</button>
+          <button class="count-btn" data-n="5" onclick="setBoxCount(5)">5</button>
+        </div>
+
+        <div class="pg-cols">
+          <div class="pg-controls">
+            <div class="ctrl-row">
+              <label>flex-direction</label>
+              <select id="flDir" onchange="updateFlex()">
+                <option value="row">row</option>
+                <option value="row-reverse">row-reverse</option>
+                <option value="column">column</option>
+                <option value="column-reverse">column-reverse</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label>justify-content</label>
+              <select id="flJC" onchange="updateFlex()">
+                <option value="flex-start">flex-start</option>
+                <option value="flex-end">flex-end</option>
+                <option value="center">center</option>
+                <option value="space-between">space-between</option>
+                <option value="space-around">space-around</option>
+                <option value="space-evenly">space-evenly</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label>align-items</label>
+              <select id="flAI" onchange="updateFlex()">
+                <option value="stretch">stretch</option>
+                <option value="flex-start">flex-start</option>
+                <option value="flex-end">flex-end</option>
+                <option value="center">center</option>
+                <option value="baseline">baseline</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label>flex-wrap</label>
+              <select id="flWrap" onchange="updateFlex()">
+                <option value="nowrap">nowrap</option>
+                <option value="wrap">wrap</option>
+                <option value="wrap-reverse">wrap-reverse</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label>gap</label>
+              <input type="range" id="flGap" min="0" max="40" value="12" oninput="updateFlex()">
+              <span class="vdisp" id="flGapD">12px</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Item width</label>
+              <input type="range" id="flItemW" min="40" max="180" value="80" oninput="updateFlex()">
+              <span class="vdisp" id="flItemWD">80px</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Item height</label>
+              <input type="range" id="flItemH" min="40" max="160" value="70" oninput="updateFlex()">
+              <span class="vdisp" id="flItemHD">70px</span>
+            </div>
+            <div class="ctrl-row">
+              <label>Container h</label>
+              <input type="range" id="flContH" min="120" max="360" value="200" oninput="updateFlex()">
+              <span class="vdisp" id="flContHD">200px</span>
+            </div>
+          </div>
+          <div>
+            <div class="live-css-flex" id="flexCss"></div>
+          </div>
+        </div>
+
+        <!-- Scene -->
+        <div class="flex-scene" id="flexScene" style="height:200px;">
+          <span class="flex-scene-label">.contenedor</span>
+        </div>
+
+        <!-- Axis info -->
+        <div class="flex-axis-info" id="flexAxisInfo">
+          <span class="axis-badge axis-main" id="mainAxisLabel">→ Eje principal: row</span>
+          <span class="axis-badge axis-cross" id="crossAxisLabel">↓ Eje cruzado: column</span>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(1)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(2)">Siguiente paso →</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       PASO 3 – POSITION vs FLEXBOX
+  ══════════════════════════════════════════════════════════ -->
+  <div class="step-card" id="step-3">
+    <div class="step-header" onclick="toggleStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-title">
+        <h2>⚖️ Position vs Flexbox</h2>
+        <p>Cuándo usar cada uno — diferencias, escenarios y guía de decisión</p>
+      </div>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="step-body" id="body-3">
+
+      <p class="explanation">
+        <strong>Position</strong> y <strong>Flexbox</strong> no compiten: son herramientas
+        con propósitos distintos que se <em>complementan</em> en un mismo diseño.
+        La clave está en entender qué resuelve cada uno.
+      </p>
+
+      <div class="vs-grid">
+        <div class="vs-card pos">
+          <h4>📍 Usá position cuando…</h4>
+          <ul class="vs-list">
+            <li>Necesitás <strong>superponer</strong> elementos (modales, tooltips, overlays)</li>
+            <li>Querés anclar algo al <strong>viewport</strong> (header fijo, botón flotante)</li>
+            <li>Necesitás que un elemento <strong>salga del flujo</strong> sin afectar al resto</li>
+            <li>Colocás un <strong>badge o etiqueta</strong> sobre una tarjeta o imagen</li>
+            <li>Controlás el <strong>z-index</strong> (capas de apilamiento)</li>
+            <li>Hacés un <strong>header sticky</strong> que se pega al hacer scroll</li>
+            <li>Posicionás elementos en coordenadas <strong>precisas</strong></li>
+          </ul>
+        </div>
+        <div class="vs-card flex">
+          <h4>📦 Usá Flexbox cuando…</h4>
+          <ul class="vs-list">
+            <li>Tenés <strong>múltiples items</strong> que distribuir en fila o columna</li>
+            <li>Necesitás <strong>centrar</strong> fácilmente (horizontal, vertical o ambos)</li>
+            <li>Los elementos deben <strong>crecer o achicarse</strong> según el espacio</li>
+            <li>Construís una <strong>barra de navegación</strong></li>
+            <li>Alineás elementos de <strong>diferente altura</strong> en la misma fila</li>
+            <li>Hacés un layout de <strong>tarjetas</strong> con separación uniforme</li>
+            <li>Controlás el <strong>orden visual</strong> sin cambiar el HTML</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <div class="ct">⚠️ El error más común</div>
+        Intentar hacer una <strong>grilla de cards</strong> con <code>position:absolute</code> 
+        y coordenadas manuales para cada card. Esto rompe la responsividad y es imposible de mantener.
+        Para distribución de múltiples elementos en filas/columnas: <strong>Flexbox</strong> (o CSS Grid).
+        <code>position:absolute</code> es para <em>un elemento</em> posicionado respecto a su contexto.
+      </div>
+
+      <h3 class="sec"><span>🏗</span> Escenarios reales</h3>
+      <div class="scenario-grid">
+        <div class="scenario-card">
+          <div class="scenario-icon">🗂️</div>
+          <div class="scenario-title">Navbar con logo + links</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Logo a la izquierda, links a la derecha distribuidos.</div>
+          <span class="scenario-badge sb-flex">Flexbox</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">🔔</div>
+          <div class="scenario-title">Badge sobre ícono</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Número rojo en esquina superior derecha del ícono.</div>
+          <span class="scenario-badge sb-pos">position: absolute</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">📦</div>
+          <div class="scenario-title">Grilla de tarjetas</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Cards en fila, separadas, con wrap al achicarse.</div>
+          <span class="scenario-badge sb-flex">Flexbox (o Grid)</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">🪟</div>
+          <div class="scenario-title">Modal / Dialog</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Overlay oscuro + cuadro centrado encima de todo.</div>
+          <span class="scenario-badge sb-both">fixed + Flex</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">📌</div>
+          <div class="scenario-title">Menú lateral sticky</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Sidebar que se queda visible mientras el contenido hace scroll.</div>
+          <span class="scenario-badge sb-pos">position: sticky</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">🔲</div>
+          <div class="scenario-title">Centrar un elemento</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Un solo div centrado horizontal y vertical.</div>
+          <span class="scenario-badge sb-both">Flex o absolute</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">💬</div>
+          <div class="scenario-title">Tooltip</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Texto que aparece sobre un ícono al hacer hover.</div>
+          <span class="scenario-badge sb-pos">position: absolute</span>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">📊</div>
+          <div class="scenario-title">Formulario en columna</div>
+          <div style="font-size:.75rem;color:var(--muted);line-height:1.5;">Label + input apilados verticalmente, con separación uniforme.</div>
+          <span class="scenario-badge sb-flex">Flexbox column</span>
+        </div>
+      </div>
+
+      <h3 class="sec"><span>📋</span> Tabla comparativa</h3>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th class="th-pos">📍 position</th>
+            <th class="th-flex">📦 Flexbox</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Afecta al flujo</td>
+            <td class="td-pos">Solo relative/sticky mantienen flujo. absolute/fixed lo rompen.</td>
+            <td class="td-flex">Siempre en flujo normal.</td>
+          </tr>
+          <tr>
+            <td>Cuántos elementos</td>
+            <td class="td-pos">Pensado para UN elemento posicionado.</td>
+            <td class="td-flex">Diseñado para MÚLTIPLES hijos.</td>
+          </tr>
+          <tr>
+            <td>Referencia</td>
+            <td class="td-pos">Padre posicionado (absolute) o viewport (fixed/sticky).</td>
+            <td class="td-flex">El propio contenedor flex.</td>
+          </tr>
+          <tr>
+            <td>Distribución automática</td>
+            <td class="td-pos">No. Se necesitan coordenadas manuales.</td>
+            <td class="td-flex">Sí. justify-content y align-items distribuyen solos.</td>
+          </tr>
+          <tr>
+            <td>Responsive</td>
+            <td class="td-pos">Puede ser difícil sin calcular posiciones dinámicas.</td>
+            <td class="td-flex">Muy responsive: flex-wrap y flex-grow adaptan solos.</td>
+          </tr>
+          <tr>
+            <td>Capas (z-index)</td>
+            <td class="td-pos">✓ Sí, con z-index.</td>
+            <td class="td-flex">No. Mismo plano visual.</td>
+          </tr>
+          <tr>
+            <td>Centrado vertical</td>
+            <td class="td-pos">top:50% + transform:translateY(-50%) (verboso).</td>
+            <td class="td-flex">align-items:center (una sola línea).</td>
+          </tr>
+          <tr>
+            <td>Típico uso</td>
+            <td class="td-pos">Modales, tooltips, headers fijos, badges, overlays.</td>
+            <td class="td-flex">Navbars, cards, formularios, centrado, distribución.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout ok">
+        <div class="ct">✅ La regla de oro</div>
+        <strong>Si necesitás distribuir varios elementos en fila o columna → Flexbox.</strong><br>
+        <strong>Si necesitás que un elemento se posicione de forma especial respecto a algo → position.</strong><br><br>
+        En la mayoría de los layouts reales, <em>usarás ambos</em>: Flexbox para la distribución general
+        y <code>position:absolute</code> para detalles como badges, tooltips o elementos decorativos.
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-secondary" onclick="goToStep(2)">← Anterior</button>
+        <button class="btn btn-primary" onclick="completeStep(3)">✅ Finalizar práctica</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINISH -->
+  <div class="finish-card" id="finishCard">
+    <div class="finish-icon">🧩</div>
+    <h2>¡Layout dominado!</h2>
+    <p>
+      Conocés los <strong>5 tipos de position</strong> y cuándo cada uno sale o permanece en el flujo,
+      manejás <strong>Flexbox</strong> con todos sus ejes y propiedades,
+      y sabés tomar la decisión correcta entre uno y otro según el escenario.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;">
+      <button class="btn btn-secondary" onclick="resetAll()">🔄 Reiniciar</button>
+      <a href="paso-a-paso-tipografia.html" style="text-decoration:none;">
+        <button class="btn btn-primary">← Práctica 3: Tipografía</button>
+      </a>
+    </div>
+  </div>
+</div><!-- /wrapper -->
+
+<script>
+/* ═══════════════════════════════ STEP ENGINE ═══════════════════════════════ */
+const TOTAL = 3;
+const done  = new Set();
+function toggleStep(n) {
+  const body = document.getElementById('body-' + n);
+  const open = body.classList.contains('open');
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('body-' + i).classList.remove('open');
+    if (!done.has(i)) document.getElementById('step-' + i).classList.remove('active');
+  }
+  if (!open) { body.classList.add('open'); document.getElementById('step-' + n).classList.add('active'); }
+}
+function goToStep(n) {
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('body-' + i).classList.remove('open');
+  document.getElementById('body-' + n).classList.add('open');
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('step-' + n).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function completeStep(n) {
+  done.add(n);
+  const card = document.getElementById('step-' + n);
+  card.classList.remove('active'); card.classList.add('done');
+  document.getElementById('body-' + n).classList.remove('open');
+  updateProgress();
+  if (n < TOTAL) setTimeout(() => goToStep(n + 1), 320);
+  else { document.getElementById('finishCard').classList.add('visible'); document.getElementById('finishCard').scrollIntoView({ behavior: 'smooth' }); }
+}
+function updateProgress() {
+  document.getElementById('progressBar').style.width = (done.size / TOTAL * 100) + '%';
+  document.getElementById('progressLabel').textContent = done.size + ' / ' + TOTAL + ' pasos';
+}
+function resetAll() {
+  done.clear(); updateProgress();
+  for (let i = 1; i <= TOTAL; i++) { document.getElementById('step-' + i).classList.remove('done','active'); document.getElementById('body-' + i).classList.remove('open'); }
+  document.getElementById('finishCard').classList.remove('visible');
+  document.getElementById('step-1').classList.add('active');
+  document.getElementById('body-1').classList.add('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ═══ COPY ═══ */
+function copyCode(btn) {
+  const text = btn.nextElementSibling.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado'; btn.style.background = 'var(--success)'; btn.style.color = '#000';
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; btn.style.color = ''; }, 1800);
+  }).catch(() => { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = 'Copiar', 1800); });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   POSITION TYPE CARDS (step 1 info panel)
+═══════════════════════════════════════════════════════════ */
+const posInfos = {
+  static: {
+    text: `<strong>static</strong> — Valor por defecto. El elemento está en el flujo normal del documento. Las propiedades <code>top/right/bottom/left</code> y <code>z-index</code> son ignoradas.`,
+    flow: true,
+    note: ''
+  },
+  relative: {
+    text: `<strong>relative</strong> — El elemento permanece en el flujo normal, pero se desplaza visualmente desde su posición original. El espacio que ocupaba <em>se conserva</em> (las otras cajas no se mueven para llenar ese hueco).`,
+    flow: true,
+    note: ''
+  },
+  absolute: {
+    text: `<strong>absolute</strong> — El elemento <em>sale del flujo</em>: las otras cajas lo ignoran y ocupan su espacio. Se posiciona respecto al <strong>ancestro posicionado más cercano</strong> (el que tenga position ≠ static). Si no hay ninguno, usa el <code>&lt;html&gt;</code>.`,
+    flow: false,
+    note: ''
+  },
+  fixed: {
+    text: `<strong>fixed</strong> — Sale del flujo. Se posiciona respecto al <strong>viewport</strong> (la ventana del navegador). Permanece en su lugar aunque el usuario haga scroll. Ideal para headers, navbars, botones flotantes (FAB).`,
+    flow: false,
+    note: '⚠ fixed es relativo a la VENTANA del navegador, no al padre. En esta previsualización se simula dentro del contenedor.'
+  },
+  sticky: {
+    text: `<strong>sticky</strong> — Híbrido: se comporta como <code>relative</code> mientras el usuario no haga scroll suficiente, y como <code>fixed</code> cuando alcanza el umbral (valor de <code>top</code>). <em>Requiere que el contenedor padre tenga altura suficiente</em>.`,
+    flow: true,
+    note: '⚠ sticky necesita un contenedor padre con scroll y altura suficiente para verse en acción.'
+  },
+};
+
+function selectPosType(card, type) {
+  document.querySelectorAll('.pos-type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  const info = posInfos[type];
+  document.getElementById('posInfoPanel').innerHTML = info.text;
+  const badge = document.getElementById('flowBadge');
+  if (info.flow) { badge.className = 'flow-badge in-flow'; badge.textContent = '✓ En el flujo (ocupa espacio)'; }
+  else { badge.className = 'flow-badge out-flow'; badge.textContent = '✗ Fuera del flujo (las otras cajas lo ignoran)'; }
+  // Sync playground select
+  document.getElementById('pgPosType').value = type;
+  updatePositionScene();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   POSITION PLAYGROUND
+═══════════════════════════════════════════════════════════ */
+function updatePositionScene() {
+  const posType = document.getElementById('pgPosType').value;
+  const useRB   = document.getElementById('useRB').checked;
+  const top     = parseInt(document.getElementById('pgTop').value);
+  const left    = parseInt(document.getElementById('pgLeft').value);
+  const right   = parseInt(document.getElementById('pgRight').value);
+  const bottom  = parseInt(document.getElementById('pgBottom').value);
+  const z       = parseInt(document.getElementById('pgZ').value);
+
+  // Sync type cards
+  document.querySelectorAll('.pos-type-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.pos === posType);
+  });
+
+  // Update displays
+  document.getElementById('pgTopD').textContent    = posType === 'static' ? '—' : top + 'px';
+  document.getElementById('pgLeftD').textContent   = (posType === 'static' || useRB) ? '—' : left + 'px';
+  document.getElementById('pgRightD').textContent  = (!useRB || posType === 'static') ? '—' : right + 'px';
+  document.getElementById('pgBottomD').textContent = (!useRB || posType === 'static') ? '—' : bottom + 'px';
+  document.getElementById('pgZD').textContent      = posType === 'static' ? '—' : z;
+
+  // Disable offsets for static
+  document.getElementById('offsetControls').classList.toggle('offset-disabled', posType === 'static');
+
+  // Apply to scene element
+  const target = document.getElementById('boxTarget');
+  const boxA   = document.getElementById('boxA');
+  const boxB   = document.getElementById('boxB');
+  const cont   = document.getElementById('sceneContainer');
+
+  // Reset
+  target.style.cssText = '';
+  target.className = 'scene-box scene-box-target';
+
+  boxA.style.display = 'flex';
+  boxB.style.display = 'flex';
+  cont.style.alignItems = 'flex-start';
+
+  if (posType === 'static') {
+    // nothing extra
+  } else if (posType === 'relative') {
+    target.style.position = 'relative';
+    target.style.top      = top + 'px';
+    target.style.left     = useRB ? '' : left + 'px';
+    target.style.right    = useRB ? right + 'px' : '';
+    target.style.bottom   = useRB ? bottom + 'px' : '';
+    target.style.zIndex   = z;
+  } else if (posType === 'absolute') {
+    target.style.position = 'absolute';
+    target.style.top      = top + 'px';
+    target.style.left     = useRB ? '' : left + 'px';
+    target.style.right    = useRB ? right + 'px' : '';
+    target.style.bottom   = useRB ? bottom + 'px' : '';
+    target.style.zIndex   = z;
+  } else if (posType === 'fixed') {
+    // Simulate fixed inside container (using absolute as visual approximation)
+    target.style.position = 'absolute';
+    target.style.top      = top + 'px';
+    target.style.left     = useRB ? '' : left + 'px';
+    target.style.right    = useRB ? right + 'px' : '';
+    target.style.bottom   = useRB ? bottom + 'px' : '';
+    target.style.zIndex   = z;
+    target.style.boxShadow = '0 0 0 3px var(--warn)';
+  } else if (posType === 'sticky') {
+    target.style.position = 'sticky';
+    target.style.top      = top + 'px';
+    target.style.zIndex   = z;
+  }
+
+  // Note for fixed/sticky
+  const note = document.getElementById('fixedStickyNote');
+  const info = posInfos[posType];
+  if (info.note) { note.style.display='block'; note.textContent = info.note; }
+  else { note.style.display='none'; }
+
+  // Flow badge in playground
+  const inFlow = posType === 'static' || posType === 'relative' || posType === 'sticky';
+  const playBadge = document.getElementById('playFlowBadge');
+  if (inFlow) { playBadge.className='flow-badge in-flow'; playBadge.textContent='✓ En el flujo (ocupa espacio)'; }
+  else { playBadge.className='flow-badge out-flow'; playBadge.textContent='✗ Fuera del flujo (las otras cajas lo ignoran)'; }
+
+  // Update info panel
+  document.getElementById('posInfoPanel').innerHTML = info.text;
+  const globalBadge = document.getElementById('flowBadge');
+  if (info.flow) { globalBadge.className='flow-badge in-flow'; globalBadge.textContent='✓ En el flujo (ocupa espacio)'; }
+  else { globalBadge.className='flow-badge out-flow'; globalBadge.textContent='✗ Fuera del flujo (las otras cajas lo ignoran)'; }
+
+  // Build live CSS
+  let css = `<span class="sel">.contenedor</span> { <span class="prop">position</span>: <span class="val">relative</span>; }\n\n`;
+  css += `<span class="sel">.target</span> {\n`;
+  css += `  <span class="prop">position</span>: <span class="val">${posType}</span>;\n`;
+  if (posType !== 'static') {
+    if (!useRB) {
+      css += `  <span class="prop">top</span>:  <span class="num">${top}px</span>;\n`;
+      css += `  <span class="prop">left</span>: <span class="num">${left}px</span>;\n`;
+    } else {
+      css += `  <span class="prop">top</span>:    <span class="num">${top}px</span>;\n`;
+      css += `  <span class="prop">right</span>:  <span class="num">${right}px</span>;\n`;
+      css += `  <span class="prop">bottom</span>: <span class="num">${bottom}px</span>;\n`;
+    }
+    css += `  <span class="prop">z-index</span>: <span class="num">${z}</span>;\n`;
+  }
+  css += `}`;
+  document.getElementById('posCss').innerHTML = css;
+}
+updatePositionScene();
+
+/* ═══════════════════════════════════════════════════════════
+   FLEXBOX PLAYGROUND
+═══════════════════════════════════════════════════════════ */
+let currentBoxCount = 3;
+const boxColors = ['fi-1','fi-2','fi-3','fi-4','fi-5'];
+const boxLabels = ['A','B','C','D','E'];
+
+function setBoxCount(n) {
+  currentBoxCount = n;
+  document.querySelectorAll('.count-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === n));
+  updateFlex();
+}
+
+function updateFlex() {
+  const dir   = document.getElementById('flDir').value;
+  const jc    = document.getElementById('flJC').value;
+  const ai    = document.getElementById('flAI').value;
+  const wrap  = document.getElementById('flWrap').value;
+  const gap   = document.getElementById('flGap').value;
+  const itemW = document.getElementById('flItemW').value;
+  const itemH = document.getElementById('flItemH').value;
+  const contH = document.getElementById('flContH').value;
+
+  document.getElementById('flGapD').textContent   = gap + 'px';
+  document.getElementById('flItemWD').textContent = itemW + 'px';
+  document.getElementById('flItemHD').textContent = itemH + 'px';
+  document.getElementById('flContHD').textContent = contH + 'px';
+
+  const scene = document.getElementById('flexScene');
+  scene.style.flexDirection    = dir;
+  scene.style.justifyContent   = jc;
+  scene.style.alignItems       = ai;
+  scene.style.flexWrap         = wrap;
+  scene.style.gap              = gap + 'px';
+  scene.style.height           = contH + 'px';
+
+  // Rebuild items
+  // Remove old items (keep label span)
+  [...scene.querySelectorAll('.flex-item')].forEach(el => el.remove());
+
+  for (let i = 0; i < currentBoxCount; i++) {
+    const el = document.createElement('div');
+    el.className = `flex-item ${boxColors[i]}`;
+    el.style.width  = itemW + 'px';
+    el.style.height = ai === 'stretch' ? 'auto' : itemH + 'px';
+    el.style.minHeight = itemH + 'px';
+    el.textContent = boxLabels[i];
+    scene.appendChild(el);
+  }
+
+  // Axis labels
+  const isRow = dir.startsWith('row');
+  document.getElementById('mainAxisLabel').textContent = isRow ? '→ Eje principal: horizontal' : '↓ Eje principal: vertical';
+  document.getElementById('crossAxisLabel').textContent = isRow ? '↓ Eje cruzado: vertical' : '→ Eje cruzado: horizontal';
+
+  // CSS output
+  const itemCount = Array.from({length: currentBoxCount}, (_,i) => `<span class="cmt">/* item ${boxLabels[i]} */</span>`).join(' ');
+  document.getElementById('flexCss').innerHTML =
+    `<span class="cmt">/* ── Contenedor ── */</span>\n` +
+    `<span class="sel">.contenedor</span> {\n` +
+    `  <span class="prop">display</span>:          <span class="val">flex</span>;\n` +
+    `  <span class="prop">flex-direction</span>:  <span class="val">${dir}</span>;\n` +
+    `  <span class="prop">justify-content</span>: <span class="val">${jc}</span>;\n` +
+    `  <span class="prop">align-items</span>:     <span class="val">${ai}</span>;\n` +
+    `  <span class="prop">flex-wrap</span>:       <span class="val">${wrap}</span>;\n` +
+    `  <span class="prop">gap</span>:             <span class="num">${gap}px</span>;\n` +
+    `  <span class="prop">height</span>:          <span class="num">${contH}px</span>;\n` +
+    `}\n\n` +
+    `<span class="cmt">/* ── Hijos (${currentBoxCount} items) ── */</span>\n` +
+    `<span class="sel">.item</span> {\n` +
+    `  <span class="prop">width</span>:  <span class="num">${itemW}px</span>;\n` +
+    `  <span class="prop">height</span>: <span class="num">${itemH}px</span>;\n` +
+    `}`;
+}
+
+// Init
+updateFlex();
+updatePositionScene();
+</script>
+</body>
+</html>
