@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejercicio 5: Layout Flexbox – Playground</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Fira+Code:wght@400;600&family=Outfit:wght@800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ====================================================
+       ESTILOS DEL ENTORNO DE APRENDIZAJE (NO MODIFICAR)
+       Estos estilos le dan forma a las instrucciones y al layout.
+       ==================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #090b11;
+      --surface: #10121e;
+      --surface-card: #17192a;
+      --border: #22263f;
+      --accent: #e040fb;
+      --accent-bright: #f070ff;
+      --text: #e2e4f0;
+      --text-muted: #848aab;
+      --font: 'Inter', sans-serif;
+      --mono: 'Fira Code', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(to bottom, #10121f, var(--bg));
+      border-bottom: 1px solid var(--border);
+      padding: 30px 40px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(224, 64, 251, 0.15);
+      border: 1px solid rgba(224, 64, 251, 0.3);
+      color: var(--accent-bright);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Layout principal */
+    .playground-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 30px;
+      padding: 30px 40px;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .playground-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Paneles de UI */
+    .panel {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .panel-title span {
+      background-color: var(--accent);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Sección de Consignas */
+    .consignas {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .consignas strong {
+      color: var(--accent-bright);
+    }
+
+    .consigna-item {
+      background-color: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .consigna-item:hover {
+      border-color: rgba(224, 64, 251, 0.4);
+    }
+
+    .consigna-num {
+      color: var(--accent-bright);
+      font-weight: 800;
+      font-family: var(--mono);
+      margin-right: 6px;
+    }
+
+    /* Bloques de código de apoyo */
+    code {
+      font-family: var(--mono);
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffd866;
+      font-size: 0.85em;
+    }
+
+    /* MOCKUP - RESULTADO ESPERADO */
+    .mockup-wrap {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--surface-card);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .mockup-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    /* MOCKUP REPRODUCTOR ESTATICO */
+    .ui-target-player {
+      width: 280px;
+      height: 320px;
+      background-color: #111322;
+      border: 2px solid #2a2f5a;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    .ui-target-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .ui-target-album {
+      width: 50px;
+      height: 50px;
+      background-color: #e040fb;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ui-target-info {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ui-target-song {
+      width: 100px;
+      height: 10px;
+      background-color: #e2e4f0;
+      border-radius: 4px;
+    }
+
+    .ui-target-artist {
+      width: 60px;
+      height: 6px;
+      background-color: #848aab;
+      border-radius: 3px;
+    }
+
+    .ui-target-like {
+      width: 24px;
+      height: 24px;
+      background-color: #00e5ff;
+      border-radius: 50%;
+      font-size: 0.6rem;
+      color: #090b11;
+      font-weight: 800;
+      line-height: 24px;
+      text-align: center;
+    }
+
+    .ui-target-timeline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .ui-target-time {
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      color: #848aab;
+    }
+
+    .ui-target-bar-outer {
+      flex-grow: 1;
+      height: 6px;
+      background-color: #1c2040;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .ui-target-bar-inner {
+      width: 45%;
+      height: 100%;
+      background-color: #00e5ff;
+    }
+
+    .ui-target-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ui-target-btn {
+      width: 32px;
+      height: 32px;
+      background-color: #1c2040;
+      border-radius: 50%;
+      color: #848aab;
+      font-size: 0.65rem;
+      font-weight: 700;
+      line-height: 32px;
+      text-align: center;
+    }
+
+    .ui-target-btn-play {
+      width: 44px;
+      height: 44px;
+      background-color: #7c5cfc;
+      border-radius: 50%;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 44px;
+      text-align: center;
+    }
+
+    /* Lienzo donde se renderiza la solución del alumno */
+    .lienzo {
+      background-color: #0c0e17;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      flex: 1;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .lienzo::before {
+      content: 'TÚ RESULTADO EN TIEMPO REAL';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+  </style>
+
+  <!-- ====================================================
+     ✏️ ESPACIO PARA ESCRIBIR TU CÓDIGO CSS (CONSIGNA 5)
+     Aquí adentro debes definir los estilos de tus clases.
+     ==================================================== -->
+  <style id="estudiante-css">
+    
+    /* === ESCRIBE TU CÓDIGO CSS ABAJO DE ESTA LÍNEA === */
+    
+    
+    
+    
+    
+    
+    
+    /* === FIN DE TU ESPACIO CSS === */
+    
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header>
+    <div class="badge">Módulo 4 · Práctica de Flexbox</div>
+    <h1>Estructura de Componentes con Flexbox</h1>
+    <p>Crea el layout de un reproductor de audio distribuyendo filas, columnas y alineando controles en los ejes.</p>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="playground-container">
+    
+    <!-- PANEL IZQUIERDO: CONSIGNAS E INSTRUCCIONES -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Consignas del Ejercicio
+      </div>
+      
+      <div class="consignas">
+        
+        <div class="consigna-item">
+          <p><span class="consigna-num">01. El Reproductor Base (`.flex-reproductor`):</span> Crea el contenedor principal de la tarjeta. En tu CSS, configúralo con un ancho de <code>280px</code>, altura de <code>320px</code>, fondo oscuro <code>#111322</code>, borde sólido <code>2px solid #2a2f5a</code>, <code>border-radius: 16px</code> y un <code>padding</code> interno de <code>24px</code>.
+          <br><strong>Comportamiento Flex:</strong> Conviértelo en un **contenedor flexible vertical** (`display: flex; flex-direction: column; justify-content: space-between;`). Esto distribuirá de manera uniforme la cabecera, la barra y los botones en la altura.</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">02. La Cabecera del Tema (`.flex-cabecera`):</span> Dentro del reproductor, crea un div con la clase <code>.flex-cabecera</code>.
+          <br>Configúralo como un contenedor **flexible horizontal** (`display: flex; align-items: center; gap: 15px;`).
+          <br>Dentro de él, agrega tres bloques:
+          <ul style="margin: 6px 0 0 20px; list-style-type: square; color: var(--text-muted);">
+            <li><code>.flex-album</code>: Representa la portada (ancho y alto de <code>50px</code>, fondo magenta <code>#e040fb</code>, <code>border-radius: 8px</code> y el texto "Art").</li>
+            <li><code>.flex-datos</code>: Representa los datos del tema. Conviértelo en un flex vertical de <code>gap: 4px</code> y aplícale <code>flex-grow: 1</code> (para que crezca y empuje al botón de like a la derecha). Adentro inserta dos barras simuladas <code>.flex-barra-song</code> (ancho 100px, alto 10px, fondo <code>#e2e4f0</code>, redondeado 4px) y <code>.flex-barra-artist</code> (ancho 60px, alto 6px, fondo <code>#848aab</code>, redondeado 3px).</li>
+            <li><code>.flex-like</code>: El botón de favorito (ancho y alto de <code>24px</code>, fondo celeste <code>#00e5ff</code>, esquinas redondeadas de <code>50%</code> y texto "L").</li>
+          </ul>
+          </p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">03. La Línea de Tiempo (`.flex-linea-tiempo`):</span> Crea un div con la clase <code>.flex-linea-tiempo</code>. Configúralo con <code>display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 15px 0;</code>.
+          <br>Dentro de él, inserta tres elementos:
+          <ul style="margin: 6px 0 0 20px; list-style-type: square; color: var(--text-muted);">
+            <li>Un span <code>.flex-tiempo</code> con texto "1:24" (fuente monoespaciada).</li>
+            <li>Un div `.flex-barra-progreso-outer` (ancho completo con <code>flex-grow: 1</code>, altura de <code>6px</code>, fondo <code>#1c2040</code> y redondeado de <code>3px</code>). Dentro de él, inserta un div `.flex-barra-progreso-inner` con un ancho del <code>45%</code>, alto del <code>100%</code> y fondo celeste <code>#00e5ff</code>.</li>
+            <li>Un span <code>.flex-tiempo</code> con texto "3:05".</li>
+          </ul>
+          </p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">04. La Fila de Controles (`.flex-controles`):</span> Crea un div con la clase <code>.flex-controles</code> y configúralo con <code>display: flex; justify-content: space-between; align-items: center;</code>.
+          <br>Dentro de él, agrega los cinco botones de control:
+          <ul style="margin: 6px 0 0 20px; list-style-type: square; color: var(--text-muted);">
+            <li>Cuatro botones con la clase `.flex-btn` ( Shuffle "S", Prev "P", Next "N", Repeat "R") con ancho y alto de <code>32px</code>, fondo <code>#1c2040</code>, color <code>#848aab</code> y redondeado de <code>50%</code>.</li>
+            <li>El botón central `.flex-btn-play` ("Play") con ancho y alto de <code>44px</code>, fondo violeta <code>#7c5cfc</code>, color blanco y redondeado de <code>50%</code>.</li>
+          </ul>
+          </p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">05. Organización:</span> Inserta tu CSS en el style y el HTML dentro del lienzo.</p>
+        </div>
+
+      </div>
+
+      <!-- VISTA MOCKUP METAS -->
+      <div class="mockup-wrap">
+        <div class="mockup-title">Resultado Esperado (Mockup)</div>
+        <div class="ui-target-player">
+          <div class="ui-target-header">
+            <div class="ui-target-album">Art</div>
+            <div class="ui-target-info">
+              <div class="ui-target-song"></div>
+              <div class="ui-target-artist"></div>
+            </div>
+            <div class="ui-target-like">L</div>
+          </div>
+          
+          <div class="ui-target-timeline">
+            <div class="ui-target-time">1:24</div>
+            <div class="ui-target-bar-outer">
+              <div class="ui-target-bar-inner"></div>
+            </div>
+            <div class="ui-target-time">3:05</div>
+          </div>
+          
+          <div class="ui-target-controls">
+            <div class="ui-target-btn">S</div>
+            <div class="ui-target-btn">P</div>
+            <div class="ui-target-btn-play">Play</div>
+            <div class="ui-target-btn">N</div>
+            <div class="ui-target-btn">R</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PANEL DERECHO: TU LIENZO DE TRABAJO -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Tu Lienzo de Trabajo
+      </div>
+      
+      <div class="lienzo">
+        
+        <!-- ====================================================
+           ✏️ ESPACIO PARA ESCRIBIR TU ESTRUCTURA HTML (CONSIGNAS 1 a 4)
+           Crea tus divs dentro de esta sección.
+           ==================================================== -->
+        
+        
+        
+        
+        
+        
+        
+        <!-- ====================================================
+           FIN DE TU ESPACIO HTML
+           ==================================================== -->
+        
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

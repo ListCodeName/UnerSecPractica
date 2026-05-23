@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejercicio 7: Transiciones y Eventos CSS – Playground</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Fira+Code:wght@400;600&family=Outfit:wght@800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ====================================================
+       ESTILOS DEL ENTORNO DE APRENDIZAJE (NO MODIFICAR)
+       Estos estilos le dan forma a las instrucciones y al layout.
+       ==================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #090b11;
+      --surface: #10121e;
+      --surface-card: #17192a;
+      --border: #22263f;
+      --accent: #7c5cfc;
+      --accent-bright: #a28bff;
+      --text: #e2e4f0;
+      --text-muted: #848aab;
+      --font: 'Inter', sans-serif;
+      --mono: 'Fira Code', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(to bottom, #10121f, var(--bg));
+      border-bottom: 1px solid var(--border);
+      padding: 30px 40px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(124, 92, 252, 0.15);
+      border: 1px solid rgba(124, 92, 252, 0.3);
+      color: var(--accent-bright);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Layout principal */
+    .playground-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 30px;
+      padding: 30px 40px;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .playground-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Paneles de UI */
+    .panel {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .panel-title span {
+      background-color: var(--accent);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Sección de Consignas */
+    .consignas {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .consignas strong {
+      color: var(--accent-bright);
+    }
+
+    .consigna-item {
+      background-color: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .consigna-item:hover {
+      border-color: rgba(124, 92, 252, 0.4);
+    }
+
+    .consigna-num {
+      color: var(--accent-bright);
+      font-weight: 800;
+      font-family: var(--mono);
+      margin-right: 6px;
+    }
+
+    /* Bloques de código de apoyo */
+    code {
+      font-family: var(--mono);
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffd866;
+      font-size: 0.85em;
+    }
+
+    /* MOCKUP - RESULTADO ESPERADO */
+    .mockup-wrap {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--surface-card);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .mockup-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    /* MOCKUP INTERACTIVO SIMULADO */
+    .ui-target-card-theme {
+      width: 260px;
+      height: 280px;
+      background-color: #ffffff;
+      color: #0c0e17;
+      border: 2px solid #e2e4f0;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      position: relative;
+    }
+
+    .ui-target-card-theme.dark-mode {
+      background-color: #0f111a;
+      color: #ffffff;
+      border-color: #22263f;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .ui-target-toggle-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ui-target-toggle-lbl {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Track del switch */
+    .ui-target-switch {
+      width: 54px;
+      height: 28px;
+      background-color: #e2e4f0;
+      border-radius: 99px;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .ui-target-card-theme.dark-mode .ui-target-switch {
+      background-color: #7c5cfc;
+    }
+
+    /* Knob del switch */
+    .ui-target-knob {
+      width: 20px;
+      height: 20px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .ui-target-card-theme.dark-mode .ui-target-knob {
+      transform: translateX(26px);
+    }
+
+    .ui-target-card-body {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .ui-target-text-line-1 {
+      width: 140px;
+      height: 12px;
+      background-color: #e2e4f0;
+      border-radius: 4px;
+    }
+
+    .ui-target-card-theme.dark-mode .ui-target-text-line-1 {
+      background-color: #22263f;
+    }
+
+    .ui-target-text-line-2 {
+      width: 90px;
+      height: 8px;
+      background-color: #f0f2f8;
+      border-radius: 3px;
+    }
+
+    .ui-target-card-theme.dark-mode .ui-target-text-line-2 {
+      background-color: #17192a;
+    }
+
+    .ui-target-button-glow {
+      width: 100%;
+      height: 38px;
+      background-color: #0c0e17;
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 38px;
+      text-align: center;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .ui-target-card-theme.dark-mode .ui-target-button-glow {
+      background-color: #7c5cfc;
+      box-shadow: 0 0 15px rgba(124,92,252,0.4);
+    }
+
+    /* Lienzo donde se renderiza la solución del alumno */
+    .lienzo {
+      background-color: #0c0e17;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      flex: 1;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .lienzo::before {
+      content: 'TÚ RESULTADO EN TIEMPO REAL (HAZ CLICK EN EL SWITCH)';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+  </style>
+
+  <!-- ====================================================
+     ✏️ ESPACIO PARA ESCRIBIR TU CÓDIGO CSS (CONSIGNA 5)
+     Aquí adentro debes definir los estilos de tus clases.
+     ==================================================== -->
+  <style id="estudiante-css">
+    
+    /* === ESCRIBE TU CÓDIGO CSS ABAJO DE ESTA LÍNEA === */
+    
+    
+    
+    
+    
+    
+    
+    /* === FIN DE TU ESPACIO CSS === */
+    
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header>
+    <div class="badge">Módulo 5 · Transiciones &amp; Pseudo-clases</div>
+    <h1>Transiciones de Estado e Interacciones Capturadas</h1>
+    <p>Crea una tarjeta interactiva de Modo Noche controlada enteramente con selectores CSS sin usar Javascript.</p>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="playground-container">
+    
+    <!-- PANEL IZQUIERDO: CONSIGNAS E INSTRUCCIONES -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Consignas del Ejercicio
+      </div>
+      
+      <div class="consignas">
+        
+        <div class="consigna-item">
+          <p><span class="consigna-num">01. La Tarjeta Reactiva (`.modo-tarjeta`):</span> Crea un div contenedor `.modo-tarjeta`. En tu CSS, aplícale ancho de <code>260px</code>, alto de <code>280px</code>, esquinas redondeadas de <code>16px</code> y un relleno interno de <code>24px</code>.
+          <br><strong>Estilos por defecto (Modo Claro):</strong> Fondo blanco <code>#ffffff</code>, color de texto oscuro <code>#0c0e17</code> y un borde sólido de <code>2px solid #e2e4f0</code>.
+          <br><strong>Transición:</strong> Agrega una transición suave para el fondo, texto y bordes (`transition: background-color 0.3s, color 0.3s, border-color 0.3s`).</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">02. El Checkbox Invisible (`.modo-check`):</span> Agrega un `<input type="checkbox">` con la clase <code>.modo-check</code> como primer elemento dentro de la tarjeta. En tu CSS, ocúltalo por completo usando <code>display: none</code> (capturaremos su estado sin verlo).</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">03. El Switch Deslizante (`.modo-switch` y `.modo-knob`):</span> Crea una etiqueta `<label>` con la clase <code>.modo-switch</code> y asóciala al checkbox.
+          <br>En tu CSS, el switch debe medir <code>54px</code> de ancho y <code>28px</code> de alto, tener fondo gris claro <code>#e2e4f0</code>, <code>border-radius: 99px</code> y ser de posición `relative` con cursor pointer.
+          <br>Dentro de la etiqueta `.modo-switch`, inserta un div vacío con la clase <code>.modo-knob</code> (el deslizador). Configúralo con <code>20px</code> de ancho y alto, fondo blanco, <code>border-radius: 50%</code>, y posición **absoluta** a <code>4px</code> del borde superior (<code>top</code>) y a <code>4px</code> del borde izquierdo (<code>left</code>).
+          <br><strong>Transición:</strong> Aplica a `.modo-knob` una transición de `transform` usando un resorte suave: `transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);`.</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">04. El Evento Checked (`:checked` y `:has()`):</span> Ahora capturaremos las interacciones utilizando pseudo-clases:
+          <ul style="margin: 6px 0 0 20px; list-style-type: square; color: var(--text-muted);">
+            <li><strong>Desplazar el botón:</strong> Cuando el checkbox esté marcado, desplaza el knob horizontalmente. Usa:
+            <br><code>.modo-check:checked + .modo-switch .modo-knob { transform: translateX(26px); }</code></li>
+            <li><strong>Cambiar el color del Switch:</strong> Cuando esté marcado, cambia el fondo del switch track a violeta. Usa:
+            <br><code>.modo-check:checked + .modo-switch { background-color: #7c5cfc; }</code></li>
+            <li><strong>Activar el Modo Noche en la tarjeta:</strong> Usando la pseudo-clase de relación de padres `:has()`, cambia la apariencia de la tarjeta completa cuando su checkbox esté activado. Usa:
+            <br><code>.modo-tarjeta:has(.modo-check:checked) { background-color: #0f111a; color: #ffffff; border-color: #22263f; }</code></li>
+          </ul>
+          </p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">05. Decoración y Botón de Brillo:</span> Inserta dentro de la tarjeta dos barras simuladas de texto `.modo-linea-a` (ancho 140px, alto 12px, fondo `#e2e4f0`, redondeado 4px) y `.modo-linea-b` (ancho 90px, alto 8px, fondo `#f0f2f8`, redondeado 3px) que cambien a gris oscuro (`#22263f` y `#17192a` respectivamente) al activar el modo noche.
+          <br>Agrega un botón `.modo-btn-glow` (ancho completo, alto 38px, fondo oscuro `#0c0e17`, color blanco y redondeado 8px, con texto "Confirmar"). Cuando el Modo Noche esté activo en la tarjeta, cámbiale el fondo a violeta `7c5cfc` y dale un brillo neón con `box-shadow: 0 0 15px rgba(124,92,252,0.4)`.</p>
+        </div>
+
+      </div>
+
+      <!-- VISTA MOCKUP METAS -->
+      <div class="mockup-wrap">
+        <div class="mockup-title">Resultado Esperado (Mockup)</div>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+          
+          <!-- Mockup en Claro -->
+          <div class="ui-target-card-theme">
+            <div class="ui-target-toggle-wrap">
+              <span class="ui-target-toggle-lbl">Modo Noche</span>
+              <div class="ui-target-switch">
+                <div class="ui-target-knob"></div>
+              </div>
+            </div>
+            <div class="ui-target-card-body">
+              <div class="ui-target-text-line-1"></div>
+              <div class="ui-target-text-line-2"></div>
+            </div>
+            <div class="ui-target-button-glow">Confirmar</div>
+          </div>
+
+          <!-- Mockup en Oscuro -->
+          <div class="ui-target-card-theme dark-mode">
+            <div class="ui-target-toggle-wrap">
+              <span class="ui-target-toggle-lbl">Modo Noche</span>
+              <div class="ui-target-switch">
+                <div class="ui-target-knob"></div>
+              </div>
+            </div>
+            <div class="ui-target-card-body">
+              <div class="ui-target-text-line-1"></div>
+              <div class="ui-target-text-line-2"></div>
+            </div>
+            <div class="ui-target-button-glow">Confirmar</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PANEL DERECHO: TU LIENZO DE TRABAJO -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Tu Lienzo de Trabajo
+      </div>
+      
+      <div class="lienzo">
+        
+        <!-- ====================================================
+           ✏️ ESPACIO PARA ESCRIBIR TU ESTRUCTURA HTML (CONSIGNAS 1 a 5)
+           Crea tus divs dentro de esta sección.
+           ==================================================== -->
+        
+        
+        
+        
+        
+        
+        
+        <!-- ====================================================
+           FIN DE TU ESPACIO HTML
+           ==================================================== -->
+        
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Pequeño script utilitario para asegurar el click interactivo de la etiqueta switch en la UI
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.ui-target-switch')) {
+        const card = e.target.closest('.ui-target-card-theme');
+        card.classList.toggle('dark-mode');
+      }
+    });
+  </script>
+</body>
+</html>

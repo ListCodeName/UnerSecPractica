@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejercicio 1: Divs &amp; Selectores – Playground</title>
+  
+  <!-- Tipografía Premium para las instrucciones y la interfaz -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ====================================================
+       ESTILOS DEL ENTORNO DE APRENDIZAJE (NO MODIFICAR)
+       Estos estilos le dan forma a las instrucciones y al layout.
+       ==================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #090b11;
+      --surface: #10121e;
+      --surface-card: #17192a;
+      --border: #22263f;
+      --accent: #7c5cfc;
+      --accent-bright: #9e85ff;
+      --text: #e2e4f0;
+      --text-muted: #848aab;
+      --font: 'Inter', sans-serif;
+      --mono: 'Fira Code', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(to bottom, #10121f, var(--bg));
+      border-bottom: 1px solid var(--border);
+      padding: 30px 40px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(124, 92, 252, 0.15);
+      border: 1px solid rgba(124, 92, 252, 0.3);
+      color: var(--accent-bright);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Layout principal */
+    .playground-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 30px;
+      padding: 30px 40px;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .playground-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Paneles de UI */
+    .panel {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .panel-title span {
+      background-color: var(--accent);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Sección de Consignas */
+    .consignas {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .consignas strong {
+      color: var(--accent-bright);
+    }
+
+    .consigna-item {
+      background-color: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .consigna-item:hover {
+      border-color: rgba(124, 92, 252, 0.4);
+    }
+
+    .consigna-num {
+      color: var(--accent-bright);
+      font-weight: 800;
+      font-family: var(--mono);
+      margin-right: 6px;
+    }
+
+    /* Bloques de código de apoyo */
+    code {
+      font-family: var(--mono);
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffd866;
+      font-size: 0.85em;
+    }
+
+    /* MOCKUP - RESULTADO ESPERADO */
+    .mockup-wrap {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--surface-card);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .mockup-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    /* Renderizado estático de ejemplo para que vean la meta */
+    .ui-target-container {
+      width: 300px;
+      height: 220px;
+      background-color: #1c2040;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .ui-target-banner {
+      width: 100%;
+      height: 50px;
+      background-color: #7c5cfc;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .ui-target-body {
+      width: 100%;
+      height: 125px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .ui-target-box-a {
+      width: 110px;
+      height: 90px;
+      background-color: #00e5ff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 700;
+      color: #090b11;
+      font-size: 0.8rem;
+    }
+
+    .ui-target-box-b {
+      width: 110px;
+      height: 90px;
+      background-color: #e040fb;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 0.8rem;
+    }
+
+    /* Lienzo donde se renderiza la solución del alumno */
+    .lienzo {
+      background-color: #0c0e17;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      flex: 1;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .lienzo::before {
+      content: 'TÚ RESULTADO EN TIEMPO REAL';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+  </style>
+
+  <!-- ====================================================
+     ✏️ ESPACIO PARA ESCRIBIR TU CÓDIGO CSS (CONSIGNA 5)
+     Aquí adentro debes definir los estilos de tus clases.
+     ==================================================== -->
+  <style id="estudiante-css">
+    
+    /* === ESCRIBE TU CÓDIGO CSS ABAJO DE ESTA LÍNEA === */
+    
+    
+    
+    
+    
+    
+    
+    /* === FIN DE TU ESPACIO CSS === */
+    
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header>
+    <div class="badge">Módulo 1 · Práctica Evaluativa</div>
+    <h1>Construyendo Estructuras con Divs y Selectores</h1>
+    <p>Completa las consignas editando el HTML en el body y los estilos CSS en el style del head.</p>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="playground-container">
+    
+    <!-- PANEL IZQUIERDO: CONSIGNAS E INSTRUCCIONES -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Consignas del Ejercicio
+      </div>
+      
+      <div class="consignas">
+        
+        <div class="consigna-item">
+          <p><span class="consigna-num">01.</span> Crea un contenedor principal que agrupará a toda la tarjeta. Su clase de CSS debe llamarse <code>.mi-contenedor</code>. En tu hoja de estilos, dale un ancho fijo de <code>300px</code>, un alto de <code>220px</code> y un color de fondo azul oscuro <code>#1c2040</code>.</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">02.</span> Dentro de <code>.mi-contenedor</code>, agrega un primer bloque para el banner de cabecera con la clase <code>.mi-banner</code>. En tu CSS, aplícale una altura de <code>50px</code>, color de fondo violeta <code>#7c5cfc</code>, y escribe la palabra "Banner" en su interior.</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">03.</span> Debajo de <code>.mi-banner</code> (como su hermano directo dentro del contenedor), crea una sección de cuerpo llamada <code>.mi-cuerpo</code> con una altura de <code>140px</code> y fondo transparente o sin especificar.</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">04.</span> Dentro de <code>.mi-cuerpo</code>, inserta dos bloques hermanos para representar dos columnas de contenido:</p>
+          <ul style="margin: 10px 0 0 20px; list-style-type: square; color: var(--text-muted);">
+            <li>Ambos deben tener un ancho de <code>110px</code> y un alto de <code>90px</code>.</li>
+            <li>El primero con la clase <code>.mi-caja-a</code> (color de fondo <code>#00e5ff</code> y texto "A").</li>
+            <li>El segundo con la clase <code>.mi-caja-b</code> (color de fondo <code>#e040fb</code> y texto "B").</li>
+            <li>Usa <code>display: inline-block</code> en ambos elementos para que se posicionen uno al lado del otro.</li>
+          </ul>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">05.</span> Escribe todas tus reglas CSS dentro de la etiqueta <code>&lt;style id="estudiante-css"&gt;</code> en la cabecera del documento, y la estructura HTML en la caja de abajo señalada por los comentarios.</p>
+        </div>
+
+      </div>
+
+      <!-- VISTA MOCKUP METAS -->
+      <div class="mockup-wrap">
+        <div class="mockup-title">Resultado Esperado (Mockup)</div>
+        <div class="ui-target-container">
+          <div class="ui-target-banner">Banner</div>
+          <div class="ui-target-body">
+            <div class="ui-target-box-a">A</div>
+            <div class="ui-target-box-b">B</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PANEL DERECHO: TU LIENZO DE TRABAJO -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Tu Lienzo de Trabajo
+      </div>
+      
+      <div class="lienzo">
+        
+        <!-- ====================================================
+           ✏️ ESPACIO PARA ESCRIBIR TU ESTRUCTURA HTML (CONSIGNAS 1 a 4)
+           Crea tus divs dentro de esta sección.
+           ==================================================== -->
+        
+        
+        
+        
+        
+        
+        
+        <!-- ====================================================
+           FIN DE TU ESPACIO HTML
+           ==================================================== -->
+        
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

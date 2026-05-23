@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejercicio 4: Posicionamiento CSS – Playground</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Fira+Code:wght@400;600&family=Outfit:wght@800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ====================================================
+       ESTILOS DEL ENTORNO DE APRENDIZAJE (NO MODIFICAR)
+       Estos estilos le dan forma a las instrucciones y al layout.
+       ==================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #090b11;
+      --surface: #10121e;
+      --surface-card: #17192a;
+      --border: #22263f;
+      --accent: #00e676;
+      --accent-bright: #69ffb2;
+      --text: #e2e4f0;
+      --text-muted: #848aab;
+      --font: 'Inter', sans-serif;
+      --mono: 'Fira Code', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(to bottom, #10121f, var(--bg));
+      border-bottom: 1px solid var(--border);
+      padding: 30px 40px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 230, 118, 0.15);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--accent-bright);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Layout principal */
+    .playground-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 30px;
+      padding: 30px 40px;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .playground-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Paneles de UI */
+    .panel {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .panel-title span {
+      background-color: var(--accent);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Sección de Consignas */
+    .consignas {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .consignas strong {
+      color: var(--accent-bright);
+    }
+
+    .consigna-item {
+      background-color: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .consigna-item:hover {
+      border-color: rgba(0, 230, 118, 0.4);
+    }
+
+    .consigna-num {
+      color: var(--accent-bright);
+      font-weight: 800;
+      font-family: var(--mono);
+      margin-right: 6px;
+    }
+
+    /* Bloques de código de apoyo */
+    code {
+      font-family: var(--mono);
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffd866;
+      font-size: 0.85em;
+    }
+
+    /* MOCKUP - RESULTADO ESPERADO */
+    .mockup-wrap {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--surface-card);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .mockup-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    /* MOCKUP ESTATICO DE EJEMPLO */
+    .ui-target-viewport {
+      width: 320px;
+      height: 350px;
+      background-color: #0c0e17;
+      border: 1px solid #22263f;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .ui-target-widget {
+      width: 250px;
+      height: 180px;
+      background-color: #13162b;
+      border: 2px solid #2a2f5a;
+      border-radius: 12px;
+      padding: 16px;
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .ui-target-sticky-header {
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      margin-top: -16px;
+      height: 40px;
+      background-color: #7c5cfc;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .ui-target-avatar-container {
+      width: 50px;
+      height: 50px;
+      background-color: #1c2040;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .ui-target-badge-online {
+      width: 12px;
+      height: 12px;
+      background-color: #00e676;
+      border: 2px solid #13162b;
+      border-radius: 50%;
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      z-index: 5;
+    }
+
+    .ui-target-close-btn {
+      width: 20px;
+      height: 20px;
+      background-color: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      color: #ffffff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      line-height: 20px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .ui-target-body-text {
+      width: 140px;
+      height: 12px;
+      background-color: #22263f;
+      border-radius: 4px;
+      position: absolute;
+      bottom: 25px;
+      left: 80px;
+    }
+
+    .ui-target-body-subtext {
+      width: 90px;
+      height: 8px;
+      background-color: #1c2040;
+      border-radius: 4px;
+      position: absolute;
+      bottom: 12px;
+      left: 80px;
+    }
+
+    /* Lienzo donde se renderiza la solución del alumno */
+    .lienzo {
+      background-color: #05060b;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      flex: 1;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    .lienzo::before {
+      content: 'TÚ RESULTADO EN TIEMPO REAL';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      z-index: 1;
+    }
+
+    /* Estructura contenedora del viewport en el lienzo del estudiante */
+    .simulated-viewport {
+      width: 320px;
+      height: 350px;
+      background-color: #0c0e17;
+      border: 1px solid #22263f;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+  </style>
+
+  <!-- ====================================================
+     ✏️ ESPACIO PARA ESCRIBIR TU CÓDIGO CSS (CONSIGNA 5)
+     Aquí adentro debes definir los estilos de tus clases.
+     ==================================================== -->
+  <style id="estudiante-css">
+    
+    /* === ESCRIBE TU CÓDIGO CSS ABAJO DE ESTA LÍNEA === */
+    
+    
+    
+    
+    
+    
+    
+    /* === FIN DE TU ESPACIO CSS === */
+    
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header>
+    <div class="badge">Módulo 4 · Práctica de Position</div>
+    <h1>Posicionamiento Avanzado: Relative &amp; Absolute en Capas</h1>
+    <p>Construye un widget flotante en la esquina de la pantalla utilizando esquemas de capas y offsets.</p>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="playground-container">
+    
+    <!-- PANEL IZQUIERDO: CONSIGNAS E INSTRUCCIONES -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Consignas del Ejercicio
+      </div>
+      
+      <div class="consignas">
+        
+        <div class="consigna-item">
+          <p><span class="consigna-num">01. El Contenedor Flotante (`.pos-tarjeta`):</span> Crea un div con clase <code>.pos-tarjeta</code>. Este representa al widget del chat. En tu CSS, aplícale un ancho de <code>250px</code>, alto de <code>180px</code>, fondo <code>#13162b</code>, bordes de <code>2px solid #2a2f5a</code> y <code>border-radius: 12px</code>.
+          <br><strong>El Desafío de Posición:</strong> Para anclarlo en la esquina inferior derecha del simulador de pantalla (que tiene <code>position: relative</code> de base), debes declararlo como <code>position: absolute</code> y desplazarlo a <code>20px</code> del borde inferior (<code>bottom</code>) y a <code>20px</code> del borde derecho (<code>right</code>).</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">02. El Header Adherido (`.pos-sticky-header`):</span> Dentro de <code>.pos-tarjeta</code>, crea un bloque con la clase <code>.pos-sticky-header</code> y escribe "Soporte". En tu CSS, dale un ancho de <code>100%</code>, altura de <code>40px</code>, fondo <code>#7c5cfc</code>, color blanco y bordes superiores redondeados de <code>10px</code>.
+          <br><strong>Nota de Layout:</strong> Dale <code>position: sticky</code> y anclaje a <code>top: 0</code> (esto asegura que permanezca en la parte superior si el widget tuviera scroll).</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">03. El Botón de Cerrar (`.pos-boton-cerrar`):</span> Dentro del header `.pos-sticky-header`, inserta un pequeño div con el texto "x" y la clase <code>.pos-boton-cerrar</code>. Configúralo en tu CSS con un ancho y alto de <code>20px</code>, fondo blanco translúcido (<code>rgba(255,255,255,0.15)</code>) y redondeado de <code>50%</code>.
+          <br><strong>Ubicación:</strong> Posiciónalo de forma **absoluta** con respecto a su header padre, colocándolo a <code>10px</code> de arriba (<code>top</code>) y a <code>12px</code> de la derecha (<code>right</code>).</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">04. El Avatar &amp; Badge Neón (`.pos-avatar` y `.pos-badge-estado`):</span> Debajo de la cabecera (fuera del header), crea un div contenedor `.pos-avatar` de <code>50px</code> de ancho y alto, con fondo <code>#1c2040</code> y esquinas redondeadas de <code>8px</code>.
+          <br><strong>El Badge de Conexión:</strong> Dentro de `.pos-avatar`, inserta un div vacío con la clase <code>.pos-badge-estado</code>.
+          <br>Para lograr la superposición, el contenedor `.pos-avatar` **debe tener** <code>position: relative</code>. El badge `.pos-badge-estado` debe configurarse con <code>position: absolute</code>, medir <code>12px</code> de ancho y alto, tener fondo verde <code>#00e676</code> con un borde de <code>2px solid #13162b</code>, esquinas redondeadas de <code>50%</code> y desplazarse a <code>-4px</code> de arriba (<code>top</code>) y <code>-4px</code> de la derecha (<code>right</code>).</p>
+        </div>
+
+        <div class="consigna-item">
+          <p><span class="consigna-num">05. Decoración de Líneas de Texto:</span> Añade un relleno interno (<code>padding-left: 80px</code>) a la zona inferior de la tarjeta o bien crea dos divs absolutos `.pos-linea-a` (ancho <code>140px</code>, alto <code>12px</code>, fondo <code>#22263f</code>, ubicado en <code>bottom: 25px; left: 80px; position: absolute; border-radius: 4px;</code>) y `.pos-linea-b` (ancho <code>90px</code>, alto <code>8px</code>, fondo <code>#1c2040</code>, ubicado en <code>bottom: 12px; left: 80px; position: absolute; border-radius: 4px;</code>) para simular líneas de texto de chat.</p>
+        </div>
+
+      </div>
+
+      <!-- VISTA MOCKUP METAS -->
+      <div class="mockup-wrap">
+        <div class="mockup-title">Resultado Esperado (Mockup)</div>
+        <div class="ui-target-viewport">
+          <div class="ui-target-widget">
+            <div class="ui-target-sticky-header">
+              Soporte
+              <div class="ui-target-close-btn">x</div>
+            </div>
+            <div class="ui-target-avatar-container">
+              <div class="ui-target-badge-online"></div>
+            </div>
+            <div class="ui-target-body-text"></div>
+            <div class="ui-target-body-subtext"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PANEL DERECHO: TU LIENZO DE TRABAJO -->
+    <div class="panel">
+      <div class="panel-title">
+        <span></span>Tu Lienzo de Trabajo
+      </div>
+      
+      <div class="lienzo">
+        <div class="simulated-viewport">
+          
+          <!-- ====================================================
+             ✏️ ESPACIO PARA ESCRIBIR TU ESTRUCTURA HTML (CONSIGNAS 1 a 5)
+             Crea tus divs dentro de esta sección.
+             ==================================================== -->
+          
+          
+          
+          
+          
+          
+          
+          <!-- ====================================================
+             FIN DE TU ESPACIO HTML
+             ==================================================== -->
+          
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
