@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Multi-IDE: Completado de Código Progresivo</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           TEMA RETRO-SYNTHWAVE / CYBER-SUNSET: ARCADE COMPACT MULTI-IDE
+           ========================================================================== */
+        :root {
+            --bg-dark: #07060e;
+            --surface: rgba(18, 14, 38, 0.85);
+            --border-neon: 1px solid rgba(157, 78, 221, 0.3);
+            --border-active: 1px solid #ff2e93;
+            
+            --neon-pink: #ff2e93;
+            --neon-purple: #9d4edd;
+            --neon-cyan: #00f5ff;
+            --neon-yellow: #ffb703;
+            --neon-green: #39ff14;
+            
+            --grad-sunset: linear-gradient(135deg, #ff2e93 0%, #ff6b35 50%, #ffb703 100%);
+            --grad-terminal: linear-gradient(180deg, #100d28 0%, #060411 100%);
+            
+            --text-main: #f3f0fc;
+            --text-muted: #8b85a3;
+            
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(to right, rgba(255, 46, 147, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 46, 147, 0.02) 1px, transparent 1px);
+            background-size: 25px 25px;
+            font-family: var(--font-sans);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            overflow-x: hidden;
+        }
+
+        /* Layout Grid */
+        .page-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .badge-didactico {
+            display: inline-block;
+            background: rgba(255, 46, 147, 0.1);
+            border: 1px solid var(--neon-pink);
+            color: #ff75bd;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            padding: 5px 14px;
+            border-radius: 99px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: var(--grad-sunset);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 30px;
+            max-width: 1350px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Izquierdo: Enunciado y Editor */
+        .editor-panel {
+            background: var(--surface);
+            border: var(--border-neon);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .editor-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--grad-sunset);
+        }
+
+        .enunciado-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(157, 78, 221, 0.15);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #d1cbdc;
+            margin-bottom: 20px;
+            min-height: 90px;
+        }
+
+        .enunciado-box strong {
+            color: var(--neon-yellow);
+        }
+
+        /* Ventana del IDE */
+        .ide-window {
+            background: #050409;
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+            margin-bottom: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* IDE Top Bar & Tabs */
+        .ide-bar {
+            background: #0d0a1b;
+            border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 38px;
+        }
+
+        .ide-tabs {
+            display: flex;
+            height: 100%;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .ide-tab {
+            background: #0a0815;
+            border: 1px solid rgba(157, 78, 221, 0.15);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+            height: 30px;
+        }
+
+        .ide-tab:hover {
+            color: white;
+            background: #110e24;
+        }
+
+        .ide-tab.active {
+            background: #050409;
+            border-color: rgba(157, 78, 221, 0.3);
+            color: #ffffff;
+            font-weight: 600;
+            height: 32px;
+            border-bottom: 1px solid #050409;
+        }
+
+        .ide-tab.active::after {
+            content: '●';
+            color: var(--neon-pink);
+            font-size: 0.5rem;
+            margin-left: 4px;
+        }
+
+        .ide-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .ide-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .dot-close { background: #ff5f56; }
+        .dot-min { background: #ffbd2e; }
+        .dot-max { background: #27c93f; }
+
+        /* Code Editor Area */
+        .ide-editor {
+            display: none;
+            padding: 20px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            line-height: 2.1;
+            overflow-x: auto;
+            color: #d8d5e4;
+            flex: 1;
+        }
+
+        .ide-editor.active {
+            display: flex;
+        }
+
+        /* Line numbers */
+        .ide-lines {
+            width: 30px;
+            color: rgba(157, 78, 221, 0.3);
+            text-align: right;
+            padding-right: 12px;
+            user-select: none;
+            border-right: 1px solid rgba(157, 78, 221, 0.1);
+        }
+
+        /* Code content */
+        .ide-code {
+            padding-left: 15px;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Inputs Inline */
+        .code-input {
+            background: rgba(255, 46, 147, 0.04);
+            border: none;
+            border-bottom: 1px solid rgba(255, 46, 147, 0.35);
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0 4px;
+            height: 22px;
+            text-align: center;
+            border-radius: 2px;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .code-input:focus {
+            background: rgba(0, 245, 255, 0.08);
+            border-bottom-color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0, 245, 255, 0.25);
+        }
+
+        .code-input.valid {
+            background: rgba(57, 255, 20, 0.06) !important;
+            border-bottom: 1.5px solid var(--neon-green) !important;
+            color: var(--neon-green) !important;
+            box-shadow: 0 0 8px rgba(57, 255, 20, 0.15) !important;
+        }
+
+        .code-input.invalid {
+            background: rgba(255, 46, 147, 0.06) !important;
+            border-bottom: 1.5px solid var(--neon-pink) !important;
+            color: var(--neon-pink) !important;
+            box-shadow: 0 0 8px rgba(255, 46, 147, 0.15) !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* Highlighting Classes */
+        .keyword { color: #ff79c6; }
+        .function { color: #50fa7b; }
+        .var { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+
+        /* Fila de Controles */
+        .action-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-run {
+            flex: 1;
+            background: var(--grad-sunset);
+            border: none;
+            color: var(--bg-dark);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.3);
+        }
+
+        .btn-run:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 4px 15px rgba(255, 46, 147, 0.5);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0 18px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #ff5f56;
+            color: var(--bg-dark);
+            border-color: transparent;
+        }
+
+        /* Panel Derecho: Consola y Pruebas Visuales */
+        .output-panel {
+            background: var(--surface);
+            border: var(--border-neon);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .output-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* Visual DOM Preview (Only for Exercise 5) */
+        .preview-box {
+            display: none;
+            background: #050409;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 130px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .preview-box.active {
+            display: flex;
+        }
+
+        .preview-box::before {
+            content: 'PREVISUALIZACIÓN EN VIVO (DOM)';
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        /* Interactive light styles */
+        .lamp-bulb {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #332d44;
+            border: 2px solid #110e20;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .lamp-bulb.brillante {
+            background: var(--neon-yellow);
+            box-shadow: 0 0 25px var(--neon-yellow);
+            border-color: #ffffff;
+        }
+
+        .lamp-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(157, 78, 221, 0.4);
+            color: white;
+            font-family: var(--font-title);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Terminal Console */
+        .terminal {
+            background: var(--grad-terminal);
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 10px;
+            padding: 18px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #f3f0fc;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            min-height: 180px;
+        }
+
+        .terminal-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .terminal-line {
+            word-break: break-all;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        .terminal-line.log { color: #f3f0fc; }
+        .terminal-line.success { color: var(--neon-green); text-shadow: 0 0 10px rgba(57, 255, 20, 0.2); }
+        .terminal-line.error { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255, 46, 147, 0.2); }
+        .terminal-line.info { color: var(--neon-cyan); }
+
+        /* Global Progress */
+        .global-progress {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .progress-bar-container {
+            width: 120px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--grad-sunset);
+            transition: width 0.4s;
+        }
+
+        /* Nav Portal link */
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+        }
+        .back-link a {
+            color: var(--neon-pink);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link a:hover {
+            color: var(--neon-yellow);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PORTAL HEADER -->
+    <header class="page-header">
+        <div class="badge-didactico">Entrenamiento Arcade IDE</div>
+        <h1>Completado de Código (Cloze IDE)</h1>
+        <p>Evalúa tu precisión sintáctica rellenando las partes faltantes del código directamente en el editor.</p>
+    </header>
+
+    <!-- CUERPO PRINCIPAL DEL PLAYGROUND -->
+    <div class="app-grid">
+        
+        <!-- PANEL IZQUIERDO: EDITORE & ENUNCIADO -->
+        <div class="editor-panel">
+            
+            <!-- Bloque de Enunciado Reactivo -->
+            <div class="enunciado-box" id="consigna-text">Cargando consigna...</div>
+
+            <!-- IDE Window con File Tabs -->
+            <div class="ide-window">
+                <div class="ide-bar">
+                    <div class="ide-tabs">
+                        <div class="ide-tab active" data-tab="0">01_intercambio.js</div>
+                        <div class="ide-tab" data-tab="1">02_anio_bisiesto.js</div>
+                        <div class="ide-tab" data-tab="2">03_collatz.js</div>
+                        <div class="ide-tab" data-tab="3">04_inventario_rpg.js</div>
+                        <div class="ide-tab" data-tab="4">05_evento_dom.js</div>
+                    </div>
+                    <div class="ide-dots">
+                        <span class="ide-dot dot-close"></span>
+                        <span class="ide-dot dot-min"></span>
+                        <span class="ide-dot dot-max"></span>
+                    </div>
+                </div>
+
+                <!-- ZONAS DE EDICIÓN DEL CODE EDITOR (1 por ejercicio) -->
+                
+                <!-- Taller 1: Variables (Intercambio sin auxiliar) -->
+                <div class="ide-editor active" id="editor-0">
+                    <div class="ide-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8</div>
+                    <div class="ide-code"><span class="keyword">function</span> <span class="function">intercambiarSinAuxiliar</span>(a, b) {
+    <span class="comment">// Multiplica y resta algebraicamente para intercambiar sin variable auxiliar</span>
+    a = a + <input type="text" class="code-input" id="blank-1-1" placeholder="..." style="width: 45px;">;
+    b = <input type="text" class="code-input" id="blank-1-2" placeholder="..." style="width: 45px;"> - b;
+    a = a - <input type="text" class="code-input" id="blank-1-3" placeholder="..." style="width: 45px;">;
+
+    <span class="keyword">return</span> { a: a, b: b };
+}</div>
+                </div>
+
+                <!-- Taller 2: Condicionales (Año bisiesto compuesto) -->
+                <div class="ide-editor" id="editor-1">
+                    <div class="ide-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+                    <div class="ide-code"><span class="keyword">function</span> <span class="function">esAnioBisiesto</span>(anio) {
+    <span class="keyword">let</span> bisiesto = <span class="keyword">false</span>;
+
+    <span class="keyword">if</span> ((<input type="text" class="code-input" id="blank-2-1" placeholder="..." style="width: 150px;"> && anio % 100 !== <input type="text" class="code-input" id="blank-2-2" placeholder="..." style="width: 40px;">) || <input type="text" class="code-input" id="blank-2-3" placeholder="..." style="width: 150px;">) {
+        bisiesto = <input type="text" class="code-input" id="blank-2-4" placeholder="..." style="width: 70px;">;
+    }
+
+    <span class="keyword">return</span> bisiesto;
+}</div>
+                </div>
+
+                <!-- Taller 3: Bucles (Collatz) -->
+                <div class="ide-editor" id="editor-2">
+                    <div class="ide-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12</div>
+                    <div class="ide-code"><span class="keyword">function</span> <span class="function">contarPasosCollatz</span>(n) {
+    <span class="keyword">let</span> pasos = 0;
+
+    <span class="keyword">while</span> (n !== <input type="text" class="code-input" id="blank-3-1" placeholder="..." style="width: 40px;">) {
+        <span class="keyword">if</span> (<input type="text" class="code-input" id="blank-3-2" placeholder="..." style="width: 130px;">) {
+            n = n / 2;
+        } <span class="keyword">else</span> {
+            n = <input type="text" class="code-input" id="blank-3-3" placeholder="..." style="width: 110px;">;
+        }
+        pasos<input type="text" class="code-input" id="blank-3-4" placeholder="..." style="width: 45px;">;
+    }
+
+    <span class="keyword">return</span> pasos;
+}</div>
+                </div>
+
+                <!-- Taller 4: Colecciones (Filtro Inventario) -->
+                <div class="ide-editor" id="editor-3">
+                    <div class="ide-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12</div>
+                    <div class="ide-code"><span class="keyword">function</span> <span class="function">valorNoArmas</span>(inventario) {
+    <span class="keyword">let</span> valorTotal = <input type="text" class="code-input" id="blank-4-1" placeholder="..." style="width: 40px;">;
+
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = 0; i < inventario.<input type="text" class="code-input" id="blank-4-2" placeholder="..." style="width: 80px;">; i++) {
+        <span class="keyword">const</span> item = inventario[i];
+
+        <span class="keyword">if</span> (item.tipo !== <input type="text" class="code-input" id="blank-4-3" placeholder="..." style="width: 90px;">) {
+            valorTotal += item.<input type="text" class="code-input" id="blank-4-4" placeholder="..." style="width: 70px;">;
+        }
+    }
+
+    <span class="keyword">return</span> valorTotal;
+}</div>
+                </div>
+
+                <!-- Taller 5: DOM Eventos (Interruptor en Código) -->
+                <div class="ide-editor" id="editor-4">
+                    <div class="ide-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13</div>
+                    <div class="ide-code"><span class="keyword">function</span> <span class="function">configurarLuzInteractiva</span>() {
+    <span class="keyword">const</span> btn = document.querySelector(<input type="text" class="code-input" id="blank-5-1" placeholder="..." style="width: 140px;">);
+    <span class="keyword">const</span> bulb = document.getElementById(<input type="text" class="code-input" id="blank-5-2" placeholder="..." style="width: 110px;">);
+
+    btn.addEventListener(<input type="text" class="code-input" id="blank-5-3" placeholder="..." style="width: 80px;">, () => {
+        bulb.classList.toggle(<input type="text" class="code-input" id="blank-5-4" placeholder="..." style="width: 100px;">);
+
+        <span class="keyword">if</span> (bulb.classList.contains('brillante')) {
+            btn.textContent = <input type="text" class="code-input" id="blank-5-5" placeholder="..." style="width: 100px;">;
+        } <span class="keyword">else</span> {
+            btn.textContent = <span class="keyword">'ENCENDER'</span>;
+        }
+    });
+}</div>
+                </div>
+
+            </div>
+
+            <!-- Fila de Acciones -->
+            <div class="action-row">
+                <button class="btn-reset" id="reset-btn">Limpiar</button>
+                <button class="btn-run" id="run-btn">▶ Compilar y Ejecutar</button>
+            </div>
+
+        </div>
+
+        <!-- PANEL DERECHO: TERMINAL, DOCK & DOM PREVIEW -->
+        <div class="output-panel">
+            
+            <!-- LIENZO DEDICADO DE PREVISUALIZACIÓN DE EVENTOS DOM (Solo visible en Ejercicio 5) -->
+            <div class="preview-box" id="dom-preview-area">
+                <div class="lamp-bulb" id="luz-neon"></div>
+                <button class="lamp-btn" id="switch-neon">ENCENDER</button>
+            </div>
+
+            <!-- Consola de Compilación -->
+            <div class="terminal-title">
+                <span>Terminal del Compilador</span>
+                <span>Console Sandbox</span>
+            </div>
+            <div class="terminal" id="terminal-log">
+                <div class="terminal-line info">> Listo para compilar. Selecciona un archivo tab y completa el código para validarlo.</div>
+            </div>
+
+            <!-- Resumen de Progreso General -->
+            <div class="global-progress">
+                <span>Ejercicios Completados:</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progress-bar"></div>
+                    </div>
+                    <strong id="progress-val">0/5</strong>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Retroceso al portal -->
+    <div class="back-link">
+        <a href="index.html">&larr; Volver al Portal de JavaScript</a>
+    </div>
+
+    <!-- SCRIPT DE CONTROL E INTERACCIONES COMPLETAMENTE EMBEBIDO -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State
+            let currentTab = 0;
+            const completedExercises = new Set();
+
+            // DOM Elements
+            const tabs = document.querySelectorAll('.ide-tab');
+            const editors = document.querySelectorAll('.ide-editor');
+            const consignaText = document.getElementById('consigna-text');
+            const runBtn = document.getElementById('run-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const logBox = document.getElementById('terminal-log');
+            const domPreview = document.getElementById('dom-preview-area');
+            const progressBar = document.getElementById('progress-bar');
+            const progressVal = document.getElementById('progress-val');
+
+            // Data de Ejercicios del IDE
+            const challengesData = [
+                {
+                    id: 0,
+                    title: "Intercambio Sin Auxiliar (Aritmética)",
+                    desc: "Dadas dos variables numéricas <code>a</code> y <code>b</code>, realiza su intercambio matemático **sin declarar una tercera variable auxiliar**. Debes utilizar propiedades aritméticas de suma y resta.",
+                    answers: [
+                        { id: 'blank-1-1', regex: /^\s*b\s*$/ },
+                        { id: 'blank-1-2', regex: /^\s*a\s*$/ },
+                        { id: 'blank-1-3', regex: /^\s*b\s*$/ }
+                    ],
+                    compile: (vals) => {
+                        const code = `
+                            return function intercambiarSinAuxiliar(a, b) {
+                                a = a + ${vals['blank-1-1']};
+                                b = ${vals['blank-1-2']} - b;
+                                a = a - ${vals['blank-1-3']};
+                                return { a, b };
+                            }
+                        `;
+                        const fn = new Function(code)();
+                        const test = fn(12, 35);
+                        if (test && test.a === 35 && test.b === 12) return { ok: true, out: `Entrada (a:12, b:35) -> Salida (a:${test.a}, b:${test.b})` };
+                        throw new Error("El intercambio aritmético no dio el resultado esperado.");
+                    }
+                },
+                {
+                    id: 1,
+                    title: "Evaluador de Año Bisiesto Compuesto (Condicionales)",
+                    desc: "Completa la condición del bloque <code>if</code> para validar si el <code>anio</code> es bisiesto. Debe ser divisible por 4 y no divisible por 100, a menos que sea divisible por 400. Recuerda rellenar el booleano y las constantes del resto.",
+                    answers: [
+                        { id: 'blank-2-1', regex: /^anio\s*%\s*4\s*(===|==)\s*0$/ },
+                        { id: 'blank-2-2', regex: /^\s*0\s*$/ },
+                        { id: 'blank-2-3', regex: /^anio\s*%\s*400\s*(===|==)\s*0$/ },
+                        { id: 'blank-2-4', regex: /^\s*true\s*$/ }
+                    ],
+                    compile: (vals) => {
+                        const code = `
+                            return function esAnioBisiesto(anio) {
+                                let bisiesto = false;
+                                if ((${vals['blank-2-1']} && anio % 100 !== ${vals['blank-2-2']}) || ${vals['blank-2-3']}) {
+                                    bisiesto = ${vals['blank-2-4']};
+                                }
+                                return bisiesto;
+                            }
+                        `;
+                        const fn = new Function(code)();
+                        if (fn(2024) === true && fn(1900) === false && fn(2000) === true) {
+                            return { ok: true, out: "Año 2024: bisiesto (true) | Año 1900: común (false)" };
+                        }
+                        throw new Error("La condición del bisiesto arroja valores incorrectos.");
+                    }
+                },
+                {
+                    id: 2,
+                    title: "La Conjetura de Collatz (Bucles)",
+                    desc: "Implementa el algoritmo de Collatz. El bucle debe procesar a <code>n</code> hasta llegar a 1. Si <code>n</code> es par, se divide por 2; si es impar, se multiplica por 3 y se suma 1. Debes incrementar el contador <code>pasos</code> correspondientemente.",
+                    answers: [
+                        { id: 'blank-3-1', regex: /^\s*1\s*$/ },
+                        { id: 'blank-3-2', regex: /^n\s*%\s*2\s*(===|==)\s*0$/ },
+                        { id: 'blank-3-3', regex: /^3\s*\*\s*n\s*\+\s*1$|^n\s*\*\s*3\s*\+\s*1$/ },
+                        { id: 'blank-3-4', regex: /^\s*\+\+\s*$/ }
+                    ],
+                    compile: (vals) => {
+                        const code = `
+                            return function contarPasosCollatz(n) {
+                                let pasos = 0;
+                                while (n !== ${vals['blank-3-1']}) {
+                                    if (${vals['blank-3-2']}) {
+                                        n = n / 2;
+                                    } else {
+                                        n = ${vals['blank-3-3']};
+                                    }
+                                    pasos${vals['blank-3-4']};
+                                }
+                                return pasos;
+                            }
+                        `;
+                        const fn = new Function(code)();
+                        const steps = fn(6);
+                        if (steps === 8) return { ok: true, out: "N: 6 -> 8 pasos calculados correctamente." };
+                        throw new Error(`Se esperaba 8 pasos para N: 6, pero devolvió ${steps}`);
+                    }
+                },
+                {
+                    id: 3,
+                    title: "Validador de Inventario RPG (Arrays y Objetos)",
+                    desc: "Recorre un array de objetos <code>inventario</code>. Debes calcular la suma total de valor de todos los ítems cuyo <code>tipo</code> sea diferente de <code>'arma'</code>. Recuerda inicializar las variables y acceder al límite del array.",
+                    answers: [
+                        { id: 'blank-4-1', regex: /^\s*0\s*$/ },
+                        { id: 'blank-4-2', regex: /^\s*length\s*$/ },
+                        { id: 'blank-4-3', regex: /^\s*(['"])(arma)\1\s*$/ },
+                        { id: 'blank-4-4', regex: /^\s*valor\s*$/ }
+                    ],
+                    compile: (vals) => {
+                        const code = `
+                            return function valorNoArmas(inventario) {
+                                let valorTotal = ${vals['blank-4-1']};
+                                for (let i = 0; i < inventario.${vals['blank-4-2']}; i++) {
+                                    const item = inventario[i];
+                                    if (item.tipo !== ${vals['blank-4-3']}) {
+                                        valorTotal += item.${vals['blank-4-4']};
+                                    }
+                                }
+                                return valorTotal;
+                            }
+                        `;
+                        const fn = new Function(code)();
+                        const items = [
+                            { tipo: 'arma', valor: 100 },
+                            { tipo: 'pocion', valor: 30 },
+                            { tipo: 'escudo', valor: 50 }
+                        ];
+                        const total = fn(items);
+                        if (total === 80) return { ok: true, out: "Filtró armas (100) y sumó poción+escudo (80)." };
+                        throw new Error(`Se esperaba suma de 80, recibió ${total}`);
+                    }
+                },
+                {
+                    id: 4,
+                    title: "Interacción de Evento DOM (DOM & Eventos)",
+                    desc: "Implementa la vinculación visual. Queremos que al presionar el botón de la previsualización, este encienda o apague el brillo de la lámpara. Completa los selectores por ID/Clase, el evento de escucha y la clase interactiva.",
+                    answers: [
+                        { id: 'blank-5-1', regex: /^\s*(['"])(#switch-neon)\1\s*$/ },
+                        { id: 'blank-5-2', regex: /^\s*(['"])(luz-neon)\1\s*$/ },
+                        { id: 'blank-5-3', regex: /^\s*(['"])(click)\1\s*$/ },
+                        { id: 'blank-5-4', regex: /^\s*(['"])(brillante)\1\s*$/ },
+                        { id: 'blank-5-5', regex: /^\s*(['"])(APAGAR)\1\s*$/ }
+                    ],
+                    compile: (vals) => {
+                        const code = `
+                            return function configurarLuzInteractiva() {
+                                const btn = document.querySelector(${vals['blank-5-1']});
+                                const bulb = document.getElementById(${vals['blank-5-2']});
+                                
+                                // Remove previous listeners to avoid overlapping
+                                const clone = btn.cloneNode(true);
+                                btn.parentNode.replaceChild(clone, btn);
+                                
+                                clone.addEventListener(${vals['blank-5-3']}, () => {
+                                    bulb.classList.toggle(${vals['blank-5-4']});
+                                    if (bulb.classList.contains(${vals['blank-5-4']})) {
+                                        clone.textContent = ${vals['blank-5-5']};
+                                    } else {
+                                        clone.textContent = 'ENCENDER';
+                                    }
+                                });
+                            }
+                        `;
+                        const fn = new Function(code)();
+                        fn(); // Bind DOM listener
+
+                        // Assert DOM changes dynamically
+                        const btn = document.getElementById('switch-neon');
+                        const bulb = document.getElementById('luz-neon');
+                        
+                        // Force clean state
+                        bulb.className = 'lamp-bulb';
+                        btn.textContent = 'ENCENDER';
+
+                        btn.click(); // Trigger student's event
+                        const turnedOn = bulb.classList.contains('brillante') && btn.textContent === "APAGAR";
+                        
+                        btn.click(); // Restore off state
+                        const turnedOff = !bulb.classList.contains('brillante') && btn.textContent === "ENCENDER";
+
+                        if (turnedOn && turnedOff) {
+                            return { ok: true, out: "El evento Click se vinculó de forma correcta y alterna la clase brillante." };
+                        }
+                        throw new Error("El listener de eventos no alteró la clase o texto del botón correctamente.");
+                    }
+                }
+            ];
+
+            // Setup logs
+            function appendLog(type, text) {
+                const line = document.createElement('div');
+                line.className = `terminal-line ${type}`;
+                line.innerText = `> ${text}`;
+                logBox.appendChild(line);
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+
+            function clearLogs() {
+                logBox.innerHTML = '';
+            }
+
+            // Sync Tab Switching
+            function switchTab(index) {
+                currentTab = index;
+                const data = challengesData[index];
+                
+                // Active classes on tabs
+                tabs.forEach((tab, i) => {
+                    if (i === index) tab.classList.add('active');
+                    else tab.classList.remove('active');
+                });
+
+                // Active editors
+                editors.forEach((editor, i) => {
+                    if (i === index) editor.classList.add('active');
+                    else editor.classList.remove('active');
+                });
+
+                // Display instructions
+                consignaText.innerHTML = `🏁 <strong>${data.title}:</strong> ${data.desc}`;
+
+                // Toggle Special Visual Sandbox Panel for DOM exercise (Index 4)
+                if (index === 4) {
+                    domPreview.classList.add('active');
+                } else {
+                    domPreview.classList.remove('active');
+                }
+
+                clearLogs();
+                appendLog('info', `Archivo '${tabs[index].innerText}' abierto en el editor.`);
+            }
+
+            // Bind Tab Click Event
+            tabs.forEach(tab => {
+                tab.onclick = () => {
+                    const index = parseInt(tab.dataset.tab);
+                    switchTab(index);
+                };
+            });
+
+            // Clean active editor inputs
+            resetBtn.onclick = () => {
+                clearLogs();
+                appendLog('info', 'Valores de inputs limpiados en el archivo actual.');
+                const currentData = challengesData[currentTab];
+                currentData.answers.forEach(ans => {
+                    const inputEl = document.getElementById(ans.id);
+                    inputEl.value = '';
+                    inputEl.className = 'code-input';
+                });
+            };
+
+            // Validation & Compilation logic
+            runBtn.onclick = () => {
+                clearLogs();
+                appendLog('info', 'Iniciando compilador virtual...');
+                
+                const currentData = challengesData[currentTab];
+                let isTextualValid = true;
+                const userValues = {};
+
+                // 1. Textual Regex Parsing
+                currentData.answers.forEach(ans => {
+                    const inputEl = document.getElementById(ans.id);
+                    const val = inputEl.value.trim();
+                    userValues[ans.id] = val;
+
+                    if (ans.regex.test(val)) {
+                        inputEl.className = 'code-input valid';
+                    } else {
+                        inputEl.className = 'code-input invalid';
+                        isTextualValid = false;
+                        appendLog('error', `ERROR DE SINTAXIS en espacio [${inputEl.placeholder}]: El valor '${val || 'vacío'}' no coincide con el fragmento esperado.`);
+                    }
+                });
+
+                if (!isTextualValid) {
+                    appendLog('error', 'Compilación fallida. Por favor, corrige los campos en rojo en el código.');
+                    return;
+                }
+
+                // 2. Functional Sandbox execution
+                try {
+                    const testResult = currentData.compile(userValues);
+                    if (testResult.ok) {
+                        appendLog('success', '¡COMPILACIÓN EXITOSA! Lógica validada en el sandbox.');
+                        appendLog('success', testResult.out);
+                        
+                        completedExercises.add(currentTab);
+                        updateProgress();
+                    }
+                } catch (err) {
+                    appendLog('error', `ERROR DE EJECUCIÓN: El código compilado arrojó una excepción. Detalles: ${err.message}`);
+                }
+            };
+
+            // Update Progress Bar
+            function updateProgress() {
+                const total = challengesData.length;
+                const count = completedExercises.size;
+                const pct = (count / total) * 100;
+                
+                progressBar.style.width = `${pct}%`;
+                progressVal.innerText = `${count}/${total}`;
+            }
+
+            // Init first tab
+            switchTab(0);
+        });
+    </script>
+</body>
+</html>

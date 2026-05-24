@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 2: Estructuras Condicionales y Lógica</title>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body data-workshop-id="taller2">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Taller 02</div>
+        <h1>Decisiones Lógicas y Ramificaciones</h1>
+        <p>Aprende a ramificar el comportamiento de tu programa mediante condicionales. Diseña filtros lógicos y validaciones seguras.</p>
+        <div class="header-meta">
+            <span>Dificultad: <strong>Fácil a Difícil</strong></span>
+            <span>Desafíos: <strong>10 Ejercicios</strong></span>
+            <span>Retorno: <a href="index.html" style="color: var(--neon-pink); text-decoration: none;">&larr; Volver al Portal</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: SELECCIÓN Y DETALLE -->
+        <div class="panel">
+            <div class="panel-title">
+                Selecciona un Desafío <span class="indicator"></span>
+            </div>
+            
+            <!-- Selector de Ejercicios -->
+            <div class="exercise-selector" id="exercise-buttons"></div>
+
+            <!-- Detalles del Ejercicio Activo -->
+            <div class="exercise-detail-card">
+                <div>
+                    <div class="ex-badge-row">
+                        <span class="diff-badge" id="ex-difficulty">Fácil</span>
+                        <span class="ex-concepts" id="ex-concepts-list">Conceptos: </span>
+                    </div>
+                    <h2 class="ex-title" id="ex-title">Cargando...</h2>
+                    <div class="restriction-box" id="ex-restriction"></div>
+                    <p class="ex-desc" id="ex-desc">Cargando consigna...</p>
+                </div>
+                
+                <!-- Pistas -->
+                <div class="hint-container">
+                    <button class="hint-trigger-btn" id="hint-btn">💡 Ver Pista</button>
+                    <div class="hint-content-box" id="hint-content"></div>
+                </div>
+            </div>
+
+            <!-- Firma de la función visual (Solo informativo) -->
+            <div class="code-support-box" id="code-support-snippet"></div>
+
+            <!-- Teoría Rápida de Apoyo -->
+            <div class="theory-card">
+                <h3>Resumen Teórico del Taller</h3>
+                <ul>
+                    <li><code>if (condición) { ... } else { ... }</code> bifurca el flujo de ejecución.</li>
+                    <li>Operadores lógicos: <code>&&</code> (Y lógico), <code>||</code> (O lógico), <code>!</code> (Negación).</li>
+                    <li>Operadores relacionales: <code>===</code> (igualdad estricta), <code>!==</code> (desigualdad estricta), <code>&gt;</code>, <code>&lt;=</code>, etc.</li>
+                    <li>El bloque <code>switch</code> evalúa una expresión contra múltiples casos de valor.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: PLAYGROUND, TERMINAL Y RESULTADOS -->
+        <div class="panel sandbox-card">
+            <div class="panel-title">
+                Consola y Validador de Pruebas <span class="indicator" style="background-color: var(--neon-cyan); box-shadow: var(--glow-cyan);"></span>
+            </div>
+
+            <div class="student-instruction-banner">
+                💡 <strong>¿Cómo resolver?</strong> Abre este archivo en tu editor de código preferido (ej. VS Code). Busca el bloque <code>&lt;script id="soluciones"&gt;</code> al final del documento y completa el código de las funciones indicadas. Guarda el archivo, recarga esta página y haz clic en <strong>Ejecutar y Validar</strong>.
+            </div>
+
+            <!-- Botón de Ejecutar -->
+            <div class="action-row">
+                <button class="btn-run" id="run-btn">
+                    <span>▶ Ejecutar y Validar Código</span>
+                </button>
+            </div>
+
+            <!-- Consola de Resultados Simulada -->
+            <div class="terminal-header">
+                <span>Terminal de Salida</span>
+                <span>Console Sandbox</span>
+            </div>
+            <div class="terminal" id="terminal-content"></div>
+
+            <!-- Resultados del Test Suite -->
+            <div class="test-results-box">
+                <div class="test-results-title">
+                    <span>Suite de Pruebas</span>
+                    <span class="test-summary" id="progress-summary">Progreso: 0/10 Completados</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="test-list" id="test-results-list" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- DEFINE DATA DE EJERCICIOS PARA EL TESTER -->
+    <script>
+        window.exercisesData = [
+            {
+                id: 1,
+                title: "Signo y Paridad",
+                difficulty: "easy",
+                concepts: "Estructuras If / Else y Resto (%)",
+                restriction: "Prohibido usar arrays, objetos o bucles.",
+                signature: "resolver2_1(numero)",
+                functionName: "resolver2_1",
+                desc: "Clasifica un número de forma compuesta. Recibe un entero <code>numero</code> y debe retornar un string describiendo su signo y paridad en minúsculas. Los valores posibles son: <code>'positivo-par'</code>, <code>'positivo-impar'</code>, <code>'negativo-par'</code>, <code>'negativo-impar'</code>, o <code>'cero'</code>.",
+                hint: "Primero chequea si el número es exactamente 0. Luego, en las ramas if/else, evalúa si es positivo o negativo, y anida un chequeo del resto (%) con 2.",
+                tests: [
+                    {
+                        name: "Clasificar número 6 (positivo-par)",
+                        assert: (fn) => {
+                            const res = fn(6);
+                            if (res !== "positivo-par") throw new Error(`Esperaba 'positivo-par', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Clasificar número -7 (negativo-impar)",
+                        assert: (fn) => {
+                            const res = fn(-7);
+                            if (res !== "negativo-impar") throw new Error(`Esperaba 'negativo-impar', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Clasificar número 0 (cero)",
+                        assert: (fn) => {
+                            const res = fn(0);
+                            if (res !== "cero") throw new Error(`Esperaba 'cero', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Evaluador Académico",
+                difficulty: "easy",
+                concepts: "Rangos y Comparación",
+                restriction: "Prohibido usar arrays o bucles.",
+                signature: "resolver2_2(n1, n2, n3)",
+                functionName: "resolver2_2",
+                desc: "Dadas tres notas decimales de exámenes <code>n1</code>, <code>n2</code> y <code>n3</code>, calcula el promedio. Si el promedio es mayor o igual a 6.0, retorna <code>'aprobado'</code>. Si está entre 4.0 (inclusive) y 5.9 (inclusive), retorna <code>'examen final'</code>. Si es menor a 4.0, retorna <code>'desaprobado'</code>.",
+                hint: "Fórmula del promedio: (n1 + n2 + n3) / 3. Evalúa con condicionales secuenciales o anidados los rangos indicados.",
+                tests: [
+                    {
+                        name: "Promedio de 8, 7 y 6 (aprobado)",
+                        assert: (fn) => {
+                            const res = fn(8, 7, 6);
+                            if (res !== "aprobado") throw new Error(`Esperaba 'aprobado', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Promedio de 5, 4 y 6 (examen final)",
+                        assert: (fn) => {
+                            const res = fn(5, 4, 6);
+                            if (res !== "examen final") throw new Error(`Esperaba 'examen final', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Promedio de 3, 2 y 4 (desaprobado)",
+                        assert: (fn) => {
+                            const res = fn(3, 2, 4);
+                            if (res !== "desaprobado") throw new Error(`Esperaba 'desaprobado', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Tarifador de Taxis",
+                difficulty: "easy",
+                concepts: "Operadores Aritméticos y Lógicos",
+                restriction: "Prohibido usar arrays, objetos o bucles.",
+                signature: "resolver2_3(distancia, nocturno)",
+                functionName: "resolver2_3",
+                desc: "Calcula el precio de un viaje en taxi. La tarifa base es siempre de $500. Si la <code>distancia</code> recorrida es menor o igual a 15km, el costo adicional es de $80 por kilómetro. Si supera los 15km, el costo de todos los kilómetros recorridos baja a $60 por km. Si el viaje es <code>nocturno</code> (booleano true), se le suma un 25% de recargo sobre la tarifa final calculada. Retorna el precio final.",
+                hint: "Calcula el precio base + distancia * costoKm. Luego verifica si 'nocturno' es verdadero para multiplicar el resultado por 1.25.",
+                tests: [
+                    {
+                        name: "Viaje diurno de 10km (500 + 800 = 1300)",
+                        assert: (fn) => {
+                            const res = fn(10, false);
+                            if (res !== 1300) throw new Error(`Esperaba 1300, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Viaje nocturno de 20km ((500 + 1200) * 1.25 = 2125)",
+                        assert: (fn) => {
+                            const res = fn(20, true);
+                            if (res !== 2125) throw new Error(`Esperaba 2125, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Año Bisiesto",
+                difficulty: "medium",
+                concepts: "Lógica Compuesta",
+                restriction: "Prohibido usar métodos nativos de fecha.",
+                signature: "resolver2_4(anio)",
+                functionName: "resolver2_4",
+                desc: "Determina si un año dado <code>anio</code> es bisiesto. Un año es bisiesto si es divisible por 4, excepto aquellos divisibles por 100, a menos que también sean divisibles por 400. Retorna <code>true</code> si lo es, y <code>false</code> de lo contrario.",
+                hint: "Usa el operador % con 4, 100 y 400. Puedes unificar las reglas con operadores lógicos: (anio % 4 === 0 && anio % 100 !== 0) || (anio % 400 === 0).",
+                tests: [
+                    {
+                        name: "Año 2024 es bisiesto",
+                        assert: (fn) => {
+                            if (fn(2024) !== true) throw new Error("2024 debería ser bisiesto (true)");
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Año 1900 no es bisiesto",
+                        assert: (fn) => {
+                            if (fn(1900) !== false) throw new Error("1900 no debería ser bisiesto (false)");
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Año 2000 es bisiesto",
+                        assert: (fn) => {
+                            if (fn(2000) !== true) throw new Error("2000 debería ser bisiesto (true)");
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "El Trío de Números",
+                difficulty: "medium",
+                concepts: "Anidamiento de Decisiones",
+                restriction: "PROHIBIDO EL USO DE Math.max(). Usa condiciones manuales.",
+                signature: "resolver2_5(a, b, c)",
+                functionName: "resolver2_5",
+                desc: "Dados tres números enteros <code>a</code>, <code>b</code> y <code>c</code>, escribe un algoritmo manual que encuentre el número mayor y lo retorne.",
+                hint: "Compara si 'a' es mayor o igual que 'b' y 'c'. Si no, compara si 'b' es mayor o igual que 'c'. En caso contrario, el mayor es 'c'.",
+                tests: [
+                    {
+                        name: "Mayor es el primero (15, 8, 4)",
+                        assert: (fn) => {
+                            const res = fn(15, 8, 4);
+                            if (res !== 15) throw new Error(`Esperaba 15, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Mayor es el del medio (4, 99, 12)",
+                        assert: (fn) => {
+                            const res = fn(4, 99, 12);
+                            if (res !== 99) throw new Error(`Esperaba 99, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Mayor es el último y negativos (-5, -2, -1)",
+                        assert: (fn) => {
+                            const res = fn(-5, -2, -1);
+                            if (res !== -1) throw new Error(`Esperaba -1, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Simulador de Cajero",
+                difficulty: "medium",
+                concepts: "Filtros de Validación",
+                restriction: "Prohibido usar arrays, objetos o bucles.",
+                signature: "resolver2_6(retiro, saldo)",
+                functionName: "resolver2_6",
+                desc: "Un cliente intenta retirar una cantidad de dinero <code>retiro</code> de su cuenta con fondos <code>saldo</code>. Escribe un filtro que verifique:<br>1. Si el retiro es menor o igual a 0, retorna <code>'error-monto-invalido'</code>.<br>2. Si el retiro no es múltiplo de $100, retorna <code>'error-billetes'</code>.<br>3. Si el monto excede el saldo disponible, retorna <code>'error-saldo-insuficiente'</code>.<br>4. Si pasa todas las validaciones, descuenta el saldo y retorna el <strong>nuevo saldo</strong>.",
+                hint: "Usa múltiples ifs encadenados en orden. Chequea el residuo con 100 usando el operador % para validar múltiplos de billete.",
+                tests: [
+                    {
+                        name: "Retiro inválido de -500",
+                        assert: (fn) => {
+                            const res = fn(-500, 2000);
+                            if (res !== "error-monto-invalido") throw new Error(`Esperaba 'error-monto-invalido', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Retiro sin billetes correctos (250)",
+                        assert: (fn) => {
+                            const res = fn(250, 2000);
+                            if (res !== "error-billetes") throw new Error(`Esperaba 'error-billetes', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Monto mayor al saldo disponible (3000 vs 2000)",
+                        assert: (fn) => {
+                            const res = fn(3000, 2000);
+                            if (res !== "error-saldo-insuficiente") throw new Error(`Esperaba 'error-saldo-insuficiente', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Retiro exitoso de 800 con saldo de 2000",
+                        assert: (fn) => {
+                            const res = fn(800, 2000);
+                            if (res !== 1200) throw new Error(`Esperaba saldo de 1200, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Constructor de Triángulos",
+                difficulty: "medium",
+                concepts: "Geometría y Lógica Condicional",
+                restriction: "Prohibido usar arrays o bucles.",
+                signature: "resolver2_7(s1, s2, s3)",
+                functionName: "resolver2_7",
+                desc: "Dadas tres longitudes de lado <code>s1</code>, <code>s2</code> y <code>s3</code>, determina primero si forman un triángulo válido (la suma de dos lados cualesquiera debe ser estrictamente mayor que el tercer lado). Si no es válido, retorna <code>'invalido'</code>. Si es válido, clasifícalo y retorna en minúsculas: <code>'equilatero'</code>, <code>'isosceles'</code> o <code>'escaleno'</code>.",
+                hint: "Regla de validez: (s1 + s2 > s3) && (s1 + s3 > s2) && (s2 + s3 > s1). Luego clasifica comparando si todos los lados son iguales, si hay dos iguales, o si todos son diferentes.",
+                tests: [
+                    {
+                        name: "Lados no forman triángulo (1, 2, 10)",
+                        assert: (fn) => {
+                            const res = fn(1, 2, 10);
+                            if (res !== "invalido") throw new Error(`Esperaba 'invalido', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Lados equilátero (5, 5, 5)",
+                        assert: (fn) => {
+                            const res = fn(5, 5, 5);
+                            if (res !== "equilatero") throw new Error(`Esperaba 'equilatero', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Lados isósceles (5, 5, 8)",
+                        assert: (fn) => {
+                            const res = fn(5, 5, 8);
+                            if (res !== "isosceles") throw new Error(`Esperaba 'isosceles', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Lados escaleno (3, 4, 5)",
+                        assert: (fn) => {
+                            const res = fn(3, 4, 5);
+                            if (res !== "escaleno") throw new Error(`Esperaba 'escaleno', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "Boletería Dinámica",
+                difficulty: "hard",
+                concepts: "Condicionales Compuestos Secuenciales",
+                restriction: "Prohibido usar arrays, objetos o bucles.",
+                signature: "resolver2_8(edad, vip, miercoles, precioBase)",
+                functionName: "resolver2_8",
+                desc: "Calcula el precio de un ticket de cine. Consiste en evaluar varios descuentos acumulativos aplicados de forma secuencial:<br>1. Si la <code>edad</code> es menor a 5 años, el precio es $0 (100% de descuento).<br>2. Si la edad está entre 5 y 17 años inclusive, aplica un 30% de descuento sobre el precio base.<br>3. Si el cliente tiene membresía <code>vip</code> (booleano true), se le aplica un 15% de descuento sobre el precio acumulado actual.<br>4. Si es <code>miercoles</code> (booleano true), se le aplica un 10% de descuento sobre el precio acumulado actual. Retorna el precio final con dos decimales de precisión.",
+                hint: "Los descuentos acumulativos se aplican de a uno, afectando el precio intermedio calculado. Es decir, precio = precio * (1 - desc). Al final, usa Number(precio.toFixed(2)).",
+                tests: [
+                    {
+                        name: "Niño menor a 5 años gratis",
+                        assert: (fn) => {
+                            const res = fn(3, true, true, 1000);
+                            if (res !== 0) throw new Error(`Esperaba 0, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Adolescente VIP en un miércoles (Precio Base $1000)",
+                        assert: (fn) => {
+                            // 1000 * 0.70 (edad) = 700 -> 700 * 0.85 (vip) = 595 -> 595 * 0.90 (miercoles) = 535.5
+                            const res = fn(15, true, true, 1000);
+                            if (res !== 535.5) throw new Error(`Esperaba 535.5, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Adulto regular diurno (Precio Base $1200)",
+                        assert: (fn) => {
+                            const res = fn(30, false, false, 1200);
+                            if (res !== 1200) throw new Error(`Esperaba 1200, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Piedra, Papel o Tijera",
+                difficulty: "hard",
+                concepts: "Switch y Comparaciones Cruzadas",
+                restriction: "Prohibido usar arrays, objetos o bucles.",
+                signature: "resolver2_9(jugador, cpu)",
+                functionName: "resolver2_9",
+                desc: "Dadas las elecciones de un <code>jugador</code> y la <code>cpu</code> (que pueden ser: <code>'piedra'</code>, <code>'papel'</code> o <code>'tijera'</code>), determina quién es el ganador de la partida. Retorna la cadena <code>'usuario'</code> si ganó el jugador, <code>'cpu'</code> si ganó la máquina, y <code>'empate'</code> en caso de tablas.",
+                hint: "Primero chequea si ambos ingresaron lo mismo (empate). Luego evalúa mediante múltiples condiciones o switch/case cruzado las tres alternativas donde gana el usuario; cualquier otra combinación restante dará como ganador al CPU.",
+                tests: [
+                    {
+                        name: "Usuario gana: papel contra piedra",
+                        assert: (fn) => {
+                            const res = fn("papel", "piedra");
+                            if (res !== "usuario") throw new Error(`Esperaba 'usuario', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "CPU gana: piedra contra tijera",
+                        assert: (fn) => {
+                            const res = fn("tijera", "piedra");
+                            if (res !== "cpu") throw new Error(`Esperaba 'cpu', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Empate: tijera contra tijera",
+                        assert: (fn) => {
+                            const res = fn("tijera", "tijera");
+                            if (res !== "empate") throw new Error(`Esperaba 'empate', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Impuesto Progresivo",
+                difficulty: "legendary",
+                concepts: "Estructuras Anidadas por Tramos",
+                restriction: "Prohibido usar arrays, objetos o bucles.",
+                signature: "resolver2_10(salario)",
+                functionName: "resolver2_10",
+                desc: "Calcula el impuesto progresivo al salario anual según la siguiente escala por tramos:<br>• Tramo 1: Hasta $15,000 libres de impuesto (0%).<br>• Tramo 2: Por el monto entre $15,001 y $35,000 se cobra el 10%.<br>• Tramo 3: Por el monto entre $35,001 y $60,000 se cobra el 20%.<br>• Tramo 4: Por todo monto excedente de $60,000 se cobra el 30%.<br>Retorna el impuesto total calculado con dos decimales de precisión.",
+                hint: "Ejemplo: Para un salario de $40,000: los primeros 15k pagan 0; los siguientes 20k pagan 10% ($2000); los últimos 5k pagan 20% ($1000). Total: $3000. Calcula los aportes de cada tramo por separado evaluando el excedente de cada barrera.",
+                tests: [
+                    {
+                        name: "Salario exento ($12,000)",
+                        assert: (fn) => {
+                            const res = fn(12000);
+                            if (res !== 0) throw new Error(`Esperaba 0, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Salario en Tramo 3 ($40,000)",
+                        assert: (fn) => {
+                            const res = fn(40000);
+                            if (res !== 3000) throw new Error(`Esperaba 3000, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Salario muy alto ($85,000)",
+                        assert: (fn) => {
+                            // 0 en los primeros 15k
+                            // (35k - 15k) * 0.10 = 2000
+                            // (60k - 35k) * 0.20 = 5000
+                            // (85k - 60k) * 0.30 = 7500
+                            // Total = 14500
+                            const res = fn(85000);
+                            if (res !== 14500) throw new Error(`Esperaba 14500, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            }
+        ];
+    </script>
+
+    <!-- BLOQUE DE SCRIPT PARA LAS SOLUCIONES DEL ESTUDIANTE -->
+    <script id="soluciones">
+        // ==========================================================================
+        // ✏️ ESPACIO PARA COMPLETAR TU CODIGO JAVASCRIPT
+        // Completa el interior de cada función de acuerdo a las consignas indicadas.
+        // ==========================================================================
+
+        // Ejercicio 1: Signo y Paridad
+        function resolver2_1(numero) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 2: Evaluador Académico
+        function resolver2_2(n1, n2, n3) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 3: Tarifador de Taxis
+        function resolver2_3(distancia, nocturno) {
+            let precioFinal;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return precioFinal;
+        }
+
+        // Ejercicio 4: Año Bisiesto
+        function resolver2_4(anio) {
+            let esBisiesto;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return esBisiesto;
+        }
+
+        // Ejercicio 5: El Trío de Números
+        function resolver2_5(a, b, c) {
+            let mayor;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return mayor;
+        }
+
+        // Ejercicio 6: Simulador de Cajero
+        function resolver2_6(retiro, saldo) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 7: Constructor de Triángulos
+        function resolver2_7(s1, s2, s3) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 8: Boletería Dinámica
+        function resolver2_8(edad, vip, miercoles, precioBase) {
+            let precioFinal;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return precioFinal;
+        }
+
+        // Ejercicio 9: Piedra, Papel o Tijera
+        function resolver2_9(jugador, cpu) {
+            let ganador;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return ganador;
+        }
+
+        // Ejercicio 10: Impuesto Progresivo
+        function resolver2_10(salario) {
+            let impuestoTotal;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return impuestoTotal;
+        }
+    </script>
+
+    <!-- INCLUYE EL MOTOR DEL PLAYGROUND COMPARTIDO -->
+    <script src="js/tester.js"></script>
+</body>
+</html>

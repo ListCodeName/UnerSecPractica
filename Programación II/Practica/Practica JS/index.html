@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Playground: Portal de Aprendizaje</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        /* Specific Hub styling overrides */
+        .hub-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+        }
+        
+        .global-stats-card {
+            background-color: var(--surface);
+            background-image: linear-gradient(135deg, var(--surface-card) 0%, rgba(22, 17, 43, 0.4) 100%);
+            border: var(--border-neon);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--glow-purple);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .global-stats-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--grad-sunset);
+        }
+
+        .stats-info h2 {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .stats-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stats-numbers {
+            display: flex;
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--neon-pink);
+            text-shadow: var(--glow-pink);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .card-progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 99px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .card-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--grad-sunset);
+            box-shadow: var(--glow-pink);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-progress-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-progress-text strong {
+            color: var(--neon-green);
+        }
+        
+        @media (max-width: 768px) {
+            .global-stats-card {
+                flex-direction: column;
+                gap: 25px;
+                text-align: center;
+            }
+            .stats-numbers {
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ENCABEZADO HUB -->
+    <header>
+        <div class="badge-topic">Ruta de Aprendizaje</div>
+        <h1>JavaScript Arcade Playground</h1>
+        <p>Aprende JavaScript de forma práctica y progresiva mediante talleres de dificultad creciente. Resuelve problemas ingeniosos bajo restricciones estrictas para fijar el conocimiento.</p>
+    </header>
+
+    <div class="hub-container">
+        
+        <!-- TARJETA DE ESTADÍSTICAS GLOBALES -->
+        <div class="global-stats-card">
+            <div class="stats-info">
+                <h2>Tu Progreso de Entrenamiento</h2>
+                <p>Completa los 10 desafíos de cada taller para desbloquear el siguiente nivel de la cadena.</p>
+            </div>
+            <div class="stats-numbers">
+                <div class="stat-box">
+                    <span class="stat-value" id="global-completed">0</span>
+                    <span class="stat-label">Desafíos Resueltos</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="global-percent">0%</span>
+                    <span class="stat-label">Completado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- REJILLA DE TALLERES (CARDS) -->
+        <div class="hub-grid">
+            
+            <!-- Taller 1 -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #ff2e93, #ff5e62)">
+                <div class="hub-card-number">01</div>
+                <div>
+                    <h3 class="hub-card-title">Sintaxis Básica</h3>
+                    <p class="hub-card-desc">Domina la manipulación de variables, tipos de datos primitivos y operadores matemáticos. Resuelve ecuaciones y formateos bajo restricciones estrictas.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Variables (let, const)</span>
+                        <span class="concept-tag">Operaciones Aritméticas</span>
+                        <span class="concept-tag">Strings y Coerción</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-taller1"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-taller1">0/10 desafíos</span>
+                        <span id="pct-taller1">0%</span>
+                    </div>
+                    <a href="01-variables-operaciones.html" class="hub-card-btn" style="margin-top: 15px;">Ingresar al Taller</a>
+                </div>
+            </div>
+
+            <!-- Taller 2 -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #ff5e62, #ff9966)">
+                <div class="hub-card-number">02</div>
+                <div>
+                    <h3 class="hub-card-title">Decisiones Lógicas</h3>
+                    <p class="hub-card-desc">Aprende a ramificar el flujo de tu aplicación mediante condicionales. Añade validaciones lógicas complejas combinando operadores booleanos.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Estructuras If / Else</span>
+                        <span class="concept-tag">Sentencias Switch</span>
+                        <span class="concept-tag">Lógica Booleana</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-taller2"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-taller2">0/10 desafíos</span>
+                        <span id="pct-taller2">0%</span>
+                    </div>
+                    <a href="02-condicionales.html" class="hub-card-btn" style="margin-top: 15px;">Ingresar al Taller</a>
+                </div>
+            </div>
+
+            <!-- Taller 3 -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #ffb703, #fb8500)">
+                <div class="hub-card-number">03</div>
+                <div>
+                    <h3 class="hub-card-title">Ciclos e Iteraciones</h3>
+                    <p class="hub-card-desc">Crea flujos repetitivos. Resuelve problemas matemáticos y genera patrones visuales de caracteres mediante el control preciso de bucles.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Bucles For</span>
+                        <span class="concept-tag">Bucles While</span>
+                        <span class="concept-tag">Bucles Anidados</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-taller3"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-taller3">0/10 desafíos</span>
+                        <span id="pct-taller3">0%</span>
+                    </div>
+                    <a href="03-bucles.html" class="hub-card-btn" style="margin-top: 15px;">Ingresar al Taller</a>
+                </div>
+            </div>
+
+            <!-- Taller 4 -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #00f5ff, #00e676)">
+                <div class="hub-card-number">04</div>
+                <div>
+                    <h3 class="hub-card-title">Colecciones y Datos</h3>
+                    <p class="hub-card-desc">Estructura grandes volúmenes de información. Gestiona catálogos e inventarios en arrays de objetos y manipula datos indexados.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Arrays y Matrices</span>
+                        <span class="concept-tag">Objetos Literales</span>
+                        <span class="concept-tag">Métodos de Colecciones</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-taller4"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-taller4">0/10 desafíos</span>
+                        <span id="pct-taller4">0%</span>
+                    </div>
+                    <a href="04-arrays-objetos.html" class="hub-card-btn" style="margin-top: 15px;">Ingresar al Taller</a>
+                </div>
+            </div>
+
+            <!-- Taller 5 -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #9d4edd, #7b2cbf)">
+                <div class="hub-card-number">05</div>
+                <div>
+                    <h3 class="hub-card-title">Modularización</h3>
+                    <p class="hub-card-desc">Crea código reutilizable y limpio. Domina los alcances (scopes), closures, callbacks y las funciones puras de orden superior.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Funciones Flecha</span>
+                        <span class="concept-tag">Callbacks y Clones</span>
+                        <span class="concept-tag">Recursividad y Scope</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-taller5"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-taller5">0/10 desafíos</span>
+                        <span id="pct-taller5">0%</span>
+                    </div>
+                    <a href="05-funciones.html" class="hub-card-btn" style="margin-top: 15px;">Ingresar al Taller</a>
+                </div>
+            </div>
+
+            <!-- Taller 6 -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #ff2e93, #9d4edd)">
+                <div class="hub-card-number">06</div>
+                <div>
+                    <h3 class="hub-card-title">DOM e Interactividad</h3>
+                    <p class="hub-card-desc">La culminación: conecta tu lógica de programación con el navegador. Manipula elementos visuales y crea aplicaciones reactivas interactivas.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Selectores DOM</span>
+                        <span class="concept-tag">Estilos y Clases</span>
+                        <span class="concept-tag">Event Listeners</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-taller6"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-taller6">0/10 desafíos</span>
+                        <span id="pct-taller6">0%</span>
+                    </div>
+                    <a href="06-dom-eventos.html" class="hub-card-btn" style="margin-top: 15px;">Ingresar al Taller</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <script>
+        // Update stats from localStorage dynamically
+        document.addEventListener('DOMContentLoaded', () => {
+            const workshops = [
+                { id: 'taller1', key: 'js_practica_taller1' },
+                { id: 'taller2', key: 'js_practica_taller2' },
+                { id: 'taller3', key: 'js_practica_taller3' },
+                { id: 'taller4', key: 'js_practica_taller4' },
+                { id: 'taller5', key: 'js_practica_taller5' },
+                { id: 'taller6', key: 'js_practica_taller6' }
+            ];
+
+            let globalCompleted = 0;
+            const totalExercises = 60; // 6 workshops * 10 exercises each
+
+            workshops.forEach(ws => {
+                const saved = localStorage.getItem(ws.key);
+                let completedCount = 0;
+                if (saved) {
+                    try {
+                        completedCount = JSON.parse(saved).length;
+                    } catch (e) {
+                        completedCount = 0;
+                    }
+                }
+                
+                globalCompleted += completedCount;
+                
+                // Update Card DOM
+                const fillEl = document.getElementById(`fill-${ws.id}`);
+                const textEl = document.getElementById(`text-${ws.id}`);
+                const pctEl = document.getElementById(`pct-${ws.id}`);
+                
+                if (fillEl && textEl && pctEl) {
+                    const pct = (completedCount / 10) * 100;
+                    fillEl.style.width = `${pct}%`;
+                    textEl.innerHTML = `<strong>${completedCount}</strong>/10 desafíos`;
+                    pctEl.innerText = `${Math.round(pct)}%`;
+                }
+            });
+
+            // Global stats
+            const globalCompletedEl = document.getElementById('global-completed');
+            const globalPercentEl = document.getElementById('global-percent');
+            
+            if (globalCompletedEl && globalPercentEl) {
+                globalCompletedEl.innerText = globalCompleted;
+                const globalPct = (globalCompleted / totalExercises) * 100;
+                globalPercentEl.innerText = `${Math.round(globalPct)}%`;
+            }
+        });
+    </script>
+</body>
+</html>

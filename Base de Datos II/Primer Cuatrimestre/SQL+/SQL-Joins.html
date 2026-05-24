@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>SQL Joins — Base de Datos II</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f8f9fc;
+            --s: #fff;
+            --s2: #f1f4f9;
+            --bd: #e2e8f0;
+            --a: #0284c7;
+            --a2: #2563eb;
+            --a3: #10b981;
+            --a4: #f59e0b;
+            --pk: #ef4444;
+            --fk: #6366f1;
+            --text: #1e293b;
+            --m: #64748b;
+            --r: 12px;
+            --rs: 7px;
+            --sh: 0 2px 12px rgba(2, 132, 199, .08)
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh
+        }
+
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 3.2rem 1.5rem 2.2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #e0f2fe 0%, #e0f7fa 50%, #e0e7ff 100%);
+            border-bottom: 1px solid var(--bd)
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 55% 50% at 20% -10%, rgba(2, 132, 199, .12) 0%, transparent 60%), radial-gradient(ellipse 50% 45% at 85% 110%, rgba(99, 102, 241, .09) 0%, transparent 60%);
+            pointer-events: none
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(2, 132, 199, .1);
+            border: 1px solid rgba(2, 132, 199, .3);
+            color: #0369a1;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: .25rem .9rem;
+            border-radius: 999px;
+            margin-bottom: .9rem
+        }
+
+        header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.7rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #0284c7, #2563eb, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .5rem
+        }
+
+        header p.sub {
+            color: var(--m);
+            max-width: 620px;
+            margin: 0 auto;
+            font-size: .95rem
+        }
+
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .65rem 1.5rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            font-size: .78rem;
+            color: var(--m)
+        }
+
+        .bc a {
+            color: var(--m);
+            text-decoration: none
+        }
+
+        .bc a:hover {
+            color: var(--a)
+        }
+
+        .bc .cur {
+            color: var(--a);
+            font-weight: 600
+        }
+
+        nav.tabs {
+            display: flex;
+            justify-content: center;
+            gap: .4rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: var(--s);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .04)
+        }
+
+        nav.tabs button {
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            color: var(--m);
+            font-family: 'Inter', sans-serif;
+            font-size: .8rem;
+            font-weight: 500;
+            padding: .42rem .95rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        nav.tabs button:hover {
+            border-color: var(--a);
+            color: var(--a);
+            background: #e0f2fe
+        }
+
+        nav.tabs button.active {
+            background: var(--a);
+            border-color: var(--a);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, .3)
+        }
+
+        .sec {
+            display: none;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2.4rem 1.2rem 4rem;
+            animation: fi .3s ease
+        }
+
+        .sec.active {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bd)
+        }
+
+        .sec-title .icon {
+            font-size: 1.6rem
+        }
+
+        .sec-title h2 {
+            font-size: 1.4rem;
+            font-weight: 700
+        }
+
+        .sec-title p {
+            font-size: .87rem;
+            color: var(--m);
+            margin-top: .1rem
+        }
+
+        .sh {
+            font-size: .93rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 1.8rem 0 .8rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .sh::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--bd), transparent);
+            margin-left: .5rem
+        }
+
+        .ib {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: .95rem 1.15rem;
+            font-size: .86rem;
+            color: var(--m);
+            margin-bottom: 1.1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .03)
+        }
+
+        .ib.cy { border-left: 3px solid var(--a) }
+        .ib.gr { border-left: 3px solid var(--a3) }
+        .ib.am { border-left: 3px solid var(--a4) }
+        .ib.rd { border-left: 3px solid var(--pk) }
+        .ib.bl { border-left: 3px solid var(--fk) }
+
+        /* GROUP HEADER */
+        .grp-head {
+            background: linear-gradient(135deg, var(--s2), var(--s));
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem
+        }
+
+        .grp-badge {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            padding: .3rem .75rem;
+            border-radius: 6px;
+            flex-shrink: 0;
+            margin-top: .1rem;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .grp-head h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: .2rem
+        }
+
+        .grp-head p {
+            font-size: .83rem;
+            color: var(--m)
+        }
+
+        /* COMMAND CARDS */
+        .cmd-list {
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+            margin-bottom: 2rem
+        }
+
+        .cmd-card {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            transition: box-shadow .2s
+        }
+
+        .cmd-card:hover {
+            box-shadow: 0 4px 18px rgba(2, 132, 199, .15)
+        }
+
+        .cmd-head {
+            display: flex;
+            align-items: center;
+            gap: .9rem;
+            padding: .85rem 1.1rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .cmd-kw {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .85rem;
+            font-weight: 700;
+            padding: .2rem .65rem;
+            border-radius: 6px;
+            flex-shrink: 0
+        }
+
+        .cmd-desc {
+            flex: 1;
+            font-size: .87rem;
+            font-weight: 500
+        }
+
+        .cmd-arr {
+            font-size: .75rem;
+            color: var(--m);
+            transition: transform .25s;
+            flex-shrink: 0
+        }
+
+        .cmd-card.open .cmd-arr {
+            transform: rotate(180deg)
+        }
+
+        .cmd-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .38s ease
+        }
+
+        .cmd-card.open .cmd-body {
+            max-height: 900px
+        }
+
+        .cmd-inner {
+            padding: .85rem 1.1rem 1.1rem;
+            border-top: 1px solid var(--bd)
+        }
+
+        .cmd-inner p {
+            font-size: .86rem;
+            color: var(--m);
+            margin-bottom: .85rem
+        }
+
+        /* SYNTAX BOX */
+        .syntax {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: var(--rs);
+            padding: .8rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            color: #0c4a6e;
+            margin-bottom: .85rem;
+            white-space: pre-wrap;
+            line-height: 1.7
+        }
+
+        .kw {
+            color: #0284c7;
+            font-weight: 700
+        }
+
+        .val {
+            color: #10b981
+        }
+
+        .op {
+            color: #6366f1
+        }
+
+        .str {
+            color: #b45309
+        }
+
+        .cm {
+            color: #94a3b8
+        }
+
+        /* EXAMPLE BOX */
+        .ex-box {
+            background: #f8fafc;
+            border: 1px solid var(--bd);
+            border-radius: var(--rs);
+            padding: .85rem 1rem;
+            margin-bottom: .85rem
+        }
+
+        .ex-box .ex-title {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--m);
+            margin-bottom: .55rem
+        }
+
+        .ex-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem;
+            color: #0c4a6e;
+            background: #e0f2fe;
+            padding: .6rem .85rem;
+            border-radius: 6px;
+            margin-bottom: .6rem;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* QUIZ */
+        .quiz-wrap {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: var(--rs);
+            padding: .85rem 1rem
+        }
+
+        .quiz-wrap .q-label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: .5rem
+        }
+
+        .quiz-input {
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .82rem;
+            padding: .5rem .75rem;
+            border: 1.5px solid #fcd34d;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .quiz-input:focus {
+            border-color: #f59e0b
+        }
+
+        .quiz-btn {
+            margin-top: .5rem;
+            background: var(--a4);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: .4rem 1rem;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s
+        }
+
+        .quiz-btn:hover {
+            background: #d97706
+        }
+
+        .quiz-fb {
+            margin-top: .5rem;
+            font-size: .8rem;
+            font-weight: 600;
+            padding: .4rem .75rem;
+            border-radius: 6px;
+            display: none
+        }
+
+        .quiz-fb.ok {
+            background: #d1fae5;
+            color: #065f46;
+            display: block
+        }
+
+        .quiz-fb.err {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block
+        }
+
+        /* TABLE */
+        .tbl-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            border-radius: var(--rs);
+            border: 1px solid var(--bd);
+        }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .81rem;
+        }
+
+        .tbl th {
+            background: var(--s2);
+            padding: .5rem .8rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: .7rem;
+            color: var(--m);
+            border-bottom: 1px solid var(--bd);
+            white-space: nowrap;
+        }
+
+        .tbl td {
+            padding: .45rem .8rem;
+            border-bottom: 1px solid var(--bd);
+            color: var(--text);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .tbl tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tbl tr:hover td {
+            background: var(--s2)
+        }
+
+        /* QUIZ CARDS IN AUTOPREGUNTAS */
+        .qb {
+            margin-bottom: .65rem;
+            border-radius: var(--r);
+            border: 1px solid var(--bd);
+            overflow: hidden;
+            background: var(--s);
+            box-shadow: var(--sh)
+        }
+
+        .qb:hover {
+            box-shadow: 0 4px 14px rgba(2, 132, 199, .14)
+        }
+
+        .qh {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding: .85rem 1.1rem;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .qn {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e0f2fe;
+            border: 1px solid rgba(2, 132, 199, .3);
+            color: var(--a);
+            font-size: .73rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .qt {
+            flex: 1;
+            font-size: .88rem;
+            font-weight: 500
+        }
+
+        .qa {
+            font-size: .73rem;
+            color: var(--m);
+            transition: transform .25s
+        }
+
+        .qb.open .qa {
+            transform: rotate(180deg)
+        }
+
+        .qbdy {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+
+        .qb.open .qbdy {
+            max-height: 400px
+        }
+
+        .qbi {
+            padding: .8rem 1.1rem 1rem;
+            border-top: 1px solid var(--bd)
+        }
+
+        .qbi p {
+            color: var(--m);
+            font-size: .85rem;
+            margin-bottom: .55rem
+        }
+
+        .qtgs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .35rem
+        }
+
+        .tg {
+            font-size: .67rem;
+            padding: .1rem .45rem;
+            border-radius: 999px;
+            font-weight: 600
+        }
+
+        .tg.cy {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd
+        }
+
+        .tg.gr {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0
+        }
+
+        .tg.am {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d
+        }
+
+        .tg.rd {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5
+        }
+
+        .pb-w {
+            background: var(--s2);
+            border-radius: 999px;
+            height: 7px;
+            margin-bottom: .4rem;
+            overflow: hidden;
+            border: 1px solid var(--bd)
+        }
+
+        .pb-f {
+            height: 100%;
+            background: linear-gradient(90deg, var(--a), var(--a3));
+            border-radius: 999px;
+            transition: width .4s;
+            width: 0%
+        }
+
+        .pb-l {
+            font-size: .75rem;
+            color: var(--m);
+            text-align: right;
+            margin-bottom: 1.4rem
+        }
+
+        /* CONCEPT CARDS GRID */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem
+        }
+
+        /* Visual steps layout for Tab 1 */
+        .cartesian-step-box {
+            background: var(--s);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            margin-bottom: 1.8rem;
+        }
+
+        .cartesian-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: var(--s2);
+            border-bottom: 1px solid var(--bd);
+        }
+
+        .cartesian-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--a);
+        }
+
+        .cartesian-btn {
+            background: var(--a);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: background 0.2s;
+        }
+
+        .cartesian-btn:hover {
+            background: var(--a2);
+        }
+
+        .cartesian-btn:disabled {
+            background: var(--bd);
+            color: var(--m);
+            cursor: not-allowed;
+        }
+
+        .cartesian-content {
+            padding: 20px;
+        }
+
+        .cartesian-step {
+            display: none;
+            animation: fi 0.3s ease-out;
+        }
+
+        .cartesian-step.active {
+            display: block;
+        }
+
+        .cartesian-step p {
+            font-size: 0.88rem;
+            color: var(--m);
+            margin-bottom: 15px;
+        }
+
+        /* Responsive adaptations */
+        @media (max-width: 768px) {
+            header {
+                padding: 2.2rem 1rem 1.8rem;
+            }
+            .sec {
+                padding: 1.5rem 0.8rem 3rem;
+            }
+            nav.tabs button {
+                font-size: 0.72rem;
+                padding: 0.35rem 0.8rem;
+            }
+            .grp-head {
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            border-top: 1px solid var(--bd);
+            color: var(--m);
+            font-size: .75rem;
+            background: var(--s)
+        }
+    </style>
+</head>
+
+<body>
+    
+    <!-- HEADER -->
+    <header>
+        <span class="badge">Base de Datos II · Primer Cuatrimestre</span>
+        <h1>🔀 SQL JOINS</h1>
+        <p class="sub">Guía didáctica interactiva sobre cómo fusionar información entre tablas relacionales, desde el producto cartesiano hasta consultas multitablas.</p>
+    </header>
+
+    <!-- BREADCRUMBS -->
+    <div class="bc">
+        <a href="../../../">🏠 Inicio</a>
+        <span style="opacity:.4"> › </span>
+        <a href="../../">Base de Datos II</a>
+        <span style="opacity:.4"> › </span>
+        <span class="cur">🔀 SQL JOINS</span>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <nav class="tabs">
+        <button class="active" onclick="sh('intro')" id="tab-intro">🗂️ Producto Cartesiano</button>
+        <button onclick="sh('inner')" id="tab-inner">🔍 INNER JOIN</button>
+        <button onclick="sh('outer')" id="tab-outer">↔️ OUTER JOINS</button>
+        <button onclick="sh('otros')" id="tab-otros">🔄 Otros Joins</button>
+        <button onclick="sh('tips')" id="tab-tips">💡 Tips y Rendimiento</button>
+        <button onclick="sh('clase')" id="tab-clase">🏫 Prácticos de Clase</button>
+        <button onclick="sh('preguntas')" id="tab-preguntas">❓ Autoevaluación</button>
+    </nav>
+
+    <!-- 1. PRODUCTO CARTESIANO -->
+    <section id="intro" class="sec active">
+        <div class="sec-title">
+            <span class="icon">🗂️</span>
+            <div>
+                <h2>El Concepto Previo: Producto Cartesiano</h2>
+                <p>Comprender cómo se genera la unión "manual" cruzando conjuntos de datos</p>
+            </div>
+        </div>
+
+        <div class="ib cy">
+            📌 <strong>¿Cómo surge un JOIN?</strong> Antes de que existiera la palabra clave <code>JOIN</code> en SQL, la unión de datos se realizaba mediante el <strong>Producto Cartesiano (Cross Product)</strong> y un posterior filtro de campos en el <code>WHERE</code>. Conocer este mecanismo es clave para entender la lógica interna con la que operan los motores de bases de datos.
+        </div>
+
+        <div class="sh">Demostración Paso a Paso de la Unión Manual</div>
+
+        <div class="cartesian-step-box">
+            <div class="cartesian-nav">
+                <span class="cartesian-title" id="step-title">Paso 1: Tablas de Origen</span>
+                <div>
+                    <button class="cartesian-btn" id="btn-prev-step" onclick="changeStep(-1)" disabled>Anterior</button>
+                    <button class="cartesian-btn" id="btn-next-step" onclick="changeStep(1)">Siguiente</button>
+                </div>
+            </div>
+            
+            <div class="cartesian-content">
+                
+                <!-- Paso 1 -->
+                <div class="cartesian-step active" id="c-step-1">
+                    <p>Imaginemos que disponemos de dos tablas independientes. La tabla <code>empleados</code> y la tabla <code>departamentos</code>. Ambas están vinculadas mediante la clave foránea <code>id_departamento</code>.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px;">
+                        <div>
+                            <strong style="font-size: 0.8rem; display: block; margin-bottom: 6px;">Tabla: empleados</strong>
+                            <div class="tbl-container">
+                                <table class="tbl">
+                                    <thead>
+                                        <tr>
+                                            <th>id_empleado (PK)</th>
+                                            <th>nombre</th>
+                                            <th>id_departamento (FK)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>1</td><td>Carlos</td><td>10</td></tr>
+                                        <tr><td>2</td><td>Marta</td><td>20</td></tr>
+                                        <tr><td>3</td><td>Javier</td><td>NULL</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <strong style="font-size: 0.8rem; display: block; margin-bottom: 6px;">Tabla: departamentos</strong>
+                            <div class="tbl-container">
+                                <table class="tbl">
+                                    <thead>
+                                        <tr>
+                                            <th>id_departamento (PK)</th>
+                                            <th>nombre_depto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>10</td><td>Ventas</td></tr>
+                                        <tr><td>20</td><td>Sistemas</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="cartesian-step" id="c-step-2">
+                    <p>Al escribir <code>SELECT * FROM empleados, departamentos;</code> sin añadir filtros, el motor de base de datos genera el **Producto Cartesiano**, es decir, combina **cada una de las filas de la primera tabla con absolutamente todas las filas de la segunda tabla**.</p>
+                    <strong style="font-size: 0.8rem; display: block; margin-bottom: 6px;">Resultado del Producto Cartesiano (6 filas totales - Combinación Cruzada):</strong>
+                    <div class="tbl-container">
+                        <table class="tbl">
+                            <thead>
+                                <tr style="background: #fee2e2;">
+                                    <th>empleados.nombre</th>
+                                    <th>empleados.id_departamento</th>
+                                    <th>departamentos.id_departamento</th>
+                                    <th>departamentos.nombre_depto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: rgba(239, 68, 68, 0.05);"><td>Carlos</td><td>10</td><td>10</td><td>Ventas (Coincide)</td></tr>
+                                <tr><td>Carlos</td><td>10</td><td>20</td><td>Sistemas (Falsa asociación)</td></tr>
+                                <tr><td>Marta</td><td>20</td><td>10</td><td>Ventas (Falsa asociación)</td></tr>
+                                <tr style="background: rgba(239, 68, 68, 0.05);"><td>Marta</td><td>20</td><td>20</td><td>Sistemas (Coincide)</td></tr>
+                                <tr><td>Javier</td><td>NULL</td><td>10</td><td>Ventas (Falsa asociación)</td></tr>
+                                <tr><td>Javier</td><td>NULL</td><td>20</td><td>Sistemas (Falsa asociación)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="cartesian-step" id="c-step-3">
+                    <p>Para corregir las asociaciones incorrectas, debemos aplicar un filtro en la cláusula <code>WHERE</code> que exija que las claves coincidan: <code>WHERE empleados.id_departamento = departamentos.id_departamento</code>.</p>
+                    <div class="syntax"><span class="kw">SELECT</span> empleados.nombre, departamentos.nombre_depto
+<span class="kw">FROM</span> empleados, departamentos
+<span class="kw">WHERE</span> empleados.id_departamento = departamentos.id_departamento;</div>
+                    <strong style="font-size: 0.8rem; display: block; margin-bottom: 6px;">Resultado final del filtrado (Solo coinciden 2 registros):</strong>
+                    <div class="tbl-container">
+                        <table class="tbl">
+                            <thead>
+                                <tr style="background: #d1fae5;">
+                                    <th>nombre</th>
+                                    <th>nombre_depto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Carlos</td><td>Ventas</td></tr>
+                                <tr><td>Marta</td><td>Sistemas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.8rem; font-style: italic; color: var(--a3);">💡 ¡Esta unión manual en el WHERE es conceptualmente idéntica al funcionamiento lógico de un <strong>INNER JOIN</strong> moderno!</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. INNER JOIN -->
+    <section id="inner" class="sec">
+        <div class="sec-title">
+            <span class="icon">🔍</span>
+            <div>
+                <h2>INNER JOIN — La Intersección Exacta</h2>
+                <p>Combina filas cuando existe correspondencia exacta en ambas tablas</p>
+            </div>
+        </div>
+
+        <div class="ib cy">
+            <strong>¿Cuándo usar?</strong> Utiliza <code>INNER JOIN</code> cuando necesites recuperar únicamente los registros que tengan coincidencia en **ambas tablas simultáneamente**. Cualquier registro que tenga un valor nulo en su clave foránea o que no coincida con la otra tabla quedará completamente **excluido** del resultado.
+        </div>
+
+        <div class="cmd-list">
+            <div class="cmd-card open" id="cmd-200">
+                <div class="cmd-head" onclick="tgCmd(200)">
+                    <span class="cmd-kw" style="background:#e0f2fe; color:#0284c7">Sintaxis INNER</span>
+                    <span class="cmd-desc">Estructura formal para unir dos conjuntos de datos</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>La cláusula <code>INNER JOIN</code> se ubica a continuación del <code>FROM</code> de la primera tabla, y se complementa obligatoriamente con la cláusula <code>ON</code>, que define la condición de correspondencia de claves.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> t1.columna, t2.columna
+<span class="kw">FROM</span> tabla1 t1
+<span class="kw">INNER JOIN</span> tabla2 t2 <span class="kw">ON</span> t1.clave_comun = t2.clave_comun;</div>
+                        
+                        <div class="ex-box">
+                            <div class="ex-title">📝 Ejemplo práctico</div>
+                            <div class="ex-code">SELECT e.nombre, d.nombre_depto
+FROM empleados e
+INNER JOIN departamentos d ON e.id_departamento = d.id_departamento;</div>
+                            <p style="font-size:.78rem;color:var(--m);margin:0">ℹ️ Solo devolverá a Carlos y Marta. Excluye a Javier (no tiene departamento asignado).</p>
+                        </div>
+
+                        <!-- Quiz interactivo -->
+                        <div class="quiz-wrap">
+                            <p class="q-label">🧠 Inténtalo: Escribe la consulta para obtener los nombres de productos (tabla <code>productos</code>) junto con el nombre de su categoría (tabla <code>categorias</code>) usando INNER JOIN sobre la clave <code>id_categoria</code>.</p>
+                            <input class="quiz-input" id="qi-200" placeholder="Escribe tu consulta SQL aquí..." />
+                            <br>
+                            <button class="quiz-btn" id="btn-q-200">Verificar</button>
+                            <div class="quiz-fb" id="qf-200"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. OUTER JOINS -->
+    <section id="outer" class="sec">
+        <div class="sec-title">
+            <span class="icon">↔️</span>
+            <div>
+                <h2>OUTER JOINS — Uniones Externas</h2>
+                <p>Recuperar datos de una tabla aunque no tengan coincidencia en la otra</p>
+            </div>
+        </div>
+
+        <div class="ib am">
+            <strong>¿Por qué existen?</strong> A diferencia del <code>INNER JOIN</code> que es selectivo y excluyente, los <code>OUTER JOINS</code> permiten priorizar y **preservar** todas las filas de una tabla origen, forzando al motor a completar con valores <code>NULL</code> en los campos de la otra tabla si no existe correspondencia.
+        </div>
+
+        <div class="cmd-list">
+            
+            <!-- LEFT JOIN -->
+            <div class="cmd-card" id="cmd-301">
+                <div class="cmd-head" onclick="tgCmd(301)">
+                    <span class="cmd-kw" style="background:#e0e7ff; color:#6366f1">LEFT JOIN</span>
+                    <span class="cmd-desc">Preserva todo el conjunto de la izquierda</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>Devuelve todas las filas de la tabla **izquierda** (tabla declarada en el <code>FROM</code>) y las filas coincidentes de la tabla derecha. Si no hay correspondencia, se rellenan con <code>NULL</code> los campos de la derecha.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto
+<span class="kw">FROM</span> empleados e
+<span class="kw">LEFT JOIN</span> departamentos d <span class="kw">ON</span> e.id_departamento = d.id_departamento;</div>
+                        <div class="tbl-container">
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>e.nombre (Izquierda)</th>
+                                        <th>d.nombre_depto (Derecha)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Carlos</td><td>Ventas</td></tr>
+                                    <tr><td>Marta</td><td>Sistemas</td></tr>
+                                    <tr style="color: var(--pk);"><td>Javier</td><td><strong>NULL</strong> (Preservado)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="quiz-wrap">
+                            <p class="q-label">🧠 Inténtalo: Escribe un LEFT JOIN para listar todos los clientes (tabla <code>clientes</code>) y sus números de pedido (tabla <code>pedidos</code>) asociados mediante <code>id_cliente</code>.</p>
+                            <input class="quiz-input" id="qi-301" placeholder="Escribe tu consulta SQL aquí..." />
+                            <br>
+                            <button class="quiz-btn" id="btn-q-301">Verificar</button>
+                            <div class="quiz-fb" id="qf-301"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT JOIN -->
+            <div class="cmd-card" id="cmd-302">
+                <div class="cmd-head" onclick="tgCmd(302)">
+                    <span class="cmd-kw" style="background:#ede9fe; color:#7c3aed">RIGHT JOIN</span>
+                    <span class="cmd-desc">Preserva todo el conjunto de la derecha</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>Es la contraparte simétrica del LEFT JOIN. Devuelve todos los registros de la tabla de la **derecha** (tabla declarada dentro del <code>RIGHT JOIN</code>) y las coincidencias de la izquierda. Si no coincide, completa con <code>NULL</code>.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto
+<span class="kw">FROM</span> empleados e
+<span class="kw">RIGHT JOIN</span> departamentos d <span class="kw">ON</span> e.id_departamento = d.id_departamento;</div>
+                        <div class="tbl-container">
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>e.nombre (Izquierda)</th>
+                                        <th>d.nombre_depto (Derecha)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Carlos</td><td>Ventas</td></tr>
+                                    <tr><td>Marta</td><td>Sistemas</td></tr>
+                                    <tr style="color: var(--a4);"><td><strong>NULL</strong></td><td>Marketing (Preservado)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="ib am">
+                            💡 <strong>Tip de clase:</strong> Cualquier <code>RIGHT JOIN</code> se puede escribir de forma equivalente como un <code>LEFT JOIN</code> invirtiendo el orden en que se declaran las tablas. La industria prefiere masivamente el uso de <code>LEFT JOIN</code> porque facilita la lectura del flujo lógico de izquierda a derecha.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FULL JOIN -->
+            <div class="cmd-card" id="cmd-303">
+                <div class="cmd-head" onclick="tgCmd(303)">
+                    <span class="cmd-kw" style="background:#fce7f3; color:#db2777">FULL JOIN</span>
+                    <span class="cmd-desc">Preserva la totalidad de ambas tablas (Unión)</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>Devuelve todos los registros cuando hay correspondencia tanto en la tabla izquierda como en la derecha. Si no hay correspondencia, rellena los campos del lado sin coincidencia con <code>NULL</code>.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto
+<span class="kw">FROM</span> empleados e
+<span class="kw">FULL OUTER JOIN</span> departamentos d <span class="kw">ON e.id_departamento = d.id_departamento;</span></div>
+                        <div class="tbl-container">
+                            <table class="tbl">
+                                <thead>
+                                    <tr>
+                                        <th>e.nombre</th>
+                                        <th>d.nombre_depto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Carlos</td><td>Ventas</td></tr>
+                                    <tr><td>Marta</td><td>Sistemas</td></tr>
+                                    <tr style="color: var(--pk);"><td>Javier</td><td><strong>NULL</strong></td></tr>
+                                    <tr style="color: var(--a4);"><td><strong>NULL</strong></td><td>Marketing</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="ib rd">
+                            ⚠️ <strong>Compatibilidad en MySQL:</strong> El motor MySQL/MariaDB **no soporta nativamente** la sentencia <code>FULL JOIN</code>. Para simularlo en estos motores, se realiza la unión de un <code>LEFT JOIN</code> y un <code>RIGHT JOIN</code> usando el operador <code>UNION</code>:
+                            <pre style="margin-top: 5px; font-family: var(--font-mono); font-size: 0.75rem; color: #1e293b;">SELECT e.nombre, d.nombre_depto FROM empleados e LEFT JOIN departamentos d ON e.id_departamento = d.id_departamento
+UNION
+SELECT e.nombre, d.nombre_depto FROM empleados e RIGHT JOIN departamentos d ON e.id_departamento = d.id_departamento;</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 4. OTROS JOINS -->
+    <section id="otros" class="sec">
+        <div class="sec-title">
+            <span class="icon">🔄</span>
+            <div>
+                <h2>Otros Joins y Extensiones</h2>
+                <p>Modelos de unión cruzada, simplificaciones y consultas multitablas</p>
+            </div>
+        </div>
+
+        <div class="cmd-list">
+            
+            <!-- CROSS JOIN -->
+            <div class="cmd-card" id="cmd-401">
+                <div class="cmd-head" onclick="tgCmd(401)">
+                    <span class="cmd-kw" style="background:#fef3c7; color:#b45309">CROSS JOIN</span>
+                    <span class="cmd-desc">El producto cartesiano de forma explícita</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>Produce el producto cartesiano exacto de ambas tablas. Es idéntico a listar las tablas separadas por comas en el <code>FROM</code> sin poner condiciones en el <code>WHERE</code>.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto
+<span class="kw">FROM</span> empleados e
+<span class="kw">CROSS JOIN</span> departamentos d;</div>
+                        <p style="font-size: 0.8rem;">Produce una matriz combinatoria de todas las filas. Útil para generar combinaciones completas (ej: tallas de remeras x colores de remeras).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NATURAL JOIN & USING -->
+            <div class="cmd-card" id="cmd-402">
+                <div class="cmd-head" onclick="tgCmd(402)">
+                    <span class="cmd-kw" style="background:#e8f5e9; color:#2e7d32">USING &amp; NATURAL</span>
+                    <span class="cmd-desc">Simplificación sintáctica por columnas homónimas</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>Si la columna de unión comparte exactamente el mismo nombre en ambas tablas (ej. <code>id_departamento</code>), SQL provee dos formas de simplificar la consulta:</p>
+                        
+                        <strong style="font-size:0.8rem; display:block; margin-bottom:5px;">Opción A: La cláusula USING</strong>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto
+<span class="kw">FROM</span> empleados e
+<span class="kw">INNER JOIN</span> departamentos d <span class="kw">USING</span> (id_departamento);</div>
+                        
+                        <strong style="font-size:0.8rem; display:block; margin: 10px 0 5px;">Opción B: NATURAL JOIN (¡Peligroso en Producción!)</strong>
+                        <p>Busca de forma automática **todas** las columnas que tengan nombres idénticos en ambas tablas y las une mediante ellas de manera implícita.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto
+<span class="kw">FROM</span> empleados e
+<span class="kw">NATURAL JOIN</span> departamentos d;</div>
+                        <div class="ib rd">
+                            ⚠️ <strong>Peligro en producción:</strong> Si en el futuro se añade una columna llamada <code>fecha_registro</code> o <code>estado</code> a ambas tablas con propósitos diferentes, el <code>NATURAL JOIN</code> intentará unir implícitamente por esos campos también, **rompiendo por completo la consulta**. Su uso no está recomendado en entornos profesionales.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MULTI-TABLE JOINS -->
+            <div class="cmd-card" id="cmd-403">
+                <div class="cmd-head" onclick="tgCmd(403)">
+                    <span class="cmd-kw" style="background:#e0f7fa; color:#006064">Joins Múltiples</span>
+                    <span class="cmd-desc">Unir tres o más tablas consecutivamente</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p>No existe límite en SQL para la cantidad de tablas que puedes conectar. Solo debes encadenar las sentencias <code>JOIN ... ON</code> de forma consecutiva.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto, s.ciudad
+<span class="kw">FROM</span> empleados e
+<span class="kw">INNER JOIN</span> departamentos d <span class="kw">ON</span> e.id_departamento = d.id_departamento
+<span class="kw">INNER JOIN</span> sedes s <span class="kw">ON</span> d.id_sede = s.id_sede;</div>
+                        <p style="font-size: 0.8rem; color: var(--m);">El motor procesará secuencialmente las uniones de izquierda a derecha.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 5. TIPS Y RENDIMIENTO -->
+    <section id="tips" class="sec">
+        <div class="sec-title">
+            <span class="icon">💡</span>
+            <div>
+                <h2>Tips y Optimización de Rendimiento</h2>
+                <p>Prácticas recomendadas para escribir consultas eficientes y limpias</p>
+            </div>
+        </div>
+
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="cc-icon">🏷️</div>
+                <h4>Usa Alias de Tabla (AS)</h4>
+                <p>Los alias acortan el código y facilitan su mantenimiento. Usa letras cortas y descriptivas (ej: <code>empleados e</code>, <code>pedidos p</code>).</p>
+                <span class="cc-tag">Legibilidad</span>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">🛡️</div>
+                <h4>Califica tus Columnas</h4>
+                <p>Si un campo se llama igual en ambas tablas (ej. <code>creado_en</code>), SQL arrojará error de ambigüedad. Antepone siempre el alias: <code>e.creado_en</code>.</p>
+                <span class="cc-tag">Seguridad</span>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">⚡</div>
+                <h4>Indexa las Claves de Unión</h4>
+                <p>Para que los JOINs sean rápidos, las columnas de la condición (FK y PK) deben tener **índices**. Las PK ya lo tienen; asegúrate de indexar las FK.</p>
+                <span class="cc-tag">Rendimiento</span>
+            </div>
+            <div class="concept-card">
+                <div class="cc-icon">🛑</div>
+                <h4>Evita Joins Innecesarios</h4>
+                <p>Cada JOIN incrementa la carga computacional en el servidor. Une únicamente las tablas que contengan columnas que necesites listar o filtrar.</p>
+                <span class="cc-tag">Buenas Prácticas</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. PRÁCTICOS DE CLASE -->
+    <section id="clase" class="sec">
+        <div class="sec-title">
+            <span class="icon">🏫</span>
+            <div>
+                <h2>Ejercicios Resueltos para el Aula</h2>
+                <p>Casos prácticos de resolución conjunta para trabajar en el pizarrón</p>
+            </div>
+        </div>
+
+        <div class="cmd-list">
+            
+            <!-- Ejercicio 1 -->
+            <div class="cmd-card open" id="cmd-601">
+                <div class="cmd-head" onclick="tgCmd(601)">
+                    <span class="cmd-kw" style="background:#e0f2fe; color:#0284c7">Caso 01</span>
+                    <span class="cmd-desc">Encontrar Clientes sin Compras (Técnica Anti-Join)</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p><strong>Problema:</strong> El departamento de marketing necesita enviar una oferta especial de bienvenida a aquellos clientes registrados que **aún no han realizado ninguna compra** en la tienda.</p>
+                        <div class="syntax"><span class="cm">-- Unimos con LEFT JOIN y filtramos los nulos de la derecha</span>
+<span class="kw">SELECT</span> c.id_cliente, c.nombre, c.email
+<span class="kw">FROM</span> clientes c
+<span class="kw">LEFT JOIN</span> pedidos p <span class="kw">ON</span> c.id_cliente = p.id_cliente
+<span class="kw">WHERE</span> p.id_pedido <span class="kw">IS NULL</span>;</div>
+                        <p style="font-size: 0.8rem; font-style: italic; color: var(--a3);">💡 <strong>Explicación:</strong> El LEFT JOIN preserva a todos los clientes. Si un cliente no compró nada, sus campos de pedidos serán NULL. Al filtrar <code>WHERE p.id_pedido IS NULL</code> aislamos a este segmento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejercicio 2 -->
+            <div class="cmd-card" id="cmd-602">
+                <div class="cmd-head" onclick="tgCmd(602)">
+                    <span class="cmd-kw" style="background:#ede9fe; color:#7c3aed">Caso 02</span>
+                    <span class="cmd-desc">Reporte Financiero Multitabla</span>
+                    <span class="cmd-arr">▼</span>
+                </div>
+                <div class="cmd-body">
+                    <div class="cmd-inner">
+                        <p><strong>Problema:</strong> Listar los nombres de los empleados, el departamento al que pertenecen y el total acumulado que han vendido en pedidos facturados.</p>
+                        <div class="syntax"><span class="kw">SELECT</span> e.nombre, d.nombre_depto, <span class="kw">SUM</span>(p.monto_total) <span class="kw">AS</span> total_ventas
+<span class="kw">FROM</span> empleados e
+<span class="kw">INNER JOIN</span> departamentos d <span class="kw">ON</span> e.id_departamento = d.id_departamento
+<span class="kw">INNER JOIN</span> pedidos p <span class="kw">ON</span> e.id_empleado = p.id_vendedor
+<span class="kw">GROUP BY</span> e.id_empleado, d.nombre_depto;</div>
+                        <p style="font-size: 0.8rem; font-style: italic; color: var(--a2);">💡 <strong>Explicación:</strong> Realizamos un join en cadena de tres tablas (empleados, departamentos y pedidos) y agrupamos mediante GROUP BY para aplicar la suma acumulativa.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 7. AUTOEVALUACIÓN -->
+    <section id="preguntas" class="sec">
+        <div class="sec-title">
+            <span class="icon">❓</span>
+            <div>
+                <h2>Preguntas de Repaso y Autoevaluación</h2>
+                <p>Comprueba tus conocimientos conceptuales sobre la lógica de JOINs</p>
+            </div>
+        </div>
+
+        <div class="pb-w">
+            <div class="pb-f" id="pf"></div>
+        </div>
+        <div class="pb-l" id="pl">0 de 10 preguntas leídas</div>
+        
+        <div id="qc"></div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>Base de Datos II · Primer Cuatrimestre &nbsp;›&nbsp; SQL JOINS</footer>
+
+    <!-- SCRIPT DE LOGICA DE TABS Y PREGUNTAS AUTOEVALUADAS -->
+    <script>
+        // Tab switching
+        function sh(id) { 
+            document.querySelectorAll('.sec').forEach(s => s.classList.remove('active')); 
+            document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active')); 
+            document.getElementById(id).classList.add('active'); 
+            document.getElementById('tab-' + id).classList.add('active'); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        // Cartesian Step slider
+        let currentStep = 1;
+        function changeStep(dir) {
+            const next = currentStep + dir;
+            if (next < 1 || next > 3) return;
+            
+            document.getElementById(`c-step-${currentStep}`).classList.remove('active');
+            document.getElementById(`c-step-${next}`).classList.add('active');
+            
+            currentStep = next;
+            
+            // Buttons status
+            document.getElementById('btn-prev-step').disabled = (currentStep === 1);
+            document.getElementById('btn-next-step').disabled = (currentStep === 3);
+            
+            // Header title
+            const titles = {
+                1: "Paso 1: Tablas de Origen",
+                2: "Paso 2: Producto Cartesiano Cruzado",
+                3: "Paso 3: Filtrado de correspondencias"
+            };
+            document.getElementById('step-title').innerText = titles[currentStep];
+        }
+
+        // Collapse Cmd card toggler
+        function tgCmd(i) { 
+            const c = document.getElementById('cmd-' + i); 
+            const w = c.classList.contains('open'); 
+            document.querySelectorAll('.cmd-card').forEach(x => x.classList.remove('open')); 
+            if (!w) c.classList.add('open'); 
+        }
+
+        // Interactive Quizzes logic
+        document.querySelectorAll('.quiz-btn').forEach(btn => {
+            btn.onclick = function() {
+                const i = parseInt(this.getAttribute('id').match(/\d+/)[0]);
+                const el = document.getElementById('qi-' + i);
+                const fb = document.getElementById('qf-' + i);
+                if (!el || !fb) return;
+                
+                const ans = el.value.trim().toLowerCase().replace(/\s+/g, ' ');
+                
+                let isOk = false;
+                let hint = '';
+
+                if (i === 200) { // INNER JOIN productos / categorias
+                    isOk = ans.includes("inner join") && ans.includes("on") && ans.includes("id_categoria");
+                    hint = "Asegúrate de unir productos con categorias ON p.id_categoria = c.id_categoria.";
+                } else if (i === 301) { // LEFT JOIN clientes / pedidos
+                    isOk = ans.includes("left join") && ans.includes("on") && ans.includes("id_cliente");
+                    hint = "Debes usar LEFT JOIN pedidos ON c.id_cliente = p.id_cliente.";
+                }
+
+                if (isOk) {
+                    fb.textContent = '✅ ¡Excelente! Tu consulta está bien estructurada.';
+                    fb.className = 'quiz-fb ok';
+                } else {
+                    fb.textContent = '❌ Revisa la sintaxis. ' + hint;
+                    fb.className = 'quiz-fb err';
+                }
+            };
+        });
+
+        // Autoevaluacion Questions Data
+        const Qs = [
+            { n: 1, g: 'Conceptos', t: '¿Qué es el producto cartesiano y cómo se relaciona con un JOIN?', h: 'El producto cartesiano combina todas las filas de una tabla con todas las de otra. Un JOIN es conceptualmente un producto cartesiano seguido de un filtro de correspondencia de claves.', tags: ['Básico', 'Matemáticas'] },
+            { n: 2, g: 'Conceptos', t: '¿Por qué es obligatorio definir la cláusula ON en un JOIN?', h: 'La cláusula ON define bajo qué condición coinciden las filas. Si se omite, la consulta se convierte accidentalmente en un producto cartesiano (CROSS JOIN).', tags: ['Claves', 'Sintaxis'] },
+            { n: 3, g: 'INNER JOIN', t: '¿Qué sucede con los registros que no coinciden en un INNER JOIN?', h: 'Son descartados por completo del resultado de la consulta. Solo se retornan las intersecciones exactas.', tags: ['Filtros', 'INNER'] },
+            { n: 4, g: 'OUTER JOINS', t: '¿Cuál es la diferencia primordial entre LEFT JOIN y RIGHT JOIN?', h: 'LEFT JOIN preserva todas las filas de la tabla izquierda (FROM). RIGHT JOIN preserva todas las filas de la tabla derecha (JOIN).', tags: ['Izquierda', 'Derecha'] },
+            { n: 5, g: 'OUTER JOINS', t: '¿Por qué aparecen valores NULL en los resultados de un LEFT JOIN?', h: 'Porque hay filas en la tabla de la izquierda que no tienen registros asociados en la derecha, por lo que el motor rellena esos campos vacíos con NULL.', tags: ['NULL', 'Comportamiento'] },
+            { n: 6, g: 'OUTER JOINS', t: '¿Cómo simularías un FULL JOIN en un motor como MySQL?', h: 'Se simula uniendo un LEFT JOIN y un RIGHT JOIN de las mismas tablas mediante la sentencia UNION.', tags: ['MySQL', 'UNION'] },
+            { n: 7, g: 'Otros', t: '¿Qué peligro representa el uso de NATURAL JOIN en sistemas de producción?', h: 'Que si en el futuro se agrega una columna con el mismo nombre en ambas tablas (ej. fecha_registro), el NATURAL JOIN intentará unir implícitamente por ahí, rompiendo la consulta.', tags: ['Peligros', 'Buenas Prácticas'] },
+            { n: 8, g: 'Tips', t: '¿Qué es un error de ambigüedad en SQL y cómo se previene?', h: 'Ocurre cuando pides una columna que existe en ambas tablas. Se previene calificando las columnas con el alias de la tabla (ej. e.nombre).', tags: ['Alias', 'Ambigüedad'] },
+            { n: 9, g: 'Rendimiento', t: '¿Cuál es el impacto de los índices en la velocidad de los JOINs?', h: 'Cruzar tablas sin índices en las claves de unión obliga al motor a realizar búsquedas completas de tabla (Table Scans), haciendo la consulta extremadamente lenta.', tags: ['Índices', 'Velocidad'] },
+            { n: 10, g: 'Reflexión', t: '¿Se pueden unir más de dos tablas en una sola consulta?', h: 'Sí, encadenando múltiples sentencias JOIN ... ON consecutivamente de forma ilimitada.', tags: ['Avanzado', 'Multi-Join'] }
+        ];
+
+        let oQ = new Set();
+        function renderQuestions() {
+            const c = document.getElementById('qc'); 
+            let lg = '';
+            
+            Qs.forEach(q => {
+                if (q.g !== lg) { 
+                    lg = q.g; 
+                    const d = document.createElement('div'); 
+                    d.style.cssText = 'font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:1.6rem 0 .6rem;display:flex;align-items:center;gap:.5rem'; 
+                    d.innerHTML = `${q.g}<span style="flex:1;height:1px;background:var(--bd);margin-left:.4rem"></span>`; 
+                    c.appendChild(d); 
+                }
+                
+                const b = document.createElement('div'); 
+                b.className = 'qb'; 
+                b.id = 'qq-' + q.n;
+                b.innerHTML = `<div class="qh" onclick="tq(${q.n})"><div class="qn">${q.n}</div><div class="qt">${q.t}</div><span class="qa">▼</span></div><div class="qbdy"><div class="qbi"><p>💡 <em>${q.h}</em></p><div class="qtgs">${q.tags.map((t, idx) => `<span class="tg ${idx % 2 === 0 ? 'cy' : 'gr'}">${t}</span>`).join('')}</div></div></div>`;
+                c.appendChild(b);
+            });
+        }
+
+        function tq(n) { 
+            const b = document.getElementById('qq-' + n); 
+            const w = b.classList.contains('open'); 
+            document.querySelectorAll('.qb').forEach(x => x.classList.remove('open')); 
+            
+            if (!w) { 
+                b.classList.add('open'); 
+                oQ.add(n); 
+                const p = Math.round(oQ.size / Qs.length * 100); 
+                document.getElementById('pf').style.width = p + '%'; 
+                document.getElementById('pl').textContent = oQ.size + ' de ' + Qs.length + ' preguntas leídas'; 
+            } 
+        }
+
+        renderQuestions();
+    </script>
+</body>
+
+</html>

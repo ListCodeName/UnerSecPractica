@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 4: Colecciones y Estructuras (Arrays y Objetos)</title>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body data-workshop-id="taller4">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Taller 04</div>
+        <h1>Arrays, Listas y Diccionarios</h1>
+        <p>Aprende a coleccionar y estructurar datos complejos. Manipula listas ordenadas (arrays) y objetos estructurados como diccionarios.</p>
+        <div class="header-meta">
+            <span>Dificultad: <strong>Fácil a Experto</strong></span>
+            <span>Desafíos: <strong>10 Ejercicios</strong></span>
+            <span>Retorno: <a href="index.html" style="color: var(--neon-pink); text-decoration: none;">&larr; Volver al Portal</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: SELECCIÓN Y DETALLE -->
+        <div class="panel">
+            <div class="panel-title">
+                Selecciona un Desafío <span class="indicator"></span>
+            </div>
+            
+            <!-- Selector de Ejercicios -->
+            <div class="exercise-selector" id="exercise-buttons"></div>
+
+            <!-- Detalles del Ejercicio Activo -->
+            <div class="exercise-detail-card">
+                <div>
+                    <div class="ex-badge-row">
+                        <span class="diff-badge" id="ex-difficulty">Fácil</span>
+                        <span class="ex-concepts" id="ex-concepts-list">Conceptos: </span>
+                    </div>
+                    <h2 class="ex-title" id="ex-title">Cargando...</h2>
+                    <div class="restriction-box" id="ex-restriction"></div>
+                    <p class="ex-desc" id="ex-desc">Cargando consigna...</p>
+                </div>
+                
+                <!-- Pistas -->
+                <div class="hint-container">
+                    <button class="hint-trigger-btn" id="hint-btn">💡 Ver Pista</button>
+                    <div class="hint-content-box" id="hint-content"></div>
+                </div>
+            </div>
+
+            <!-- Firma de la función visual (Solo informativo) -->
+            <div class="code-support-box" id="code-support-snippet"></div>
+
+            <!-- Teoría Rápida de Apoyo -->
+            <div class="theory-card">
+                <h3>Resumen Teórico del Taller</h3>
+                <ul>
+                    <li><code>const miArray = [1, 2, 3]</code> colecciona datos ordenados por un índice numérico (0-indexed).</li>
+                    <li><code>miArray.push(valor)</code> agrega un elemento al final de la lista.</li>
+                    <li><code>const miObjeto = { nombre: "Juan", edad: 20 }</code> estructura datos clave-valor.</li>
+                    <li>Iteración sobre objetos: <code>for (let clave in miObjeto)</code> recorre sus propiedades.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: PLAYGROUND, TERMINAL Y RESULTADOS -->
+        <div class="panel sandbox-card">
+            <div class="panel-title">
+                Consola y Validador de Pruebas <span class="indicator" style="background-color: var(--neon-cyan); box-shadow: var(--glow-cyan);"></span>
+            </div>
+
+            <div class="student-instruction-banner">
+                💡 <strong>¿Cómo resolver?</strong> Abre este archivo en tu editor de código preferido (ej. VS Code). Busca el bloque <code>&lt;script id="soluciones"&gt;</code> al final del documento y completa el código de las funciones indicadas. Guarda el archivo, recarga esta página y haz clic en <strong>Ejecutar y Validar</strong>.
+            </div>
+
+            <!-- Botón de Ejecutar -->
+            <div class="action-row">
+                <button class="btn-run" id="run-btn">
+                    <span>▶ Ejecutar y Validar Código</span>
+                </button>
+            </div>
+
+            <!-- Consola de Resultados Simulada -->
+            <div class="terminal-header">
+                <span>Terminal de Salida</span>
+                <span>Console Sandbox</span>
+            </div>
+            <div class="terminal" id="terminal-content"></div>
+
+            <!-- Resultados del Test Suite -->
+            <div class="test-results-box">
+                <div class="test-results-title">
+                    <span>Suite de Pruebas</span>
+                    <span class="test-summary" id="progress-summary">Progreso: 0/10 Completados</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="test-list" id="test-results-list" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- DEFINE DATA DE EJERCICIOS PARA EL TESTER -->
+    <script>
+        window.exercisesData = [
+            {
+                id: 1,
+                title: "Buscador de Extremos",
+                difficulty: "easy",
+                concepts: "Arrays e Índices",
+                restriction: "Prohibido usar Math.min/max o métodos avanzados de filtrado.",
+                signature: "resolver4_1(temperaturas)",
+                functionName: "resolver4_1",
+                desc: "Dado un array de números <code>temperaturas</code>, calcula de forma manual el valor mínimo, el valor máximo y el promedio general de todos los elementos. Retorna un objeto con el formato exacto: <code>{ min: X, max: Y, promedio: Z }</code>. Redondea el promedio a dos decimales.",
+                hint: "Declara 'min' y 'max' con el primer elemento del array. Recorre el array con un bucle sumando los elementos. Al final, calcula el promedio y redondea con toFixed(2).",
+                tests: [
+                    {
+                        name: "Array de temperaturas clásicas [12.5, 25.0, 8.2, 19.4]",
+                        assert: (fn) => {
+                            const res = fn([12.5, 25.0, 8.2, 19.4]);
+                            if (!res || res.min !== 8.2 || res.max !== 25 || res.promedio !== 16.28) {
+                                throw new Error(`Esperaba {min: 8.2, max: 25, promedio: 16.28}, recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Filtro Selector",
+                difficulty: "easy",
+                concepts: "Array push y Filtros",
+                restriction: "Prohibido usar el método nativo array.filter().",
+                signature: "resolver4_2(numeros)",
+                functionName: "resolver4_2",
+                desc: "Dado un array de enteros <code>numeros</code>, crea un nuevo array que contenga únicamente los números pares y retórnalo en el orden original.",
+                hint: "Crea una lista vacía 'pares'. Recorre el array con un bucle for tradicional y, si el número es divisible por 2 (num % 2 === 0), agrégalo usando pares.push(num).",
+                tests: [
+                    {
+                        name: "Filtrar [3, 8, 12, 5, 6, 9] (debe retornar [8, 12, 6])",
+                        assert: (fn) => {
+                            const res = fn([3, 8, 12, 5, 6, 9]);
+                            if (!Array.isArray(res) || res.length !== 3 || res[0] !== 8 || res[1] !== 12 || res[2] !== 6) {
+                                throw new Error(`Esperaba [8, 12, 6], recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Inversión Manual",
+                difficulty: "easy",
+                concepts: "Acceso inverso a Array",
+                restriction: "PROHIBIDO EL USO DEL MÉTODO NATIVO array.reverse().",
+                signature: "resolver4_3(array)",
+                functionName: "resolver4_3",
+                desc: "Dado un <code>array</code> genérico de elementos, crea un nuevo array que contenga los mismos elementos pero en orden inverso y devuélvelo (sin alterar el array original).",
+                hint: "Puedes recorrer el array original hacia atrás (desde array.length - 1 hasta 0) e ir guardando los elementos en una nueva lista con .push().",
+                tests: [
+                    {
+                        name: "Invertir array ['a', 'b', 'c', 'd']",
+                        assert: (fn) => {
+                            const res = fn(['a', 'b', 'c', 'd']);
+                            if (!Array.isArray(res) || res.join(',') !== 'd,c,b,a') {
+                                throw new Error(`Esperaba ['d', 'c', 'b', 'a'], recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Contador de Frecuencia",
+                difficulty: "medium",
+                concepts: "Objetos Literales como Diccionarios",
+                restriction: "Prohibido usar Set o Map nativos de JS.",
+                signature: "resolver4_4(texto)",
+                functionName: "resolver4_4",
+                desc: "Dado un string <code>texto</code>, cuenta cuántas veces aparece cada letra. Retorna un objeto cuyas claves sean las letras y los valores sean la cantidad de apariciones. **Importante:** Ignora por completo los espacios en blanco.",
+                hint: "Crea un objeto vacío 'frecuencia'. Recorre el string letra por letra. Si la letra es un espacio, ignórala. Si ya existe en 'frecuencia', haz frec[letra]++. Si no, inicialízala en 1.",
+                tests: [
+                    {
+                        name: "Contar frecuencia de 'hola uner'",
+                        assert: (fn) => {
+                            const res = fn("hola uner");
+                            if (!res || res[' '] !== undefined || res.h !== 1 || res.o !== 1 || res.l !== 1 || res.a !== 1 || res.u !== 1 || res.n !== 1 || res.e !== 1 || res.r !== 1) {
+                                throw new Error(`Frecuencia incorrecta. Recibió: ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Inventario RPG",
+                difficulty: "medium",
+                concepts: "Iteración en Array de Objetos",
+                restriction: "Prohibido usar métodos avanzados de iteración (.reduce, .map, .filter).",
+                signature: "resolver4_5(inventario)",
+                functionName: "resolver4_5",
+                desc: "Un héroe tiene un <code>inventario</code> en forma de array de objetos. Cada objeto representa un ítem con las propiedades <code>nombre</code>, <code>peso</code> (decimal) y <code>valor</code> (entero). Escribe un algoritmo que calcule el peso acumulado, el valor de mercado total y cree un array con los nombres de todos los ítems. Retorna un objeto en el formato: <code>{ pesoTotal: P, valorTotal: V, nombres: [...] }</code>.",
+                hint: "Inicializa 'pesoTotal=0', 'valorTotal=0' y 'nombres=[]'. Recorre el inventario con un bucle, acumulando los pesos y valores, e insertando cada nombre al array con push().",
+                tests: [
+                    {
+                        name: "Cálculo de inventario RPG con 3 items",
+                        assert: (fn) => {
+                            const items = [
+                                { nombre: "Espada", peso: 3.5, valor: 150 },
+                                { nombre: "Escudo", peso: 5.0, valor: 200 },
+                                { nombre: "Poción", peso: 0.5, valor: 30 }
+                            ];
+                            const res = fn(items);
+                            if (!res || res.pesoTotal !== 9 || res.valorTotal !== 380 || res.nombres.join(',') !== 'Espada,Escudo,Poción') {
+                                throw new Error(`Respuesta incorrecta. Recibió: ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Elipsis de Títulos",
+                difficulty: "medium",
+                concepts: "Slices y Strings",
+                restriction: "Prohibido alterar el array original.",
+                signature: "resolver4_6(titulos, maxLongitud)",
+                functionName: "resolver4_6",
+                desc: "Toma un array de cadenas <code>titulos</code> y un entero <code>maxLongitud</code>. Retorna un nuevo array donde las cadenas cuya longitud supere <code>maxLongitud</code> sean recortadas a un largo equivalente a <code>maxLongitud - 3</code> caracteres y concatenadas con <code>'...'</code> al final. Las cadenas más cortas se mantienen sin cambios.",
+                hint: "Recorre cada título. Si titulo.length > maxLongitud, usa titulo.slice(0, maxLongitud - 3) + '...' para crear el recortado y añádelo al nuevo array.",
+                tests: [
+                    {
+                        name: "Recortar títulos con largo máximo 10",
+                        assert: (fn) => {
+                            const titulos = ["Javascript", "Aprender Programación", "HTML5", "CSS Avanzado"];
+                            const res = fn(titulos, 10);
+                            if (!Array.isArray(res) || res[0] !== "Javascript" || res[1] !== "Aprende..." || res[2] !== "HTML5" || res[3] !== "CSS Ava...") {
+                                throw new Error(`Recortes fallidos. Recibió: ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Purga de Duplicados",
+                difficulty: "medium",
+                concepts: "Lógica de Búsqueda indexof",
+                restriction: "PROHIBIDO EL USO DE Set NATIVOS. Usa bucles e indexación manual.",
+                signature: "resolver4_7(elementos)",
+                functionName: "resolver4_7",
+                desc: "Dado un array de elementos <code>elementos</code> con valores potencialmente repetidos, escribe un algoritmo que elimine todos los duplicados y retorne un nuevo array con valores únicos respetando su orden de aparición inicial.",
+                hint: "Crea un array vacío 'unicos'. Recorre el original. Si unicos.indexOf(elemento) === -1 (es decir, no está aún), agrégalo con push.",
+                tests: [
+                    {
+                        name: "Limpiar [1, 2, 2, 3, 1, 4, 2] (debe retornar [1, 2, 3, 4])",
+                        assert: (fn) => {
+                            const res = fn([1, 2, 2, 3, 1, 4, 2]);
+                            if (!Array.isArray(res) || res.join(',') !== '1,2,3,4') {
+                                throw new Error(`Esperaba [1, 2, 3, 4], recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "Fusión de Contactos",
+                difficulty: "hard",
+                concepts: "Arrays de Objetos e Indexación",
+                restriction: "Prohibido alterar los arrays originales.",
+                signature: "resolver4_8(agendaA, agendaB)",
+                functionName: "resolver4_8",
+                desc: "Se desea sincronizar dos bases de contactos. Dados dos arrays de objetos contactos <code>agendaA</code> y <code>agendaB</code> (donde cada contacto tiene las propiedades <code>nombre</code> y <code>telefono</code>), fusiònalos en un único array. Si un contacto aparece en ambas agendas (mismo nombre), se debe mantener **únicamente** la versión de la agenda B (que tiene el teléfono más actualizado).",
+                hint: "Crea una copia de agendaB. Recorre agendaA; para cada contacto, busca si existe otro en agendaB con el mismo nombre. Si no existe, agrégalo al resultado fusionado.",
+                tests: [
+                    {
+                        name: "Fusión con actualización de teléfono de B",
+                        assert: (fn) => {
+                            const a = [{ nombre: "Ana", telefono: "111" }, { nombre: "Pedro", telefono: "222" }];
+                            const b = [{ nombre: "Pedro", telefono: "999" }, { nombre: "Carlos", telefono: "333" }];
+                            const res = fn(a, b);
+                            // Pedro debe tener telefono 999. Ana debe estar. Carlos debe estar.
+                            const pedro = res.find(c => c.nombre === "Pedro");
+                            if (res.length !== 3 || !pedro || pedro.telefono !== "999") {
+                                throw new Error(`Fusión incorrecta. Recibió: ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Intersección Numérica",
+                difficulty: "hard",
+                concepts: "Lógica de Conjuntos en Arrays",
+                restriction: "Prohibido usar Set nativo o librerías.",
+                signature: "resolver4_9(array1, array2)",
+                functionName: "resolver4_9",
+                desc: "Dados dos arrays de números <code>array1</code> y <code>array2</code>, escribe un algoritmo que encuentre la intersección (es decir, una lista con los elementos comunes en ambos). Asegúrate de que el array resultante no contenga duplicados y respete el orden original.",
+                hint: "Recorre 'array1'. Si el elemento actual existe en 'array2' (array2.includes(item)) y NO existe en tu array de resultados, agrégalo.",
+                tests: [
+                    {
+                        name: "Intersección de [1, 2, 2, 3] y [2, 3, 4] (debe ser [2, 3])",
+                        assert: (fn) => {
+                            const res = fn([1, 2, 2, 3], [2, 3, 4]);
+                            if (!Array.isArray(res) || res.join(',') !== '2,3') {
+                                throw new Error(`Esperaba [2, 3], recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Matriz Plana",
+                difficulty: "legendary",
+                concepts: "Matrices y Loops Anidados",
+                restriction: "PROHIBIDO EL USO DE array.flat() O CUALQUIER MÉTODO NATIVO DE APLANADO.",
+                signature: "resolver4_10(matriz)",
+                functionName: "resolver4_10",
+                desc: "Dada una matriz bidimensional (un array conteniendo arrays de números), aplanala convirtiéndola en un único array unidimensional plano utilizando bucles anidados manuales.",
+                hint: "Crea un array 'plano'. Haz un bucle for para recorrer las filas (i de 0 a matriz.length). Adentro, haz otro bucle for para recorrer cada columna (j de 0 a matriz[i].length) e inserta matriz[i][j] en 'plano'.",
+                tests: [
+                    {
+                        name: "Aplanar matriz [[1, 2], [3, 4, 5], [6]]",
+                        assert: (fn) => {
+                            const res = fn([[1, 2], [3, 4, 5], [6]]);
+                            if (!Array.isArray(res) || res.join(',') !== '1,2,3,4,5,6') {
+                                throw new Error(`Esperaba [1, 2, 3, 4, 5, 6], recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            }
+        ];
+    </script>
+
+    <!-- BLOQUE DE SCRIPT PARA LAS SOLUCIONES DEL ESTUDIANTE -->
+    <script id="soluciones">
+        // ==========================================================================
+        // ✏️ ESPACIO PARA COMPLETAR TU CODIGO JAVASCRIPT
+        // Completa el interior de cada función de acuerdo a las consignas indicadas.
+        // ==========================================================================
+
+        // Ejercicio 1: Buscador de Extremos
+        function resolver4_1(temperaturas) {
+            let min;
+            let max;
+            let promedio;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { min, max, promedio };
+        }
+
+        // Ejercicio 2: Filtro Selector
+        function resolver4_2(numeros) {
+            let pares = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return pares;
+        }
+
+        // Ejercicio 3: Inversión Manual
+        function resolver4_3(array) {
+            let invertido = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return invertido;
+        }
+
+        // Ejercicio 4: Contador de Frecuencia
+        function resolver4_4(texto) {
+            let frecuencia = {};
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return frecuencia;
+        }
+
+        // Ejercicio 5: Inventario RPG
+        function resolver4_5(inventario) {
+            let pesoTotal = 0;
+            let valorTotal = 0;
+            let nombres = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { pesoTotal, valorTotal, nombres };
+        }
+
+        // Ejercicio 6: Elipsis de Títulos
+        function resolver4_6(titulos, maxLongitud) {
+            let resultados = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultados;
+        }
+
+        // Ejercicio 7: Purga de Duplicados
+        function resolver4_7(elementos) {
+            let unicos = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return unicos;
+        }
+
+        // Ejercicio 8: Fusión de Contactos
+        function resolver4_8(agendaA, agendaB) {
+            let agendaFusionada = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return agendaFusionada;
+        }
+
+        // Ejercicio 9: Intersección Numérica
+        function resolver4_9(array1, array2) {
+            let interseccion = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return interseccion;
+        }
+
+        // Ejercicio 10: Matriz Plana
+        function resolver4_10(matriz) {
+            let plano = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return plano;
+        }
+    </script>
+
+    <!-- INCLUYE EL MOTOR DEL PLAYGROUND COMPARTIDO -->
+    <script src="js/tester.js"></script>
+</body>
+</html>

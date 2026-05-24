@@ -1,0 +1,3199 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DER Sim-Architect — Juego de Modelado de Base de Datos</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: #eef2ff;
+            --border: #e2e8f0;
+            --ring: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --radius: 12px;
+            --rs: 8px;
+            --shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.05), 0 2px 8px -1px rgba(99, 102, 241, 0.03);
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            position: relative;
+            overflow: hidden;
+            padding: 2.2rem 1.5rem 1.8rem;
+            text-align: center;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f5f3ff 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 90% 80%, rgba(79, 70, 229, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #4f46e5;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.25rem 0.8rem;
+            border-radius: 999px;
+            margin-bottom: 0.6rem;
+        }
+
+        header h1 {
+            font-size: clamp(1.5rem, 3.5vw, 2.3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #4f46e5, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+
+        header p.sub {
+            color: var(--text-muted);
+            max-width: 720px;
+            margin: 0 auto;
+            font-size: 0.92rem;
+        }
+
+        /* BREADCRUMBS */
+        .bc {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .bc a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .bc a:hover {
+            color: var(--accent);
+        }
+
+        .bc .cur {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* MAIN GAME CONTAINER */
+        .game-wrapper {
+            max-width: 1350px;
+            width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 1rem 3rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* MOBILE TAB TOGGLE BAR */
+        .mobile-tabs {
+            display: none;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mobile-tabs button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--rs);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .mobile-tabs button.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        /* 3 PANELS GRID LAYOUT */
+        .panels-grid {
+            display: grid;
+            grid-template-columns: 28% 42% 30%;
+            gap: 1.2rem;
+            align-items: start;
+        }
+
+        /* PANEL COMMON CARD */
+        .panel-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, #fafafa, #ffffff);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h2 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* LEFT PANEL: DASHBOARD & MAP */
+        .widget-box {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .widget-box:last-child {
+            border-bottom: none;
+        }
+
+        .prestige-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+        }
+
+        .prestige-val {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* PROGRESS TRACKER BAR */
+        .progress-container {
+            margin-top: 1rem;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .progress-bar-track {
+            height: 12px;
+            background: var(--bg);
+            border-radius: 99px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 99px;
+        }
+
+        .progress-penalty-text {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--danger);
+            margin-top: 0.4rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .prestige-bar {
+            height: 8px;
+            background: var(--bg);
+            border-radius: 99px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+        }
+
+        .prestige-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #8b5cf6);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .prestige-rank {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: inline-block;
+            background: var(--bg);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        /* COMPANY DEPARTMENTS MAP */
+        .map-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            padding: 1.2rem;
+        }
+
+        .map-btn {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            transform: translateX(4px);
+        }
+
+        .map-btn.active {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            box-shadow: 0 0 0 3px var(--ring);
+        }
+
+        .map-btn.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+        }
+
+        .map-btn-title {
+            font-size: 0.84rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .map-btn-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .map-badge {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.68rem;
+            font-weight: 700;
+            background: var(--border);
+            color: var(--text-muted);
+            padding: 0.15rem 0.5rem;
+            border-radius: 99px;
+            transition: all 0.2s;
+        }
+
+        .map-btn.active .map-badge,
+        .map-btn:hover .map-badge {
+            background: var(--accent);
+            color: white;
+        }
+
+        .map-badge.done {
+            background: var(--success) !important;
+            color: white !important;
+        }
+
+        /* CENTER PANEL: INTERVIEW SCREEN & DIALOGUE */
+        .center-content {
+            padding: 1.2rem;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .intro-illustration {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .center-content.active-room {
+            justify-content: flex-start;
+            align-items: stretch;
+            text-align: left;
+            min-height: 520px;
+        }
+
+        /* CHARACTER LIST SELECTOR */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.85rem;
+            width: 100%;
+        }
+
+        .char-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            padding: 1.1rem 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .char-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .char-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            margin: 0 auto 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            transition: all 0.2s;
+        }
+
+        .char-card:hover .char-avatar {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .char-name {
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .char-role {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .char-status {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            display: inline-block;
+            border: 1px solid var(--border);
+        }
+
+        .char-card.char-done .char-status {
+            background: var(--success-light);
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        /* MEETING ROOM UI */
+        .room-back-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 0.8rem;
+            align-self: flex-start;
+            transition: color 0.2s;
+        }
+
+        .room-back-btn:hover {
+            color: var(--accent);
+        }
+
+        .room-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .room-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .room-char-info h3 {
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .room-char-info p {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+        }
+
+        /* DIALOGUE BUBBLES WINDOW */
+        .dialogue-window {
+            flex: 1;
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            background: #fafbfc;
+            margin-bottom: 1rem;
+        }
+
+        .bubble {
+            max-width: 85%;
+            padding: 0.6rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            animation: slideUp 0.25s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bubble.consultant {
+            background: var(--accent);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bubble.employee {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        /* DESIGNER INSIGHTS BLOCK */
+        .designer-insight {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 0.8rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .designer-insight.is-good {
+            background: var(--success-light);
+            border-left-color: var(--success);
+        }
+
+        .designer-insight.is-mid {
+            background: var(--warning-light);
+            border-left-color: var(--warning);
+        }
+
+        .designer-insight.is-bad {
+            background: var(--danger-light);
+            border-left-color: var(--danger);
+        }
+
+        .insight-title {
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .designer-insight.is-good .insight-title { color: var(--success); }
+        .designer-insight.is-mid .insight-title { color: #d97706; }
+        .designer-insight.is-bad .insight-title { color: var(--danger); }
+
+        .insight-body {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* INTERVIEW QUESTIONS SELECTOR */
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .question-btn {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            padding: 0.75rem 0.95rem;
+            text-align: left;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .question-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .question-btn::before {
+            content: '💬';
+            flex-shrink: 0;
+        }
+
+        .question-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #fafafa;
+        }
+
+        .btn-continue {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--rs);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            align-self: flex-end;
+        }
+
+        .btn-continue:hover {
+            background: var(--accent-hover);
+        }
+
+        /* RIGHT PANEL: REQUIREMENTS NOTEBOOK */
+        .notebook {
+            background: #fdfdfd;
+            border: 1.5px solid #d1d5db;
+            border-radius: var(--radius);
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: visible;
+        }
+
+        /* Rings on the left side of the notebook (Visual ornament) */
+        .notebook::before {
+            content: '';
+            position: absolute;
+            left: -11px;
+            top: 25px;
+            bottom: 25px;
+            width: 20px;
+            background-image: radial-gradient(circle, #9ca3af 25%, transparent 35%);
+            background-size: 20px 24px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .notebook-tabs {
+            display: flex;
+            background: #f3f4f6;
+            border-bottom: 1.5px solid #d1d5db;
+            border-top-left-radius: var(--radius);
+            border-top-right-radius: var(--radius);
+            overflow: hidden;
+            padding-left: 8px;
+        }
+
+        .notebook-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            border-bottom: 2.5px solid transparent;
+            padding: 0.6rem 0.2rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .notebook-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: #fdfdfd;
+        }
+
+        .notebook-content {
+            padding: 1.1rem;
+            overflow-y: auto;
+            max-height: 480px;
+            min-height: 420px;
+            background: #fdfdfd;
+            border-bottom-left-radius: var(--radius);
+            border-bottom-right-radius: var(--radius);
+        }
+
+        /* CLUES CARDS INSIDE NOTEBOOK */
+        .clue-card {
+            background: var(--panel);
+            border: 1.5px dashed var(--border);
+            border-radius: var(--rs);
+            padding: 0.85rem;
+            margin-bottom: 0.75rem;
+            position: relative;
+            transition: all 0.3s;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .clue-card.locked {
+            opacity: 0.6;
+            background: #fafafa;
+        }
+
+        .clue-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .clue-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .clue-card:not(.locked) {
+            border: 1px solid var(--border);
+            border-left: 3.5px solid var(--accent);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .clue-card.is-rel:not(.locked) {
+            border-left-color: #8b5cf6;
+        }
+
+        .clue-card.is-rule:not(.locked) {
+            border-left-color: var(--success);
+        }
+
+        .clue-body {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .clue-card:not(.locked) .clue-title {
+            color: var(--accent);
+        }
+
+        .clue-card.is-rel:not(.locked) .clue-title {
+            color: #8b5cf6;
+        }
+
+        .clue-card.is-rule:not(.locked) .clue-title {
+            color: var(--success);
+        }
+
+        .clue-card.locked .lock-icon {
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+
+        .clue-table-spec {
+            margin-top: 0.4rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: #1e293b;
+        }
+
+        .clue-table-spec span {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .clue-attr-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            padding: 0.15rem 0;
+        }
+
+        .clue-attr-row:last-child {
+            border-bottom: none;
+        }
+
+        .clue-attr-locked {
+            color: var(--danger);
+            font-style: italic;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        /* FINAL LOCK CARD (ACTIVATE WHEN ALL CLUES UNLOCKED) */
+        .report-unlock-box {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border-radius: var(--radius);
+            padding: 1.4rem 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+            margin-top: 1.5rem;
+            display: none;
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25); }
+            50% { box-shadow: 0 4px 25px rgba(99, 102, 241, 0.45); }
+        }
+
+        .report-unlock-box h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .report-unlock-box p {
+            font-size: 0.78rem;
+            margin-bottom: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .report-unlock-btn {
+            background: white;
+            color: var(--accent);
+            border: none;
+            padding: 0.55rem 1.3rem;
+            border-radius: var(--rs);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .report-unlock-btn:hover {
+            transform: scale(1.03);
+            background: var(--accent-light);
+        }
+
+        /* DIAGNOSTIC EXAM SECTION */
+        .diagnostic-sec {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .exam-title-box {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .exam-title-box h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+
+        .exam-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            display: none;
+        }
+
+        .exam-card.active {
+            display: block;
+        }
+
+        .exam-step-indicator {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
+        }
+
+        .exam-question {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .option-item {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            box-shadow: 0 0 0 2px var(--ring);
+        }
+
+        .option-radio {
+            margin-top: 0.15rem;
+            accent-color: var(--accent);
+        }
+
+        .exam-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.2rem;
+        }
+
+        .exam-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.55rem 1.2rem;
+            border-radius: var(--rs);
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .exam-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .exam-btn:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* SUCCESS PORTAL / ER DIAGRAM SECTION */
+        .success-sec {
+            display: none;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.2rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .trophy {
+            font-size: 3.5rem;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        .success-sec h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--success), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .score-certificate {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.4rem;
+            margin: 1.5rem auto 2.2rem;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .certificate-title {
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .certificate-rank {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.4rem;
+        }
+
+        .certificate-score {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .certificate-score span {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* INTERACTIVE ENTITY-RELATIONSHIP DIAGRAM (DER) */
+        .der-wrapper {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #0f172a;
+            border-radius: var(--radius);
+            box-shadow: 0 6px 25px rgba(15, 23, 42, 0.25);
+            color: #cbd5e1;
+            text-align: left;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .der-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .der-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .der-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: #94a3b8;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* RENDER SCHEMAS GRID */
+        .der-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            position: relative;
+        }
+
+        .der-table {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: var(--rs);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+        }
+
+        .der-table:hover {
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.15);
+        }
+
+        .der-table-header {
+            background: #273549;
+            padding: 0.45rem 0.75rem;
+            border-bottom: 1px solid #334155;
+            font-weight: 700;
+            font-size: 0.78rem;
+            color: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .der-table-header span.tag {
+            font-size: 0.58rem;
+            background: #1e293b;
+            border: 1px solid #475569;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            color: #94a3b8;
+        }
+
+        .der-table-header.is-bridge {
+            background: #3c2a68;
+        }
+
+        .der-table-header.is-branch {
+            background: #0369a1;
+        }
+
+        .der-table-header.is-quality {
+            background: #9a3412;
+        }
+
+        .der-table-body {
+            padding: 0.45rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+        }
+
+        .der-row {
+            padding: 0.2rem 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+        }
+
+        .der-row:last-child {
+            border-bottom: none;
+        }
+
+        .der-col-name {
+            font-weight: 600;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .der-col-name.pk::before {
+            content: '🔑';
+            font-size: 0.65rem;
+        }
+
+        .der-col-name.fk::before {
+            content: '🔗';
+            font-size: 0.65rem;
+        }
+
+        .der-col-type {
+            color: #64748b;
+        }
+
+        /* CONNECTIONS / FOOTER INFO */
+        .der-legend {
+            margin-top: 1.5rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #334155;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.74rem;
+            color: #94a3b8;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .btn-restart {
+            margin-top: 2rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.65rem 1.5rem;
+            border-radius: var(--rs);
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-restart:hover {
+            background: var(--accent-hover);
+        }
+
+        /* COMMON UTILITIES */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.2rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            background: var(--panel);
+            margin-top: auto;
+        }
+
+        /* RESPONSIVE MEDIA QUERIES */
+        @media (max-width: 992px) {
+            .mobile-tabs {
+                display: flex;
+            }
+
+            .panels-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .left-panel {
+                display: block; /* Always display score & area selection on mobile */
+            }
+
+            .center-panel.mobile-hidden {
+                display: none;
+            }
+
+            .right-panel.mobile-hidden {
+                display: none;
+            }
+
+            .notebook-content {
+                min-height: auto;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header {
+                padding: 1.8rem 1rem 1.4rem;
+            }
+
+            .widget-box {
+                padding: 0.8rem;
+            }
+
+            .map-container {
+                padding: 0.8rem;
+            }
+
+            .char-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <span class="badge">Base de Datos II · Primer Cuatrimestre</span>
+        <h1>🔬 DER SIM-ARCHITECT v2.0</h1>
+        <p class="sub">Releva requerimientos en la empresa <b>ZapasRun S.A.</b>, gestiona la expansión multi-sucursal y reclamos, baraja las preguntas y ten cuidado con los deslices profesionales.</p>
+    </header>
+
+    <!-- BREADCRUMBS -->
+    <div class="bc">
+        <a href="../../../">🏠 Inicio</a>
+        <span style="opacity:0.4"> › </span>
+        <a href="../../">Base de Datos II</a>
+        <span style="opacity:0.4"> › </span>
+        <span class="cur">🔬 DER Sim-Architect</span>
+    </div>
+
+    <!-- GAME WRAPPER -->
+    <div class="game-wrapper" id="game-main-screen">
+
+        <!-- MOBILE TAB TOGGLE BAR -->
+        <div class="mobile-tabs">
+            <button class="active" onclick="toggleMobileTab('entrevista')" id="m-tab-entrevista">
+                💼 Entrevistas
+            </button>
+            <button onclick="toggleMobileTab('cuaderno')" id="m-tab-cuaderno">
+                📓 Requerimientos (<span id="m-clue-count">0/16</span>)
+            </button>
+        </div>
+
+        <!-- 3 PANELS GRID -->
+        <div class="panels-grid">
+
+            <!-- LEFT PANEL: STATUS & DEPARTMENT MAP -->
+            <div class="panel-card left-panel">
+                <div class="panel-header">
+                    <h2>📋 Estado y Mapa</h2>
+                </div>
+
+                <!-- PRESTIGE CONTAINER -->
+                <div class="widget-box">
+                    <div class="prestige-header">
+                        <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted);">PRESTIGIO PROFESIONAL</span>
+                        <div class="prestige-val" id="prestige-label">0%</div>
+                    </div>
+                    <div class="prestige-bar">
+                        <div class="prestige-fill" id="prestige-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="prestige-rank" id="prestige-rank-label">Pasante de Sistemas</div>
+                </div>
+
+                <!-- PROGRESS BAR WITH CEILING PENALTY -->
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span>RELEVAMIENTO DEL CIRCUITO</span>
+                        <span id="progress-val-text" style="font-family: var(--font-mono); font-weight: 700;">0%</span>
+                    </div>
+                    <div class="progress-bar-track" id="progress-bar-track-node">
+                        <div class="progress-bar-fill" id="progress-bar-fill-node"></div>
+                    </div>
+                    <div class="progress-penalty-text" id="progress-penalty-node">
+                        ⚠️ Confianza dañada. Progreso máximo limitado.
+                    </div>
+                </div>
+
+                <!-- MAP OF DEPARTMENTS -->
+                <div class="map-container">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.2rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                        SELECCIONAR ÁREA
+                    </div>
+
+                    <button class="map-btn" onclick="selectArea('produccion')" id="area-produccion">
+                        <div class="map-btn-title">🏭 Planta de Producción</div>
+                        <div class="map-btn-sub">Fabricación y suelas</div>
+                        <span class="map-badge" id="badge-produccion">0/2</span>
+                    </button>
+
+                    <button class="map-btn" onclick="selectArea('ventas')" id="area-ventas">
+                        <div class="map-btn-title">💼 Oficina Comercial</div>
+                        <div class="map-btn-sub">Clientes, sucursales y ventas</div>
+                        <span class="map-badge" id="badge-ventas">0/2</span>
+                    </button>
+
+                    <button class="map-btn" onclick="selectArea('logistica')" id="area-logistica">
+                        <div class="map-btn-title">📦 Depósito y Logística</div>
+                        <div class="map-btn-sub">Materiales y proveedores</div>
+                        <span class="map-badge" id="badge-logistica">0/1</span>
+                    </button>
+
+                    <button class="map-btn" onclick="selectArea('buffet')" id="area-buffet">
+                        <div class="map-btn-title">☕ Comedor y Buffet</div>
+                        <div class="map-btn-sub">Garantías y recreación</div>
+                        <span class="map-badge" id="badge-buffet">0/2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CENTER PANEL: INTERVIEW SCREEN -->
+            <div class="panel-card center-panel" id="center-panel-node">
+                <div class="panel-header">
+                    <h2 id="center-header-title">💬 Sala de Entrevistas</h2>
+                </div>
+
+                <div class="center-content" id="center-panel-content">
+                    <!-- Default Welcome screen -->
+                    <div id="room-welcome">
+                        <div class="intro-illustration">🏢</div>
+                        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">¡Bienvenido, Consultor!</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); max-width: 280px; margin: 0 auto 1.2rem;">
+                            Selecciona un área de la empresa en el panel izquierdo para comenzar a entrevistar a sus integrantes.
+                        </p>
+                    </div>
+
+                    <!-- Characters selector view -->
+                    <div id="room-char-select" style="display: none; width: 100%;">
+                        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                            PERSONAS DISPONIBLES EN EL ÁREA
+                        </div>
+                        <div class="char-grid" id="char-grid-container">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Chat / Room interface -->
+                    <div id="room-chat-box" style="display: none; width: 100%;">
+                        <button class="room-back-btn" onclick="exitChatRoom()">
+                            ⬅ Ver otras personas del área
+                        </button>
+                        <div class="room-header">
+                            <div class="room-avatar" id="chat-char-avatar">👷</div>
+                            <div class="room-char-info">
+                                <h3 id="chat-char-name">Ing. Rodolfo</h3>
+                                <p id="chat-char-role">Jefe de Planta</p>
+                            </div>
+                        </div>
+
+                        <!-- Chat dialogue viewport -->
+                        <div class="dialogue-window" id="chat-dialogue-window">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Designer insight popup -->
+                        <div class="designer-insight" id="chat-designer-insight" style="display: none;">
+                            <div class="insight-title" id="insight-title-node">✨ Análisis del Diseñador</div>
+                            <div class="insight-body" id="insight-body-node">
+                                Excelente pregunta. Descubriste que un lote contiene únicamente...
+                            </div>
+                        </div>
+
+                        <!-- Predefined Questions selector -->
+                        <div class="questions-list" id="chat-questions-list">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Continue button -->
+                        <button class="btn-continue" id="chat-btn-continue" style="display: none;" onclick="advanceChatFlow()">
+                            Continuar entrevista ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: REQUIREMENTS NOTEBOOK -->
+            <div class="panel-card right-panel">
+                <div class="notebook">
+                    <!-- Ring binder tabs -->
+                    <div class="notebook-tabs">
+                        <button class="notebook-tab active" onclick="selectNotebookTab('entidades')" id="n-tab-entidades">📋 Tablas</button>
+                        <button class="notebook-tab" onclick="selectNotebookTab('relaciones')" id="n-tab-relaciones">🔗 Relaciones</button>
+                        <button class="notebook-tab" onclick="selectNotebookTab('reglas')" id="n-tab-reglas">⚖️ Reglas</button>
+                    </div>
+
+                    <!-- Notebook paper body -->
+                    <div class="notebook-content" id="notebook-content-body">
+                        <!-- Clues will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Locked final report box -->
+                <div class="report-unlock-box" id="report-lock-box">
+                    <h3>🏆 ¡Circuito Completado!</h3>
+                    <p>Has recabado la información necesaria para modelar la base de datos de ZapasRun S.A. ¿Listo para emitir el diagnóstico de diseño?</p>
+                    <button class="report-unlock-btn" onclick="startFinalExam()">Emitir Reporte de Diseño</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- DIAGNOSTIC EXAM SECTION -->
+    <div class="game-wrapper diagnostic-sec" id="game-exam-screen">
+        <div class="exam-title-box">
+            <span class="badge" style="background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.2); color: var(--accent);">DIAGNÓSTICO ARQUITECTÓNICO AVANZADO</span>
+            <h2>Reporte de Diseño Técnico (6 Desafíos)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Asocia los requerimientos complejos del cuaderno a la estructura relacional óptima.</p>
+        </div>
+
+        <div id="exam-cards-container">
+            <!-- Questions will be injected here -->
+        </div>
+
+        <div class="exam-nav">
+            <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600;" id="exam-progress-text">Desafío 1 de 6</div>
+            <button class="exam-btn" id="exam-next-btn" onclick="nextExamStep()">Siguiente Desafío ➔</button>
+        </div>
+    </div>
+
+    <!-- SUCCESS / ER DIAGRAM SECTION -->
+    <div class="game-wrapper success-sec" id="game-success-screen">
+        <div class="trophy">🏆</div>
+        <h2>¡Certificación de Modelado DER Exitosa!</h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 580px; margin: 0 auto 1.5rem;">
+            Has resuelto con éxito los desafíos de arquitectura relacional y diseñado el esquema de base de datos multi-sucursal y calidad de <b>ZapasRun S.A.</b>
+        </p>
+
+        <!-- Dynamic Rank Badge -->
+        <div class="score-certificate">
+            <div class="certificate-title">Rango de Consultor Obtenido</div>
+            <div class="certificate-rank" id="cert-rank">Diseñador Senior DER</div>
+            <div class="certificate-score">Puntaje de Prestigio Profesional Final: <span id="cert-score">0%</span></div>
+        </div>
+
+        <!-- Rendered Entity-Relationship Diagram -->
+        <div class="der-wrapper">
+            <div class="der-header">
+                <div class="der-title">📊 Esquema Físico Final de Tablas (Modelo Relacional Expandido)</div>
+                <div class="der-badge">Motor SQL Relacional Compilado</div>
+            </div>
+
+            <div class="der-grid">
+                <!-- Clientes -->
+                <div class="der-table">
+                    <div class="der-table-header">
+                        <span>Clientes</span>
+                        <span class="tag">Transaccional</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">cuit_dni</span>
+                            <span class="der-col-type">VARCHAR(20)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">razon_social</span>
+                            <span class="der-col-type">VARCHAR(100)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">direccion</span>
+                            <span class="der-col-type">VARCHAR(150)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">email</span>
+                            <span class="der-col-type">VARCHAR(80)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sucursales -->
+                <div class="der-table">
+                    <div class="der-table-header is-branch">
+                        <span>Sucursales</span>
+                        <span class="tag">Sede</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">id_sucursal</span>
+                            <span class="der-col-type">INT AUTO_INC</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">nombre_ciudad</span>
+                            <span class="der-col-type">VARCHAR(50)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">direccion</span>
+                            <span class="der-col-type">VARCHAR(150)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pedidos -->
+                <div class="der-table">
+                    <div class="der-table-header">
+                        <span>Pedidos</span>
+                        <span class="tag">Transaccional</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">numero_pedido</span>
+                            <span class="der-col-type">INT AUTO_INC</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">fecha</span>
+                            <span class="der-col-type">DATE</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">total_facturado</span>
+                            <span class="der-col-type">DECIMAL(12,2)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">estado</span>
+                            <span class="der-col-type">VARCHAR(20)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name fk">cuit_dni_cliente</span>
+                            <span class="der-col-type">VARCHAR(20)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name fk">id_sucursal</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalle Pedido (Bridge) -->
+                <div class="der-table">
+                    <div class="der-table-header is-bridge">
+                        <span>DetallePedido</span>
+                        <span class="tag">Asociativa</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk fk">numero_pedido</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name pk fk">id_modelo</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">cantidad_vendida</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">precio_unitario_venta</span>
+                            <span class="der-col-type">DECIMAL(10,2)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reclamos de Garantía -->
+                <div class="der-table">
+                    <div class="der-table-header is-quality">
+                        <span>ReclamosGarantia</span>
+                        <span class="tag">Calidad</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">id_reclamo</span>
+                            <span class="der-col-type">INT AUTO_INC</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">fecha_reclamo</span>
+                            <span class="der-col-type">DATE</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">motivo_defecto</span>
+                            <span class="der-col-type">VARCHAR(200)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">estado_aprobado</span>
+                            <span class="der-col-type">VARCHAR(20)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name fk">numero_pedido</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name fk">id_modelo</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modelos -->
+                <div class="der-table">
+                    <div class="der-table-header">
+                        <span>Modelos</span>
+                        <span class="tag">Maestra</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">id_modelo</span>
+                            <span class="der-col-type">INT AUTO_INC</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">nombre</span>
+                            <span class="der-col-type">VARCHAR(50)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">precio_base</span>
+                            <span class="der-col-type">DECIMAL(10,2)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">fecha_introduccion</span>
+                            <span class="der-col-type">DATE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lotes -->
+                <div class="der-table">
+                    <div class="der-table-header">
+                        <span>LotesProduccion</span>
+                        <span class="tag">Operativa</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">id_lote</span>
+                            <span class="der-col-type">INT AUTO_INC</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">fecha_inicio</span>
+                            <span class="der-col-type">DATE</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">cantidad_pares</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">linea_montaje</span>
+                            <span class="der-col-type">VARCHAR(10)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name fk">id_modelo</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Receta / Composicion (Bridge) -->
+                <div class="der-table">
+                    <div class="der-table-header is-bridge">
+                        <span>RecetaComposicion</span>
+                        <span class="tag">Asociativa</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk fk">id_modelo</span>
+                            <span class="der-col-type">INT</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name pk fk">sku_material</span>
+                            <span class="der-col-type">VARCHAR(30)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">cantidad_utilizada</span>
+                            <span class="der-col-type">DECIMAL(8,2)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Materiales -->
+                <div class="der-table">
+                    <div class="der-table-header">
+                        <span>Materiales</span>
+                        <span class="tag">Maestra</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">sku_material</span>
+                            <span class="der-col-type">VARCHAR(30)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">nombre</span>
+                            <span class="der-col-type">VARCHAR(50)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">stock_disponible</span>
+                            <span class="der-col-type">DECIMAL(10,2)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name fk">cuit_proveedor</span>
+                            <span class="der-col-type">VARCHAR(20)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proveedores -->
+                <div class="der-table">
+                    <div class="der-table-header">
+                        <span>Proveedores</span>
+                        <span class="tag">Maestra</span>
+                    </div>
+                    <div class="der-table-body">
+                        <div class="der-row">
+                            <span class="der-col-name pk">cuit_proveedor</span>
+                            <span class="der-col-type">VARCHAR(20)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">razon_social</span>
+                            <span class="der-col-type">VARCHAR(100)</span>
+                        </div>
+                        <div class="der-row">
+                            <span class="der-col-name">telefono</span>
+                            <span class="der-col-type">VARCHAR(30)</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Legend of Schema -->
+            <div class="der-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #273549;"></div>
+                    <span>Tablas Transaccionales/Maestras</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3c2a68;"></div>
+                    <span>Tablas Asociativas (N:M)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #0369a1;"></div>
+                    <span>Entidad Sucursales (Expansión)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9a3412;"></div>
+                    <span>Entidad ReclamosGarantia (Auditoría)</span>
+                </div>
+                <div class="legend-item">
+                    <span>🔑 Clave Primaria (PK)</span>
+                </div>
+                <div class="legend-item">
+                    <span>🔗 Clave Foránea (FK)</span>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="btn-restart" onclick="restartGame()">Volver a Jugar 🔄</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>Base de Datos II · Cátedra de Diseño y Modelado Relacional</p>
+        <p style="font-size:0.68rem; color:var(--text-muted); margin-top:0.25rem;">ZapasRun S.A. Simulation Engine v2.0.0 · UnerSecPractica</p>
+    </footer>
+
+    <!-- GAME CODE (JAVASCRIPT STATE ENGINE) -->
+    <script>
+        // --- GAME DATASET & TEXT CONTENT ---
+        const GAME_DATA = {
+            produccion: {
+                title: "Planta de Producción",
+                chars: {
+                    rodolfo: {
+                        name: "Ing. Rodolfo",
+                        role: "Jefe de Planta",
+                        avatar: "👷",
+                        questions: [
+                            {
+                                id: "Q_ROD_LOTES",
+                                text: "¿Cómo organizan el flujo diario de fabricación y su relación con los modelos de calzado?",
+                                value: "high",
+                                dialogue: "Cada tirada de producción se organiza en un <b>Lote de Producción</b>. Un lote tiene un número correlativo único, fecha de inicio, cantidad de pares a fabricar y se asigna a una línea de montaje específica. Por supuesto, cada lote es exclusivo para un único <b>Modelo de Zapatilla</b>. Un modelo puede fabricarse en muchos lotes distintos a lo largo del tiempo.",
+                                insight: "¡Excelente! Has identificado la entidad <b>LotesProduccion</b> con sus atributos y la relación <b>1 a N</b> con <b>Modelos</b> (un lote tiene un solo modelo, un modelo puede estar en muchos lotes). La clave foránea <code>id_modelo</code> debe viajar a la tabla <code>LotesProduccion</code>.",
+                                points: 8,
+                                unlocks: ["table_lotes", "rel_modelo_lote"]
+                            },
+                            {
+                                id: "Q_ROD_TELEFONO",
+                                text: "¿Cómo actúan si se quedan sin un material crítico a mitad de un lote?",
+                                value: "mid",
+                                dialogue: "Es una pesadilla. Paramos las máquinas y llamamos inmediatamente al <b>teléfono de urgencias</b> del proveedor de ese material. Hugo tiene registrados esos contactos en su agenda corporativa, son indispensables para emergencias.",
+                                insight: "¡Excelente pista secundaria! Revelaste la necesidad de registrar el atributo crítico <code>telefono</code> en la entidad <b>Proveedores</b> para atender incidencias operativas.",
+                                points: 6,
+                                unlocks: ["attr_prov_telefono"]
+                            },
+                            {
+                                id: "Q_ROD_RUIDO",
+                                text: "¿Es verdad el rumor de que se pierden muchos materiales porque los empleados se los llevan?",
+                                value: "low",
+                                dialogue: "¿Pero qué clase de pregunta es esa? Aquí tenemos estrictas normas de seguridad y auditorías semanales. No voy a tolerar acusaciones infundadas de un analista externo.",
+                                insight: "Pregunta sumamente improfesional. Has dañado la relación de confianza con el Jefe de Planta y no obtuviste ningún dato relacional. Pierdes prestigio y bloqueas el 10% del progreso máximo.",
+                                points: -10
+                            }
+                        ]
+                    },
+                    marta: {
+                        name: "Marta",
+                        role: "Operaria de Ensamble",
+                        avatar: "👩‍🔧",
+                        questions: [
+                            {
+                                id: "Q_MAR_RECETA",
+                                text: "Marta, para ensamblar un modelo de zapatilla, ¿utilizan siempre los mismos materiales?",
+                                value: "high",
+                                dialogue: "Sí, cada modelo tiene una receta de composición estricta en su ficha de desarrollo. Usamos insumos como cuero sintético, goma de suela, ojetes de metal y cordones. Necesitamos registrar exactamente qué cantidad de cada <b>Material</b> lleva cada modelo. Por ejemplo, el modelo 'Running Pro' lleva exactamente 250 gramos de goma y 1.2 metros de cordones. Lógicamente, un mismo material puede ser parte de la receta de múltiples modelos distintos.",
+                                insight: "¡Brillante! Descubriste una relación <b>Muchos a Muchos (N:M)</b> entre <b>Modelos</b> y <b>Materiales</b>. Para resolver esto físicamente, necesitaremos una tabla intermedia asociativa llamada <b>RecetaComposicion</b>, que contendrá las claves foráneas de ambos lados y un atributo de relación crucial: <code>cantidad_utilizada</code>.",
+                                points: 8,
+                                unlocks: ["rel_modelo_material"]
+                            },
+                            {
+                                id: "Q_MAR_CALZADO",
+                                text: "¿Es cómodo el calzado de seguridad que les provee la empresa para trabajar?",
+                                value: "mid",
+                                dialogue: "Sí, la verdad es que son cómodos y antideslizantes, lo cual es necesario porque el suelo de la planta suele estar aceitoso por las prensas. Se agradece el detalle.",
+                                insight: "Pregunta empática y amable que mejora el clima de la entrevista, pero carece de valor analítico para el diseño de la estructura de tablas.",
+                                points: 2,
+                                unlocks: []
+                            },
+                            {
+                                id: "Q_MAR_GRITON",
+                                text: "¿Qué opina del carácter del Ing. Rodolfo? Dicen en la oficina que es muy gritón.",
+                                value: "low",
+                                dialogue: "Mire, yo vengo aquí a cumplir mi turno y hacer bien mi trabajo, no a hablar a espaldas de mis superiores. Si me disculpa, tengo que revisar la templadora de suelas.",
+                                insight: "Has incomodado a la operaria desviándote del objetivo técnico. Demuestra falta de ética profesional y pierdes confianza de las áreas (-10% cap).",
+                                points: -10
+                            }
+                        ]
+                    }
+                }
+            },
+            ventas: {
+                title: "Oficina Comercial y Ventas",
+                chars: {
+                    laura: {
+                        name: "Laura",
+                        role: "Gerente Comercial",
+                        avatar: "👩‍💼",
+                        questions: [
+                            {
+                                id: "Q_LAU_CLIENTES",
+                                text: "¿De qué manera identifican a las personas que les compran y cómo registran cada transacción realizada?",
+                                value: "high",
+                                dialogue: "Vendemos a distribuidores mayoristas y a clientes recurrentes registrados. De cada <b>Cliente</b> registramos su DNI o CUIT (que es único), nombre o razón social y dirección física. Cada compra se formaliza en un <b>Pedido</b>, que tiene un número correlativo automático, fecha de emisión, estado (Pendiente, Entregado, Cancelado) y el importe total. Cada cliente puede registrar muchos pedidos independientes a su nombre.",
+                                insight: "¡Gran trabajo! Has identificado las entidades <b>Clientes</b> (clave primaria <code>cuit_dni</code>) y <b>Pedidos</b> (clave primaria <code>numero_pedido</code>). Además, revelaste una relación <b>1 a N</b> entre Clientes y Pedidos. Esto significa que la clave foránea <code>cuit_dni_cliente</code> debe ir en la tabla Pedidos.",
+                                points: 8,
+                                unlocks: ["table_clientes", "table_pedidos", "rel_cliente_pedido"]
+                            },
+                            {
+                                id: "Q_LAU_EXPANSION",
+                                text: "Laura, me enteré de los planes de expansión. ¿Cómo estructurarán la operación en otras ciudades?",
+                                value: "high",
+                                dialogue: "Sí, abriremos sucursales físicas en Córdoba y Rosario el próximo semestre. Además, cada sucursal tendrá su propio stock de calzado y sus propios vendedores locales. El sistema actual centralizado va a explotar si no diferenciamos las ventas de cada local.",
+                                insight: "¡Hipótesis de diseño excelente! Identificaste un requerimiento de escalabilidad masiva. Debemos crear la entidad <b>Sucursales</b> (<code>id_sucursal</code>, <code>nombre_ciudad</code>, <code>direccion</code>) y relacionarla <b>1 a N</b> con <b>Pedidos</b> y <b>Lotes/Stock</b> (o crear una tabla de stock por sucursal). Esto evitará colisiones de datos y permitirá reportes consolidados.",
+                                points: 8,
+                                unlocks: ["table_sucursales", "rel_sucursal_pedido"]
+                            },
+                            {
+                                id: "Q_LAU_COMS",
+                                text: "¿Es cierto que los vendedores tienen comisiones en negro que no figuran en los recibos?",
+                                value: "low",
+                                dialogue: "¿Disculpe? Toda nuestra facturación y liquidaciones de sueldos están estrictamente auditadas y en regla con la ley. No toleraré insinuaciones de ese estilo.",
+                                insight: "Pregunta inapropiada que genera desconfianza legal y rompe la cooperación con la gerencia. Pierdes reputación severamente (-10% cap).",
+                                points: -10
+                            }
+                        ]
+                    },
+                    javier: {
+                        name: "Javier",
+                        role: "Vendedor de Tienda",
+                        avatar: "👨‍💼",
+                        questions: [
+                            {
+                                id: "Q_JAV_DETALLE",
+                                text: "Javier, cuando un cliente realiza un Pedido, ¿qué detalles de los calzados se registran en la factura?",
+                                value: "high",
+                                dialogue: "Bueno, en un solo pedido el cliente puede llevarse diferentes modelos. Por ejemplo, se lleva 2 pares de 'Running Pro' y 1 par de 'Urban Casual'. En el comprobante debemos guardar exactamente qué <b>Modelos</b> incluye el pedido, la <b>Cantidad</b> de cada uno y, muy importante, el <b>Precio Unitario de Venta</b> cobrado en ese momento específico (ya que el precio base del modelo puede subir mañana y la factura vieja no debe alterarse).",
+                                insight: "¡Espectacular! Descubriste una relación <b>Muchos a Muchos (N:M)</b> entre <b>Pedidos</b> y <b>Modelos</b>. Se requiere crear una tabla intermedia asociativa: <b>DetallePedido</b>. Sus claves primarias compuestas serán <code>numero_pedido</code> y <code>id_modelo</code>. Contendrá además los atributos históricos <code>cantidad_vendida</code> y <code>precio_unitario_venta</code>.",
+                                points: 8,
+                                unlocks: ["rel_pedido_modelo"]
+                            },
+                            {
+                                id: "Q_JAV_EMAIL",
+                                text: "¿Cómo impacta el canal de ventas online en la facturación del local?",
+                                value: "mid",
+                                dialogue: "¡Uf! Las compras online se despachan desde aquí. Para coordinar los envíos y enviar el número de seguimiento, es obligatorio registrar el <b>email</b> de cada cliente en su ficha, sino no hay forma de contactarlos.",
+                                insight: "¡Excelente pista secundaria! Has obtenido el atributo secundario faltante <code>email</code> para completar la ficha de <b>Clientes</b> en el cuaderno de requerimientos.",
+                                points: 6,
+                                unlocks: ["attr_client_email"]
+                            },
+                            {
+                                id: "Q_JAV_SABADO",
+                                text: "¿Le molesta tener que trabajar los sábados por la tarde mientras otros descansan?",
+                                value: "low",
+                                dialogue: "Es el horario de mayor venta al público, es parte de nuestro contrato comercial. Preferiría que nos preocupe el sistema informático, que anda bastante lento hoy.",
+                                insight: "Pregunta sobre insatisfacción laboral irrelevante que desvía la conversación profesional y desgasta la paciencia del empleado.",
+                                points: -10
+                            }
+                        ]
+                    }
+                }
+            },
+            logistica: {
+                title: "Depósito y Suministros",
+                chars: {
+                    hugo: {
+                        name: "Hugo",
+                        role: "Encargado de Depósito",
+                        avatar: "🧔",
+                        questions: [
+                            {
+                                id: "Q_HUG_PROVS",
+                                text: "¿Cómo controlan el origen de los materiales que almacenan y a quiénes se los compran?",
+                                value: "high",
+                                dialogue: "Cada <b>Material</b> en el inventario tiene un SKU único, nombre comercial y stock disponible. Compramos estos insumos a nuestros <b>Proveedores</b>, a quienes tenemos bien identificados por su CUIT (único), razón social y teléfono de contacto. Para simplificar los pedidos de reabastecimiento, establecimos que cada material específico se le compra a un único proveedor principal, aunque un mismo proveedor nos abastece de múltiples materiales distintos.",
+                                insight: "¡Excelente! Has definido las entidades <b>Materiales</b> (clave primaria <code>sku_material</code>) y <b>Proveedores</b> (clave primaria <code>cuit_proveedor</code>). Asimismo, determinaste una relación <b>1 a N</b> entre Proveedores y Materiales, lo cual exige que la clave foránea <code>cuit_proveedor</code> se añada a la tabla Materiales.",
+                                points: 8,
+                                unlocks: ["table_materiales", "table_proveedores", "rel_proveedor_material"]
+                            },
+                            {
+                                id: "Q_HUG_MAQ",
+                                text: "¿Tienen montacargas eléctricos o siguen moviendo las cajas de forma manual?",
+                                value: "mid",
+                                dialogue: "Sí, incorporamos dos autoelevadores eléctricos el año pasado y nos salvaron la vida, porque apilar los rollos de cuero sintético a mano era demoledor para la espalda.",
+                                insight: "Dato logístico interesante sobre la infraestructura física de la empresa, pero carente de valor para estructurar campos o relaciones en el motor SQL.",
+                                points: 2,
+                                unlocks: []
+                            },
+                            {
+                                id: "Q_HUG_ROBOS",
+                                text: "¿Qué hace con los retazos de cuero sobrantes? ¿Se los vende a artesanos por fuera?",
+                                value: "low",
+                                dialogue: "¿Qué insinúa? Todo el residuo de material se registra en planillas de descarte y se procesa para reciclado industrial. No hay desvíos aquí. Si vino a espiar, mejor retírese.",
+                                insight: "Has acusado indirectamente al encargado de robo o mercado negro. Has arruinado la entrevista y tu reputación profesional está por los suelos (-10% cap).",
+                                points: -10
+                            }
+                        ]
+                    }
+                }
+            },
+            buffet: {
+                title: "Comedor y Buffet",
+                chars: {
+                    enzo: {
+                        name: "Enzo",
+                        role: "Encargado del Buffet / Cocinero",
+                        avatar: "👨‍🍳",
+                        questions: [
+                            {
+                                id: "Q_ENZ_ROD",
+                                text: "¿Qué rumores ha escuchado sobre el carácter del Ingeniero Rodolfo?",
+                                value: "mid",
+                                dialogue: "¡Ah! Rodolfo es un pan de Dios cuando no se le quema el lote de calzado. Pero cuando se le atrasa la inyectora de goma, grita tanto que se escucha hasta la cocina. Le recomiendo llevarle un alfajor si va a entrevistarlo.",
+                                insight: "Puro chisme de pasillo. Divertido para conocer el temperamento del jefe, pero totalmente inservible para diseñar el esquema relacional.",
+                                points: 0,
+                                unlocks: []
+                            },
+                            {
+                                id: "Q_ENZ_MILANESAS",
+                                text: "¿Qué tal son las ventas de café y almuerzos en el buffet?",
+                                value: "mid",
+                                dialogue: "¡Excelente! Los miércoles de milanesa se llena. Vendemos unas 120 porciones. Registramos todo en un cuaderno espiralado viejo. No me hable de sistemas que me mareo.",
+                                insight: "Charla informal de negocio. Conocer los volúmenes del buffet es irrelevante ya que fuiste contratado para modelar el circuito de zapatillas.",
+                                points: 2,
+                                unlocks: []
+                            },
+                            {
+                                id: "Q_ENZ_OPERARIOS",
+                                text: "¿A qué hora suele llenarse de operarios el buffet?",
+                                value: "mid",
+                                dialogue: "Entre las 12:00 y las 13:30. Es el horario de almuerzo de las tres líneas de montaje. A esa hora no le van a contestar ninguna pregunta sobre zapatillas.",
+                                insight: "Dato operativo menor. Útil para coordinar los horarios de tus entrevistas, pero no aporta datos técnicos sobre el DER.",
+                                points: 0,
+                                unlocks: []
+                            }
+                        ]
+                    },
+                    valeria: {
+                        name: "Valeria",
+                        role: "Auditora de Procesos y Calidad",
+                        avatar: "👩‍🔬",
+                        questions: [
+                            {
+                                id: "Q_VAL_RECLAMOS",
+                                text: "Valeria, ¿cómo registran cuando un cliente devuelve un calzado defectuoso?",
+                                value: "high",
+                                dialogue: "Cada devolución se formaliza en un <b>Reclamo de Garantía</b>. Registramos un ID de reclamo único, fecha, motivo del defecto y el estado de resolución (Aprobado/Rechazado). Para auditar qué falló, vinculamos el reclamo al artículo específico del pedido utilizando la clave compuesta del pedido y el modelo del zapato.",
+                                insight: "¡Magistral! Identificaste la entidad <b>ReclamosGarantia</b> con su PK <code>id_reclamo</code> y atributos. Además, descubriste una relación <b>1 a N</b> con la tabla asociativa <b>DetallePedido</b>, lo que exige una clave foránea compuesta <code>(numero_pedido, id_modelo)</code> en Reclamos.",
+                                points: 8,
+                                unlocks: ["table_reclamos", "rel_detalle_reclamo"]
+                            },
+                            {
+                                id: "Q_VAL_DEFECTOS",
+                                text: "¿Cuáles son las fallas de calidad más comunes en el calzado?",
+                                value: "mid",
+                                dialogue: "La mayoría son desprendimientos de suela de goma en el talón debido a variaciones de temperatura de las inyectoras o costuras flojas en la capellada de cuero.",
+                                insight: "Información técnica de producto útil para el control industrial, pero que no define campos ni relaciones en el DER de ventas y stock.",
+                                points: 2,
+                                unlocks: []
+                            },
+                            {
+                                id: "Q_VAL_GOSSIP",
+                                text: "¿Es verdad que la gerente Laura es muy controladora con las finanzas?",
+                                value: "low",
+                                dialogue: "Mire, yo me encargo de auditar la calidad física de los calzados, no la gestión de personal de la gerencia comercial. Le sugiero mantenerse en su rol de consultor.",
+                                insight: "Gossip irrelevante. Has importunado a la auditora y demostrado falta de tacto profesional, reduciendo tu prestigio y penalizando tu progreso máximo (-10% cap).",
+                                points: -10
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        const EXAM_QUESTIONS = [
+            {
+                text: "¿Qué atributo clave debemos elegir como Clave Primaria (PK) para identificar inequívocamente a cada Cliente en la base de datos de ZapasRun S.A.?",
+                options: [
+                    "El correo electrónico, ya que es único para cada persona.",
+                    "El CUIT o DNI, ya que es el identificador legal oficial y es inmutable.",
+                    "El nombre o la razón social completa del cliente.",
+                    "Un número correlativo autoincremental id_cliente creado de forma arbitraria."
+                ],
+                correct: 1,
+                explanation: "Correcto: El CUIT o DNI provee una garantía inmutable y legal de identificación unívoca para cualquier entidad física o jurídica que interactúa comercialmente."
+            },
+            {
+                text: "¿Cómo modelamos correctamente la relación comercial que descubrimos entre las tablas Clientes y Pedidos?",
+                options: [
+                    "Es una relación N:M (Muchos a Muchos), por lo que debemos crear una tabla intermedia con las claves de ambos.",
+                    "Es una relación 1:N (Uno a Muchos), por lo que debemos añadir la clave foránea cuit_dni en la tabla Pedidos.",
+                    "Es una relación 1:N (Uno a Muchos), por lo que debemos añadir la clave foránea numero_pedido en la tabla Clientes.",
+                    "Es una relación de tipo 1:1 (Uno a Uno), donde un cliente solo puede tener asignado un único pedido histórico."
+                ],
+                correct: 1,
+                explanation: "Correcto: Dado que un Cliente puede hacer múltiples Pedidos pero cada Pedido pertenece a un único Cliente, la clave del lado 'Uno' (Clientes) viaja como Foránea (FK) a la tabla del lado 'Muchos' (Pedidos)."
+            },
+            {
+                text: "Marta nos explicó que un Modelo puede usar múltiples Materiales en su receta, y un Material ser parte de múltiples Modelos. ¿Cómo se resuelve físicamente esta relación en el DER?",
+                options: [
+                    "Añadiendo la clave id_modelo como FK en la tabla Materiales.",
+                    "Añadiendo el sku_material como FK en la tabla Modelos.",
+                    "Creando una tabla asociativa intermedia (RecetaComposicion) con claves compuestas (id_modelo, sku_material) y el atributo de relación cantidad_utilizada.",
+                    "Ignorando la relación en la base de datos y resolviéndolo mediante código de aplicación frontend."
+                ],
+                correct: 2,
+                explanation: "Correcto: Las relaciones Muchos a Muchos (N:M) no pueden modelarse directamente en bases de datos relacionales sin provocar duplicación de datos. Se requiere una tabla intermedia con claves compuestas y sus atributos de relación."
+            },
+            {
+                text: "Javier nos advirtió que al vender un Modelo de zapatilla en un Pedido, debemos registrar el Precio Unitario Cobrado en ese instante, en lugar de consultar siempre el precio base de la zapatilla. ¿Dónde debe guardarse este atributo de precio?",
+                options: [
+                    "En la tabla de Modelos de zapatilla, actualizando el campo precio_base.",
+                    "En la tabla transaccional de Pedidos generales.",
+                    "En la tabla asociativa intermedia DetallePedido (o Línea de Pedido), registrando el valor histórico cobrado junto a la cantidad.",
+                    "En una tabla histórica externa llamada PreciosModelos sin relación directa con las ventas."
+                ],
+                correct: 2,
+                explanation: "Correcto: El precio unitario histórico cobrado al cliente pertenece a la línea o detalle del pedido. Si solo consultáramos el precio base en la tabla Modelos, cualquier cambio futuro de precios alteraría falsamente los montos de facturas emitidas en el pasado."
+            },
+            {
+                text: "Laura nos adelantó planes de abrir sucursales en Córdoba y Rosario. ¿Cómo prevenimos colisiones de datos y organizamos los pedidos por local físico?",
+                options: [
+                    "Colocamos la sucursal como una cadena de texto libre directamente en el nombre del cliente.",
+                    "Creando una entidad maestra Sucursales (id_sucursal, nombre_ciudad) y relacionándola 1 a N con Pedidos (insertando id_sucursal FK en Pedidos).",
+                    "Creando un archivo de base de datos Excel completamente independiente para cada provincia.",
+                    "Haciendo que cada sucursal comparta el mismo número correlativo de folios sin diferenciar la base física."
+                ],
+                correct: 1,
+                explanation: "Correcto: Crear una entidad Sucursales y colocar su clave como foránea en Pedidos permite diferenciar el origen transaccional de las ventas, evitando solapamientos y facilitando la analítica corporativa consolidada."
+            },
+            {
+                text: "Valeria nos indicó que cada Reclamo de Garantía se realiza sobre un artículo defectuoso específico comprado en un pedido. ¿Cómo establecemos esta conexión de clave foránea?",
+                options: [
+                    "Colocando id_reclamo como FK en la tabla de Pedidos generales.",
+                    "Estableciendo una Clave Foránea Compuesta (numero_pedido, id_modelo) en ReclamosGarantia apuntando a la clave compuesta de la tabla DetallePedido.",
+                    "Creando una relación de muchos a muchos entre Clientes y Materiales.",
+                    "Añadiendo el CUIT del proveedor del material en la tabla Reclamos."
+                ],
+                correct: 1,
+                explanation: "Correcto: Dado que DetallePedido tiene una Clave Primaria Compuesta (numero_pedido, id_modelo) para identificar la línea exacta del calzado comprado, cualquier tabla hija (como ReclamosGarantia) debe usar una Clave Foránea Compuesta idéntica para mantener la integridad referencial."
+            }
+        ];
+
+        // --- GAME STATE ---
+        let gameState = {
+            prestige: 0, // Starts at 0% Prestige Professional
+            activeArea: null,
+            activeChar: null,
+            badQuestionsCount: 0,
+            interviewedChars: {
+                rodolfo: false,
+                marta: false,
+                laura: false,
+                javier: false,
+                hugo: false,
+                enzo: false,
+                valeria: false
+            },
+            unlockedClues: {
+                table_lotes: false,
+                rel_modelo_lote: false,
+                table_clientes: false,
+                table_pedidos: false,
+                rel_cliente_pedido: false,
+                table_sucursales: false,
+                rel_sucursal_pedido: false,
+                table_materiales: false,
+                table_proveedores: false,
+                rel_proveedor_material: false,
+                table_reclamos: false,
+                rel_detalle_reclamo: false,
+                rel_modelo_material: false,
+                rel_pedido_modelo: false,
+                attr_client_email: false,
+                attr_prov_telefono: false
+            },
+            currentRoomQuestions: [],
+            activeNotebookTab: 'entidades',
+            activeMobileTab: 'entrevista',
+            examStep: 0,
+            examAnswers: [null, null, null, null, null, null]
+        };
+
+        const TOTAL_PROGRESS_ITEMS = 16;
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderNotebook();
+            updateUI();
+        });
+
+        // --- FISHER-YATES SHUFFLE ALGORITHM ---
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // --- CORE NAVIGATION & UI CONTROLS ---
+        function selectArea(areaKey) {
+            gameState.activeArea = areaKey;
+            gameState.activeChar = null;
+            
+            // Highlight active map card
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`area-${areaKey}`).classList.add('active');
+
+            // Switch to Characters list view
+            document.getElementById('room-welcome').style.display = 'none';
+            document.getElementById('room-chat-box').style.display = 'none';
+            document.getElementById('room-char-select').style.display = 'block';
+
+            // Set dynamic area title
+            document.getElementById('center-header-title').innerText = `💬 Sala: ${GAME_DATA[areaKey].title}`;
+
+            // Render characters cards
+            const container = document.getElementById('char-grid-container');
+            container.innerHTML = '';
+            
+            const areaChars = GAME_DATA[areaKey].chars;
+            for (let charKey in areaChars) {
+                const char = areaChars[charKey];
+                const isDone = gameState.interviewedChars[charKey];
+                const statusText = isDone ? 'Completado ✓' : 'Pendiente';
+                const cardClass = isDone ? 'char-card char-done' : 'char-card';
+
+                container.innerHTML += `
+                    <div class="${cardClass}" onclick="startInterview('${charKey}')">
+                        <div class="char-avatar">${char.avatar}</div>
+                        <div class="char-name">${char.name}</div>
+                        <div class="char-role">${char.role}</div>
+                        <div class="char-status">${statusText}</div>
+                    </div>
+                `;
+            }
+
+            // Mobile view toggle auto Focus
+            if (window.innerWidth <= 992) {
+                toggleMobileTab('entrevista');
+            }
+        }
+
+        function startInterview(charKey) {
+            gameState.activeChar = charKey;
+            const area = gameState.activeArea;
+            const char = GAME_DATA[area].chars[charKey];
+
+            // Setup character UI info
+            document.getElementById('chat-char-avatar').innerText = char.avatar;
+            document.getElementById('chat-char-name').innerText = char.name;
+            document.getElementById('chat-char-role').innerText = char.role;
+
+            // Switch views inside center panel
+            document.getElementById('room-char-select').style.display = 'none';
+            document.getElementById('room-chat-box').style.display = 'block';
+
+            // Reset conversation transcript window
+            const dialogueWin = document.getElementById('chat-dialogue-window');
+            dialogueWin.innerHTML = `
+                <div class="bubble employee">
+                    Hola, soy ${char.name}, ${char.role} de la empresa ZapasRun S.A. ¿En qué te puedo colaborar con el análisis?
+                </div>
+            `;
+
+            // Reset designer insights popup
+            document.getElementById('chat-designer-insight').style.display = 'none';
+
+            // MAP QUESTIONS WITH ORIGINAL INDEX AND SHUFFLE THEM
+            const questionsWithIndex = char.questions.map((q, idx) => ({ ...q, originalIndex: idx }));
+            gameState.currentRoomQuestions = shuffleArray(questionsWithIndex);
+
+            // Render questions list
+            renderQuestionsList();
+        }
+
+        function exitChatRoom() {
+            // Re-render character selector for the current area
+            selectArea(gameState.activeArea);
+        }
+
+        function renderQuestionsList() {
+            const listNode = document.getElementById('chat-questions-list');
+            listNode.innerHTML = '';
+
+            const area = gameState.activeArea;
+            const char = GAME_DATA[area].chars[gameState.activeChar];
+
+            // Render shuffled questions
+            gameState.currentRoomQuestions.forEach((q) => {
+                // Check if this specific high-value clue was already collected to mark it disabled
+                let isAlreadyAsked = false;
+                if (q.value === 'high' && char.clueId && gameState.interviewedChars[gameState.activeChar]) {
+                    isAlreadyAsked = true;
+                }
+                
+                // If it's a specific question that we already resolved, let's keep it disabled
+                if (q.id === "Q_ROD_TELEFONO" && gameState.unlockedClues.attr_prov_telefono) isAlreadyAsked = true;
+                if (q.id === "Q_JAV_EMAIL" && gameState.unlockedClues.attr_client_email) isAlreadyAsked = true;
+                if (q.id === "Q_LAU_EXPANSION" && gameState.unlockedClues.table_sucursales) isAlreadyAsked = true;
+                if (q.id === "Q_ROD_LOTES" && gameState.unlockedClues.table_lotes) isAlreadyAsked = true;
+                if (q.id === "Q_MAR_RECETA" && gameState.unlockedClues.rel_modelo_material) isAlreadyAsked = true;
+                if (q.id === "Q_JAV_DETALLE" && gameState.unlockedClues.rel_pedido_modelo) isAlreadyAsked = true;
+                if (q.id === "Q_VAL_RECLAMOS" && gameState.unlockedClues.table_reclamos) isAlreadyAsked = true;
+                if (q.id === "Q_HUG_PROVS" && gameState.unlockedClues.table_materiales) isAlreadyAsked = true;
+
+                const disabledClass = isAlreadyAsked ? 'disabled' : '';
+
+                listNode.innerHTML += `
+                    <button class="question-btn ${disabledClass}" onclick="askQuestion(${q.originalIndex})">
+                        ${q.text}
+                    </button>
+                `;
+            });
+            
+            document.getElementById('chat-btn-continue').style.display = 'none';
+        }
+
+        function askQuestion(qIdx) {
+            const area = gameState.activeArea;
+            const char = GAME_DATA[area].chars[gameState.activeChar];
+            const question = char.questions[qIdx];
+
+            // 1. Add question bubble from consultant
+            const dialogueWin = document.getElementById('chat-dialogue-window');
+            dialogueWin.innerHTML += `
+                <div class="bubble consultant">${question.text}</div>
+            `;
+
+            // Scroll to bottom
+            dialogueWin.scrollTop = dialogueWin.scrollHeight;
+
+            // Disable other questions during display
+            document.getElementById('chat-questions-list').style.display = 'none';
+
+            // 2. Delay response for dynamic feel
+            setTimeout(() => {
+                dialogueWin.innerHTML += `
+                    <div class="bubble employee">${question.dialogue}</div>
+                `;
+                dialogueWin.scrollTop = dialogueWin.scrollHeight;
+
+                // 3. Apply prestige updates
+                updatePrestige(question.points);
+
+                // 4. If they asked a gossip question, penalize maximum progress cap
+                if (question.value === 'low') {
+                    gameState.badQuestionsCount++;
+                }
+
+                // 5. Render designer insight based on quality
+                const insightNode = document.getElementById('chat-designer-insight');
+                const titleNode = document.getElementById('insight-title-node');
+                const bodyNode = document.getElementById('insight-body-node');
+
+                insightNode.className = 'designer-insight'; // clear old classes
+                insightNode.style.display = 'block';
+
+                if (question.value === 'high' || question.id === "Q_JAV_EMAIL" || question.id === "Q_ROD_TELEFONO") {
+                    insightNode.classList.add('is-good');
+                    titleNode.innerHTML = '✨ ¡Excelente Relevamiento! (Requerimiento Estructural)';
+                    
+                    // Mark character as interviewed for completed status cards
+                    if (question.value === 'high') {
+                        gameState.interviewedChars[gameState.activeChar] = true;
+                    }
+
+                    // Unlock corresponding progressive database items
+                    if (question.unlocks) {
+                        question.unlocks.forEach(item => {
+                            gameState.unlockedClues[item] = true;
+                        });
+                    }
+
+                    renderNotebook();
+                    updateAreaBadges();
+                } else if (question.value === 'mid') {
+                    insightNode.classList.add('is-mid');
+                    titleNode.innerHTML = '⚖️ Pregunta Regular (Poco Valor relacional)';
+                } else {
+                    insightNode.classList.add('is-bad');
+                    titleNode.innerHTML = '⚠️ Indiscreción Profesional (Pérdida de Prestigio y Bloqueo de Barra)';
+                }
+
+                bodyNode.innerText = question.insight;
+                dialogueWin.scrollTop = dialogueWin.scrollHeight;
+
+                // Show continue button to exit dialogue state
+                document.getElementById('chat-btn-continue').style.display = 'block';
+
+                // Recalculate and update Progress Bar
+                updateProgressBar();
+
+            }, 450);
+        }
+
+        function advanceChatFlow() {
+            // Restore question panel
+            document.getElementById('chat-questions-list').style.display = 'flex';
+            document.getElementById('chat-designer-insight').style.display = 'none';
+            document.getElementById('chat-btn-continue').style.display = 'none';
+
+            // Re-render questions to mark active state
+            renderQuestionsList();
+            
+            // Check if all essential keys are collected to display final exam
+            checkEssentialCluesCompleted();
+        }
+
+        // --- PRESTIGE SCORE ENGINE ---
+        function updatePrestige(delta) {
+            gameState.prestige = Math.max(0, Math.min(100, gameState.prestige + delta));
+            
+            // Update UI elements
+            const pLabel = document.getElementById('prestige-label');
+            const pFill = document.getElementById('prestige-progress');
+            const pRank = document.getElementById('prestige-rank-label');
+
+            pLabel.innerText = `${gameState.prestige}%`;
+            pFill.style.width = `${gameState.prestige}%`;
+
+            // Calculate title rank based on score
+            let rankText = 'Pasante de Sistemas';
+            if (gameState.prestige >= 90) {
+                rankText = 'Arquitecto DER Senior';
+            } else if (gameState.prestige >= 70) {
+                rankText = 'Analista Semi-Senior';
+            } else if (gameState.prestige >= 40) {
+                rankText = 'Consultor Novato';
+            }
+
+            pRank.innerText = rankText;
+        }
+
+        // --- PROGRESS BAR WITH TRUST PENALTY (CEILING CAP) ---
+        function updateProgressBar() {
+            // Calculate unlocked criteria count
+            let unlockedCount = 0;
+            for (let item in gameState.unlockedClues) {
+                if (gameState.unlockedClues[item] === true) {
+                    unlockedCount++;
+                }
+            }
+
+            // Progress bar value starts from 0%
+            let rawProgress = Math.round((unlockedCount / TOTAL_PROGRESS_ITEMS) * 100);
+
+            // Trust penalty ceiling capping: 10% locked per bad question
+            let maxProgressCap = 100 - (gameState.badQuestionsCount * 10);
+            maxProgressCap = Math.max(0, maxProgressCap);
+
+            // Clamp progress to cap
+            let displayProgress = Math.min(rawProgress, maxProgressCap);
+
+            // Update DOM text and fill
+            document.getElementById('progress-val-text').innerText = `${displayProgress}%`;
+            const fillNode = document.getElementById('progress-bar-fill-node');
+            fillNode.style.width = `${displayProgress}%`;
+
+            // Visual capping styling on the track background
+            const trackNode = document.getElementById('progress-bar-track-node');
+            if (gameState.badQuestionsCount > 0) {
+                trackNode.style.background = `linear-gradient(90deg, #e2e8f0 0%, #e2e8f0 ${maxProgressCap}%, #fee2e2 ${maxProgressCap}%, #fca5a5 100%)`;
+                
+                // Show warning message
+                const penaltyMsg = document.getElementById('progress-penalty-node');
+                penaltyMsg.style.display = 'block';
+                penaltyMsg.innerHTML = `⚠️ Confianza dañada. Progreso máximo limitado al <b>${maxProgressCap}%</b> por indiscreciones.`;
+            } else {
+                trackNode.style.background = 'var(--bg)';
+                document.getElementById('progress-penalty-node').style.display = 'none';
+            }
+        }
+
+        // --- AREA BADGES CALCULATIONS ---
+        function updateAreaBadges() {
+            // Produccion (Rodolfo, Marta)
+            let prodCount = 0;
+            if (gameState.interviewedChars.rodolfo) prodCount++;
+            if (gameState.interviewedChars.marta) prodCount++;
+            const prodBadge = document.getElementById('badge-produccion');
+            prodBadge.innerText = `${prodCount}/2`;
+            if (prodCount === 2) prodBadge.classList.add('done');
+
+            // Ventas (Laura, Javier)
+            let ventasCount = 0;
+            if (gameState.interviewedChars.laura) ventasCount++;
+            if (gameState.interviewedChars.javier) ventasCount++;
+            const ventasBadge = document.getElementById('badge-ventas');
+            ventasBadge.innerText = `${ventasCount}/2`;
+            if (ventasCount === 2) ventasBadge.classList.add('done');
+
+            // Logistica (Hugo)
+            let logCount = 0;
+            if (gameState.interviewedChars.hugo) logCount++;
+            const logBadge = document.getElementById('badge-logistica');
+            logBadge.innerText = `${logCount}/1`;
+            if (logCount === 1) logBadge.classList.add('done');
+
+            // Buffet (Enzo, Valeria)
+            let buffetCount = 0;
+            if (gameState.interviewedChars.enzo) buffetCount++; // enzo is optional but tracked
+            if (gameState.interviewedChars.valeria) buffetCount++;
+            const buffetBadge = document.getElementById('badge-buffet');
+            buffetBadge.innerText = `${buffetCount}/2`;
+            if (gameState.interviewedChars.valeria) buffetBadge.classList.add('done');
+
+            // Update mobile badge counters
+            let unlockedCount = 0;
+            for (let item in gameState.unlockedClues) {
+                if (gameState.unlockedClues[item] === true) unlockedCount++;
+            }
+            document.getElementById('m-clue-count').innerText = `${unlockedCount}/16`;
+        }
+
+        // --- NOTEBOOK CONTROLLER & RENDERER ---
+        function selectNotebookTab(tabName) {
+            gameState.activeNotebookTab = tabName;
+            
+            // Tab visual state
+            document.querySelectorAll('.notebook-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`n-tab-${tabName}`).classList.add('active');
+
+            renderNotebook();
+        }
+
+        function renderNotebook() {
+            const bodyNode = document.getElementById('notebook-content-body');
+            bodyNode.innerHTML = '';
+            
+            const activeTab = gameState.activeNotebookTab;
+            const clues = gameState.unlockedClues;
+
+            if (activeTab === 'entidades') {
+                // Table 1: Modelos (Unlocked by default, since it is the core product)
+                bodyNode.innerHTML += `
+                    <div class="clue-card">
+                        <div class="clue-card-header">
+                            <span class="clue-title">📋 Tabla: Modelos</span>
+                            <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">MAESTRA</span>
+                        </div>
+                        <div class="clue-body">
+                            Modeliza los modelos de calzados fabricados por la empresa.
+                        </div>
+                        <div class="clue-table-spec">
+                            <span>Primary Key:</span> id_modelo (INT)<br>
+                            <span>Atributos:</span> nombre (VARCHAR), precio_base (DECIMAL), fecha_introduccion (DATE)
+                        </div>
+                    </div>
+                `;
+
+                // Table 2: Lotes (Unlocked by Rodolfo)
+                if (clues.table_lotes) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: LotesProduccion</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">OPERATIVA</span>
+                            </div>
+                            <div class="clue-body">
+                                Almacena las tandas de fabricación diarias supervisadas en planta.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> id_lote (INT)<br>
+                                <span>Foreign Key:</span> id_modelo (➔ Modelos)<br>
+                                <span>Atributos:</span> fecha_inicio (DATE), cantidad_pares (INT), linea_montaje (VARCHAR)
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Tabla de Lotes', 'Ing. Rodolfo (Jefe de Planta)');
+                }
+
+                // Table 3: Clientes & Pedidos (Unlocked by Laura)
+                if (clues.table_clientes) {
+                    const isEmailUnlocked = clues.attr_client_email;
+                    bodyNode.innerHTML += `
+                        <div class="clue-card" style="margin-bottom: 0.75rem;">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: Clientes</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">TRANSACCIONAL</span>
+                            </div>
+                            <div class="clue-body">
+                                Guarda las fichas de mayoristas y particulares.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> cuit_dni (VARCHAR)<br>
+                                <span>Atributos:</span><br>
+                                • razon_social (VARCHAR)<br>
+                                • direccion (VARCHAR)<br>
+                                ${isEmailUnlocked 
+                                    ? '• <b style="color:var(--success)">email (VARCHAR) ✓ Desbloqueado</b>' 
+                                    : '• <span class="clue-attr-locked">🔒 [email] Locked: Pregunta a Javier por la venta online</span>'}
+                            </div>
+                        </div>
+                        <div class="clue-card">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: Pedidos</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">TRANSACCIONAL</span>
+                            </div>
+                            <div class="clue-body">
+                                Registra los folios de compras históricas asociando clientes y sucursales.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> numero_pedido (INT)<br>
+                                <span>Foreign Keys:</span><br>
+                                • cuit_dni_cliente (➔ Clientes)<br>
+                                • id_sucursal (➔ Sucursales)<br>
+                                <span>Atributos:</span> fecha (DATE), total_facturado (DECIMAL), estado (VARCHAR)
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Tablas de Clientes y Pedidos', 'Laura (Gerente Comercial)');
+                }
+
+                // Table 4: Sucursales (Unlocked by Laura High 2)
+                if (clues.table_sucursales) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: Sucursales</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">LOCALIZACIÓN</span>
+                            </div>
+                            <div class="clue-body">
+                                Entidad que aloja los locales comerciales en distintas ciudades para evitar cruces.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> id_sucursal (INT)<br>
+                                <span>Atributos:</span> nombre_ciudad (VARCHAR), direccion (VARCHAR)
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Tabla de Sucursales (Expansión)', 'Laura (Planes de Córdoba/Rosario)');
+                }
+
+                // Table 5: Materiales & Proveedores (Unlocked by Hugo)
+                if (clues.table_materiales) {
+                    const isTelefonoUnlocked = clues.attr_prov_telefono;
+                    bodyNode.innerHTML += `
+                        <div class="clue-card" style="margin-bottom: 0.75rem;">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: Materiales</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">MAESTRA</span>
+                            </div>
+                            <div class="clue-body">
+                                Detalla la materia prima e insumos de stock.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> sku_material (VARCHAR)<br>
+                                <span>Foreign Key:</span> cuit_proveedor (➔ Proveedores)<br>
+                                <span>Atributos:</span> nombre (VARCHAR), stock_disponible (DECIMAL)
+                            </div>
+                        </div>
+                        <div class="clue-card">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: Proveedores</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">MAESTRA</span>
+                            </div>
+                            <div class="clue-body">
+                                Datos de contacto de los proveedores de insumos.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> cuit_proveedor (VARCHAR)<br>
+                                <span>Atributos:</span><br>
+                                • razon_social (VARCHAR)<br>
+                                ${isTelefonoUnlocked 
+                                    ? '• <b style="color:var(--success)">telefono (VARCHAR) ✓ Desbloqueado</b>' 
+                                    : '• <span class="clue-attr-locked">🔒 [telefono] Locked: Pregunta a Rodolfo por reabastecimientos críticos</span>'}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Tablas de Materiales y Proveedores', 'Hugo (Depósito)');
+                }
+
+                // Table 6: Reclamos (Unlocked by Valeria)
+                if (clues.table_reclamos) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card">
+                            <div class="clue-card-header">
+                                <span class="clue-title">📋 Tabla: ReclamosGarantia</span>
+                                <span style="font-size: 0.65rem; color: var(--accent); font-weight: 700;">CALIDAD</span>
+                            </div>
+                            <div class="clue-body">
+                                Auditoría física de calzados fallados devueltos por clientes.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Primary Key:</span> id_reclamo (INT)<br>
+                                <span>Foreign Keys Compuestas (➔ DetallePedido):</span><br>
+                                • numero_pedido (INT), id_modelo (INT)<br>
+                                <span>Atributos:</span> fecha_reclamo (DATE), motivo_defecto (VARCHAR), estado_aprobado (VARCHAR)
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Tabla de Reclamos de Garantía', 'Valeria (Auditora de Calidad en el Buffet)');
+                }
+
+            } else if (activeTab === 'relaciones') {
+                
+                // Relation 1: Modelo -> Lote (Rodolfo)
+                if (clues.rel_modelo_lote) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 Modelos ➔ Lotes (1:N)</span>
+                            </div>
+                            <div class="clue-body">
+                                Un modelo se fabrica en múltiples lotes operacionales independientes. Un lote es de un único modelo.
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación Modelos-Lotes', 'Ing. Rodolfo (Jefe de Planta)');
+                }
+
+                // Relation 2: Modelo <-> Material (Marta)
+                if (clues.rel_modelo_material) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 Modelos ➔ Materiales (N:M)</span>
+                            </div>
+                            <div class="clue-body">
+                                <b>Tabla Asociativa: RecetaComposicion</b><br>
+                                Una zapatilla usa muchos materiales en cantidades exactas, y un material es usado en muchos modelos.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Foreign Keys:</span> id_modelo, sku_material<br>
+                                <span>Atributos Propios:</span> cantidad_utilizada (DECIMAL)
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación Receta (Modelos-Materiales)', 'Marta (Ensambladora)');
+                }
+
+                // Relation 3: Cliente -> Pedido (Laura)
+                if (clues.rel_cliente_pedido) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 Clientes ➔ Pedidos (1:N)</span>
+                            </div>
+                            <div class="clue-body">
+                                Un cliente puede emitir y facturar muchos pedidos a lo largo del tiempo. Un pedido pertenece obligatoriamente a un cliente.
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación Clientes-Pedidos', 'Laura (Gerente Comercial)');
+                }
+
+                // Relation 4: Sucursal -> Pedidos (Laura High 2)
+                if (clues.rel_sucursal_pedido) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 Sucursales ➔ Pedidos (1:N)</span>
+                            </div>
+                            <div class="clue-body">
+                                Una Sucursal gestiona y factura múltiples pedidos físicos. Cada pedido se vincula a una única sucursal emisora.
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación Sucursales-Pedidos', 'Laura (Planes de Sucursales)');
+                }
+
+                // Relation 5: Pedido <-> Modelo (Javier)
+                if (clues.rel_pedido_modelo) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 Pedidos ➔ Modelos (N:M)</span>
+                            </div>
+                            <div class="clue-body">
+                                <b>Tabla Asociativa: DetallePedido</b><br>
+                                Un pedido contiene diferentes tipos de calzados, y un modelo puede figurar en varios pedidos.
+                            </div>
+                            <div class="clue-table-spec">
+                                <span>Foreign Keys:</span> numero_pedido, id_modelo<br>
+                                <span>Atributos de Relación:</span> cantidad_vendida (INT), precio_unitario_venta (DECIMAL)
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación Detalle (Pedidos-Modelos)', 'Javier (Vendedor)');
+                }
+
+                // Relation 6: Proveedor -> Material (Hugo)
+                if (clues.rel_proveedor_material) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 Proveedores ➔ Materiales (1:N)</span>
+                            </div>
+                            <div class="clue-body">
+                                Cada insumo o material de fabricación se adquiere a un único proveedor principal, quien a su vez suministra múltiples tipos de materiales.
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación Proveedores-Materiales', 'Hugo (Depósito)');
+                }
+
+                // Relation 7: DetallePedido -> Reclamos (Valeria)
+                if (clues.rel_detalle_reclamo) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rel">
+                            <div class="clue-card-header">
+                                <span class="clue-title">🔗 DetallePedido ➔ Reclamos (1:N)</span>
+                            </div>
+                            <div class="clue-body">
+                                Un artículo vendido específico en un pedido puede recibir uno o varios reclamos históricos por fallas de costura o suela.
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    bodyNode.innerHTML += renderLockedClueCard('Relación DetallePedido-Reclamos', 'Valeria (Calidad)');
+                }
+
+            } else {
+                // RULES
+                bodyNode.innerHTML += `
+                    <div class="clue-card is-rule">
+                        <div class="clue-card-header">
+                            <span class="clue-title">⚖️ Regla 1: Identificación Legal</span>
+                        </div>
+                        <div class="clue-body">
+                            Los clientes y proveedores no se identifican con números secuenciales abstractos, sino mediante sus códigos tributarios oficiales únicos (CUIT/DNI).
+                        </div>
+                    </div>
+                `;
+
+                if (clues.table_lotes) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rule">
+                            <div class="clue-card-header">
+                                <span class="clue-title">⚖️ Regla 2: Exclusividad del Lote</span>
+                            </div>
+                            <div class="clue-body">
+                                Planta prohíbe mezclar modelos en un lote. Un lote de producción es de una sola zapatilla (ej. Lote 14 es solo de 'Running Pro').
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (clues.rel_modelo_material) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rule">
+                            <div class="clue-card-header">
+                                <span class="clue-title">⚖️ Regla 3: Precisión de Receta</span>
+                            </div>
+                            <div class="clue-body">
+                                La base de datos debe almacenar las cantidades exactas con precisión decimal para evitar mermas financieras de insumos en lotes masivos.
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (clues.rel_pedido_modelo) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rule">
+                            <div class="clue-card-header">
+                                <span class="clue-title">⚖️ Regla 4: Historial de Precios</span>
+                            </div>
+                            <div class="clue-body">
+                                Las facturas antiguas deben conservar el precio exacto al que fueron cobradas, protegiendo las auditorías contables frente a futuros aumentos inflacionarios.
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (clues.table_sucursales) {
+                    bodyNode.innerHTML += `
+                        <div class="clue-card is-rule">
+                            <div class="clue-card-header">
+                                <span class="clue-title">⚖️ Regla 5: Segregación Regional</span>
+                            </div>
+                            <div class="clue-body">
+                                Para abrir los almacenes en Córdoba y Rosario, el sistema debe registrar el origen geográfico de cada pedido para evitar solapamiento de folios de venta.
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function renderLockedClueCard(clueTitle, charSource) {
+            return `
+                <div class="clue-card locked">
+                    <div class="clue-card-header">
+                        <span class="clue-title">🔒 Clave: ${clueTitle}</span>
+                        <span class="lock-icon">🔒</span>
+                    </div>
+                    <div class="clue-body">
+                        Entrevista a <b>${charSource}</b> formulando preguntas técnicas de alto valor para desbloquear este requerimiento.
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- CHECK FINISHED REQUIREMENTS ---
+        function checkEssentialCluesCompleted() {
+            // Core high questions represent interviewedChars: rodolfo, marta, laura, javier, hugo, valeria
+            const coreInterviewed = 
+                gameState.interviewedChars.rodolfo && 
+                gameState.interviewedChars.marta && 
+                gameState.interviewedChars.laura && 
+                gameState.interviewedChars.javier && 
+                gameState.interviewedChars.hugo &&
+                gameState.interviewedChars.valeria;
+
+            if (coreInterviewed) {
+                // Show final diagnostic lock box
+                document.getElementById('report-lock-box').style.display = 'block';
+                document.getElementById('m-tab-cuaderno').classList.add('active-glow');
+            }
+        }
+
+        // --- MOBILE ADAPTABILITY VIEWS ---
+        function toggleMobileTab(tabKey) {
+            gameState.activeMobileTab = tabKey;
+            
+            const btnEntrevista = document.getElementById('m-tab-entrevista');
+            const btnCuaderno = document.getElementById('m-tab-cuaderno');
+            
+            const panelCenter = document.querySelector('.center-panel');
+            const panelRight = document.querySelector('.right-panel');
+
+            if (tabKey === 'entrevista') {
+                btnEntrevista.classList.add('active');
+                btnCuaderno.classList.remove('active');
+                panelCenter.classList.remove('mobile-hidden');
+                panelRight.classList.add('mobile-hidden');
+            } else {
+                btnEntrevista.classList.remove('active');
+                btnCuaderno.classList.add('active');
+                panelCenter.classList.add('mobile-hidden');
+                panelRight.classList.remove('mobile-hidden');
+            }
+        }
+
+        // --- EXAM ENGINE ---
+        function startFinalExam() {
+            // Hide main screen, show exam screen
+            document.getElementById('game-main-screen').style.display = 'none';
+            document.getElementById('game-exam-screen').style.display = 'block';
+
+            // Reset exam answers
+            gameState.examStep = 0;
+            gameState.examAnswers = [null, null, null, null, null, null];
+
+            renderExamStep();
+        }
+
+        function renderExamStep() {
+            const container = document.getElementById('exam-cards-container');
+            container.innerHTML = '';
+
+            const step = gameState.examStep;
+            const q = EXAM_QUESTIONS[step];
+
+            // Render active question card
+            container.innerHTML = `
+                <div class="exam-card active">
+                    <div class="exam-step-indicator">Desafío Técnico de Diseño ${step + 1} de 6</div>
+                    <div class="exam-question">${q.text}</div>
+                    <div class="options-list">
+                        ${q.options.map((opt, idx) => {
+                            const isSelected = gameState.examAnswers[step] === idx;
+                            const selClass = isSelected ? 'selected' : '';
+                            return `
+                                <div class="option-item ${selClass}" onclick="selectExamOption(${idx})">
+                                    <input type="radio" name="exam-opt" class="option-radio" ${isSelected ? 'checked' : ''}>
+                                    <div>${opt}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Adjust navigation buttons
+            document.getElementById('exam-progress-text').innerText = `Desafío ${step + 1} de 6`;
+            
+            const nextBtn = document.getElementById('exam-next-btn');
+            if (step === 5) {
+                nextBtn.innerText = 'Validar Diseño Final DER 🏆';
+            } else {
+                nextBtn.innerText = 'Siguiente Desafío ➔';
+            }
+
+            // Disable next if no option chosen
+            nextBtn.disabled = gameState.examAnswers[step] === null;
+        }
+
+        function selectExamOption(optIdx) {
+            const step = gameState.examStep;
+            gameState.examAnswers[step] = optIdx;
+
+            // Re-render to show visual highlights
+            renderExamStep();
+        }
+
+        function nextExamStep() {
+            const step = gameState.examStep;
+            
+            if (step < 5) {
+                gameState.examStep++;
+                renderExamStep();
+            } else {
+                // Final validate
+                compileFinalDesign();
+            }
+        }
+
+        function compileFinalDesign() {
+            // Count correct answers
+            let correctCount = 0;
+
+            gameState.examAnswers.forEach((ans, idx) => {
+                if (ans === EXAM_QUESTIONS[idx].correct) {
+                    correctCount++;
+                }
+            });
+
+            // Add points for correct answers (+4 per correct answer, max +24)
+            let examScore = correctCount * 4;
+            updatePrestige(examScore);
+
+            // Hide exam screen, show success screen
+            document.getElementById('game-exam-screen').style.display = 'none';
+            document.getElementById('game-success-screen').style.display = 'block';
+
+            // Calculate final title & description
+            const finalScore = gameState.prestige;
+            document.getElementById('cert-score').innerText = `${finalScore}%`;
+
+            const rankNode = document.getElementById('cert-rank');
+            if (finalScore >= 90) {
+                rankNode.innerText = '🥇 Arquitecto de Base de Datos Senior';
+                rankNode.style.color = 'var(--success)';
+            } else if (finalScore >= 70) {
+                rankNode.innerText = '🥈 Diseñador Semi-Senior DER';
+                rankNode.style.color = 'var(--accent)';
+            } else if (finalScore >= 40) {
+                rankNode.innerText = '🥉 Diseñador Junior DER';
+                rankNode.style.color = 'var(--warning)';
+            } else {
+                rankNode.innerText = '⚠️ Pasante de Base de Datos';
+                rankNode.style.color = 'var(--danger)';
+            }
+        }
+
+        function restartGame() {
+            // Reset state
+            gameState = {
+                prestige: 0,
+                activeArea: null,
+                activeChar: null,
+                badQuestionsCount: 0,
+                interviewedChars: {
+                    rodolfo: false,
+                    marta: false,
+                    laura: false,
+                    javier: false,
+                    hugo: false,
+                    enzo: false,
+                    valeria: false
+                },
+                unlockedClues: {
+                    table_lotes: false,
+                    rel_modelo_lote: false,
+                    table_clientes: false,
+                    table_pedidos: false,
+                    rel_cliente_pedido: false,
+                    table_sucursales: false,
+                    rel_sucursal_pedido: false,
+                    table_materiales: false,
+                    table_proveedores: false,
+                    rel_proveedor_material: false,
+                    table_reclamos: false,
+                    rel_detalle_reclamo: false,
+                    rel_modelo_material: false,
+                    rel_pedido_modelo: false,
+                    attr_client_email: false,
+                    attr_prov_telefono: false
+                },
+                currentRoomQuestions: [],
+                activeNotebookTab: 'entidades',
+                activeMobileTab: 'entrevista',
+                examStep: 0,
+                examAnswers: [null, null, null, null, null, null]
+            };
+
+            // Restore Main views
+            document.getElementById('game-success-screen').style.display = 'none';
+            document.getElementById('game-exam-screen').style.display = 'none';
+            document.getElementById('game-main-screen').style.display = 'flex';
+
+            // Restore center panel status
+            document.getElementById('room-welcome').style.display = 'block';
+            document.getElementById('room-char-select').style.display = 'none';
+            document.getElementById('room-chat-box').style.display = 'none';
+            document.getElementById('center-header-title').innerText = '💬 Sala de Entrevistas';
+
+            // Remove highlighted map buttons
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('report-lock-box').style.display = 'none';
+
+            // Re-initialize values
+            updatePrestige(0);
+            updateProgressBar();
+            updateAreaBadges();
+            renderNotebook();
+        }
+
+        // Helper update UI state
+        function updateUI() {
+            updatePrestige(0);
+            updateProgressBar();
+            updateAreaBadges();
+        }
+    </script>
+</body>
+
+</html>

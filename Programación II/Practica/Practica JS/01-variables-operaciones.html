@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 1: Variables y Operaciones Básicas</title>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body data-workshop-id="taller1">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Taller 01</div>
+        <h1>Sintaxis Básica y Aritmética</h1>
+        <p>Aprende a declarar variables, reconocer tipos de datos y aplicar operadores matemáticos. Resuelve cada reto respetando las limitaciones impuestas.</p>
+        <div class="header-meta">
+            <span>Dificultad: <strong>Fácil a Desafiante</strong></span>
+            <span>Desafíos: <strong>10 Ejercicios</strong></span>
+            <span>Retorno: <a href="index.html" style="color: var(--neon-pink); text-decoration: none;">&larr; Volver al Portal</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: SELECCIÓN Y DETALLE -->
+        <div class="panel">
+            <div class="panel-title">
+                Selecciona un Desafío <span class="indicator"></span>
+            </div>
+            
+            <!-- Selector de Ejercicios -->
+            <div class="exercise-selector" id="exercise-buttons"></div>
+
+            <!-- Detalles del Ejercicio Activo -->
+            <div class="exercise-detail-card">
+                <div>
+                    <div class="ex-badge-row">
+                        <span class="diff-badge" id="ex-difficulty">Fácil</span>
+                        <span class="ex-concepts" id="ex-concepts-list">Conceptos: </span>
+                    </div>
+                    <h2 class="ex-title" id="ex-title">Cargando...</h2>
+                    <div class="restriction-box" id="ex-restriction"></div>
+                    <p class="ex-desc" id="ex-desc">Cargando consigna...</p>
+                </div>
+                
+                <!-- Pistas -->
+                <div class="hint-container">
+                    <button class="hint-trigger-btn" id="hint-btn">💡 Ver Pista</button>
+                    <div class="hint-content-box" id="hint-content"></div>
+                </div>
+            </div>
+
+            <!-- Firma de la función visual (Solo informativo) -->
+            <div class="code-support-box" id="code-support-snippet"></div>
+
+            <!-- Teoría Rápida de Apoyo -->
+            <div class="theory-card">
+                <h3>Resumen Teórico del Taller</h3>
+                <ul>
+                    <li><code>let</code> declara variables mutables (pueden reasignarse).</li>
+                    <li><code>const</code> declara constantes inmutables (no pueden cambiar).</li>
+                    <li>Aritmética básica: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> y el módulo <code>%</code> (resto de división).</li>
+                    <li>Para redondear hacia abajo de forma entera se usa <code>Math.floor()</code>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: PLAYGROUND, TERMINAL Y RESULTADOS -->
+        <div class="panel sandbox-card">
+            <div class="panel-title">
+                Consola y Validador de Pruebas <span class="indicator" style="background-color: var(--neon-cyan); box-shadow: var(--glow-cyan);"></span>
+            </div>
+
+            <div class="student-instruction-banner">
+                💡 <strong>¿Cómo resolver?</strong> Abre este archivo en tu editor de código preferido (ej. VS Code). Busca el bloque <code>&lt;script id="soluciones"&gt;</code> al final del documento y completa el código de las funciones indicadas. Guarda el archivo, recarga esta página y haz clic en <strong>Ejecutar y Validar</strong>.
+            </div>
+
+            <!-- Botón de Ejecutar -->
+            <div class="action-row">
+                <button class="btn-run" id="run-btn">
+                    <span>▶ Ejecutar y Validar Código</span>
+                </button>
+            </div>
+
+            <!-- Consola de Resultados Simulada -->
+            <div class="terminal-header">
+                <span>Terminal de Salida</span>
+                <span>Console Sandbox</span>
+            </div>
+            <div class="terminal" id="terminal-content"></div>
+
+            <!-- Resultados del Test Suite -->
+            <div class="test-results-box">
+                <div class="test-results-title">
+                    <span>Suite de Pruebas</span>
+                    <span class="test-summary" id="progress-summary">Progreso: 0/10 Completados</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="test-list" id="test-results-list" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- DEFINE DATA DE EJERCICIOS PARA EL TESTER -->
+    <script>
+        window.exercisesData = [
+            {
+                id: 1,
+                title: "El Intercambio Aritmético",
+                difficulty: "easy",
+                concepts: "Variables y Operadores",
+                restriction: "Prohibido usar if, switch, arrays o bucles.",
+                signature: "resolver1_1(a, b)",
+                functionName: "resolver1_1",
+                desc: "Dadas dos variables numéricas <code>a</code> y <code>b</code>, intercambia sus valores utilizando una variable auxiliar <code>c</code> de forma que al final del proceso <code>a</code> contenga el valor original de <code>b</code> y viceversa. Retorna un objeto en el formato: <code>{ a: a, b: b }</code>.",
+                hint: "Guarda el valor de 'a' en la variable 'c' antes de que 'a' sea sobreescrita por 'b'. Luego asigna 'c' a 'b'.",
+                tests: [
+                    {
+                        name: "Valores intercambiados correctamente para (5, 10)",
+                        assert: (fn) => {
+                            const res = fn(5, 10);
+                            if (!res || typeof res !== 'object') throw new Error("Debe retornar un objeto.");
+                            if (res.a !== 10 || res.b !== 5) throw new Error(`Esperaba {a: 10, b: 5}, pero retornó {a: ${res.a}, b: ${res.b}}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Funciona con números negativos (-3, 8)",
+                        assert: (fn) => {
+                            const res = fn(-3, 8);
+                            if (res.a !== 8 || res.b !== -3) throw new Error(`Esperaba {a: 8, b: -3}, pero retornó {a: ${res.a}, b: ${res.b}}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Conversor Térmico",
+                difficulty: "easy",
+                concepts: "Aritmética y Variables",
+                restriction: "Prohibido usar estructuras condicionales.",
+                signature: "resolver1_2(celsius)",
+                functionName: "resolver1_2",
+                desc: "Crea un conversor de temperatura. Recibe un valor en grados <code>celsius</code> y calcula su equivalente en Fahrenheit (<code>F = C * 9/5 + 32</code>) y Kelvin (<code>K = C + 273.15</code>). Retorna un objeto con las propiedades <code>fahrenheit</code> y <code>kelvin</code>.",
+                hint: "Recuerda el uso de operadores aritméticos estándar (*, /, +) y el valor exacto de la constante Kelvin.",
+                tests: [
+                    {
+                        name: "Punto de congelación (0°C)",
+                        assert: (fn) => {
+                            const res = fn(0);
+                            if (!res || res.fahrenheit !== 32 || res.kelvin !== 273.15) {
+                                throw new Error(`Esperaba {fahrenheit: 32, kelvin: 273.15}, recibió {fahrenheit: ${res?.fahrenheit}, kelvin: ${res?.kelvin}}`);
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Temperatura corporal promedio (37°C)",
+                        assert: (fn) => {
+                            const res = fn(37);
+                            if (!res || res.fahrenheit !== 98.6 || res.kelvin !== 310.15) {
+                                throw new Error(`Esperaba {fahrenheit: 98.6, kelvin: 310.15}, recibió {fahrenheit: ${res?.fahrenheit}, kelvin: ${res?.kelvin}}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Desglose Fiscal",
+                difficulty: "easy",
+                concepts: "Operaciones Aritméticas",
+                restriction: "Prohibido usar condicionales.",
+                signature: "resolver1_3(precioBase)",
+                functionName: "resolver1_3",
+                desc: "Dado un <code>precioBase</code> decimal que representa el costo neto de un producto, aplícale primero el impuesto del IVA (21%) y luego aplica un descuento promocional del 15% sobre el total con IVA incluido. Retorna el precio final redondeado a dos decimales (usa <code>Number(resultado.toFixed(2))</code>).",
+                hint: "Multiplicar un valor por 1.21 le suma el 21%. Multiplicarlo por 0.85 le resta el 15%. ¡Usa toFixed(2) para los decimales!",
+                tests: [
+                    {
+                        name: "Para precio base de $100",
+                        assert: (fn) => {
+                            const res = fn(100);
+                            if (res !== 102.85) throw new Error(`Esperaba 102.85, pero recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Para precio base de $45.50",
+                        assert: (fn) => {
+                            const res = fn(45.50);
+                            if (res !== 46.80) throw new Error(`Esperaba 46.80, pero recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Reparto de Botín",
+                difficulty: "easy",
+                concepts: "Módulo y División Entera",
+                restriction: "Prohibido usar condicionales.",
+                signature: "resolver1_4(monedas, piratas)",
+                functionName: "resolver1_4",
+                desc: "Un grupo de <code>piratas</code> desea repartir de forma equitativa un cofre con <code>monedas</code> de oro. Escribe un algoritmo que calcule cuántas monedas completas le tocan a cada pirata y cuántas monedas sobran en el cofre. Retorna un objeto en el formato: <code>{ cadaUno: X, sobra: Y }</code>.",
+                hint: "Para la parte entera de una división, usa Math.floor(monedas / piratas). Para el resto o residuo sobrante, usa el operador %.",
+                tests: [
+                    {
+                        name: "Reparto de 85 monedas entre 6 piratas",
+                        assert: (fn) => {
+                            const res = fn(85, 6);
+                            if (!res || res.cadaUno !== 14 || res.sobra !== 1) {
+                                throw new Error(`Esperaba {cadaUno: 14, sobra: 1}, recibió {cadaUno: ${res?.cadaUno}, sobra: ${res?.sobra}}`);
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Reparto exacto (100 monedas entre 10 piratas)",
+                        assert: (fn) => {
+                            const res = fn(100, 10);
+                            if (!res || res.cadaUno !== 10 || res.sobra !== 0) {
+                                throw new Error(`Esperaba {cadaUno: 10, sobra: 0}, recibió {cadaUno: ${res?.cadaUno}, sobra: ${res?.sobra}}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Mail Corporativo",
+                difficulty: "medium",
+                concepts: "Manipulación de Strings",
+                restriction: "Prohibido usar condicionales.",
+                signature: "resolver1_5(nombre, apellido)",
+                functionName: "resolver1_5",
+                desc: "Un sistema de RRHH necesita automatizar la creación de correos corporativos. Dados el <code>nombre</code> y el <code>apellido</code> de un empleado en bruto (que pueden contener espacios innecesarios al inicio/fin y mayúsculas desordenadas), límpialos, conviértelos a minúsculas y retorna el correo con el formato: <code>nombre.apellido@empresa.com</code>.",
+                hint: "Usa los métodos de string .trim() para limpiar espacios y .toLowerCase() para pasar a minúsculas. Concatena con el operador '+' o template literals.",
+                tests: [
+                    {
+                        name: "Limpia y concatena '  Juan ' y ' Perez '",
+                        assert: (fn) => {
+                            const res = fn("  Juan ", " Perez ");
+                            if (res !== "juan.perez@empresa.com") throw new Error(`Esperaba 'juan.perez@empresa.com', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Limpia mayúsculas 'MARIA' y 'GONZALEZ'",
+                        assert: (fn) => {
+                            const res = fn("MARIA", "GONZALEZ");
+                            if (res !== "maria.gonzalez@empresa.com") throw new Error(`Esperaba 'maria.gonzalez@empresa.com', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Presupuesto del Viaje",
+                difficulty: "medium",
+                concepts: "Operaciones Combinadas",
+                restriction: "Prohibido usar condicionales.",
+                signature: "resolver1_6(distancia, rendimiento, precioLitro)",
+                functionName: "resolver1_6",
+                desc: "Calcula los costos de combustible para un viaje por ruta. Dados la <code>distancia</code> total a recorrer en kilómetros, el <code>rendimiento</code> del coche (litros de combustible que consume cada 100km recorridos), y el <code>precioLitro</code> de combustible, calcula los litros totales necesarios y el costo monetario total. Retorna un objeto: <code>{ litros: L, costo: C }</code> con dos decimales de precisión.",
+                hint: "Fórmula de litros consumidos: (distancia / 100) * rendimiento. Costo total: litros * precio. No olvides redondear a 2 decimales usando toFixed(2) y convertir a Number.",
+                tests: [
+                    {
+                        name: "Viaje de 300km (rendimiento 8L/100km, $1500/L)",
+                        assert: (fn) => {
+                            const res = fn(300, 8, 1500);
+                            if (!res || res.litros !== 24 || res.costo !== 36000) {
+                                throw new Error(`Esperaba {litros: 24, costo: 36000}, recibió {litros: ${res?.litros}, costo: ${res?.costo}}`);
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Viaje de 125km (rendimiento 6.5L/100km, $1420.50/L)",
+                        assert: (fn) => {
+                            const res = fn(125, 6.5, 1420.50);
+                            if (!res || res.litros !== 8.13 || res.costo !== 11541.56) {
+                                throw new Error(`Esperaba {litros: 8.13, costo: 11541.56}, recibió {litros: ${res?.litros}, costo: ${res?.costo}}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Descompresor de Tiempo",
+                difficulty: "medium",
+                concepts: "Módulo y División de Horas",
+                restriction: "Prohibido usar if o bucles.",
+                signature: "resolver1_7(totalSegundos)",
+                functionName: "resolver1_7",
+                desc: "Un sistema de mediciones deportivas entrega los tiempos en un entero representando el total de segundos. Escribe un algoritmo que convierta ese valor en un formato legible desglosándolo en horas, minutos y segundos restantes. Retorna un objeto en el formato: <code>{ horas: H, minutos: M, segundos: S }</code>.",
+                hint: "1 hora son 3600 segundos. 1 minuto son 60 segundos. Divide de forma entera (Math.floor) entre 3600 para las horas, obtén el resto (%) y divídelo entre 60 para los minutos.",
+                tests: [
+                    {
+                        name: "Desglose de 3665 segundos (1h, 1m, 5s)",
+                        assert: (fn) => {
+                            const res = fn(3665);
+                            if (!res || res.horas !== 1 || res.minutos !== 1 || res.segundos !== 5) {
+                                throw new Error(`Esperaba {horas: 1, minutos: 1, segundos: 5}, recibió {horas: ${res?.horas}, minutos: ${res?.minutos}, segundos: ${res?.segundos}}`);
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Desglose de 7200 segundos exactos (2h, 0m, 0s)",
+                        assert: (fn) => {
+                            const res = fn(7200);
+                            if (!res || res.horas !== 2 || res.minutos !== 0 || res.segundos !== 0) {
+                                throw new Error(`Esperaba {horas: 2, minutos: 0, segundos: 0}, recibió {horas: ${res?.horas}, minutos: ${res?.minutos}, segundos: ${res?.segundos}}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "Geometría Estricta",
+                difficulty: "medium",
+                concepts: "Librería Math",
+                restriction: "Prohibido usar condicionales.",
+                signature: "resolver1_8(radio, base, altura)",
+                functionName: "resolver1_8",
+                desc: "Dados el <code>radio</code> de un círculo, y la <code>base</code> y <code>altura</code> de un rectángulo, calcula el área y perímetro de ambos. Retorna un objeto con las claves: <code>areaCirculo</code>, <code>perimetroCirculo</code>, <code>areaRectangulo</code>, <code>perimetroRectangulo</code>. Todos los resultados con 2 decimales de precisión.",
+                hint: "Fórmulas del círculo: Área = PI * R^2, Perímetro = 2 * PI * R. Usa Math.PI y Math.pow() o el operador '**'. Redondea cada valor a 2 decimales.",
+                tests: [
+                    {
+                        name: "Dimensiones R: 3, B: 5, H: 8",
+                        assert: (fn) => {
+                            const res = fn(3, 5, 8);
+                            if (!res || res.areaCirculo !== 28.27 || res.perimetroCirculo !== 18.85 || res.areaRectangulo !== 40 || res.perimetroRectangulo !== 26) {
+                                throw new Error(`Resultados incorrectos. Recibió: ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Cifrado César Básico",
+                difficulty: "hard",
+                concepts: "String ASCII charCode",
+                restriction: "Prohibido usar bucles.",
+                signature: "resolver1_9(caracter, desplazamiento)",
+                functionName: "resolver1_9",
+                desc: "Consiste en desplazar una posición fija los caracteres. Dado un único <code>caracter</code> (string de longitud 1) y un número de <code>desplazamiento</code> entero, obtén su representación numérica ASCII, súmale el desplazamiento y retorna el nuevo carácter encriptado en forma de string.",
+                hint: "Usa caracter.charCodeAt(0) para obtener el código ASCII. Súmale el desplazamiento. Luego usa String.fromCharCode(codigoNuevo) para volver a texto.",
+                tests: [
+                    {
+                        name: "Desplazar 'A' por 3 posiciones (debe ser 'D')",
+                        assert: (fn) => {
+                            const res = fn("A", 3);
+                            if (res !== "D") throw new Error(`Esperaba 'D', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Desplazar 'z' por 5 posiciones (debe ser '' o correspondiente)",
+                        assert: (fn) => {
+                            const res = fn("z", 2);
+                            if (res !== "|") throw new Error(`Esperaba '|', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Cajero Sin Ramas",
+                difficulty: "legendary",
+                concepts: "Lógica Matemática Pura",
+                restriction: "PROHIBIDO EL USO DE SENTENCIAS IF, ELSE, SWITCH O BUCLES. Únicamente operaciones aritméticas.",
+                signature: "resolver1_10(cantidad)",
+                functionName: "resolver1_10",
+                desc: "Un cajero automático entrega billetes de $1000, $500 y $100. Dada una <code>cantidad</code> de dinero entera (siempre múltiplo de 100), calcula la menor cantidad de billetes necesarios para pagar ese importe. Retorna un objeto en el formato: <code>{ b1000: X, b500: Y, b100: Z }</code>.",
+                hint: "Calcula los billetes de $1000 dividiendo por 1000 de forma entera. El sobrante se obtiene con el módulo %. Repite la operación con el resto para $500 y el nuevo resto para $100.",
+                tests: [
+                    {
+                        name: "Breakdown para $3800 (3x1000, 1x500, 3x100)",
+                        assert: (fn) => {
+                            const res = fn(3800);
+                            if (!res || res.b1000 !== 3 || res.b500 !== 1 || res.b100 !== 3) {
+                                throw new Error(`Esperaba {b1000: 3, b500: 1, b100: 3}, recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Breakdown para $1500 (1x1000, 1x500, 0x100)",
+                        assert: (fn) => {
+                            const res = fn(1500);
+                            if (!res || res.b1000 !== 1 || res.b500 !== 1 || res.b100 !== 0) {
+                                throw new Error(`Esperaba {b1000: 1, b500: 1, b100: 0}, recibió ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            }
+        ];
+    </script>
+
+    <!-- BLOQUE DE SCRIPT PARA LAS SOLUCIONES DEL ESTUDIANTE -->
+    <script id="soluciones">
+        // ==========================================================================
+        // ✏️ ESPACIO PARA COMPLETAR TU CODIGO JAVASCRIPT
+        // Completa el interior de cada función de acuerdo a las consignas indicadas.
+        // ==========================================================================
+
+        // Ejercicio 1: El Intercambio Aritmético
+        function resolver1_1(a, b) {
+            let c;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { a, b };
+        }
+
+        // Ejercicio 2: Conversor Térmico
+        function resolver1_2(celsius) {
+            let fahrenheit;
+            let kelvin;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { fahrenheit, kelvin };
+        }
+
+        // Ejercicio 3: Desglose Fiscal
+        function resolver1_3(precioBase) {
+            let precioFinal;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return precioFinal;
+        }
+
+        // Ejercicio 4: Reparto de Botín
+        function resolver1_4(monedas, piratas) {
+            let cadaUno;
+            let sobra;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { cadaUno, sobra };
+        }
+
+        // Ejercicio 5: Mail Corporativo
+        function resolver1_5(nombre, apellido) {
+            let email;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return email;
+        }
+
+        // Ejercicio 6: Presupuesto del Viaje
+        function resolver1_6(distancia, rendimiento, precioLitro) {
+            let litros;
+            let costo;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { litros, costo };
+        }
+
+        // Ejercicio 7: Descompresor de Tiempo
+        function resolver1_7(totalSegundos) {
+            let horas;
+            let minutos;
+            let segundos;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { horas, minutos, segundos };
+        }
+
+        // Ejercicio 8: Geometría Estricta
+        function resolver1_8(radio, base, altura) {
+            let areaCirculo;
+            let perimetroCirculo;
+            let areaRectangulo;
+            let perimetroRectangulo;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { areaCirculo, perimetroCirculo, areaRectangulo, perimetroRectangulo };
+        }
+
+        // Ejercicio 9: Cifrado César Básico
+        function resolver1_9(caracter, desplazamiento) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 10: Cajero Sin Ramas
+        function resolver1_10(cantidad) {
+            let b1000;
+            let b500;
+            let b100;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return { b1000, b500, b100 };
+        }
+    </script>
+
+    <!-- INCLUYE EL MOTOR DEL PLAYGROUND COMPARTIDO -->
+    <script src="js/tester.js"></script>
+</body>
+</html>

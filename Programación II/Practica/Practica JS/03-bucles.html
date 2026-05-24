@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 3: Bucles e Iteraciones</title>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body data-workshop-id="taller3">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Taller 03</div>
+        <h1>Estructuras Repetitivas y Bucles</h1>
+        <p>Aprende a ejecutar código repetidamente usando ciclos de control. Manipula series numéricas y crea patrones lógicos.</p>
+        <div class="header-meta">
+            <span>Dificultad: <strong>Fácil a Experto</strong></span>
+            <span>Desafíos: <strong>10 Ejercicios</strong></span>
+            <span>Retorno: <a href="index.html" style="color: var(--neon-pink); text-decoration: none;">&larr; Volver al Portal</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: SELECCIÓN Y DETALLE -->
+        <div class="panel">
+            <div class="panel-title">
+                Selecciona un Desafío <span class="indicator"></span>
+            </div>
+            
+            <!-- Selector de Ejercicios -->
+            <div class="exercise-selector" id="exercise-buttons"></div>
+
+            <!-- Detalles del Ejercicio Activo -->
+            <div class="exercise-detail-card">
+                <div>
+                    <div class="ex-badge-row">
+                        <span class="diff-badge" id="ex-difficulty">Fácil</span>
+                        <span class="ex-concepts" id="ex-concepts-list">Conceptos: </span>
+                    </div>
+                    <h2 class="ex-title" id="ex-title">Cargando...</h2>
+                    <div class="restriction-box" id="ex-restriction"></div>
+                    <p class="ex-desc" id="ex-desc">Cargando consigna...</p>
+                </div>
+                
+                <!-- Pistas -->
+                <div class="hint-container">
+                    <button class="hint-trigger-btn" id="hint-btn">💡 Ver Pista</button>
+                    <div class="hint-content-box" id="hint-content"></div>
+                </div>
+            </div>
+
+            <!-- Firma de la función visual (Solo informativo) -->
+            <div class="code-support-box" id="code-support-snippet"></div>
+
+            <!-- Teoría Rápida de Apoyo -->
+            <div class="theory-card">
+                <h3>Resumen Teórico del Taller</h3>
+                <ul>
+                    <li><code>for (let i = 0; i < N; i++)</code> se usa cuando conocemos el número exacto de iteraciones.</li>
+                    <li><code>while (condición)</code> itera indefinidamente mientras la condición sea verdadera.</li>
+                    <li><code>do { ... } while (condición)</code> asegura al menos una ejecución previa al chequeo.</li>
+                    <li>Bucles anidados consisten en estructuras repetitivas una dentro de la otra para modelar planos 2D o matrices.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: PLAYGROUND, TERMINAL Y RESULTADOS -->
+        <div class="panel sandbox-card">
+            <div class="panel-title">
+                Consola y Validador de Pruebas <span class="indicator" style="background-color: var(--neon-cyan); box-shadow: var(--glow-cyan);"></span>
+            </div>
+
+            <div class="student-instruction-banner">
+                💡 <strong>¿Cómo resolver?</strong> Abre este archivo en tu editor de código preferido (ej. VS Code). Busca el bloque <code>&lt;script id="soluciones"&gt;</code> al final del documento y completa el código de las funciones indicadas. Guarda el archivo, recarga esta página y haz clic en <strong>Ejecutar y Validar</strong>.
+            </div>
+
+            <!-- Botón de Ejecutar -->
+            <div class="action-row">
+                <button class="btn-run" id="run-btn">
+                    <span>▶ Ejecutar y Validar Código</span>
+                </button>
+            </div>
+
+            <!-- Consola de Resultados Simulada -->
+            <div class="terminal-header">
+                <span>Terminal de Salida</span>
+                <span>Console Sandbox</span>
+            </div>
+            <div class="terminal" id="terminal-content"></div>
+
+            <!-- Resultados del Test Suite -->
+            <div class="test-results-box">
+                <div class="test-results-title">
+                    <span>Suite de Pruebas</span>
+                    <span class="test-summary" id="progress-summary">Progreso: 0/10 Completados</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="test-list" id="test-results-list" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- DEFINE DATA DE EJERCICIOS PARA EL TESTER -->
+    <script>
+        window.exercisesData = [
+            {
+                id: 1,
+                title: "Tabla de Multiplicar",
+                difficulty: "easy",
+                concepts: "Bucle For y Strings",
+                restriction: "Prohibido usar arrays, objetos o métodos de array.",
+                signature: "resolver3_1(n)",
+                functionName: "resolver3_1",
+                desc: "Dado un número entero positivo <code>n</code>, genera su tabla de multiplicar desde el 1 hasta el 10 en una sola cadena de texto. Cada línea debe terminar con un salto de línea (<code>\\n</code>). El formato de cada línea debe ser exactamente: <code>n * i = resultado\\n</code>.",
+                hint: "Inicializa un string vacío. Haz un bucle for de 1 a 10 y concatena el texto formateado usando template literals (respeta los espacios y el '\\n').",
+                tests: [
+                    {
+                        name: "Tabla del 5 correcta",
+                        assert: (fn) => {
+                            const res = fn(5);
+                            const expected = "5 * 1 = 5\n5 * 2 = 10\n5 * 3 = 15\n5 * 4 = 20\n5 * 5 = 25\n5 * 6 = 30\n5 * 7 = 35\n5 * 8 = 40\n5 * 9 = 45\n5 * 10 = 50\n";
+                            if (res !== expected) throw new Error(`Esperaba tabla de multiplicación clásica. Recibió:\n${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Sumatoria Promedio",
+                difficulty: "easy",
+                concepts: "Acumuladores y Filtros en Bucle",
+                restriction: "Prohibido usar arrays u objetos.",
+                signature: "resolver3_2(A, B)",
+                functionName: "resolver3_2",
+                desc: "Dado un rango cerrado definido por los enteros <code>A</code> y <code>B</code> (donde A <= B), suma todos los números **impares** dentro del rango y cuéntalos. Retorna un string con el formato exacto: <code>'suma: X, promedio: Y'</code>. Si no existieran impares en el rango, retorna <code>'suma: 0, promedio: 0'</code>.",
+                hint: "Usa dos variables acumuladoras: una para la suma y otra para la cantidad de impares. En el bucle de A a B, verifica si i % 2 !== 0 para acumular.",
+                tests: [
+                    {
+                        name: "Rango de impares entre 1 y 5 (1, 3, 5 -> suma 9, prom 3)",
+                        assert: (fn) => {
+                            const res = fn(1, 5);
+                            if (res !== "suma: 9, promedio: 3") throw new Error(`Esperaba 'suma: 9, promedio: 3', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Rango par sin impares (4, 4)",
+                        assert: (fn) => {
+                            const res = fn(4, 4);
+                            if (res !== "suma: 0, promedio: 0") throw new Error(`Esperaba 'suma: 0, promedio: 0', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Conteo Digital",
+                difficulty: "easy",
+                concepts: "Bucle While y Reducción Matemática",
+                restriction: "Prohibido convertir el número a string (prohibido toString o template literals).",
+                signature: "resolver3_3(numero)",
+                functionName: "resolver3_3",
+                desc: "Dado un entero estrictamente positivo <code>numero</code>, calcula cuántos dígitos individuales tiene. Debes hacerlo de forma matemática mediante divisiones enteras sucesivas.",
+                hint: "Usa un bucle while que se ejecute mientras el número sea mayor a 0. En cada paso, incrementa un contador y reasigna el número dividiéndolo por 10 y aplicando Math.floor().",
+                tests: [
+                    {
+                        name: "Número 75498 tiene 5 dígitos",
+                        assert: (fn) => {
+                            const res = fn(75498);
+                            if (res !== 5) throw new Error(`Esperaba 5, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Número de un solo dígito (3)",
+                        assert: (fn) => {
+                            const res = fn(3);
+                            if (res !== 1) throw new Error(`Esperaba 1, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Lienzo de Asteriscos",
+                difficulty: "medium",
+                concepts: "Bucles Anidados y Caracteres",
+                restriction: "Prohibido usar arrays u objetos.",
+                signature: "resolver3_4(ancho, alto)",
+                functionName: "resolver3_4",
+                desc: "Genera una cadena de texto representando un rectángulo **hueco** de asteriscos de dimensiones <code>ancho</code> y <code>alto</code>. Las líneas deben separarse por un salto de línea (<code>\\n</code>). El interior del rectángulo debe contener espacios en blanco.",
+                hint: "En bucles anidados i (alto) y j (ancho), dibuja un '*' si estás en la primera fila (i===0), última fila (i===alto-1), primera columna (j===0) o última columna (j===ancho-1); si no, dibuja un espacio.",
+                tests: [
+                    {
+                        name: "Rectángulo hueco de 4x3",
+                        assert: (fn) => {
+                            const res = fn(4, 3);
+                            const expected = "****\n*  *\n****\n";
+                            if (res !== expected) throw new Error(`Estructura incorrecta. Recibió:\n${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Filtro de Primos",
+                difficulty: "medium",
+                concepts: "Algoritmo de Primalidad y Loops",
+                restriction: "Prohibido usar arrays o librerías externas.",
+                signature: "resolver3_5(num)",
+                functionName: "resolver3_5",
+                desc: "Escribe un algoritmo clásico de primalidad. Recibe un entero <code>num</code> y debe retornar <code>true</code> si el número es primo (divisible únicamente por sí mismo y por 1) y <code>false</code> de lo contrario. Ten en cuenta casos borde como números menores o iguales a 1.",
+                hint: "Si es <= 1, no es primo. Haz un bucle for desde 2 hasta la raíz cuadrada del número (Math.sqrt(num)) o hasta num - 1. Si en algún paso num % i === 0, retorna false.",
+                tests: [
+                    {
+                        name: "Números primos clásicos (7, 13 son true)",
+                        assert: (fn) => {
+                            if (fn(7) !== true || fn(13) !== true) throw new Error("Debe detectar primos como true");
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Números compuestos y borde (4, 1, 0, 15 son false)",
+                        assert: (fn) => {
+                            if (fn(4) !== false || fn(1) !== false || fn(15) !== false) throw new Error("Debe clasificar no primos como false");
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Fibonacci Sin Estructuras",
+                difficulty: "medium",
+                concepts: "Series de Fibonacci sin Arrays",
+                restriction: "PROHIBIDO EL USO DE ARRAYS. No uses corchetes [] ni métodos de array.",
+                signature: "resolver3_6(n)",
+                functionName: "resolver3_6",
+                desc: "Genera una cadena con los primeros <code>n</code> términos de la sucesión de Fibonacci (comenzando en 0, luego 1, 1, 2, 3, 5...). Retorna los números separados por un solo espacio. Si n es 0, retorna string vacío.",
+                hint: "Mantén tres variables numéricas: 'previo' (0), 'actual' (1) y 'siguiente'. Concatena en un string a medida que iteras y sumas los dos últimos estados.",
+                tests: [
+                    {
+                        name: "Fibonacci para n: 5 ('0 1 1 2 3')",
+                        assert: (fn) => {
+                            const res = fn(5);
+                            if (res !== "0 1 1 2 3") throw new Error(`Esperaba '0 1 1 2 3', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Fibonacci para n: 1 ('0')",
+                        assert: (fn) => {
+                            const res = fn(1);
+                            if (res !== "0") throw new Error(`Esperaba '0', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Espejo Matemático",
+                difficulty: "medium",
+                concepts: "Operaciones Aritméticas e Inversión",
+                restriction: "Prohibido convertir el número a string (prohibido toString o template literals).",
+                signature: "resolver3_7(n)",
+                functionName: "resolver3_7",
+                desc: "Dado un número entero positivo <code>n</code>, devuélvelo invertido de forma puramente matemática. Por ejemplo, si ingresa <code>1234</code>, debe retornar el número entero <code>4321</code>.",
+                hint: "Usa un bucle while (n > 0). Extrae el último dígito con n % 10. Multiplica tu acumulado por 10 y súmale el dígito. Divide n entre 10 con Math.floor.",
+                tests: [
+                    {
+                        name: "Invertir 8531 a 1358",
+                        assert: (fn) => {
+                            const res = fn(8531);
+                            if (res !== 1358) throw new Error(`Esperaba 1358, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Invertir número capicúa (1001)",
+                        assert: (fn) => {
+                            const res = fn(1001);
+                            if (res !== 1001) throw new Error(`Esperaba 1001, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "La Conjetura de Collatz",
+                difficulty: "hard",
+                concepts: "Secuencia Collatz y Contadores",
+                restriction: "Prohibido usar arrays u objetos.",
+                signature: "resolver3_8(n)",
+                functionName: "resolver3_8",
+                desc: "Toma un entero positivo inicial <code>n</code>. Si es par, divídelo por 2. Si es impar, multiplícalo por 3 y súmale 1. Repite el proceso hasta llegar a 1. Retorna el camino de pasos formateado en un string separado por ' -> ' y el conteo de pasos al final. Formato: <code>'N -> ... -> 1 (pasos: X)'</code>.",
+                hint: "Usa un ciclo while (n !== 1). En cada paso, evalúa la paridad con %, realiza la operación y acumula el paso en tu cadena de texto incrementando un contador.",
+                tests: [
+                    {
+                        name: "Secuencia Collatz de 6 (8 pasos)",
+                        assert: (fn) => {
+                            const res = fn(6);
+                            const expected = "6 -> 3 -> 10 -> 5 -> 16 -> 8 -> 4 -> 2 -> 1 (pasos: 8)";
+                            if (res !== expected) throw new Error(`Esperaba '${expected}', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "La Pirámide Centrada",
+                difficulty: "hard",
+                concepts: "Bucles Anidados y Espaciado",
+                restriction: "Prohibido usar arrays u objetos.",
+                signature: "resolver3_9(altura)",
+                functionName: "resolver3_9",
+                desc: "Genera un triángulo de asteriscos alineado y centrado verticalmente de una <code>altura</code> dada. Cada línea debe terminar en un salto de línea (<code>\\n</code>). El espaciado de alineamiento debe hacerse mediante espacios en blanco leading.",
+                hint: "Para cada fila i (de 1 a altura): concatena (altura - i) espacios vacíos, seguidos de (2 * i - 1) asteriscos '*', y finaliza con un '\\n'.",
+                tests: [
+                    {
+                        name: "Pirámide alineada de altura 3",
+                        assert: (fn) => {
+                            const res = fn(3);
+                            const expected = "  *\n ***\n*****\n";
+                            if (res !== expected) throw new Error(`Estructura incorrecta. Recibió:\n${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "El Adivino Binario",
+                difficulty: "legendary",
+                concepts: "Búsqueda Binaria Simulada en Bucle",
+                restriction: "Prohibido usar arrays o adivinar al azar.",
+                signature: "resolver3_10(secreto)",
+                functionName: "resolver3_10",
+                desc: "Simula cuántos intentos le tomará a un algoritmo de búsqueda binaria adivinar un número <code>secreto</code> ubicado en el rango cerrado [1, 1000]. En cada iteración, el algoritmo calcula el punto medio <code>mid = Math.floor((min + max) / 2)</code>. Si <code>mid</code> es menor al secreto, reajusta <code>min = mid + 1</code>. Si es mayor, <code>max = mid - 1</code>. Retorna el número total de intentos realizados hasta acertar.",
+                hint: "Declara min=1, max=1000 e intentos=0. Usa un ciclo while (min <= max). En el ciclo calcula 'mid', incrementa 'intentos', y reajusta límites según corresponda.",
+                tests: [
+                    {
+                        name: "Adivinar número 500 (1 intento)",
+                        assert: (fn) => {
+                            const res = fn(500);
+                            if (res !== 1) throw new Error(`Esperaba 1 intento, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Adivinar número 750 (2 intentos)",
+                        assert: (fn) => {
+                            const res = fn(750);
+                            if (res !== 2) throw new Error(`Esperaba 2 intentos, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Adivinar número extremo 1 (10 intentos)",
+                        assert: (fn) => {
+                            const res = fn(1);
+                            if (res !== 10) throw new Error(`Esperaba 10 intentos, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            }
+        ];
+    </script>
+
+    <!-- BLOQUE DE SCRIPT PARA LAS SOLUCIONES DEL ESTUDIANTE -->
+    <script id="soluciones">
+        // ==========================================================================
+        // ✏️ ESPACIO PARA COMPLETAR TU CODIGO JAVASCRIPT
+        // Completa el interior de cada función de acuerdo a las consignas indicadas.
+        // ==========================================================================
+
+        // Ejercicio 1: Tabla de Multiplicar
+        function resolver3_1(n) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 2: Sumatoria Promedio
+        function resolver3_2(A, B) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 3: Conteo Digital
+        function resolver3_3(numero) {
+            let cantidadDigitos = 0;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return cantidadDigitos;
+        }
+
+        // Ejercicio 4: Lienzo de Asteriscos
+        function resolver3_4(ancho, alto) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 5: Filtro de Primos
+        function resolver3_5(num) {
+            let esPrimo = true;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return esPrimo;
+        }
+
+        // Ejercicio 6: Fibonacci Sin Estructuras
+        function resolver3_6(n) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 7: Espejo Matemático
+        function resolver3_7(n) {
+            let invertido = 0;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return invertido;
+        }
+
+        // Ejercicio 8: La Conjetura de Collatz
+        function resolver3_8(n) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 9: La Pirámide Centrada
+        function resolver3_9(altura) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 10: El Adivino Binario
+        function resolver3_10(secreto) {
+            let intentos = 0;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return intentos;
+        }
+    </script>
+
+    <!-- INCLUYE EL MOTOR DEL PLAYGROUND COMPARTIDO -->
+    <script src="js/tester.js"></script>
+</body>
+</html>

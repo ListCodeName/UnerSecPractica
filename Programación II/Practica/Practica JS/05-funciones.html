@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 5: Funciones y Modularización</title>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+<body data-workshop-id="taller5">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Taller 05</div>
+        <h1>Modularización y Funciones</h1>
+        <p>Aprende a escribir bloques de código reutilizables y limpios. Domina alcances (scopes), cierres (closures), funciones flecha y callbacks.</p>
+        <div class="header-meta">
+            <span>Dificultad: <strong>Fácil a Experto</strong></span>
+            <span>Desafíos: <strong>10 Ejercicios</strong></span>
+            <span>Retorno: <a href="index.html" style="color: var(--neon-pink); text-decoration: none;">&larr; Volver al Portal</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: SELECCIÓN Y DETALLE -->
+        <div class="panel">
+            <div class="panel-title">
+                Selecciona un Desafío <span class="indicator"></span>
+            </div>
+            
+            <!-- Selector de Ejercicios -->
+            <div class="exercise-selector" id="exercise-buttons"></div>
+
+            <!-- Detalles del Ejercicio Activo -->
+            <div class="exercise-detail-card">
+                <div>
+                    <div class="ex-badge-row">
+                        <span class="diff-badge" id="ex-difficulty">Fácil</span>
+                        <span class="ex-concepts" id="ex-concepts-list">Conceptos: </span>
+                    </div>
+                    <h2 class="ex-title" id="ex-title">Cargando...</h2>
+                    <div class="restriction-box" id="ex-restriction"></div>
+                    <p class="ex-desc" id="ex-desc">Cargando consigna...</p>
+                </div>
+                
+                <!-- Pistas -->
+                <div class="hint-container">
+                    <button class="hint-trigger-btn" id="hint-btn">💡 Ver Pista</button>
+                    <div class="hint-content-box" id="hint-content"></div>
+                </div>
+            </div>
+
+            <!-- Firma de la función visual (Solo informativo) -->
+            <div class="code-support-box" id="code-support-snippet"></div>
+
+            <!-- Teoría Rápida de Apoyo -->
+            <div class="theory-card">
+                <h3>Resumen Teórico del Taller</h3>
+                <ul>
+                    <li><code>function nombre(params) { return valor; }</code> encapsula lógica reutilizable.</li>
+                    <li><code>const flecha = (a, b) => a + b;</code> proporciona una sintaxis más corta e implícita.</li>
+                    <li><strong>Callbacks:</strong> Funciones pasadas como parámetros a otras funciones para ejecutarse más tarde.</li>
+                    <li><strong>Closures:</strong> Funciones que recuerdan y acceden al entorno léxico donde fueron creadas.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: PLAYGROUND, TERMINAL Y RESULTADOS -->
+        <div class="panel sandbox-card">
+            <div class="panel-title">
+                Consola y Validador de Pruebas <span class="indicator" style="background-color: var(--neon-cyan); box-shadow: var(--glow-cyan);"></span>
+            </div>
+
+            <div class="student-instruction-banner">
+                💡 <strong>¿Cómo resolver?</strong> Abre este archivo en tu editor de código preferido (ej. VS Code). Busca el bloque <code>&lt;script id="soluciones"&gt;</code> al final del documento y completa el código de las funciones indicadas. Guarda el archivo, recarga esta página y haz clic en <strong>Ejecutar y Validar</strong>.
+            </div>
+
+            <!-- Botón de Ejecutar -->
+            <div class="action-row">
+                <button class="btn-run" id="run-btn">
+                    <span>▶ Ejecutar y Validar Código</span>
+                </button>
+            </div>
+
+            <!-- Consola de Resultados Simulada -->
+            <div class="terminal-header">
+                <span>Terminal de Salida</span>
+                <span>Console Sandbox</span>
+            </div>
+            <div class="terminal" id="terminal-content"></div>
+
+            <!-- Resultados del Test Suite -->
+            <div class="test-results-box">
+                <div class="test-results-title">
+                    <span>Suite de Pruebas</span>
+                    <span class="test-summary" id="progress-summary">Progreso: 0/10 Completados</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="test-list" id="test-results-list" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- DEFINE DATA DE EJERCICIOS PARA EL TESTER -->
+    <script>
+        window.exercisesData = [
+            {
+                id: 1,
+                title: "Conversor Universal",
+                difficulty: "easy",
+                concepts: "Declaración, Parámetros y Retorno",
+                restriction: "Prohibido usar variables globales.",
+                signature: "resolver5_1(cantidad, tasa, simbolo)",
+                functionName: "resolver5_1",
+                desc: "Crea una función pura que reciba una <code>cantidad</code> de dinero, la <code>tasa</code> de conversión numérica y el <code>simbolo</code> de moneda de destino. Debe realizar la conversión y retornar un string con el formato exacto: <code>'SIMBOLO CONVERTIDO'</code> (ej. <code>'$ 150.25'</code>). Asegúrate de redondear la conversión a 2 decimales.",
+                hint: "Multiplica cantidad * tasa. Aplica .toFixed(2) al resultado y concatena el símbolo al inicio separado por un espacio.",
+                tests: [
+                    {
+                        name: "Convertir 100 USD a ARS con tasa 980.50",
+                        assert: (fn) => {
+                            const res = fn(100, 980.50, "$");
+                            if (res !== "$ 98050.00") throw new Error(`Esperaba '$ 98050.00', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Filtro de Correos",
+                difficulty: "easy",
+                concepts: "Métodos de String y Lógica",
+                restriction: "Prohibido usar Expresiones Regulares (Regex).",
+                signature: "resolver5_2(email)",
+                functionName: "resolver5_2",
+                desc: "Crea una función que verifique si una cadena <code>email</code> es un correo válido bajo las siguientes reglas:<br>1. Debe contener un carácter <code>'@'</code>.<br>2. Debe contener un carácter punto <code>'.'</code>.<br>3. No debe iniciar ni terminar con '@' o '.'.<br>4. Debe tener una longitud mínima de 6 caracteres.<br>Retorna <code>true</code> si es válido, y <code>false</code> de lo contrario.",
+                hint: "Usa email.includes('@') y email.includes('.'). Chequea que email[0] !== '@' y email[email.length-1] !== '.' y la longitud.",
+                tests: [
+                    {
+                        name: "Email válido 'juan@uner.edu'",
+                        assert: (fn) => {
+                            if (fn("juan@uner.edu") !== true) throw new Error("Debería ser válido");
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Emails inválidos ('a@b', '@uner.com', 'juan@uner.')",
+                        assert: (fn) => {
+                            if (fn("a@b") !== false || fn("@uner.com") !== false || fn("juan@uner.") !== false) {
+                                throw new Error("Deberían ser inválidos");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Factorial Recursivo",
+                difficulty: "easy",
+                concepts: "Recursividad en Funciones",
+                restriction: "Prohibido usar bucles (for, while) en tu implementación.",
+                signature: "resolver5_3(n)",
+                functionName: "resolver5_3",
+                desc: "Escribe una función recursiva que calcule el factorial de un número entero positivo <code>n</code>. Recuerda el caso base: el factorial de 0 y 1 es siempre 1.",
+                hint: "Caso base: if (n <= 1) return 1. Caso recursivo: return n * resolver5_3(n - 1).",
+                tests: [
+                    {
+                        name: "Factorial de 5 es 120",
+                        assert: (fn) => {
+                            const res = fn(5);
+                            if (res !== 120) throw new Error(`Esperaba 120, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Factorial de 0 es 1",
+                        assert: (fn) => {
+                            const res = fn(0);
+                            if (res !== 1) throw new Error(`Esperaba 1, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Buscador Genérico",
+                difficulty: "medium",
+                concepts: "Iteración Dinámica por Claves",
+                restriction: "Prohibido usar array.filter() nativo.",
+                signature: "resolver5_4(lista, propiedad, valor)",
+                functionName: "resolver5_4",
+                desc: "Escribe una función modular que reciba un array de objetos <code>lista</code>, el nombre de una <code>propiedad</code> y un <code>valor</code> buscado. Debe retornar un nuevo array conteniendo únicamente los objetos que tengan esa propiedad con el valor exacto especificado.",
+                hint: "Crea un array vacío. Recorre la lista con un bucle for; para cada objeto, verifica si obj[propiedad] === valor, y en tal caso, agrégalo con push.",
+                tests: [
+                    {
+                        name: "Buscar personas con edad 20",
+                        assert: (fn) => {
+                            const list = [
+                                { nombre: "Ana", edad: 20 },
+                                { nombre: "Pedro", edad: 25 },
+                                { nombre: "Juan", edad: 20 }
+                            ];
+                            const res = fn(list, "edad", 20);
+                            if (res.length !== 2 || res[0].nombre !== "Ana" || res[1].nombre !== "Juan") {
+                                throw new Error(`Filtro fallido. Recibió: ${JSON.stringify(res)}`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Recreando Map",
+                difficulty: "medium",
+                concepts: "Callbacks y Transformación",
+                restriction: "PROHIBIDO EL USO DEL MÉTODO NATIVO array.map().",
+                signature: "resolver5_5(array, callback)",
+                functionName: "resolver5_5",
+                desc: "Recrea de forma manual la lógica del método nativo <code>.map()</code>. Crea una función que tome un <code>array</code> y un <code>callback</code> (función de transformación), aplique el callback a cada elemento, y devuelva un nuevo array con las transformaciones.",
+                hint: "Crea una lista vacía. Recorre el array. En cada iteración llama a 'callback(elemento, index)' y guarda el resultado devuelto en tu lista.",
+                tests: [
+                    {
+                        name: "Duplicar números usando callback (x => x * 2)",
+                        assert: (fn) => {
+                            const res = fn([1, 2, 3], (x) => x * 2);
+                            if (res.join(',') !== '2,4,6') throw new Error(`Esperaba [2, 4, 6], recibió ${JSON.stringify(res)}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Recreando Filter",
+                difficulty: "medium",
+                concepts: "Callbacks y Filtrado",
+                restriction: "PROHIBIDO EL USO DEL MÉTODO NATIVO array.filter().",
+                signature: "resolver5_6(array, callback)",
+                functionName: "resolver5_6",
+                desc: "Recrea de forma manual la lógica del método nativo <code>.filter()</code>. Crea una función que tome un <code>array</code> y un <code>callback</code> (función lógica de evaluación que devuelve true/false), y retorne una nueva lista con los elementos que pasaron la evaluación del callback.",
+                hint: "Recorre el array. Evalúa 'callback(elemento)'. Si el retorno de esa llamada es estrictamente true, añade el elemento a tu array de salida.",
+                tests: [
+                    {
+                        name: "Filtrar mayores a 10 (x => x > 10)",
+                        assert: (fn) => {
+                            const res = fn([5, 12, 8, 20], (x) => x > 10);
+                            if (res.join(',') !== '12,20') throw new Error(`Esperaba [12, 20], recibió ${JSON.stringify(res)}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Detector de Palíndromos",
+                difficulty: "medium",
+                concepts: "Limpieza de Cadenas e Inversión",
+                restriction: "Ignora espacios, mayúsculas y acentos.",
+                signature: "resolver5_7(frase)",
+                functionName: "resolver5_7",
+                desc: "Crea una función que determine si una <code>frase</code> es un palíndromo (se lee igual de izquierda a derecha que de derecha a izquierda). Debes limpiar los espacios en blanco de la frase, convertirla a minúsculas y luego compararla.",
+                hint: "Para limpiar espacios puedes usar frase.split(' ').join(''). Conviértela en array de caracteres con split(''), inviértelo con reverse(), júnalo con join('') y compáralo con el limpio.",
+                tests: [
+                    {
+                        name: "Detectar palíndromo simple 'Anita lava la tina'",
+                        assert: (fn) => {
+                            if (fn("Anita lava la tina") !== true) throw new Error("Debería retornar true");
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Detectar no palíndromo 'hola uner'",
+                        assert: (fn) => {
+                            if (fn("hola uner") !== false) throw new Error("Debería retornar false");
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "Generador de Facturas",
+                difficulty: "hard",
+                concepts: "Closures (Funciones de Retorno)",
+                restriction: "Prohibido usar variables globales de acumulación.",
+                signature: "resolver5_8(tasaImpuesto)",
+                functionName: "resolver5_8",
+                desc: "Escribe una función creadora que reciba una <code>tasaImpuesto</code> decimal (ej: <code>0.21</code> para el 21% de IVA). Esta función debe **retornar otra función** que reciba un array de precios numéricos, sume los precios, le aplique el impuesto guardado en el cierre (closure) y devuelva el total final de la factura con dos decimales de precisión.",
+                hint: "La función resolver5_8 debe retornar una función interna: 'return function(precios) { ... }'. La función interna sumará los precios, los multiplicará por (1 + tasaImpuesto) y redondeará.",
+                tests: [
+                    {
+                        name: "Generar factura con IVA del 21% para precios [100, 200, 50]",
+                        assert: (fn) => {
+                            // 350 * 1.21 = 423.5
+                            const crearFacturaIva = fn(0.21);
+                            if (typeof crearFacturaIva !== 'function') throw new Error("Debe retornar una función.");
+                            const total = crearFacturaIva([100, 200, 50]);
+                            if (total !== 423.50) throw new Error(`Esperaba 423.50, recibió ${total}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Calculadora de Callbacks",
+                difficulty: "hard",
+                concepts: "Inyección de Callbacks Matemáticos",
+                restriction: "Prohibido usar eval() o sentencias if/switch en la calculadora.",
+                signature: "resolver5_9(a, b, operacionCallback)",
+                functionName: "resolver5_9",
+                desc: "Crea una función calculadora genérica que reciba dos números <code>a</code> y <code>b</code>, y una función <code>operacionCallback</code>. La calculadora debe inyectar los dos números en la función callback y retornar el resultado devuelto por esta.",
+                hint: "Simplemente ejecuta y retorna: 'return operacionCallback(a, b);'. Las operaciones matemáticas se definen afuera y se pasan como callback.",
+                tests: [
+                    {
+                        name: "Multiplicación por callback",
+                        assert: (fn) => {
+                            const mult = (x, y) => x * y;
+                            const res = fn(6, 7, mult);
+                            if (res !== 42) throw new Error(`Esperaba 42, recibió ${res}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Suma por callback",
+                        assert: (fn) => {
+                            const suma = (x, y) => x + y;
+                            const res = fn(15, 25, suma);
+                            if (res !== 40) throw new Error(`Esperaba 40, recibió ${res}`);
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Encriptador César Completo",
+                difficulty: "legendary",
+                concepts: "Modularización y Aritmética Circular",
+                restriction: "Respeta mayúsculas, minúsculas, espacios y caracteres especiales.",
+                signature: "resolver5_10(texto, desplazamiento)",
+                functionName: "resolver5_10",
+                desc: "Desarrolla una función que aplique el cifrado César a una frase completa <code>texto</code> aplicando un <code>desplazamiento</code> numérico. Las letras mayúsculas de la 'A' a la 'Z' y minúsculas de la 'a' a la 'z' deben rotar de forma circular (si supera la 'z' u 'Z' vuelve a empezar en 'a' o 'A'). Los espacios y signos de puntuación se mantienen idénticos.",
+                hint: "Itera el string. Si es una letra, obtén su código ASCII y aplica la rotación circular usando restas del código base (65 para 'A', 97 para 'a') y aritmética modular: ((codigo - base + desc) % 26) + base.",
+                tests: [
+                    {
+                        name: "Cifrar 'Hola Mundo!' con desplazamiento 3",
+                        assert: (fn) => {
+                            const res = fn("Hola Mundo!", 3);
+                            if (res !== "Kroa Pxqgr!") throw new Error(`Esperaba 'Kroa Pxqgr!', recibió '${res}'`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Cifrado circular en extremos ('Zz y Aa' despl 2 -> 'Bb a Cc')",
+                        assert: (fn) => {
+                            const res = fn("Zz y Aa", 2);
+                            if (res !== "Bb a Cc") throw new Error(`Esperaba 'Bb a Cc', recibió '${res}'`);
+                            return true;
+                        }
+                    }
+                ]
+            }
+        ];
+    </script>
+
+    <!-- BLOQUE DE SCRIPT PARA LAS SOLUCIONES DEL ESTUDIANTE -->
+    <script id="soluciones">
+        // ==========================================================================
+        // ✏️ ESPACIO PARA COMPLETAR TU CODIGO JAVASCRIPT
+        // Completa el interior de cada función de acuerdo a las consignas indicadas.
+        // ==========================================================================
+
+        // Ejercicio 1: Conversor Universal
+        function resolver5_1(cantidad, tasa, simbolo) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 2: Filtro de Correos
+        function resolver5_2(email) {
+            let esValido;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return esValido;
+        }
+
+        // Ejercicio 3: Factorial Recursivo
+        function resolver5_3(n) {
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 4: Buscador Genérico
+        function resolver5_4(lista, propiedad, valor) {
+            let filtrados = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return filtrados;
+        }
+
+        // Ejercicio 5: Recreando Map
+        function resolver5_5(array, callback) {
+            let transformados = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return transformados;
+        }
+
+        // Ejercicio 6: Recreando Filter
+        function resolver5_6(array, callback) {
+            let filtrados = [];
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return filtrados;
+        }
+
+        // Ejercicio 7: Detector de Palíndromos
+        function resolver5_7(frase) {
+            let esPalindromo;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return esPalindromo;
+        }
+
+        // Ejercicio 8: Generador de Facturas
+        function resolver5_8(tasaImpuesto) {
+            // --- Escribe tu código abajo de esta línea e implementa el closure ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 9: Calculadora de Callbacks
+        function resolver5_9(a, b, operacionCallback) {
+            let resultado;
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+
+        // Ejercicio 10: Encriptador César Completo
+        function resolver5_10(texto, desplazamiento) {
+            let resultado = "";
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+            return resultado;
+        }
+    </script>
+
+    <!-- INCLUYE EL MOTOR DEL PLAYGROUND COMPARTIDO -->
+    <script src="js/tester.js"></script>
+</body>
+</html>

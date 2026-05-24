@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 6: DOM y Eventos Interactivos</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        /* Specific visual sandboxes style for Taller 6 */
+        .dom-sandbox {
+            background-color: #06050b;
+            border: 1px solid rgba(157, 78, 221, 0.35);
+            border-radius: 12px;
+            padding: 30px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .dom-sandbox::before {
+            content: 'LIENZO DE INTERACCIÓN VIVO (DOM)';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-family: var(--font-title);
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        /* Exercise 1: Bulb styles */
+        .bulb-container { text-align: center; }
+        .bulb {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #332d44;
+            border: 3px solid #221b35;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-title);
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #8b85a3;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bulb.bulb-on {
+            background-color: var(--neon-yellow);
+            color: var(--text-dark);
+            box-shadow: 0 0 35px rgba(255, 183, 3, 0.8), inset 0 0 15px #ffffff;
+            border-color: #ffffff;
+            transform: scale(1.05);
+        }
+        .btn-bulb {
+            background: var(--grad-purple);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-family: var(--font-title);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-bulb:hover {
+            box-shadow: var(--glow-purple);
+            transform: translateY(-1px);
+        }
+
+        /* Exercise 2: Counter styles */
+        .counter-container { text-align: center; }
+        .counter-val {
+            font-family: var(--font-title);
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .counter-val.fire {
+            color: var(--neon-pink);
+            text-shadow: var(--glow-pink);
+            animation: pulse 1s infinite alternate;
+        }
+        .counter-controls { display: flex; gap: 15px; justify-content: center; }
+        .btn-counter {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-counter:hover {
+            background: var(--grad-sunset);
+            color: var(--text-dark);
+            border-color: transparent;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        /* Exercise 3: Hex palette */
+        .palette-container { text-align: center; width: 100%; max-width: 300px; }
+        .color-preview {
+            width: 100%;
+            height: 120px;
+            border-radius: 12px;
+            background-color: #17122e;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-family: var(--font-title);
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.4s;
+        }
+        .palette-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: white;
+            font-family: var(--font-mono);
+            text-align: center;
+            font-size: 1rem;
+        }
+        .palette-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.2);
+        }
+
+        /* Exercise 4: Todo list */
+        .todo-container { width: 100%; max-width: 320px; }
+        .todo-form { display: flex; gap: 8px; margin-bottom: 20px; }
+        .todo-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .todo-input:focus { outline: none; border-color: var(--neon-pink); }
+        .todo-btn {
+            background: var(--grad-sunset);
+            border: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .todo-list { list-style: none; display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 5px; }
+        .todo-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .todo-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(157, 78, 221, 0.2); }
+        .todo-item.completed { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; background: rgba(57, 255, 20, 0.02); border-color: rgba(57, 255, 20, 0.1); }
+
+        /* Exercise 5: Tip calculator */
+        .tip-container { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 15px; }
+        .tip-row { display: flex; justify-content: space-between; align-items: center; }
+        .tip-label { font-size: 0.85rem; color: var(--text-muted); }
+        .tip-input, .tip-select {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 6px;
+            padding: 8px;
+            color: white;
+            width: 140px;
+            font-size: 0.85rem;
+        }
+        .tip-select option { background: var(--surface); color: white; }
+        .tip-result-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(157, 78, 221, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .tip-val-out { font-family: var(--font-title); font-size: 1.25rem; font-weight: 800; color: var(--neon-cyan); }
+
+        /* Exercise 6: Card filter */
+        .filter-container { width: 100%; max-width: 320px; }
+        .filter-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: white;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+        .cards-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .card-element {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 78, 221, 0.15);
+            border-radius: 8px;
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        /* Exercise 7: Accordion */
+        .accordion-container { width: 100%; max-width: 320px; }
+        .acc-tab { border: 1px solid rgba(157, 78, 221, 0.2); border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.02); }
+        .acc-trigger {
+            padding: 12px 16px;
+            background: rgba(157, 78, 221, 0.1);
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .acc-trigger::after { content: '▼'; font-size: 0.7rem; transition: transform 0.3s; color: var(--neon-pink); }
+        .acc-trigger.active::after { transform: rotate(180deg); }
+        .acc-content {
+            max-height: 0px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 16px;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        /* Exercise 8: Gradient generator */
+        .grad-container { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; }
+        .grad-box {
+            width: 100%;
+            height: 90px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #ff2e93, #ffb703);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .grad-pickers { display: flex; justify-content: space-between; gap: 15px; }
+        .color-picker-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--text-muted); }
+        .color-pick-input { border: none; background: transparent; cursor: pointer; width: 45px; height: 35px; }
+        .grad-slider { width: 100%; accent-color: var(--neon-pink); }
+        .grad-code-out {
+            width: 100%;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* Exercise 9: Validator */
+        .val-container { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; }
+        .val-field { display: flex; flex-direction: column; gap: 4px; }
+        .val-field label { font-size: 0.75rem; color: var(--text-muted); }
+        .val-field input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 0.85rem;
+        }
+        .val-field input:focus { outline: none; border-color: var(--neon-cyan); }
+        .val-err-msg { font-size: 0.7rem; color: var(--neon-pink); min-height: 14px; }
+        .btn-val-submit {
+            background: var(--grad-sunset);
+            border: none;
+            color: var(--text-dark);
+            font-family: var(--font-title);
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .btn-val-submit:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Exercise 10: Tic-Tac-Toe */
+        .ttt-container { width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 220px; height: 220px; }
+        .ttt-cell {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .ttt-cell:hover { background: rgba(157, 78, 221, 0.1); border-color: var(--neon-pink); }
+        .ttt-cell.x-mark { color: var(--neon-pink); text-shadow: var(--glow-pink); }
+        .ttt-cell.o-mark { color: var(--neon-cyan); text-shadow: var(--glow-cyan); }
+        .ttt-status { font-family: var(--font-title); font-size: 0.9rem; font-weight: 700; color: var(--text-muted); text-align: center; }
+        .ttt-reset {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-family: var(--font-title);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ttt-reset:hover { background: var(--grad-sunset); color: var(--text-dark); border-color: transparent; }
+    </style>
+</head>
+<body data-workshop-id="taller6">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Taller 06 · Integración Capstone</div>
+        <h1>Interactividad y Manipulación del DOM</h1>
+        <p>Conecta tu lógica de JavaScript directamente con la interfaz visual del navegador. Controla estilos, responde a eventos y crea vistas dinámicas.</p>
+        <div class="header-meta">
+            <span>Dificultad: <strong>Medio a Leyenda</strong></span>
+            <span>Desafíos: <strong>10 Aplicaciones</strong></span>
+            <span>Retorno: <a href="index.html" style="color: var(--neon-pink); text-decoration: none;">&larr; Volver al Portal</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="app-container">
+        
+        <!-- PANEL IZQUIERDO: SELECCIÓN Y DETALLE -->
+        <div class="panel">
+            <div class="panel-title">
+                Selecciona un Desafío <span class="indicator"></span>
+            </div>
+            
+            <!-- Selector de Ejercicios -->
+            <div class="exercise-selector" id="exercise-buttons"></div>
+
+            <!-- Detalles del Ejercicio Activo -->
+            <div class="exercise-detail-card">
+                <div>
+                    <div class="ex-badge-row">
+                        <span class="diff-badge" id="ex-difficulty">Fácil</span>
+                        <span class="ex-concepts" id="ex-concepts-list">Conceptos: </span>
+                    </div>
+                    <h2 class="ex-title" id="ex-title">Cargando...</h2>
+                    <div class="restriction-box" id="ex-restriction"></div>
+                    <p class="ex-desc" id="ex-desc">Cargando consigna...</p>
+                </div>
+                
+                <!-- Pistas -->
+                <div class="hint-container">
+                    <button class="hint-trigger-btn" id="hint-btn">💡 Ver Pista</button>
+                    <div class="hint-content-box" id="hint-content"></div>
+                </div>
+            </div>
+
+            <!-- Firma de la función visual (Solo informativo) -->
+            <div class="code-support-box" id="code-support-snippet"></div>
+
+            <!-- Teoría Rápida de Apoyo -->
+            <div class="theory-card">
+                <h3>Resumen Teórico del Taller</h3>
+                <ul>
+                    <li><code>document.querySelector(selector)</code> obtiene un nodo de la interfaz.</li>
+                    <li><code>element.addEventListener('click', callback)</code> inyecta una escucha ante acciones físicas.</li>
+                    <li><code>element.classList.toggle('nombre-clase')</code> agrega o remueve clases CSS dinámicamente.</li>
+                    <li><code>element.style.propiedad = valor</code> edita estilos embebidos directo sobre el nodo.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: PLAYGROUND, TERMINAL Y RESULTADOS -->
+        <div class="panel sandbox-card">
+            <div class="panel-title">
+                Lienzo Visual e Interactivo <span class="indicator" style="background-color: var(--neon-cyan); box-shadow: var(--glow-cyan);"></span>
+            </div>
+
+            <div class="student-instruction-banner" style="margin-bottom: 15px;">
+                ⚙️ <strong>Espacio de Trabajo:</strong> Completa tu código JavaScript al final del archivo en el bloque de script. ¡Interactúa directamente con el lienzo de abajo o haz clic en <strong>Verificar Solución</strong> para testear el comportamiento!
+            </div>
+
+            <!-- LIENZO DE TRABAJO (Aquí inyectamos el HTML de cada ejercicio) -->
+            <div class="dom-sandbox" id="dom-sandbox-container">
+                <!-- Se inyecta por JS dinámicamente -->
+            </div>
+
+            <!-- Botón de Ejecutar -->
+            <div class="action-row" style="margin: 15px 0;">
+                <button class="btn-run" id="run-btn" style="background: var(--grad-purple); box-shadow: var(--glow-purple);">
+                    <span>✔ Verificar Solución Visual</span>
+                </button>
+            </div>
+
+            <!-- Terminal Simulada -->
+            <div class="terminal" id="terminal-content" style="height: 90px;"></div>
+
+            <!-- Resultados del Test Suite -->
+            <div class="test-results-box" style="margin-top: 15px; padding: 15px;">
+                <div class="test-results-title" style="margin-bottom: 8px;">
+                    <span>Validador de Eventos</span>
+                    <span class="test-summary" id="progress-summary">Progreso: 0/10</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="test-list" id="test-results-list" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- DEFINE DATA DE EJERCICIOS PARA EL TESTER -->
+    <script>
+        window.exercisesData = [
+            {
+                id: 1,
+                title: "El Interruptor Neón",
+                difficulty: "easy",
+                concepts: "classList y Click Event",
+                restriction: "Debes usar document.querySelector e interactuar con clases CSS.",
+                signature: "ejercicio6_1()",
+                functionName: "ejercicio6_1",
+                desc: "Completa la función para dotar de vida al interruptor. Al hacer clic en el botón con ID <code>'neon-switch'</code>, agrégale o quítale (toggle) la clase <code>'bulb-on'</code> a la lámpara con ID <code>'neon-bulb'</code>. Además, si la lámpara se enciende, cambia el texto del botón a <code>'APAGAR'</code>; si se apaga, restáuralo a <code>'ENCENDER'</code>.",
+                hint: "Usa el evento click en el botón. Con classList.toggle('bulb-on') manejas el brillo. Con classList.contains('bulb-on') sabes si está encendido para cambiar el innerText del botón.",
+                tests: [
+                    {
+                        name: "Alterna el encendido y cambia el texto del botón a APAGAR",
+                        assert: () => {
+                            const btn = document.getElementById('neon-switch');
+                            const bulb = document.getElementById('neon-bulb');
+                            if (!btn || !bulb) throw new Error("Elementos no encontrados");
+                            
+                            // First click
+                            btn.click();
+                            if (!bulb.classList.contains('bulb-on') || btn.innerText !== "APAGAR") {
+                                throw new Error("La lámpara debería encenderse con brillo (.bulb-on) y texto 'APAGAR'");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Alterna el apagado restaurando el texto a ENCENDER",
+                        assert: () => {
+                            const btn = document.getElementById('neon-switch');
+                            const bulb = document.getElementById('neon-bulb');
+                            
+                            // Force on, then click to turn off
+                            bulb.classList.add('bulb-on');
+                            btn.innerText = "APAGAR";
+                            
+                            btn.click();
+                            if (bulb.classList.contains('bulb-on') || btn.innerText !== "ENCENDER") {
+                                throw new Error("La lámpara debería apagarse y restaurar texto a 'ENCENDER'");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Contador Protegido",
+                difficulty: "easy",
+                concepts: "Manipulación de Texto e Interacciones",
+                restriction: "Prohibido que el valor visual baje de 0.",
+                signature: "ejercicio6_2()",
+                functionName: "ejercicio6_2",
+                desc: "Implementa la lógica del contador. El botón con ID <code>'btn-inc'</code> debe aumentar el número del display <code>'contador-val'</code> en 1. El botón <code>'btn-dec'</code> debe restarle 1, pero **protegiendo** el contador para que nunca disminuya de 0. Además, si el contador supera el valor de 10, agrégale la clase <code>'fire'</code> al display e inserta un emoji de fuego <code>' 🔥'</code> en su texto. Si vuelve a 10 o menos, remueve la clase y el fuego.",
+                hint: "Usa addEventListener en ambos botones. Declara una variable numérica interna en tu script para seguir el conteo y actualiza el display (innerText) al final de cada acción.",
+                tests: [
+                    {
+                        name: "El botón '+' incrementa y el botón '-' decrementa",
+                        assert: () => {
+                            const val = document.getElementById('contador-val');
+                            const inc = document.getElementById('btn-inc');
+                            const dec = document.getElementById('btn-dec');
+                            
+                            val.innerText = "5";
+                            inc.click();
+                            if (val.innerText !== "6") throw new Error(`El incremento falló. Display dice ${val.innerText}`);
+                            
+                            dec.click();
+                            if (val.innerText !== "5") throw new Error(`El decremento falló. Display dice ${val.innerText}`);
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Protección de negativos (no baja de 0)",
+                        assert: () => {
+                            const val = document.getElementById('contador-val');
+                            const dec = document.getElementById('btn-dec');
+                            
+                            val.innerText = "0";
+                            dec.click();
+                            if (val.innerText !== "0") throw new Error("¡El contador no debe bajar de 0!");
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Superar el valor 10 activa el modo fuego (.fire + 🔥)",
+                        assert: () => {
+                            const val = document.getElementById('contador-val');
+                            const inc = document.getElementById('btn-inc');
+                            
+                            val.innerText = "10";
+                            inc.click(); // 11
+                            
+                            if (!val.classList.contains('fire') || !val.innerText.includes("🔥")) {
+                                throw new Error("Superar 10 debería agregar la clase 'fire' y el emoji 🔥");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Paleta Hexadecimal Live",
+                difficulty: "easy",
+                concepts: "Lectura de Inputs y Estilos Inline",
+                restriction: "Debes responder al evento 'input'.",
+                signature: "ejercicio6_3()",
+                functionName: "ejercicio6_3",
+                desc: "Haz que la vista previa reaccione al texto. Al escribir en el input <code>'hex-input'</code>, lee su valor. Si el valor ingresado es un formato hexadecimal válido (es decir, inicia con un <code>'#'</code> y tiene una longitud exacta de 4 o 7 caracteres), aplica ese color como <code>background-color</code> del contenedor <code>'color-preview'</code> y escribe su valor de fondo en su interior. Si es inválido, no actualices nada.",
+                hint: "Usa el evento 'input' en el input de texto. Verifica las reglas de validación (startsWith y length) antes de aplicar .style.backgroundColor.",
+                tests: [
+                    {
+                        name: "Actualiza color de fondo con hex válido (#ff2e93)",
+                        assert: () => {
+                            const inp = document.getElementById('hex-input');
+                            const prev = document.getElementById('color-preview');
+                            
+                            inp.value = "#ff2e93";
+                            inp.dispatchEvent(new Event('input'));
+                            
+                            // Check if color updated (browser converts background-color to rgb normally)
+                            if (prev.innerText !== "#ff2e93") {
+                                throw new Error("Debería actualizar el texto interior y el color de fondo.");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Ignora formatos inválidos (ej. '#12' o 'red')",
+                        assert: () => {
+                            const inp = document.getElementById('hex-input');
+                            const prev = document.getElementById('color-preview');
+                            
+                            prev.style.backgroundColor = "rgb(23, 18, 46)";
+                            prev.innerText = "Muestra";
+                            inp.value = "red";
+                            inp.dispatchEvent(new Event('input'));
+                            
+                            if (prev.innerText === "red") {
+                                throw new Error("No debería aceptar formatos que no inicien con '#' ni tengan largo 4 o 7.");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "To-Do List Interactiva",
+                difficulty: "medium",
+                concepts: "Inserción Dinámica y Eventos Delegados",
+                restriction: "Prohibido usar librerías. Manipulación de nodos directa.",
+                signature: "ejercicio6_4()",
+                functionName: "ejercicio6_4",
+                desc: "Crea un panel de tareas interactivo. Al hacer clic en el botón con ID <code>'todo-add'</code>:<br>1. Lee el texto del input <code>'todo-input'</code>. Si está vacío, no hagas nada.<br>2. Crea un nuevo elemento <code>&lt;li&gt;</code> con la clase <code>'todo-item'</code>, asígnale el texto ingresado y añádelo al contenedor <code>'todo-list'</code>.<br>3. Limpia el input.<br>4. Al hacer un **clic simple** en cualquier elemento <code>'todo-item'</code> nuevo o existente, agrégale o remueve la clase <code>'completed'</code> (lo tacha visualmente).<br>5. Al hacer **doble clic** (evento <code>'dblclick'</code>) sobre un ítem, elimínalo por completo del DOM.",
+                hint: "Crea el li usando document.createElement. Bíndale los eventos 'click' y 'dblclick' al li recién creado justo antes de insertarlo en la lista con appendChild.",
+                tests: [
+                    {
+                        name: "Añadir un elemento tacha el input y limpia",
+                        assert: () => {
+                            const inp = document.getElementById('todo-input');
+                            const btn = document.getElementById('todo-add');
+                            const list = document.getElementById('todo-list');
+                            
+                            inp.value = "Practicar JS";
+                            btn.click();
+                            
+                            const items = list.querySelectorAll('.todo-item');
+                            if (items.length === 0 || items[items.length - 1].innerText !== "Practicar JS" || inp.value !== "") {
+                                throw new Error("La tarea debería insertarse en la lista y el input debería limpiarse.");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Clic en tarea alterna la clase '.completed'",
+                        assert: () => {
+                            const list = document.getElementById('todo-list');
+                            const inp = document.getElementById('todo-input');
+                            const btn = document.getElementById('todo-add');
+                            
+                            inp.value = "Estudiar";
+                            btn.click();
+                            
+                            const items = list.querySelectorAll('.todo-item');
+                            const lastItem = items[items.length - 1];
+                            
+                            lastItem.click();
+                            if (!lastItem.classList.contains('completed')) {
+                                throw new Error("Un clic simple en la tarea debería aplicarle la clase 'completed'");
+                            }
+                            
+                            lastItem.click();
+                            if (lastItem.classList.contains('completed')) {
+                                throw new Error("Otro clic simple debería remover la clase 'completed'");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Doble clic en tarea la elimina del DOM",
+                        assert: () => {
+                            const list = document.getElementById('todo-list');
+                            const itemsBefore = list.querySelectorAll('.todo-item').length;
+                            
+                            const lastItem = list.querySelector('.todo-item');
+                            if (!lastItem) return true; // Safe fallback if empty
+                            
+                            lastItem.dispatchEvent(new Event('dblclick'));
+                            const itemsAfter = list.querySelectorAll('.todo-item').length;
+                            
+                            if (itemsAfter !== itemsBefore - 1) {
+                                throw new Error("Un evento 'dblclick' debería eliminar la tarea del listado DOM.");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Calculadora de Propinas",
+                difficulty: "medium",
+                concepts: "Matemática Interactiva en Vivo",
+                restriction: "Resultados con formato '$0.00' (dos decimales).",
+                signature: "ejercicio6_5()",
+                functionName: "ejercicio6_5",
+                desc: "Escribe la lógica interactiva. Al cambiar la cantidad en <code>'bill-amount'</code> o la selección en <code>'tip-pct'</code>, calcula de forma inmediata la propina a dejar y el total a pagar. Actualiza los spans <code>'tip-total'</code> y <code>'bill-total'</code> con el valor calculado formateado con signo pesos y dos decimales (ej. <code>'$ 15.00'</code>).",
+                hint: "Usa addEventListener para escuchar los eventos 'input' en el input de monto y 'change' en el selector. Lee los valores, conviértelos a flotante y actualiza los innerText.",
+                tests: [
+                    {
+                        name: "Monto de $100 con 15% de propina",
+                        assert: () => {
+                            const bill = document.getElementById('bill-amount');
+                            const tipPct = document.getElementById('tip-pct');
+                            const tipOut = document.getElementById('tip-total');
+                            const billOut = document.getElementById('bill-total');
+                            
+                            bill.value = "100";
+                            tipPct.value = "0.15";
+                            
+                            // Trigger inputs
+                            bill.dispatchEvent(new Event('input'));
+                            
+                            if (!tipOut.innerText.includes("15.00") || !billOut.innerText.includes("115.00")) {
+                                throw new Error(`Esperaba Propina $15.00 y Total $115.00, recibió Propina: '${tipOut.innerText}', Total: '${billOut.innerText}'`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Buscador de Tarjetas",
+                difficulty: "medium",
+                concepts: "Filtrado Visual de Elementos",
+                restriction: "Debe ser case-insensitive y dinámico.",
+                signature: "ejercicio6_6()",
+                functionName: "ejercicio6_6",
+                desc: "Crea un filtro de búsqueda live. Al escribir en el input <code>'search-card-input'</code>, oculta visualmente (usa <code>style.display = 'none'</code>) aquellos elementos con clase <code>'card-element'</code> cuyo atributo <code>data-name</code> no coincida de forma parcial con el texto ingresado. Aquellos que sí coincidan, asegúrate de mantenerlos visibles (<code>style.display = 'block'</code> o vacío).",
+                hint: "Escucha el evento 'input'. Convierte el texto buscado a minúsculas. Recorre todas las tarjetas obtenidas con document.querySelectorAll('.card-element') y compara el data-name.toLowerCase() con includes().",
+                tests: [
+                    {
+                        name: "Filtrar por 'an' (visibles: Manzana y Naranja; ocultos: Banana)",
+                        assert: () => {
+                            const inp = document.getElementById('search-card-input');
+                            const cards = document.querySelectorAll('.card-element');
+                            
+                            inp.value = "an";
+                            inp.dispatchEvent(new Event('input'));
+                            
+                            const banana = Array.from(cards).find(c => c.dataset.name === "Banana");
+                            const manzana = Array.from(cards).find(c => c.dataset.name === "Manzana");
+                            
+                            if (banana.style.display === "none" && manzana.style.display !== "none") {
+                                return true;
+                            } else {
+                                throw new Error("Banana no debería ser visible y Manzana sí.");
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Acordeón Colapsable",
+                difficulty: "medium",
+                concepts: "style.maxHeight dinámico",
+                restriction: "Debe usar transiciones fluidas de altura.",
+                signature: "ejercicio6_7()",
+                functionName: "ejercicio6_7",
+                desc: "Crea una pestaña colapsable interactiva. Al hacer clic en el encabezado con ID <code>'acc-hdr'</code>:<br>1. Si la pestaña está cerrada, ábrela agregando la clase <code>'active'</code> al encabezado y configurando la propiedad <code>style.maxHeight</code> del cuerpo con ID <code>'acc-body'</code> a <code>'100px'</code> (o su altura de contenido).<br>2. Si ya está abierta, ciérrala quitando la clase y configurando el <code>maxHeight</code> de vuelta a <code>'0px'</code>.",
+                hint: "Guarda el estado abierto/cerrado. En el click de 'acc-hdr', lee si acc-body.style.maxHeight es '0px' o está vacío para asignarle '100px' o volverlo a '0px'.",
+                tests: [
+                    {
+                        name: "Clic en pestaña abre su contenido y activa clase",
+                        assert: () => {
+                            const hdr = document.getElementById('acc-hdr');
+                            const body = document.getElementById('acc-body');
+                            
+                            // Reset state
+                            body.style.maxHeight = "0px";
+                            hdr.classList.remove('active');
+                            
+                            hdr.click();
+                            if (!hdr.classList.contains('active') || body.style.maxHeight === "0px" || body.style.maxHeight === "") {
+                                throw new Error("Debería abrirse asignando altura y agregando clase 'active'");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Segundo clic cierra y limpia la altura",
+                        assert: () => {
+                            const hdr = document.getElementById('acc-hdr');
+                            const body = document.getElementById('acc-body');
+                            
+                            // Force open state
+                            body.style.maxHeight = "100px";
+                            hdr.classList.add('active');
+                            
+                            hdr.click();
+                            if (hdr.classList.contains('active') || body.style.maxHeight !== "0px") {
+                                throw new Error("Debería cerrarse devolviendo altura a '0px' y limpiando clase 'active'");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "Generador de Degradados",
+                difficulty: "hard",
+                concepts: "Edición Multivariable CSS",
+                restriction: "Copia la cadena CSS exacta al textbox.",
+                signature: "ejercicio6_8()",
+                functionName: "ejercicio6_8",
+                desc: "Crea una fábrica de gradientes lineal. Al cambiar los colores en <code>'col-1'</code> o <code>'col-2'</code>, o regular el slider <code>'grad-angle'</code> (grados), calcula la propiedad de degradado lineal <code>linear-gradient(angulo + deg, col1, col2)</code>. Aplícalo como fondo del visor <code>'grad-preview'</code> y escribe la cadena exacta de fondo calculada dentro del input de texto <code>'grad-code'</code>.",
+                hint: "Escucha el evento 'input' en los tres elementos. La cadena generada debe ser del tipo: 'linear-gradient(90deg, #ff2e93, #ffb703)'. Aplícala a preview.style.background y actualiza el .value del input.",
+                tests: [
+                    {
+                        name: "Generar degradado de 45deg entre rojo y azul",
+                        assert: () => {
+                            const c1 = document.getElementById('col-1');
+                            const c2 = document.getElementById('col-2');
+                            const ang = document.getElementById('grad-angle');
+                            const prev = document.getElementById('grad-preview');
+                            const code = document.getElementById('grad-code');
+                            
+                            c1.value = "#ff0000";
+                            c2.value = "#0000ff";
+                            ang.value = "45";
+                            
+                            c1.dispatchEvent(new Event('input'));
+                            
+                            const expected = "linear-gradient(45deg, #ff0000, #0000ff)";
+                            if (code.value.replace(/\s/g, "") !== expected.replace(/\s/g, "")) {
+                                throw new Error(`Se esperaba en el textbox '${expected}', recibió '${code.value}'`);
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Validador de Formulario",
+                difficulty: "hard",
+                concepts: "Validación de Formularios e inputs",
+                restriction: "El botón de envío se desbloquea únicamente al cumplir todo.",
+                signature: "ejercicio6_9()",
+                functionName: "ejercicio6_9",
+                desc: "Crea un flujo de validación de registro en tiempo real. Al escribir en los inputs:<br>1. El correo con ID <code>'reg-email'</code> debe ser válido (contener '@' y '.').<br>2. La contraseña en <code>'reg-pass'</code> debe tener 6 caracteres o más. Si es menor, escribe <code>'Muy corta'</code> en el span <code>'pass-error'</code>; si es válida, limpia el texto de error.<br>3. El botón de envío con ID <code>'reg-submit'</code> debe permanecer desactivado (<code>disabled = true</code>). Desbloquéalo (<code>disabled = false</code>) **únicamente** cuando ambos campos sean correctos de forma simultánea.",
+                hint: "Escucha el evento 'input' en ambos campos. En tu callback de validación, verifica las dos condiciones lógicas. Habilita/Deshabilita el botón usando el booleano en regSubmit.disabled.",
+                tests: [
+                    {
+                        name: "Contraseña corta dispara error visual y bloquea botón",
+                        assert: () => {
+                            const mail = document.getElementById('reg-email');
+                            const pass = document.getElementById('reg-pass');
+                            const err = document.getElementById('pass-error');
+                            const submit = document.getElementById('reg-submit');
+                            
+                            mail.value = "test@uner.com";
+                            pass.value = "123";
+                            
+                            pass.dispatchEvent(new Event('input'));
+                            
+                            if (err.innerText !== "Muy corta" || !submit.disabled) {
+                                throw new Error("Debe mostrar 'Muy corta' y el botón de enviar debe estar bloqueado (disabled).");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Formulario válido desbloquea el botón de envío",
+                        assert: () => {
+                            const mail = document.getElementById('reg-email');
+                            const pass = document.getElementById('reg-pass');
+                            const err = document.getElementById('pass-error');
+                            const submit = document.getElementById('reg-submit');
+                            
+                            mail.value = "admin@empresa.com";
+                            pass.value = "secret123";
+                            
+                            pass.dispatchEvent(new Event('input'));
+                            mail.dispatchEvent(new Event('input'));
+                            
+                            if (err.innerText !== "" || submit.disabled) {
+                                throw new Error("Con datos válidos el error debe borrarse y el botón habilitarse (disabled = false).");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Ta-Te-Ti Retro",
+                difficulty: "legendary",
+                concepts: "Lógica de Estado y Coordinación DOM",
+                restriction: "Crea un juego de Ta-Te-Ti completamente jugable.",
+                signature: "ejercicio6_10()",
+                functionName: "ejercicio6_10",
+                desc: "Desarrolla un Ta-Te-Ti clásico de dos jugadores ('X' y 'O'). Al hacer clic en una celda vacía con clase <code>'ttt-cell'</code>:<br>1. Escribe la marca del turno del jugador correspondiente en mayúscula ('X' u 'O') y agrégale la clase <code>'x-mark'</code> o <code>'o-mark'</code>.<br>2. Cambia el turno del jugador y actualiza el texto de <code>'game-status'</code> a <code>'Turno de O'</code> o <code>'Turno de X'</code>.<br>3. Verifica si hay un ganador (3 marcas iguales en línea horizontal, vertical o diagonal) o empate. Si hay ganador, actualiza el status a <code>'¡Ganador X!'</code> o <code>'¡Ganador O!'</code> e impide seguir jugando.<br>4. El botón con ID <code>'game-reset'</code> debe borrar el tablero, limpiar variables y reiniciar el estado a X.",
+                hint: "Usa un array de 9 elementos para almacenar el tablero virtual. Define una constante con las 8 combinaciones ganadoras (filas, columnas, diagonales) y verifícalas después de cada jugada.",
+                tests: [
+                    {
+                        name: "Clic en celda escribe la marca y alterna turno",
+                        assert: () => {
+                            const cells = document.querySelectorAll('.ttt-cell');
+                            const status = document.getElementById('game-status');
+                            const reset = document.getElementById('game-reset');
+                            
+                            reset.click(); // Reset state first
+                            
+                            cells[0].click(); // Player X clicks cell 0
+                            if (cells[0].innerText !== "X" || !cells[0].classList.contains('x-mark')) {
+                                throw new Error("Celda debería contener 'X' y clase 'x-mark'");
+                            }
+                            if (!status.innerText.includes("Turno de O")) {
+                                throw new Error("Turno debería pasar a 'O'");
+                            }
+                            return true;
+                        }
+                    },
+                    {
+                        name: "Declarar ganador X en línea horizontal superior (celdas 0, 1, 2)",
+                        assert: () => {
+                            const cells = document.querySelectorAll('.ttt-cell');
+                            const status = document.getElementById('game-status');
+                            const reset = document.getElementById('game-reset');
+                            
+                            reset.click();
+                            
+                            // Moves: X:0, O:3, X:1, O:4, X:2 (X wins horizontally at row 0)
+                            cells[0].click(); // X
+                            cells[3].click(); // O
+                            cells[1].click(); // X
+                            cells[4].click(); // O
+                            cells[2].click(); // X
+                            
+                            if (!status.innerText.includes("Ganador X")) {
+                                throw new Error(`X debería ganar la partida en la fila superior. Status dice: ${status.innerText}`);
+                            }
+                            
+                            // Check lock board
+                            cells[5].click();
+                            if (cells[5].innerText !== "") {
+                                throw new Error("No debería poder jugarse después de declarar un ganador.");
+                            }
+                            return true;
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // CONFIGURADOR DILIGENTE DEL SANDBOX DE TRABAJO (LIENZO)
+        window.setupDomSandbox = function(exerciseId) {
+            const container = document.getElementById('dom-sandbox-container');
+            if (!container) return;
+            
+            container.innerHTML = ''; // Clear sandbox
+            
+            if (exerciseId === 1) {
+                container.innerHTML = `
+                    <div class="bulb-container">
+                        <div class="bulb" id="neon-bulb">LÁMPARA</div>
+                        <button class="btn-bulb" id="neon-switch">ENCENDER</button>
+                    </div>
+                `;
+            } else if (exerciseId === 2) {
+                container.innerHTML = `
+                    <div class="counter-container">
+                        <div class="counter-val" id="contador-val">0</div>
+                        <div class="counter-controls">
+                            <button class="btn-counter" id="btn-dec">-</button>
+                            <button class="btn-counter" id="btn-inc">+</button>
+                        </div>
+                    </div>
+                `;
+            } else if (exerciseId === 3) {
+                container.innerHTML = `
+                    <div class="palette-container">
+                        <div class="color-preview" id="color-preview">Muestra</div>
+                        <input type="text" class="palette-input" id="hex-input" placeholder="#ff2e93">
+                    </div>
+                `;
+            } else if (exerciseId === 4) {
+                container.innerHTML = `
+                    <div class="todo-container">
+                        <div class="todo-form">
+                            <input type="text" class="todo-input" id="todo-input" placeholder="Comprar leche...">
+                            <button class="todo-btn" id="todo-add">Añadir</button>
+                        </div>
+                        <ul class="todo-list" id="todo-list">
+                            <li class="todo-item completed">Aprender HTML</li>
+                            <li class="todo-item">Estudiar CSS</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (exerciseId === 5) {
+                container.innerHTML = `
+                    <div class="tip-container">
+                        <div class="tip-row">
+                            <span class="tip-label">Monto de la cuenta:</span>
+                            <input type="number" class="tip-input" id="bill-amount" placeholder="Ej: 1200" value="0">
+                        </div>
+                        <div class="tip-row">
+                            <span class="tip-label">Porcentaje de Propina:</span>
+                            <select class="tip-select" id="tip-pct">
+                                <option value="0.10">10% (Básico)</option>
+                                <option value="0.15" selected>15% (Bueno)</option>
+                                <option value="0.20">20% (Excelente)</option>
+                            </select>
+                        </div>
+                        <div class="tip-result-box">
+                            <div class="tip-row">
+                                <span class="tip-label">Propina:</span>
+                                <span class="tip-val-out" id="tip-total">$0.00</span>
+                            </div>
+                            <div class="tip-row">
+                                <span class="tip-label">Total a Pagar:</span>
+                                <span class="tip-val-out" id="bill-total" style="color: var(--neon-pink);">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (exerciseId === 6) {
+                container.innerHTML = `
+                    <div class="filter-container">
+                        <input type="text" class="filter-input" id="search-card-input" placeholder="Buscar por frutas...">
+                        <div class="cards-list" id="cards-container">
+                            <div class="card-element" data-name="Manzana">Manzana 🍎</div>
+                            <div class="card-element" data-name="Banana">Banana 🍌</div>
+                            <div class="card-element" data-name="Naranja">Naranja 🍊</div>
+                        </div>
+                    </div>
+                `;
+            } else if (exerciseId === 7) {
+                container.innerHTML = `
+                    <div class="accordion-container">
+                        <div class="acc-tab">
+                            <div class="acc-trigger" id="acc-hdr">¿Qué es JavaScript?</div>
+                            <div class="acc-content" id="acc-body" style="max-height: 0px;">
+                                <div style="padding: 12px 0;">Es un lenguaje de programación interpretado, orientado a objetos, dinámico y multiparadigma, fundamental para crear interactividad en páginas web de forma nativa en el navegador.</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (exerciseId === 8) {
+                container.innerHTML = `
+                    <div class="grad-container">
+                        <div class="grad-box" id="grad-preview"></div>
+                        <div class="grad-pickers">
+                            <div class="color-picker-wrap">
+                                <label>Color A</label>
+                                <input type="color" class="color-pick-input" id="col-1" value="#ff2e93">
+                            </div>
+                            <div class="color-picker-wrap">
+                                <label>Color B</label>
+                                <input type="color" class="color-pick-input" id="col-2" value="#ffb703">
+                            </div>
+                        </div>
+                        <div>
+                            <input type="range" class="grad-slider" id="grad-angle" min="0" max="360" value="90">
+                        </div>
+                        <input type="text" class="grad-code-out" id="grad-code" value="linear-gradient(90deg, #ff2e93, #ffb703)" readonly>
+                    </div>
+                `;
+            } else if (exerciseId === 9) {
+                container.innerHTML = `
+                    <div class="val-container">
+                        <div class="val-field">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="reg-email" placeholder="ejemplo@uner.com">
+                        </div>
+                        <div class="val-field">
+                            <label>Contraseña</label>
+                            <input type="password" id="reg-pass" placeholder="••••••••">
+                            <span class="val-err-msg" id="pass-error"></span>
+                        </div>
+                        <button class="btn-val-submit" id="reg-submit" disabled>Enviar Datos</button>
+                    </div>
+                `;
+            } else if (exerciseId === 10) {
+                container.innerHTML = `
+                    <div class="ttt-container">
+                        <div class="ttt-status" id="game-status">Turno de X</div>
+                        <div class="ttt-grid">
+                            <div class="ttt-cell" data-index="0"></div>
+                            <div class="ttt-cell" data-index="1"></div>
+                            <div class="ttt-cell" data-index="2"></div>
+                            <div class="ttt-cell" data-index="3"></div>
+                            <div class="ttt-cell" data-index="4"></div>
+                            <div class="ttt-cell" data-index="5"></div>
+                            <div class="ttt-cell" data-index="6"></div>
+                            <div class="ttt-cell" data-index="7"></div>
+                            <div class="ttt-cell" data-index="8"></div>
+                        </div>
+                        <button class="ttt-reset" id="game-reset">Reiniciar Tablero</button>
+                    </div>
+                `;
+            }
+
+            // VOLVER A ACTIVAR LOS BINDINGS DEL ALUMNO CADA VEZ QUE SE REINICIA EL LIENZO DEL EJERCICIO
+            // Esto asegura que la lógica del alumno corra sobre el HTML recién inyectado.
+            setTimeout(() => {
+                try {
+                    const fnName = window.exercisesData[exerciseId - 1].functionName;
+                    if (typeof window[fnName] === 'function') {
+                        window[fnName]();
+                    }
+                } catch(e) {
+                    console.error("Error al inyectar bindings del estudiante:", e);
+                }
+            }, 50);
+        };
+    </script>
+
+    <!-- BLOQUE DE SCRIPT PARA LAS SOLUCIONES DEL ESTUDIANTE -->
+    <script id="soluciones">
+        // ==========================================================================
+        // ✏️ ESPACIO PARA COMPLETAR TU CODIGO JAVASCRIPT (TALLER 6 CAPSTONE)
+        // Completa el interior de cada función. No cambies la estructura contenedora.
+        // ==========================================================================
+
+        // Ejercicio 1: El Interruptor Neón
+        function ejercicio6_1() {
+            const btn = document.getElementById('neon-switch');
+            const bulb = document.getElementById('neon-bulb');
+            if (!btn || !bulb) return; // Validación de existencia en el lienzo activo
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 2: Contador Protegido
+        function ejercicio6_2() {
+            const val = document.getElementById('contador-val');
+            const inc = document.getElementById('btn-inc');
+            const dec = document.getElementById('btn-dec');
+            if (!val || !inc || !dec) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 3: Paleta Hexadecimal Live
+        function ejercicio6_3() {
+            const inp = document.getElementById('hex-input');
+            const prev = document.getElementById('color-preview');
+            if (!inp || !prev) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 4: To-Do List Interactiva
+        function ejercicio6_4() {
+            const inp = document.getElementById('todo-input');
+            const btn = document.getElementById('todo-add');
+            const list = document.getElementById('todo-list');
+            if (!inp || !btn || !list) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 5: Calculadora de Propinas
+        function ejercicio6_5() {
+            const bill = document.getElementById('bill-amount');
+            const tipPct = document.getElementById('tip-pct');
+            const tipOut = document.getElementById('tip-total');
+            const billOut = document.getElementById('bill-total');
+            if (!bill || !tipPct || !tipOut || !billOut) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 6: Buscador de Tarjetas
+        function ejercicio6_6() {
+            const inp = document.getElementById('search-card-input');
+            const container = document.getElementById('cards-container');
+            if (!inp || !container) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 7: Acordeón Colapsable
+        function ejercicio6_7() {
+            const hdr = document.getElementById('acc-hdr');
+            const body = document.getElementById('acc-body');
+            if (!hdr || !body) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 8: Generador de Degradados
+        function ejercicio6_8() {
+            const c1 = document.getElementById('col-1');
+            const c2 = document.getElementById('col-2');
+            const ang = document.getElementById('grad-angle');
+            const prev = document.getElementById('grad-preview');
+            const code = document.getElementById('grad-code');
+            if (!c1 || !c2 || !ang || !prev || !code) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 9: Validador de Formulario
+        function ejercicio6_9() {
+            const mail = document.getElementById('reg-email');
+            const pass = document.getElementById('reg-pass');
+            const err = document.getElementById('pass-error');
+            const submit = document.getElementById('reg-submit');
+            if (!mail || !pass || !err || !submit) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+
+        // Ejercicio 10: Ta-Te-Ti Retro
+        function ejercicio6_10() {
+            const cells = document.querySelectorAll('.ttt-cell');
+            const status = document.getElementById('game-status');
+            const reset = document.getElementById('game-reset');
+            if (cells.length === 0 || !status || !reset) return;
+
+            // --- Escribe tu código abajo de esta línea ---
+            
+            // --- Fin de tu código ---
+        }
+    </script>
+
+    <!-- INCLUYE EL MOTOR DEL PLAYGROUND COMPARTIDO -->
+    <script src="js/tester.js"></script>
+</body>
+</html>
