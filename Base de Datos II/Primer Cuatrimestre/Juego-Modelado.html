@@ -1095,6 +1095,109 @@
             color: var(--text);
         }
 
+        /* EXAM RESULTS SUMMARY DETAILS */
+        .results-summary-container {
+            margin: 2.5rem auto 1.5rem;
+            max-width: 1000px;
+            text-align: left;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.8rem;
+        }
+
+        .results-summary-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.6rem;
+        }
+
+        .result-item-card {
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--bg);
+            transition: all 0.2s;
+        }
+
+        .result-item-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .result-item-card.is-correct {
+            border-left: 4.5px solid var(--success);
+        }
+
+        .result-item-card.is-incorrect {
+            border-left: 4.5px solid var(--danger);
+        }
+
+        .result-question-text {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.6rem;
+        }
+
+        .result-answer-row {
+            font-size: 0.82rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+        }
+
+        .result-answer-row strong {
+            font-weight: 600;
+        }
+
+        .result-badge {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.6rem;
+        }
+
+        .result-badge.correct {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .result-badge.incorrect {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .result-suggestion {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: #fafbfc;
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            margin-top: 0.6rem;
+            line-height: 1.45;
+        }
+
+        .result-suggestion strong {
+            color: var(--accent);
+        }
+
         /* INTERACTIVE ENTITY-RELATIONSHIP DIAGRAM (DER) */
         .der-wrapper {
             margin-top: 2rem;
@@ -1387,13 +1490,16 @@
                         <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted);">PRESTIGIO PROFESIONAL</span>
                         <div class="prestige-val" id="prestige-label">0%</div>
                     </div>
-                    <div class="prestige-bar">
+                    <div class="prestige-bar" id="prestige-bar-node">
                         <div class="prestige-fill" id="prestige-progress" style="width: 0%;"></div>
                     </div>
                     <div class="prestige-rank" id="prestige-rank-label">Pasante de Sistemas</div>
+                    <div class="progress-penalty-text" id="prestige-penalty-node" style="margin-top: 0.4rem; display: none;">
+                        ⚠️ Confianza dañada. Prestigio máximo limitado.
+                    </div>
                 </div>
 
-                <!-- PROGRESS BAR WITH CEILING PENALTY -->
+                <!-- PROGRESS BAR -->
                 <div class="progress-container">
                     <div class="progress-header">
                         <span>RELEVAMIENTO DEL CIRCUITO</span>
@@ -1401,9 +1507,6 @@
                     </div>
                     <div class="progress-bar-track" id="progress-bar-track-node">
                         <div class="progress-bar-fill" id="progress-bar-fill-node"></div>
-                    </div>
-                    <div class="progress-penalty-text" id="progress-penalty-node">
-                        ⚠️ Confianza dañada. Progreso máximo limitado.
                     </div>
                 </div>
 
@@ -1871,6 +1974,11 @@
 
         </div>
 
+        <!-- Resumen de Evaluación Técnico -->
+        <div id="exam-results-summary" class="results-summary-container">
+            <!-- Dynamic content injected on compileFinalDesign() -->
+        </div>
+
         <button class="btn-restart" onclick="restartGame()">Volver a Jugar 🔄</button>
     </div>
 
@@ -2244,7 +2352,9 @@
             activeNotebookTab: 'entidades',
             activeMobileTab: 'entrevista',
             examStep: 0,
-            examAnswers: [null, null, null, null, null, null]
+            examAnswers: [null, null, null, null, null, null],
+            askedQuestions: {},
+            shuffledExamQuestions: []
         };
 
         const TOTAL_PROGRESS_ITEMS = 16;
@@ -2350,6 +2460,7 @@
         function renderQuestionsList() {
             const listNode = document.getElementById('chat-questions-list');
             listNode.innerHTML = '';
+            listNode.style.display = 'flex';
 
             const area = gameState.activeArea;
             const char = GAME_DATA[area].chars[gameState.activeChar];
@@ -2358,7 +2469,7 @@
             gameState.currentRoomQuestions.forEach((q) => {
                 // Check if this specific high-value clue was already collected to mark it disabled
                 let isAlreadyAsked = false;
-                if (q.value === 'high' && char.clueId && gameState.interviewedChars[gameState.activeChar]) {
+                if (gameState.askedQuestions && gameState.askedQuestions[q.id]) {
                     isAlreadyAsked = true;
                 }
                 
@@ -2366,6 +2477,7 @@
                 if (q.id === "Q_ROD_TELEFONO" && gameState.unlockedClues.attr_prov_telefono) isAlreadyAsked = true;
                 if (q.id === "Q_JAV_EMAIL" && gameState.unlockedClues.attr_client_email) isAlreadyAsked = true;
                 if (q.id === "Q_LAU_EXPANSION" && gameState.unlockedClues.table_sucursales) isAlreadyAsked = true;
+                if (q.id === "Q_LAU_CLIENTES" && gameState.unlockedClues.table_clientes) isAlreadyAsked = true;
                 if (q.id === "Q_ROD_LOTES" && gameState.unlockedClues.table_lotes) isAlreadyAsked = true;
                 if (q.id === "Q_MAR_RECETA" && gameState.unlockedClues.rel_modelo_material) isAlreadyAsked = true;
                 if (q.id === "Q_JAV_DETALLE" && gameState.unlockedClues.rel_pedido_modelo) isAlreadyAsked = true;
@@ -2388,6 +2500,9 @@
             const area = gameState.activeArea;
             const char = GAME_DATA[area].chars[gameState.activeChar];
             const question = char.questions[qIdx];
+
+            // Mark question as asked to prevent duplicates and exploits
+            gameState.askedQuestions[question.id] = true;
 
             // 1. Add question bubble from consultant
             const dialogueWin = document.getElementById('chat-dialogue-window');
@@ -2450,7 +2565,7 @@
                     titleNode.innerHTML = '⚠️ Indiscreción Profesional (Pérdida de Prestigio y Bloqueo de Barra)';
                 }
 
-                bodyNode.innerText = question.insight;
+                bodyNode.innerHTML = question.insight;
                 dialogueWin.scrollTop = dialogueWin.scrollHeight;
 
                 // Show continue button to exit dialogue state
@@ -2477,15 +2592,34 @@
 
         // --- PRESTIGE SCORE ENGINE ---
         function updatePrestige(delta) {
-            gameState.prestige = Math.max(0, Math.min(100, gameState.prestige + delta));
+            // Trust penalty ceiling capping: 10% locked per bad question
+            let maxPrestigeCap = 100 - (gameState.badQuestionsCount * 10);
+            maxPrestigeCap = Math.max(0, maxPrestigeCap);
+
+            // Clamp prestige to cap
+            gameState.prestige = Math.max(0, Math.min(maxPrestigeCap, gameState.prestige + delta));
             
             // Update UI elements
             const pLabel = document.getElementById('prestige-label');
             const pFill = document.getElementById('prestige-progress');
             const pRank = document.getElementById('prestige-rank-label');
+            const penaltyMsg = document.getElementById('prestige-penalty-node');
 
             pLabel.innerText = `${gameState.prestige}%`;
             pFill.style.width = `${gameState.prestige}%`;
+
+            // Visual capping styling on the prestige track background
+            const trackNode = document.getElementById('prestige-bar-node');
+            if (gameState.badQuestionsCount > 0) {
+                trackNode.style.background = `linear-gradient(90deg, #e2e8f0 0%, #e2e8f0 ${maxPrestigeCap}%, #fee2e2 ${maxPrestigeCap}%, #fca5a5 100%)`;
+                
+                // Show warning message
+                penaltyMsg.style.display = 'block';
+                penaltyMsg.innerHTML = `⚠️ Confianza dañada. Prestigio máximo limitado al <b>${maxPrestigeCap}%</b> por indiscreciones.`;
+            } else {
+                trackNode.style.background = 'var(--bg)';
+                penaltyMsg.style.display = 'none';
+            }
 
             // Calculate title rank based on score
             let rankText = 'Pasante de Sistemas';
@@ -2500,7 +2634,7 @@
             pRank.innerText = rankText;
         }
 
-        // --- PROGRESS BAR WITH TRUST PENALTY (CEILING CAP) ---
+        // --- PROGRESS BAR ---
         function updateProgressBar() {
             // Calculate unlocked criteria count
             let unlockedCount = 0;
@@ -2513,31 +2647,10 @@
             // Progress bar value starts from 0%
             let rawProgress = Math.round((unlockedCount / TOTAL_PROGRESS_ITEMS) * 100);
 
-            // Trust penalty ceiling capping: 10% locked per bad question
-            let maxProgressCap = 100 - (gameState.badQuestionsCount * 10);
-            maxProgressCap = Math.max(0, maxProgressCap);
-
-            // Clamp progress to cap
-            let displayProgress = Math.min(rawProgress, maxProgressCap);
-
             // Update DOM text and fill
-            document.getElementById('progress-val-text').innerText = `${displayProgress}%`;
+            document.getElementById('progress-val-text').innerText = `${rawProgress}%`;
             const fillNode = document.getElementById('progress-bar-fill-node');
-            fillNode.style.width = `${displayProgress}%`;
-
-            // Visual capping styling on the track background
-            const trackNode = document.getElementById('progress-bar-track-node');
-            if (gameState.badQuestionsCount > 0) {
-                trackNode.style.background = `linear-gradient(90deg, #e2e8f0 0%, #e2e8f0 ${maxProgressCap}%, #fee2e2 ${maxProgressCap}%, #fca5a5 100%)`;
-                
-                // Show warning message
-                const penaltyMsg = document.getElementById('progress-penalty-node');
-                penaltyMsg.style.display = 'block';
-                penaltyMsg.innerHTML = `⚠️ Confianza dañada. Progreso máximo limitado al <b>${maxProgressCap}%</b> por indiscreciones.`;
-            } else {
-                trackNode.style.background = 'var(--bg)';
-                document.getElementById('progress-penalty-node').style.display = 'none';
-            }
+            fillNode.style.width = `${rawProgress}%`;
         }
 
         // --- AREA BADGES CALCULATIONS ---
@@ -3022,6 +3135,15 @@
             gameState.examStep = 0;
             gameState.examAnswers = [null, null, null, null, null, null];
 
+            // Shuffle questions and their options!
+            const mappedQuestions = EXAM_QUESTIONS.map((q) => ({
+                text: q.text,
+                explanation: q.explanation,
+                correctText: q.options[q.correct],
+                options: shuffleArray(q.options)
+            }));
+            gameState.shuffledExamQuestions = shuffleArray(mappedQuestions);
+
             renderExamStep();
         }
 
@@ -3030,7 +3152,7 @@
             container.innerHTML = '';
 
             const step = gameState.examStep;
-            const q = EXAM_QUESTIONS[step];
+            const q = gameState.shuffledExamQuestions[step];
 
             // Render active question card
             container.innerHTML = `
@@ -3091,7 +3213,9 @@
             let correctCount = 0;
 
             gameState.examAnswers.forEach((ans, idx) => {
-                if (ans === EXAM_QUESTIONS[idx].correct) {
+                const q = gameState.shuffledExamQuestions[idx];
+                const chosenText = q.options[ans];
+                if (chosenText === q.correctText) {
                     correctCount++;
                 }
             });
@@ -3122,6 +3246,56 @@
                 rankNode.innerText = '⚠️ Pasante de Base de Datos';
                 rankNode.style.color = 'var(--danger)';
             }
+
+            // Build and inject dynamic exam results evaluation report card mapping
+            const summaryContainer = document.getElementById('exam-results-summary');
+            let summaryHTML = `
+                <div class="results-summary-title">
+                    <span>📋 Resumen de Evaluación de Arquitectura Relacional</span>
+                </div>
+            `;
+
+            gameState.examAnswers.forEach((ans, idx) => {
+                const q = gameState.shuffledExamQuestions[idx];
+                const chosenText = q.options[ans];
+                const isCorrect = (chosenText === q.correctText);
+                
+                const cardClass = isCorrect ? 'result-item-card is-correct' : 'result-item-card is-incorrect';
+                const badgeClass = isCorrect ? 'result-badge correct' : 'result-badge incorrect';
+                const badgeText = isCorrect ? 'Correcto' : 'Incorrecto';
+                
+                summaryHTML += `
+                    <div class="${cardClass}">
+                        <div class="result-badge ${badgeClass}">${badgeText}</div>
+                        <div class="result-question-text">${idx + 1}. ${q.text}</div>
+                        <div class="result-answer-row" style="color: ${isCorrect ? 'var(--success)' : 'var(--danger)'}; font-weight: 700;">
+                            <span>${isCorrect ? '✅' : '❌'} Tu elección:</span> 
+                            <span style="font-weight: 500; margin-left: 4px;">${chosenText}</span>
+                        </div>
+                `;
+
+                if (!isCorrect) {
+                    summaryHTML += `
+                        <div class="result-suggestion">
+                            💡 <strong>Respuesta correcta:</strong> ${q.correctText}
+                            <br>
+                            <span style="font-size: 0.76rem; opacity: 0.85; display: inline-block; margin-top: 5px;">
+                                📖 <em>Explicación técnica:</em> ${q.explanation}
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    summaryHTML += `
+                        <div class="result-suggestion" style="background: var(--success-light); border-color: rgba(16, 185, 129, 0.15); color: #065f46;">
+                            💚 <strong>Explicación de diseño:</strong> ${q.explanation}
+                        </div>
+                    `;
+                }
+
+                summaryHTML += `</div>`;
+            });
+
+            summaryContainer.innerHTML = summaryHTML;
         }
 
         function restartGame() {
@@ -3162,7 +3336,9 @@
                 activeNotebookTab: 'entidades',
                 activeMobileTab: 'entrevista',
                 examStep: 0,
-                examAnswers: [null, null, null, null, null, null]
+                examAnswers: [null, null, null, null, null, null],
+                askedQuestions: {},
+                shuffledExamQuestions: []
             };
 
             // Restore Main views
