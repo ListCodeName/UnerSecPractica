@@ -4,78 +4,787 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS: Operaciones Básicas</title>
+    <title>Unidad 3: JS - Operaciones Básicas</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --bg-console: #090d16;
+            --accent-js: #f7df1e;
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --accent-pink: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
 
         h1 {
-            color: #e67e22;
+            font-size: 2.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .box {
-            background: #fdfefe;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+        h1 span.logo-js {
+            background: var(--accent-js);
+            color: #000;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 1.8rem;
         }
 
-        button {
-            padding: 8px 15px;
+        /* BLOCK NAVIGATION / TABS */
+        .block-container {
+            margin-bottom: 35px;
+        }
+
+        .block-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .block-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .block-title.aritmetica { color: var(--accent-orange); }
+        .block-title.strings { color: var(--accent-green); }
+        .block-title.logicas { color: var(--accent-purple); }
+        .block-title.relacionales { color: var(--accent-blue); }
+
+        /* GRID FOR OPERATORS */
+        .grid-operators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .op-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            transition: all 0.25s ease;
+        }
+
+        .op-card:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .op-symbol {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .code-block .keyword { color: #f472b6; }
+        .code-block .string { color: #4ade80; }
+        .code-block .number { color: #fb923c; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+
+        /* INTERACTIVE MINI TOOLS */
+        .interactive-tool {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-top: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        input[type="text"], input[type="number"] {
+            background: var(--bg-console);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #0f172a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-orange { background: var(--accent-orange); }
+        .btn-green { background: var(--accent-green); }
+        .btn-purple { background: var(--accent-purple); color: #0f172a; }
+
+        .res-box {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        /* CURIOSIDADES BOX */
+        .curiosity-card {
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.1), rgba(247, 223, 30, 0.05));
+            border: 1px dashed rgba(251, 146, 60, 0.4);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .curiosity-title {
+            color: var(--accent-orange);
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* QUIZ SECTION */
+        .quiz-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .score-board {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--accent-js);
+        }
+
+        .quiz-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-question {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .option-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+        }
+
+        .option-btn.correct {
+            background: rgba(74, 222, 128, 0.2) !important;
+            border-color: var(--accent-green) !important;
+            color: var(--accent-green) !important;
+            font-weight: 600;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(248, 113, 113, 0.2) !important;
+            border-color: var(--accent-red) !important;
+            color: var(--accent-red) !important;
+        }
+
+        .quiz-feedback {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+        .quiz-feedback.error {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Unidad 3: Operaciones Básicas</h1>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="badge">Programación II • Unidad 3</div>
+            <h1><span class="logo-js">JS</span> Operaciones Básicas en JavaScript</h1>
+            <p>Guía estructurada con ejemplos prácticos e interactivos para dominar los operadores Aritméticos, de Strings, Lógicos y Relacionales.</p>
+        </header>
 
-    <div class="box">
-        <h2>Aritmética</h2>
-        <p>Abre la consola (F12) para ver los cálculos.</p>
-        <button onclick="calcularNumeros()">Calcular: 10 y 3</button>
+        <!-- BLOQUE 1: OPERACIONES ARITMÉTICAS -->
+        <div class="block-container">
+            <div class="block-header">
+                <h2 class="block-title aritmetica">🧮 Bloque 1: Operaciones Aritméticas</h2>
+                <p style="color: var(--text-muted);">
+                    Se utilizan para realizar cálculos matemáticos entre números o variables numéricas.
+                </p>
+            </div>
+
+            <div class="grid-operators">
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-orange);">+  -  *  /</span>
+                    <h4>Básicas</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Suma, resta, multiplicación y división estándar.</p>
+                    <div class="code-block">
+                        <span class="keyword">let</span> res = (<span class="number">10</span> + <span class="number">5</span>) * <span class="number">2</span>; <span class="comment">// 30</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-orange);">% (Módulo)</span>
+                    <h4>Residuo de la División</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Devuelve el resto que sobra de una división entera. ¡Ideal para saber si un número es par!</p>
+                    <div class="code-block">
+                        <span class="keyword">let</span> resto = <span class="number">10</span> % <span class="number">3</span>; <span class="comment">// 1</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-orange);">** (Exponente)</span>
+                    <h4>Potenciación</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Eleva la base al exponente indicado (ES6).</p>
+                    <div class="code-block">
+                        <span class="keyword">let</span> cubo = <span class="number">2</span> ** <span class="number">3</span>; <span class="comment">// 8</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-orange);">++  --</span>
+                    <h4>Incremento y Decremento</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Aumenta o disminuye el valor de la variable en 1 unidad.</p>
+                    <div class="code-block">
+                        <span class="keyword">let</span> n = <span class="number">5</span>; n++; <span class="comment">// n pasa a ser 6</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROBADOR INTERACTIVO ARITMÉTICO -->
+            <div class="interactive-tool">
+                <h4 style="color: var(--accent-orange);">⚡ Probador Interactivo de Módulo (%) y Potencia (**)</h4>
+                <div class="form-row">
+                    <label>Número A: <input type="number" id="numA" value="10" style="width: 80px;"></label>
+                    <label>Número B: <input type="number" id="numB" value="3" style="width: 80px;"></label>
+                    <button class="btn btn-orange" onclick="calcularAritmetica()">Calcular</button>
+                </div>
+                <div class="form-row" style="margin-top: 12px;">
+                    <div class="res-box" id="resAritmetica" style="color: var(--accent-orange); border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.1);">
+                        Resultado: 10 % 3 = 1 | 10 ** 3 = 1000
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOQUE 2: OPERACIONES CON STRINGS -->
+        <div class="block-container">
+            <div class="block-header">
+                <h2 class="block-title strings">🔤 Bloque 2: Operaciones con Strings (Cadenas)</h2>
+                <p style="color: var(--text-muted);">
+                    Permiten manipular, unir y formatear textos dentro del código.
+                </p>
+            </div>
+
+            <div class="grid-operators">
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-green);">+ (Concatenación)</span>
+                    <h4>Unión Clásica</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Une dos o más cadenas de texto en una sola.</p>
+                    <div class="code-block">
+                        <span class="keyword">let</span> msj = <span class="string">"Hola "</span> + <span class="string">"Mundo"</span>;
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-green);">${} (Template String)</span>
+                    <h4>Interpolación Moderna</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Permite incrustar variables directamente dentro de acentos graves `` ` ` ``.</p>
+                    <div class="code-block">
+                        <span class="keyword">let</span> saludo = <span class="string">`Hola ${nombre}`</span>;
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-green);">.length / .toUpperCase()</span>
+                    <h4>Métodos Útiles</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Propiedades y funciones integradas para transformar el texto.</p>
+                    <div class="code-block">
+                        <span class="string">"hola"</span>.length; <span class="comment">// 4</span><br>
+                        <span class="string">"hola"</span>.toUpperCase(); <span class="comment">// "HOLA"</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROBADOR INTERACTIVO STRINGS -->
+            <div class="interactive-tool">
+                <h4 style="color: var(--accent-green);">⚡ Generador de Saludo Interactivo (Template String)</h4>
+                <div class="form-row">
+                    <input type="text" id="strNombre" placeholder="Tu nombre" value="Estudiante">
+                    <input type="text" id="strMateria" placeholder="Materia" value="Programación II">
+                    <button class="btn btn-green" onclick="generarSaludo()">Formatear</button>
+                </div>
+                <div class="form-row" style="margin-top: 12px;">
+                    <div class="res-box" id="resString" style="color: var(--accent-green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.1);">
+                        Resultado: `Bienvenido/a Estudiante a la materia de Programación II! ✨`
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CURIOSIDAD 1: COERCIÓN IMPLÍCITA -->
+        <div class="curiosity-card">
+            <div class="curiosity-title">🤯 Curiosidad de Coerción: "5" + 2 vs "5" - 2</div>
+            <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px;">
+                ¿Sabías que en JavaScript <code>"5" + 2</code> da <b style="color: var(--accent-green);">"52"</b>, pero <code>"5" - 2</code> da <b style="color: var(--accent-orange);">3</b>?
+            </p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                <strong>Explicación:</strong> El operador <code>+</code> está sobrecargado: si uno de los dos lados es un String, convierte todo a String y los **concatena**. Sin embargo, el operador <code>-</code> solo existe para números, por lo que JavaScript convierte automáticamente el <code>"5"</code> a número y realiza la **resta matemática**.
+            </p>
+        </div>
+
+        <!-- BLOQUE 3: OPERACIONES LÓGICAS -->
+        <div class="block-container">
+            <div class="block-header">
+                <h2 class="block-title logicas">🧠 Bloque 3: Operaciones Lógicas</h2>
+                <p style="color: var(--text-muted);">
+                    Combinan expresiones booleanas para tomar decisiones complejas en el código.
+                </p>
+            </div>
+
+            <div class="grid-operators">
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-purple);">&& (AND / Y)</span>
+                    <h4>Ambos Verdaderos</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Retorna <code>true</code> únicamente si **ambas** condiciones son verdaderas.</p>
+                    <div class="code-block">
+                        <span class="keyword">true</span> && <span class="keyword">false</span>; <span class="comment">// false</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-purple);">|| (OR / O)</span>
+                    <h4>Al Menos Uno Verdadero</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Retorna <code>true</code> si **al menos una** de las condiciones es verdadera.</p>
+                    <div class="code-block">
+                        <span class="keyword">true</span> || <span class="keyword">false</span>; <span class="comment">// true</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-purple);">! (NOT / Negación)</span>
+                    <h4>Inversión Lógica</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Invierte el valor booleano: <code>true</code> pasa a ser <code>false</code> y viceversa.</p>
+                    <div class="code-block">
+                        !<span class="keyword">true</span>; <span class="comment">// false</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA TRUTHY & FALSY -->
+            <div class="interactive-tool">
+                <h4 style="color: var(--accent-purple);">💡 Concepto Clave: Valores Truthy y Falsy en JS</h4>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+                    En JS, cualquier valor se puede evaluar como booleano en una condición. Los 6 valores <strong>Falsy</strong> principales son:
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                    <span class="res-box" style="color: var(--accent-pink); border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.1);">false</span>
+                    <span class="res-box" style="color: var(--accent-pink); border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.1);">0</span>
+                    <span class="res-box" style="color: var(--accent-pink); border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.1);">"" (String vacío)</span>
+                    <span class="res-box" style="color: var(--accent-pink); border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.1);">null</span>
+                    <span class="res-box" style="color: var(--accent-pink); border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.1);">undefined</span>
+                    <span class="res-box" style="color: var(--accent-pink); border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.1);">NaN</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">¡Cualquier otro valor (números no cero, textos no vacíos, arrays o objetos) es considerado <strong>Truthy</strong>!</p>
+            </div>
+        </div>
+
+        <!-- BLOQUE 4: OPERACIONES RELACIONALES -->
+        <div class="block-container">
+            <div class="block-header">
+                <h2 class="block-title relacionales">🔍 Bloque 4: Operaciones Relacionales (Comparación)</h2>
+                <p style="color: var(--text-muted);">
+                    Comparan dos valores y siempre devuelven un valor booleano (<code>true</code> o <code>false</code>).
+                </p>
+            </div>
+
+            <div class="grid-operators">
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-blue);">=== vs ==</span>
+                    <h4>Igualdad Estricta vs Laxa</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">
+                        <code>===</code> compara <strong>Valor Y Tipo</strong> (recomendado).<br>
+                        <code>==</code> intenta convertir tipos antes de comparar (no recomendado).
+                    </p>
+                    <div class="code-block">
+                        <span class="number">5</span> == <span class="string">"5"</span>; <span class="comment">// true ⚠️</span><br>
+                        <span class="number">5</span> === <span class="string">"5"</span>; <span class="comment">// false ✅</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-blue);">!== vs !=</span>
+                    <h4>Desigualdad Estricta vs Laxa</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Verifica si dos elementos son diferentes.</p>
+                    <div class="code-block">
+                        <span class="number">10</span> !== <span class="string">"10"</span>; <span class="comment">// true</span>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <span class="op-symbol" style="color: var(--accent-blue);">>  <  >=  <=</span>
+                    <h4>Comparación de Orden</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted);">Mayor que, menor que, mayor o igual, menor o igual.</p>
+                    <div class="code-block">
+                        <span class="number">18</span> >= <span class="number">18</span>; <span class="comment">// true</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROBADOR COMPARADOR -->
+            <div class="interactive-tool">
+                <h4 style="color: var(--accent-blue);">⚡ Probador de Igualdad Laxa (==) vs Estricta (===)</h4>
+                <div class="form-row">
+                    <button class="btn btn-purple" onclick="testComparaciones()">Ejecutar Pruebas en Vivo</button>
+                </div>
+                <div class="form-row" style="margin-top: 12px;">
+                    <div class="res-box" id="resComp" style="width: 100%; white-space: pre-wrap;">Haz clic en el botón para ver la diferencia entre == y ===...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CURIOSIDAD 2: PARADOJA DE NaN -->
+        <div class="curiosity-card">
+            <div class="curiosity-title">⚠️ La Paradoja de NaN (Not a Number)</div>
+            <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px;">
+                <code>NaN</code> representa un resultado matemático inválido (ejemplo: <code>"hola" * 2</code>).
+            </p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                ¡La curiosidad es que <code>NaN === NaN</code> devuelve <b style="color: var(--accent-red);">false</b>! Es el único valor en todo JavaScript que no es igual a sí mismo. Para saber si una variable es NaN, se debe usar la función <code>Number.isNaN(valor)</code>.
+            </p>
+        </div>
+
+        <!-- QUIZ DE EVALUACIÓN FINAL -->
+        <div class="quiz-section">
+            <div class="quiz-header">
+                <div>
+                    <h2 style="font-size: 1.4rem;">🎯 Actividades de Memorización y Práctica</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Calcula mentalmente las expresiones y verifica tus respuestas.</p>
+                </div>
+                <div class="score-board" id="scoreBoard">Puntos: 0 / 5</div>
+            </div>
+
+            <!-- PREGUNTA 1 -->
+            <div class="quiz-card" id="q1">
+                <div class="quiz-question">1. ¿Cuál es el resultado de la expresión <code>17 % 5</code> en JavaScript?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! 3.4 es la división flotante, no el resto entero.')">A) 3.4</button>
+                    <button class="option-btn" onclick="checkAnswer(1, true, this, '¡Correcto! 5 cabe 3 veces en 17 (15), y sobran 2 unidades.')">B) 2</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! 3 es el cociente de la división.')">C) 3</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! El operador % calcula el resto o residuo.')">D) 0</button>
+                </div>
+                <div class="quiz-feedback" id="fb1"></div>
+            </div>
+
+            <!-- PREGUNTA 2 -->
+            <div class="quiz-card" id="q2">
+                <div class="quiz-question">2. ¿Qué imprime en pantalla <code>console.log("10" + 20)</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! Al haber un string, el operador + concatena en lugar de sumar matemáticamente.')">A) 30</button>
+                    <button class="option-btn" onclick="checkAnswer(2, true, this, '¡Correcto! El número 20 se convierte implícitamente a texto y se une dando &quot;1020&quot;.')">B) "1020"</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! No se genera error de tipo.')">C) TypeError</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! NaN solo ocurre cuando la conversión numérica falla en operaciones como multiplicación.')">D) NaN</button>
+                </div>
+                <div class="quiz-feedback" id="fb2"></div>
+            </div>
+
+            <!-- PREGUNTA 3 -->
+            <div class="quiz-card" id="q3">
+                <div class="quiz-question">3. ¿Cuál es el resultado booleano de <code>(5 > 3) && (2 === "2")</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! Fíjate en 2 === &quot;2&quot;. Son de distinto tipo (Number vs String).')">A) true</button>
+                    <button class="option-btn" onclick="checkAnswer(3, true, this, '¡Excelente! (5 > 3) es true, pero (2 === &quot;2&quot;) es false. true && false resulta en false.')">B) false</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! Da un valor booleano estricto.')">C) undefined</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! === comprueba tipo y valor.')">D) "true"</button>
+                </div>
+                <div class="quiz-feedback" id="fb3"></div>
+            </div>
+
+            <!-- PREGUNTA 4 -->
+            <div class="quiz-card" id="q4">
+                <div class="quiz-question">4. ¿Por qué es una buena práctica usar siempre <code>===</code> en lugar de <code>==</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(4, true, this, '¡Exacto! === evita conversiones de tipo inesperadas (coerción implícita), haciendo el código seguro y predecible.')">A) Porque === compara tanto el tipo de dato como el valor sin conversiones ocultas</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! == sí existe y funciona en JS.')">B) Porque el operador == fue eliminado en ES6</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! Su rendimiento es idéntico.')">C) Porque == es el doble de lento</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! === es la comparación estricta.')">D) Porque === convierte automáticamente los textos a números</button>
+                </div>
+                <div class="quiz-feedback" id="fb4"></div>
+            </div>
+
+            <!-- PREGUNTA 5 -->
+            <div class="quiz-card" id="q5">
+                <div class="quiz-question">5. ¿Cuál de los siguientes valores es considerado <code>Falsy</code> en JavaScript?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! Un string con texto &quot;false&quot; es Truthy porque no está vacío.')">A) "false" (string con texto)</button>
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! Un array [ ] o lista vacía es un Objeto y es Truthy.')">B) [] (Array vacío)</button>
+                    <button class="option-btn" onclick="checkAnswer(5, true, this, '¡Correcto! El número 0 es uno de los 6 valores Falsy nativos de JavaScript.')">C) 0 (Número cero)</button>
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! Cualquier número diferente de cero (incluso negativos) es Truthy.')">D) -1</button>
+                </div>
+                <div class="quiz-feedback" id="fb5"></div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>Programación II • Universidad Nacional de Entre Ríos (UNER)</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Recuerda presionar <code>F12</code> para interactuar con la consola de tu navegador.</p>
+        </footer>
     </div>
 
-    <div class="box">
-        <h2>Concatenación (Texto)</h2>
-        <p>Unir cadenas de texto.</p>
-        <label>Nombre: <input type="text" id="inputNombre" placeholder="Tu nombre"></label>
-        <button onclick="saludar()">Saludar</button>
-        <p id="resultadoSaludo"></p>
-    </div>
-
+    <!-- SCRIPT DE LOGICA INTERACTIVA -->
     <script>
-        function calcularNumeros() {
-            let a = 10;
-            let b = 3;
+        // PROBADOR ARITMÉTICO
+        function calcularAritmetica() {
+            const a = parseFloat(document.getElementById("numA").value) || 0;
+            const b = parseFloat(document.getElementById("numB").value) || 0;
 
-            console.log("--- Operaciones con " + a + " y " + b + " ---");
-            console.log("Suma (+):", a + b);
-            console.log("Resta (-):", a - b);
-            console.log("Multiplicación (*):", a * b);
-            console.log("División (/):", a / b);
-            console.log("Módulo o Resto (%):", a % b); // Lo que sobra de la división
-            console.log("Exponente (**):", a ** b);   // 10 elevado a 3
+            const mod = a % b;
+            const pow = a ** b;
+
+            document.getElementById("resAritmetica").innerText = 
+                `Resultado: ${a} % ${b} = ${mod} | ${a} ** ${b} = ${pow}`;
         }
 
-        function saludar() {
-            // Obtener valor del input
-            let nombre = document.getElementById("inputNombre").value;
+        // PROBADOR DE STRINGS
+        function generarSaludo() {
+            const nom = document.getElementById("strNombre").value || "Estudiante";
+            const mat = document.getElementById("strMateria").value || "Programación II";
 
-            // Operación de concatenación (+)
-            let saludo = "Hola " + nombre + ", bienvenido a Javascript.";
+            const res = `¡Bienvenido/a ${nom} a la materia de ${mat}! ✨`;
+            document.getElementById("resString").innerText = `Resultado: "${res}" (Longitud: ${res.length} caracteres)`;
+        }
 
-            // Template String (forma moderna con backticks `)
-            let saludoModerno = `Hola ${nombre}, usando template strings.`;
+        // PROBADOR COMPARACIONES
+        function testComparaciones() {
+            const output = [
+                `0 == false       => ${0 == false} (Laxa: convierte 0 a false)`,
+                `0 === false      => ${0 === false} (Estricta: Number !== Boolean)`,
+                `"" == false      => ${"" == false} (Laxa: convierte string vacío a false)`,
+                `"" === false     => ${"" === false} (Estricta: String !== Boolean)`,
+                `"5" == 5         => ${"5" == 5} (Laxa: convierte "5" a número 5)`,
+                `"5" === 5        => ${"5" === 5} (Estricta: String !== Number)`,
+                `null == undefined => ${null == undefined} (Laxa: son equivalentes en falta de valor)`,
+                `null === undefined=> ${null === undefined} (Estricta: Null !== Undefined)`
+            ].join("\n");
 
-            console.log(saludo);
-            document.getElementById("resultadoSaludo").innerText = saludoModerno;
+            document.getElementById("resComp").innerText = output;
+        }
+
+        // QUIZ LOGIC
+        let score = 0;
+        const answeredQuestions = new Set();
+
+        function checkAnswer(questionNum, isCorrect, btnElement, feedbackText) {
+            if (answeredQuestions.has(questionNum)) return;
+
+            const card = document.getElementById(`q${questionNum}`);
+            const buttons = card.querySelectorAll(".option-btn");
+            const feedbackEl = document.getElementById(`fb${questionNum}`);
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                btnElement.classList.add("correct");
+                feedbackEl.className = "quiz-feedback show success";
+                feedbackEl.innerHTML = `✅ <b>¡Correcto!</b> ${feedbackText}`;
+                score++;
+            } else {
+                btnElement.classList.add("incorrect");
+                feedbackEl.className = "quiz-feedback show error";
+                feedbackEl.innerHTML = `❌ ${feedbackText}`;
+            }
+
+            answeredQuestions.add(questionNum);
+            document.getElementById("scoreBoard").innerText = `Puntos: ${score} / 5`;
         }
     </script>
 </body>

@@ -4,109 +4,819 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS: Variables y Datos</title>
+    <title>Unidad 3: JS - Variables y Tipos de Datos</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --bg-console: #090d16;
+            --accent-js: #f7df1e;
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
         }
 
-        h1,
-        h2 {
-            color: #f1c40f;
-            text-shadow: 1px 1px 2px #333;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .console-box {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-            white-space: pre-wrap;
+        /* HEADER & NAVBAR */
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background: radial-gradient(circle, rgba(247, 223, 30, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(247, 223, 30, 0.15);
+            color: var(--accent-js);
+            border: 1px solid rgba(247, 223, 30, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 span.logo-js {
+            background: var(--accent-js);
+            color: #000;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 1.8rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* GRID SECTIONS */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin: 35px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.4);
+            background: var(--bg-card-hover);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .tag {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .tag-var { background: rgba(248, 113, 113, 0.2); color: var(--accent-red); border: 1px solid rgba(248, 113, 113, 0.3); }
+        .tag-let { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-const { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+
+        .code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .code-block .keyword { color: #f472b6; }
+        .code-block .var-name { color: #38bdf8; }
+        .code-block .string { color: #4ade80; }
+        .code-block .number { color: #fb923c; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+
+        /* DATA TYPES TABLE / LIST */
+        .type-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .type-item {
+            background: var(--bg-card);
+            border-left: 4px solid var(--accent-purple);
+            border-radius: 8px;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .type-item.string { border-left-color: var(--accent-green); }
+        .type-item.number { border-left-color: var(--accent-orange); }
+        .type-item.boolean { border-left-color: var(--accent-blue); }
+        .type-item.undefined { border-left-color: var(--accent-purple); }
+        .type-item.null { border-left-color: var(--accent-pink); }
+        .type-item.bigint { border-left-color: var(--accent-js); }
+
+        .type-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* CURIOSITY CARDS */
+        .curiosity-card {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.1), rgba(56, 189, 248, 0.05));
+            border: 1px dashed rgba(192, 132, 252, 0.4);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .curiosity-title {
+            color: var(--accent-purple);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* INTERACTIVE CONSOLE WIDGET */
+        .interactive-playground {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            margin: 35px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .playground-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .btn {
-            background: #3498db;
-            color: white;
+            background: var(--accent-blue);
+            color: #0f172a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 18px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .btn:hover {
-            background: #2980b9;
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-purple {
+            background: var(--accent-purple);
+            color: #0f172a;
+        }
+        .btn-green {
+            background: var(--accent-green);
+            color: #0f172a;
+        }
+        .btn-clear {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .console-window {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            min-height: 140px;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #e2e8f0;
+        }
+
+        .console-line {
+            margin-bottom: 6px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .console-prompt {
+            color: var(--accent-js);
+            user-select: none;
+        }
+
+        .console-type {
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+            margin-left: 6px;
+        }
+
+        /* ACTIVITIES / QUIZ SECTION */
+        .quiz-section {
+            background: linear-gradient(180deg, var(--bg-card) 0%, rgba(30, 41, 59, 0.6) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .score-board {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--accent-js);
+        }
+
+        .quiz-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .option-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+            background: var(--bg-card-hover);
+        }
+
+        .option-btn.correct {
+            background: rgba(74, 222, 128, 0.2) !important;
+            border-color: var(--accent-green) !important;
+            color: var(--accent-green) !important;
+            font-weight: 600;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(248, 113, 113, 0.2) !important;
+            border-color: var(--accent-red) !important;
+            color: var(--accent-red) !important;
+        }
+
+        .quiz-feedback {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .quiz-feedback.error {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Unidad 3: Variables y Tipos de Datos</h1>
-    <p>Abre la <strong>Consola del Desarrollador</strong> (F12 -> Pestaña Console) para ver los resultados.</p>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="badge">Programación II • Unidad 3</div>
+            <h1><span class="logo-js">JS</span> Variables y Tipos de Datos</h1>
+            <p>Guía interactiva para dominar los cimientos de JavaScript: declaración de variables, almacenamiento en memoria y clasificación de datos primitivos.</p>
+        </header>
 
-    <h2>1. Variables</h2>
-    <p>Son contenedores para guardar información. Existen 3 formas de declararlas:</p>
-    <ul>
-        <li><code>var</code>: La forma antigua. (No recomendada hoy en día).</li>
-        <li><code>let</code>: Para valores que pueden cambiar.</li>
-        <li><code>const</code>: Para valores que NO deben cambiar (constantes).</li>
-    </ul>
+        <!-- SECCIÓN 1: DECLARACIÓN DE VARIABLES -->
+        <h2 class="section-title">⚡ 1. Formas de Declarar Variables</h2>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">
+            Una variable es un contenedor en memoria donde guardamos un valor para reutilizarlo o modificarlo más adelante.
+        </p>
 
-    <h2>2. Tipos de Datos Primitivos</h2>
-    <ul>
-        <li><strong>String:</strong> Texto (entre comillas simples o dobles).</li>
-        <li><strong>Number:</strong> Números (enteros o decimales).</li>
-        <li><strong>Boolean:</strong> Verdadero (true) o Falso (false).</li>
-        <li><strong>Undefined:</strong> Una variable declarada pero sin valor.</li>
-        <li><strong>Null:</strong> Ausencia intencional de valor.</li>
-    </ul>
+        <div class="grid-3">
+            <!-- VAR CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">var</span>
+                    <span class="tag tag-var">Antiguo (ES5)</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Tiene alcance de función (o global). Permite re-declaración y sufre de <em>hoisting</em>. <strong>No se recomienda usar actualmente.</strong>
+                </p>
+                <div class="code-block">
+                    <span class="keyword">var</span> <span class="var-name">nombre</span> = <span class="string">"Carlos"</span>;<br>
+                    <span class="keyword">var</span> <span class="var-name">nombre</span> = <span class="string">"Ana"</span>; <span class="comment">// ¡Sin error!</span>
+                </div>
+            </div>
 
-    <button class="btn" onclick="ejecutarEjemplo()">Ejecutar Ejemplo en Consola</button>
-    <div id="output" class="console-box" style="margin-top: 20px; display: none;"></div>
+            <!-- LET CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">let</span>
+                    <span class="tag tag-let">Moderno (ES6+)</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Tiene alcance de bloque <code>{ }</code>. Se puede **reasignar** (cambiar su valor), pero **no re-declarar** en el mismo bloque.
+                </p>
+                <div class="code-block">
+                    <span class="keyword">let</span> <span class="var-name">contador</span> = <span class="number">1</span>;<br>
+                    <span class="var-name">contador</span> = <span class="number">2</span>; <span class="comment">// Reasignación OK</span>
+                </div>
+            </div>
 
+            <!-- CONST CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">const</span>
+                    <span class="tag tag-const">Recomendado</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    De alcance de bloque. Es **constante**: debe inicializarse al declararse y **no se puede reasignar** su referencia.
+                </p>
+                <div class="code-block">
+                    <span class="keyword">const</span> <span class="var-name">PI</span> = <span class="number">3.1416</span>;<br>
+                    <span class="comment">// PI = 3.14; ❌ Error!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CURIOSIDAD 1 -->
+        <div class="curiosity-card">
+            <div class="curiosity-title">💡 Curiosidad JS: ¿Qué es el Alcance de Bloque (Block Scope)?</div>
+            <p style="font-size: 0.95rem; color: var(--text-main);">
+                A diferencia de <code>var</code>, las variables declaradas con <code>let</code> o <code>const</code> dentro de llaves <code>{ ... }</code> (como en un <code>if</code> o <code>for</code>) existen <strong>solamente dentro de esas llaves</strong>. ¡Esto evita que sobrescribas variables accidentales de otras partes del código!
+            </p>
+        </div>
+
+        <!-- SECCIÓN 2: TIPOS DE DATOS PRIMITIVOS -->
+        <h2 class="section-title">🧩 2. Tipos de Datos Primitivos</h2>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">
+            Los tipos primitivos representan un único valor inmutable directamente en memoria.
+        </p>
+
+        <div class="type-list">
+            <!-- STRING -->
+            <div class="type-item string">
+                <div class="type-name">
+                    <span>String (Texto)</span>
+                    <span class="tag" style="background: rgba(74,222,128,0.1); color: var(--accent-green);">"hola"</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Secuencias de caracteres encerrados entre comillas simples <code>' '</code>, dobles <code>" "</code> o *template literals* `` ` ` ``.
+                </p>
+                <div class="code-block" style="margin:0;">
+                    <span class="keyword">let</span> saludo = <span class="string">`Hola ${nombre}`</span>;
+                </div>
+            </div>
+
+            <!-- NUMBER -->
+            <div class="type-item number">
+                <div class="type-name">
+                    <span>Number (Número)</span>
+                    <span class="tag" style="background: rgba(251,146,60,0.1); color: var(--accent-orange);">42 / 3.14</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                    JavaScript no distingue entre enteros y decimales. Todos son <code>Number</code> (formato IEEE 754 a 64 bits).
+                </p>
+                <div class="code-block" style="margin:0;">
+                    <span class="keyword">let</span> precio = <span class="number">19.99</span>;
+                </div>
+            </div>
+
+            <!-- BOOLEAN -->
+            <div class="type-item boolean">
+                <div class="type-name">
+                    <span>Boolean (Lógico)</span>
+                    <span class="tag" style="background: rgba(56,189,248,0.1); color: var(--accent-blue);">true / false</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Solo puede tomar dos valores: verdadero (<code>true</code>) o falso (<code>false</code>). Ideal para tomar decisiones.
+                </p>
+                <div class="code-block" style="margin:0;">
+                    <span class="keyword">let</span> activo = <span class="keyword">true</span>;
+                </div>
+            </div>
+
+            <!-- UNDEFINED -->
+            <div class="type-item undefined">
+                <div class="type-name">
+                    <span>Undefined (Sin definir)</span>
+                    <span class="tag" style="background: rgba(192,132,252,0.1); color: var(--accent-purple);">undefined</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Es el valor por defecto que asigna JavaScript automáticamente a una variable declarada sin inicializar.
+                </p>
+                <div class="code-block" style="margin:0;">
+                    <span class="keyword">let</span> x; <span class="comment">// x vale undefined</span>
+                </div>
+            </div>
+
+            <!-- NULL -->
+            <div class="type-item null">
+                <div class="type-name">
+                    <span>Null (Nulo intencional)</span>
+                    <span class="tag" style="background: rgba(244,114,182,0.1); color: var(--accent-pink);">null</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Representa la **ausencia intencional** de cualquier valor o referencia a un objeto.
+                </p>
+                <div class="code-block" style="margin:0;">
+                    <span class="keyword">let</span> usuario = <span class="keyword">null</span>;
+                </div>
+            </div>
+
+            <!-- BIGINT -->
+            <div class="type-item bigint">
+                <div class="type-name">
+                    <span>BigInt (Enteros grandes)</span>
+                    <span class="tag" style="background: rgba(247,223,30,0.1); color: var(--accent-js);">9007199254740991n</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                    Para números enteros de precisión arbitraria mayores al límite seguro de <code>Number</code>. Se forma con una <code>n</code> al final.
+                </p>
+                <div class="code-block" style="margin:0;">
+                    <span class="keyword">const</span> numGrande = <span class="number">9007199254740995n</span>;
+                </div>
+            </div>
+        </div>
+
+        <!-- CURIOSIDAD 2 -->
+        <div class="curiosity-card">
+            <div class="curiosity-title">🐞 Curiosidad Histórica: El bug de "typeof null"</div>
+            <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px;">
+                Si ejecutas <code>typeof null</code> en la consola, JavaScript devolverá <code style="color: var(--accent-pink);">"object"</code>.
+            </p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                ¡Esto es un bug histórico reconocido desde la primera versión de JS en 1995! Nunca se corrigió porque arreglarlo rompería millones de páginas web antiguas que dependen de ese comportamiento.
+            </p>
+        </div>
+
+        <!-- INTERACTIVE CONSOLE PLAYGROUND -->
+        <div class="interactive-playground">
+            <h3 style="margin-bottom: 10px; font-size: 1.3rem; display: flex; align-items: center; gap: 8px;">
+                🖥️ Consola de Pruebas en Tiempo Real
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">
+                Haz clic en los botones para ejecutar fragmentos de JavaScript y examinar la salida formateada y el operador <code>typeof</code>:
+            </p>
+
+            <div class="playground-controls">
+                <button class="btn" onclick="runDemo1()">Prueba 1: Declaración let vs const</button>
+                <button class="btn btn-purple" onclick="runDemo2()">Prueba 2: Explorador typeof</button>
+                <button class="btn btn-green" onclick="runDemo3()">Prueba 3: Undefined vs Null</button>
+                <button class="btn btn-clear" onclick="clearConsole()">Limpiar Consola</button>
+            </div>
+
+            <div class="console-window" id="consoleOutput">
+                <div class="console-line">
+                    <span class="console-prompt">></span>
+                    <span style="color: #64748b;">Consola lista. Haz clic en un botón superior para ejecutar código...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVIDADES DE MEMORIZACIÓN -->
+        <div class="quiz-section">
+            <div class="quiz-header">
+                <div>
+                    <h2 style="font-size: 1.4rem;">🎯 Actividades de Memorización y Repaso</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Pon a prueba tus conocimientos para fijar los conceptos clave.</p>
+                </div>
+                <div class="score-board" id="scoreBoard">Puntos: 0 / 4</div>
+            </div>
+
+            <!-- PREGUNTA 1 -->
+            <div class="quiz-card" id="q1">
+                <div class="quiz-question">1. ¿Qué sucede si intentas reasignar una variable declarada con <code>const</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! const prohíbe la reasignación.')">A) Se cambia el valor sin problemas</button>
+                    <button class="option-btn" onclick="checkAnswer(1, true, this, '¡Correcto! Intentar reasignar const lanza un TypeError no capturado.')">B) Lanza un error (TypeError)</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! La variable no se convierte en undefined.')">C) Pasa a valer undefined automáticamente</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! let es quien permite cambiar valores.')">D) Se convierte automáticamente en una variable let</button>
+                </div>
+                <div class="quiz-feedback" id="fb1"></div>
+            </div>
+
+            <!-- PREGUNTA 2 -->
+            <div class="quiz-card" id="q2">
+                <div class="quiz-question">2. ¿Cuál es el resultado de ejecutar <code>typeof undefined</code> en JavaScript?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! typeof null es object, pero no undefined.')">A) "object"</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! Devuelve una cadena de texto describiendo el tipo.')">B) null</button>
+                    <button class="option-btn" onclick="checkAnswer(2, true, this, '¡Correcto! typeof undefined retorna el string exactamente &quot;undefined&quot;.')">C) "undefined"</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! string es el tipo para cadenas como &quot;hola&quot;.')">D) "string"</button>
+                </div>
+                <div class="quiz-feedback" id="fb2"></div>
+            </div>
+
+            <!-- PREGUNTA 3 -->
+            <div class="quiz-card" id="q3">
+                <div class="quiz-question">3. ¿Qué diferencia conceptual existe entre <code>null</code> y <code>undefined</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(3, true, this, '¡Excelente! undefined es la falta de valor por defecto de JS, mientras que null la establece el programador explícitamente.')">A) undefined indica que la variable no tiene valor asignado; null es la ausencia intencional definida por el desarrollador.</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! Ambos son tipos primitivos diferentes.')">B) Ninguna, son exactamente sinónimos intercambiables.</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! null no es un número.')">C) null es para números y undefined es para textos.</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! Es al revés en la inicialización implícita.')">D) undefined sólo se usa para objetos y null para funciones.</button>
+                </div>
+                <div class="quiz-feedback" id="fb3"></div>
+            </div>
+
+            <!-- PREGUNTA 4 -->
+            <div class="quiz-card" id="q4">
+                <div class="quiz-question">4. ¿Por qué NO se recomienda usar <code>var</code> en el desarrollo con JavaScript moderno?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! var es compatible en todos los navegadores.')">A) Porque var ya fue eliminado totalmente de los navegadores</button>
+                    <button class="option-btn" onclick="checkAnswer(4, true, this, '¡Exacto! Su alcance de función y hoisting pueden causar errores sutiles de sobrescritura de variables.')">B) Porque no respeta el alcance de bloque (block scope) y sufre de re-declaraciones ambiguas</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! var sí permite números.')">C) Porque solo permite guardar texto y no números</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! Su rendimiento es equivalente.')">D) Porque es 100 veces más lento que let y const</button>
+                </div>
+                <div class="quiz-feedback" id="fb4"></div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>Programación II • Universidad Nacional de Entre Ríos (UNER)</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Recuerda: Abre la consola real del navegador presionado <code>F12</code> o <code>Ctrl + Shift + I</code> para seguir practicando.</p>
+        </footer>
+    </div>
+
+    <!-- SCRIPT DE FUNCIONALIDADES E INTERACTIVIDAD -->
     <script>
-        function ejecutarEjemplo() {
+        // LOG CONSOLE INTERACTIVA
+        const consoleEl = document.getElementById("consoleOutput");
+
+        function logToScreen(message, type = "info") {
+            const line = document.createElement("div");
+            line.className = "console-line";
+            
+            let color = "#e2e8f0";
+            if (type === "error") color = "#f87171";
+            if (type === "success") color = "#4ade80";
+            if (type === "warn") color = "#fb923c";
+
+            line.innerHTML = `<span class="console-prompt">></span> <span style="color: ${color};">${message}</span>`;
+            consoleEl.appendChild(line);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+
+            // También enviamos a la consola real F12 del navegador
+            console.log(`[Unidad 3 Demo]: ${message.replace(/<[^>]*>/g, '')}`);
+        }
+
+        function clearConsole() {
+            consoleEl.innerHTML = `
+                <div class="console-line">
+                    <span class="console-prompt">></span>
+                    <span style="color: #64748b;">Consola limpia.</span>
+                </div>
+            `;
             console.clear();
-            console.log("--- INICIO DEL EJEMPLO ---");
+        }
 
-            // 1. Declaración
-            let nombre = "Juan"; // String
-            const edad = 25;     // Number
-            let esEstudiante = true; // Boolean
+        // DEMOS INTERACTIVAS
+        function runDemo1() {
+            logToScreen("--- DEMO 1: Reasignación y Constantes ---", "warn");
+            let lenguaje = "JavaScript";
+            logToScreen(`let lenguaje = "${lenguaje}"`);
+            
+            lenguaje = "JS ES6+";
+            logToScreen(`Reasignando let: lenguaje = "${lenguaje}"`, "success");
 
-            console.log("Nombre:", nombre, "(Tipo: " + typeof nombre + ")");
-            console.log("Edad:", edad, "(Tipo: " + typeof edad + ")");
-            console.log("¿Es estudiante?", esEstudiante, "(Tipo: " + typeof esEstudiante + ")");
+            const universidad = "UNER";
+            logToScreen(`const universidad = "${universidad}"`);
+            logToScreen(`Intentando: universidad = "Otra"... ❌ Error: Assignment to constant variable.`, "error");
+        }
 
-            // 2. Modificación
-            console.log("--- Modificando variables ---");
-            nombre = "Carlos"; // Se puede cambiar porque es let
-            // edad = 30; // ESTO DARÍA ERROR porque es const
-            console.log("Nuevo nombre:", nombre);
+        function runDemo2() {
+            logToScreen("--- DEMO 2: Operador typeof ---", "warn");
+            
+            const datos = [
+                { val: "Hola Mundo", desc: '"Hola Mundo"' },
+                { val: 2026, desc: '2026' },
+                { val: true, desc: 'true' },
+                { val: undefined, desc: 'undefined' },
+                { val: null, desc: 'null' },
+                { val: 100n, desc: '100n' }
+            ];
 
-            // 3. Tipos especiales
-            let variableVacia;
-            console.log("Variable sin definir:", variableVacia); // undefined
+            datos.forEach(d => {
+                const tipo = typeof d.val;
+                logToScreen(`typeof ${d.desc} === <b style="color: #c084fc;">"${tipo}"</b>`);
+            });
+        }
 
-            let variableNula = null;
-            console.log("Variable nula:", variableNula); // null
+        function runDemo3() {
+            logToScreen("--- DEMO 3: Undefined vs Null ---", "warn");
+            
+            let sinInicializar;
+            logToScreen(`let sinInicializar; -> valor: <b>${sinInicializar}</b> (typeof: ${typeof sinInicializar})`);
 
-            // Mostrar en pantalla también para feedback visual
-            const output = document.getElementById("output");
-            output.style.display = "block";
-            output.textContent =
-                `Revisa la consola (F12) para más detalles.
+            let respuestaFormulario = null;
+            logToScreen(`let respuestaFormulario = null; -> valor: <b>${respuestaFormulario}</b> (typeof: ${typeof respuestaFormulario})`);
+            
+            logToScreen(`Comparación laxa (==): null == undefined -> <b>${null == undefined}</b>`, "success");
+            logToScreen(`Comparación estricta (===): null === undefined -> <b>${null === undefined}</b>`, "error");
+        }
 
-Nombre: ${nombre}
-Edad: ${edad}
-Estudiante: ${esEstudiante}`;
+        // QUIZ LOGIC
+        let score = 0;
+        const answeredQuestions = new Set();
 
-            console.log("--- FIN DEL EJEMPLO ---");
+        function checkAnswer(questionNum, isCorrect, btnElement, feedbackText) {
+            if (answeredQuestions.has(questionNum)) return; // Evitar responder dos veces
+
+            const card = document.getElementById(`q${questionNum}`);
+            const buttons = card.querySelectorAll(".option-btn");
+            const feedbackEl = document.getElementById(`fb${questionNum}`);
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                btnElement.classList.add("correct");
+                feedbackEl.className = "quiz-feedback show success";
+                feedbackEl.innerHTML = `✅ <b>¡Correcto!</b> ${feedbackText}`;
+                score++;
+            } else {
+                btnElement.classList.add("incorrect");
+                feedbackEl.className = "quiz-feedback show error";
+                feedbackEl.innerHTML = `❌ ${feedbackText}`;
+            }
+
+            answeredQuestions.add(questionNum);
+            document.getElementById("scoreBoard").innerText = `Puntos: ${score} / 4`;
         }
     </script>
 </body>
