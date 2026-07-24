@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidad 3: JS - Manejo del DOM</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --bg-console: #090d16;
+            --accent-js: #f7df1e;
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --accent-pink: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        /* HEADER MOBILE FIRST */
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            body { padding: 24px; }
+            header { padding: 32px; margin-bottom: 35px; }
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background: radial-gradient(circle, rgba(192, 132, 252, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(192, 132, 252, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 2.3rem; }
+        }
+
+        h1 span.logo-js {
+            background: var(--accent-js);
+            color: #000;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 1.5rem;
+        }
+
+        /* BANNER DE ORDEN DE EJECUCIÓN */
+        .lifecycle-banner {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.12), rgba(56, 189, 248, 0.08));
+            border: 1px solid rgba(192, 132, 252, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .lifecycle-title {
+            color: var(--accent-purple);
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .pipeline-steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        @media (min-width: 768px) {
+            .pipeline-steps { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .step-box {
+            background: var(--bg-console);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            position: relative;
+        }
+
+        .step-num {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        .step-box.highlight {
+            border-color: var(--accent-purple);
+            background: rgba(192, 132, 252, 0.1);
+        }
+
+        .step-box.highlight .step-num {
+            color: var(--accent-purple);
+            background: rgba(192, 132, 252, 0.25);
+        }
+
+        /* SECTION TITLES */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 35px 0 18px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title.seleccion { color: var(--accent-purple); }
+        .section-title.contenido { color: var(--accent-blue); }
+        .section-title.estilos { color: var(--accent-green); }
+        .section-title.sandbox { color: var(--accent-orange); }
+        .section-title.desafios { color: var(--accent-pink); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.18rem;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.86rem;
+            color: #e2e8f0;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .code-block .keyword { color: #f472b6; }
+        .code-block .string { color: #4ade80; }
+        .code-block .number { color: #fb923c; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+
+        /* TABLA COMPARATIVA RESPONSIVE */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 15px 0;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+            background: var(--bg-card);
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--accent-purple);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        td code {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-blue);
+        }
+
+        /* SANDBOX INTERACTIVO */
+        .sandbox-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .sandbox-stage {
+            background: var(--bg-console);
+            border: 2px dashed rgba(251, 146, 60, 0.4);
+            border-radius: 12px;
+            padding: 30px 20px;
+            min-height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 18px 0;
+            transition: all 0.3s ease;
+        }
+
+        .target-element {
+            background: rgba(56, 189, 248, 0.15);
+            border: 2px solid var(--accent-blue);
+            color: var(--text-main);
+            padding: 18px 24px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+        .target-element.custom-glow {
+            box-shadow: 0 0 20px var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .target-element.dark-style {
+            background: #000 !important;
+            color: var(--accent-green) !important;
+            border-color: var(--accent-green) !important;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            background: var(--bg-console);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .btn {
+            background: var(--accent-purple);
+            color: #0f172a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-blue { background: var(--accent-blue); color: #0f172a; }
+        .btn-green { background: var(--accent-green); color: #0f172a; }
+        .btn-orange { background: var(--accent-orange); color: #0f172a; }
+        .btn-red { background: var(--accent-red); color: white; }
+
+        .res-box {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: rgba(192, 132, 252, 0.1);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            color: var(--accent-purple);
+            width: 100%;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+
+        /* CHALLENGES */
+        .challenge-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .challenge-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .level-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .lvl-1 { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+        .lvl-2 { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title { font-size: 1.1rem; font-weight: 700; }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .modal-body { padding: 20px; }
+
+        .modal-code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.86rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 320px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        /* QUIZ */
+        .quiz-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .score-board {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--accent-js);
+        }
+
+        .quiz-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .quiz-question {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .option-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-purple);
+            background: var(--bg-card-hover);
+        }
+
+        .option-btn.correct {
+            background: rgba(74, 222, 128, 0.2) !important;
+            border-color: var(--accent-green) !important;
+            color: var(--accent-green) !important;
+            font-weight: 600;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(248, 113, 113, 0.2) !important;
+            border-color: var(--accent-red) !important;
+            color: var(--accent-red) !important;
+        }
+
+        .quiz-feedback {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+        .quiz-feedback.error {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 45px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.88rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="badge">Programación II • Unidad 3</div>
+            <h1><span class="logo-js">JS</span> Manejo del DOM (Selección, Texto y Estilos)</h1>
+            <p>Aprende a conectar JavaScript con el HTML de tu página: busca elementos, modifica sus textos y cambia sus estilos dinámicamente.</p>
+        </header>
+
+        <!-- BANNER DE CICLO DE VIDA Y ORDEN DE EJECUCIÓN -->
+        <div class="lifecycle-banner">
+            <div class="lifecycle-title">
+                <span>⚙️ Ciclo de Vida y Orden de Ejecución: ¿Cuál entra en acción al final?</span>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-main);">
+                Cuando el navegador abre una página web, no carga todo de golpe. Sigue un pipeline secuencial estricto para procesar la información:
+            </p>
+
+            <div class="pipeline-steps">
+                <div class="step-box">
+                    <span class="step-num">1. HTML Parsing</span>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Lee la estructura HTML y construye el árbol de nodos en memoria conocido como <strong>DOM (Document Object Model)</strong>.
+                    </p>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-num">2. CSS Render Tree</span>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Descarga las reglas CSS, calcula la especificidad y pinta el layout visual (Render Tree) en la pantalla.
+                    </p>
+                </div>
+
+                <div class="step-box highlight">
+                    <span class="step-num">3. JavaScript (Último) 🔥</span>
+                    <p style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;">
+                        <strong>¡JavaScript es el ÚLTIMO en actuar!</strong> Se ejecuta al final para alterar el DOM y los estilos dinámicamente según las acciones del usuario.
+                    </p>
+                </div>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+                ⚠️ <strong>Problema Común (Script en Header):</strong> Si ejecutas <code>document.getElementById("miBoton")</code> en un <code>&lt;script&gt;</code> ubicado en la etiqueta <code>&lt;head&gt;</code> sin diferir, JS intentará buscar el elemento <em>antes</em> de que el HTML haya sido leído, resultando en un error de puntero nulo (<code>Cannot read properties of null</code>).<br>
+                💡 <strong>Solución:</strong> Ubica el script antes del cierre de <code>&lt;/body&gt;</code>, usa el atributo <code>defer</code> o escucha el evento <code>DOMContentLoaded</code>.
+            </p>
+        </div>
+
+        <!-- SECCIÓN 1: SELECCIÓN DE ELEMENTOS -->
+        <h2 class="section-title seleccion">🔍 1. Selección de Elementos en el DOM</h2>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">
+            Para modificar un elemento con JavaScript, primero debes encontrarlo en el árbol del DOM.
+        </p>
+
+        <!-- TABLA COMPARATIVA RESPONSIVE -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método de Selección</th>
+                        <th>Sintaxis de Búsqueda</th>
+                        <th>Tipo de Retorno</th>
+                        <th>Actualización</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>getElementById("id")</code></td>
+                        <td>ID exacto (sin <code>#</code>)</td>
+                        <td><code>Element</code> único (o <code>null</code>)</td>
+                        <td>Estática / Única</td>
+                    </tr>
+                    <tr>
+                        <td><code>querySelector("selector")</code></td>
+                        <td>Selector CSS (<code>#id</code>, <code>.clase</code>, <code>tag</code>)</td>
+                        <td>Primer <code>Element</code> coincidente</td>
+                        <td>Estática / Única</td>
+                    </tr>
+                    <tr>
+                        <td><code>querySelectorAll("selector")</code></td>
+                        <td>Selector CSS completo</td>
+                        <td><code>NodeList</code> (soporta <code>.forEach</code>)</td>
+                        <td>Colección Estática</td>
+                    </tr>
+                    <tr>
+                        <td><code>getElementsByClassName("clase")</code></td>
+                        <td>Nombre de clase (sin <code>.</code>)</td>
+                        <td><code>HTMLCollection</code></td>
+                        <td>Colección En Vivo (Live)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- DEMO SELECCIÓN INTERACTIVA -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title" style="color: var(--accent-purple);">⚡ Probador en Vivo de Métodos de Selección</span>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                Prueba cómo operan los distintos métodos seleccionando nodos de prueba en pantalla:
+            </p>
+            <div class="form-row">
+                <select id="selectMetodoPrueba">
+                    <option value="getElementById">getElementById("demo-box")</option>
+                    <option value="querySelector">querySelector(".demo-item")</option>
+                    <option value="querySelectorAll">querySelectorAll(".demo-item")</option>
+                </select>
+                <button class="btn btn-purple" onclick="testSeleccionDOM()">Ejecutar Selección</button>
+            </div>
+
+            <!-- CONTENEDOR DE PRUEBA -->
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <div id="demo-box" class="demo-item" style="background: rgba(192,132,252,0.15); border: 1px dashed var(--accent-purple); padding: 10px 14px; border-radius: 8px;">Nodo #1 (.demo-item / #demo-box)</div>
+                <div class="demo-item" style="background: rgba(56,189,248,0.15); border: 1px dashed var(--accent-blue); padding: 10px 14px; border-radius: 8px;">Nodo #2 (.demo-item)</div>
+            </div>
+            <div class="res-box" id="resSeleccionDOM" style="color: var(--accent-purple); border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.1);">Resultado: Selecciona un método...</div>
+        </div>
+
+        <!-- SECCIÓN 2: TEXTO Y CONTENIDO -->
+        <h2 class="section-title contenido">📝 2. Modificación de Contenido (`innerText` vs `textContent` vs `innerHTML`)</h2>
+
+        <div class="grid-2">
+            <!-- INNERTEXT VS TEXTCONTENT -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-blue);">innerText vs textContent</span>
+                    <span style="font-size: 0.8rem; background: rgba(56,189,248,0.15); color: var(--accent-blue); padding: 2px 8px; border-radius: 4px;">Texto Plano</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    <code>innerText</code> lee únicamente el texto visible respetando los estilos CSS (ignora elementos ocultos). <code>textContent</code> obtiene todo el contenido de texto crudo (más rápido).
+                </p>
+                <div class="code-block">
+                    <span class="keyword">let</span> elem = document.getElementById(<span class="string">"titulo"</span>);<br>
+                    elem.innerText = <span class="string">"Nuevo Título Visible"</span>;<br>
+                    elem.textContent = <span class="string">"Texto Crudo Incluyendo Ocultos"</span>;
+                </div>
+            </div>
+
+            <!-- INNERHTML Y SEGURIDAD XSS -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-red);">innerHTML (y Riesgo XSS)</span>
+                    <span style="font-size: 0.8rem; background: rgba(248,113,113,0.15); color: var(--accent-red); padding: 2px 8px; border-radius: 4px;">Interpretador HTML</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    <code>innerHTML</code> parsea e interpreta etiquetas HTML (como <code>&lt;strong&gt;</code> o <code>&lt;a&gt;</code>).
+                </p>
+                <p style="font-size: 0.85rem; color: var(--accent-red); margin-top: 6px;">
+                    ⚠️ <strong>Alerta XSS:</strong> Nunca asignes valores directo de un usuario a <code>innerHTML</code> sin sanitizar, ya que atacantes podrían inyectar código malicioso (Cross-Site Scripting).
+                </p>
+                <div class="code-block">
+                    elem.innerHTML = <span class="string">"&lt;strong&gt;¡Texto en Negrita!&lt;/strong&gt;"</span>;
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: ESTILOS Y CLASES -->
+        <h2 class="section-title estilos">🎨 3. Manipulación de Estilos y Clases CSS</h2>
+
+        <div class="grid-2">
+            <!-- ESTILOS EN LÍNEA -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-green);">Estilos Directos (`element.style`)</span>
+                    <span style="font-size: 0.8rem; background: rgba(74,222,128,0.15); color: var(--accent-green); padding: 2px 8px; border-radius: 4px;">CamelCase</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Se modifican propiedades CSS convirtiendo guiones a <strong>camelCase</strong> (ej: <code>background-color</code> ➔ <code>backgroundColor</code>).
+                </p>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                    💡 <em>Nota de Especificidad: Los estilos mediante .style aplican como atributo de estilo en línea, teniendo la máxima especificidad (valor 1000).</em>
+                </p>
+                <div class="code-block">
+                    elem.style.backgroundColor = <span class="string">"#38bdf8"</span>;<br>
+                    elem.style.fontSize = <span class="string">"20px"</span>;<br>
+                    elem.style.display = <span class="string">"none"</span>; <span class="comment">// Ocultar</span>
+                </div>
+            </div>
+
+            <!-- CLASSLIST -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-orange);">Administración de Clases (`classList`)</span>
+                    <span style="font-size: 0.8rem; background: rgba(251,146,60,0.15); color: var(--accent-orange); padding: 2px 8px; border-radius: 4px;">Recomendado</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    En lugar de escribir estilos en línea, es mejor práctica alternar clases CSS predefinidas en tus hojas de estilo usando <code>classList</code>.
+                </p>
+                <div class="code-block">
+                    elem.classList.add(<span class="string">"activo"</span>);<br>
+                    elem.classList.remove(<span class="string">"oculto"</span>);<br>
+                    elem.classList.toggle(<span class="string">"modo-oscuro"</span>); <span class="comment">// Alterna</span><br>
+                    <span class="keyword">let</span> tiene = elem.classList.contains(<span class="string">"activo"</span>);
+                </div>
+            </div>
+        </div>
+
+        <!-- SANDBOX INTERACTIVO DE PRUEBAS DEL DOM -->
+        <div class="sandbox-card">
+            <div style="color: var(--accent-orange); font-weight: 700; font-size: 1.3rem; display: flex; align-items: center; gap: 10px;">
+                <span>🛠️ Sandbox / Playground Interactivo del DOM</span>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+                Modifica en tiempo real el elemento de prueba del escenario y observa la instrucción de código JS generada al instante.
+            </p>
+
+            <!-- ESCENARIO DEL SANDBOX -->
+            <div class="sandbox-stage">
+                <div id="sandboxTarget" class="target-element">
+                    ¡Hola! Soy el Elemento Objetivo del Sandbox 👋
+                </div>
+            </div>
+
+            <!-- CONTROLES DEL SANDBOX -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 15px;">
+                <div>
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Modificar Texto / HTML:</label>
+                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                        <input type="text" id="sbInputText" value="¡Texto cambiado desde Sandbox!" style="width: 100%;">
+                    </div>
+                    <div style="display: flex; gap: 6px; margin-top: 6px;">
+                        <button class="btn btn-purple" onclick="sbChangeText()">innerText</button>
+                        <button class="btn btn-blue" onclick="sbChangeHTML()">innerHTML</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Estilos Directos (.style):</label>
+                    <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                        <button class="btn btn-green" onclick="sbSetColor('#4ade80')">Fondo Verde</button>
+                        <button class="btn btn-blue" onclick="sbSetColor('#38bdf8')">Fondo Azul</button>
+                        <button class="btn btn-orange" onclick="sbSetColor('#fb923c')">Fondo Naranja</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.85rem; color: var(--text-muted);">Clases CSS (.classList):</label>
+                    <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                        <button class="btn btn-purple" onclick="sbToggleGlow()">Toggle Glow Class</button>
+                        <button class="btn btn-red" onclick="sbToggleDarkMode()">Toggle Dark Style</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MINI CONSOLA CON CÓDIGO JS GENERADO -->
+            <div class="res-box" id="sbCodeConsole" style="margin-top: 18px; color: var(--accent-orange); border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.1);">
+                // Código JS ejecutado: Haz clic en cualquiera de los botones de control de arriba...
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: DESAFÍOS PRÁCTICOS DE CÓDIGO -->
+        <h2 class="section-title desafios">🏆 4. Desafíos Prácticos de Código (Nivel 1 al 2)</h2>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">
+            Aprende a resolver estos ejercicios de manipulación del DOM mediante código puro ejecutable directamente en la consola (<code>F12</code>).
+        </p>
+
+        <div class="challenge-container">
+            <!-- EJERCICIO 1 -->
+            <div class="challenge-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="font-size: 1.12rem;">Ejercicio 1: Tarjeta de Perfil Dinámica (Texto y Clases)</h3>
+                    <span class="level-badge lvl-1">🟢 Fácil</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+                    <strong>Enunciado:</strong> Dado un fragmento de HTML con una tarjeta de usuario, selecciona mediante <code>document.querySelector</code> el nombre para cambiarlo a <code>"Carlos Gómez"</code>, modifica el estado de <code>"Desconectado ❌"</code> a <code>"En Línea ✅"</code> y aplica una clase de resplandor <code>active-glow</code>.
+                </p>
+                <div class="interactive-tool" style="margin-top:0;">
+                    <button class="btn btn-green" onclick="abrirModalDesafio(1)">💻 Ver Código para Consola</button>
+                </div>
+            </div>
+
+            <!-- EJERCICIO 2 -->
+            <div class="challenge-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="font-size: 1.12rem;">Ejercicio 2: Cambiador de Tema Dinámico (Modo Oscuro / Claro)</h3>
+                    <span class="level-badge lvl-2">🔵 Fácil - Medio</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+                    <strong>Enunciado:</strong> Modifica dinámicamente mediante JavaScript los estilos en cascada del documento: alterna el color de fondo del cuerpo (<code>document.body.style.backgroundColor</code>), ajusta los colores de texto principales y aplica una clase <code>dark-theme</code>.
+                </p>
+                <div class="interactive-tool" style="margin-top:0;">
+                    <button class="btn btn-blue" onclick="abrirModalDesafio(2)">💻 Ver Código para Consola</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ FINAL DE MEMORIZACIÓN -->
+        <div class="quiz-section">
+            <div class="quiz-header">
+                <div>
+                    <h2 style="font-size: 1.35rem;">🎯 Cuestionario Final de Repaso</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem;">Verifica tus conocimientos sobre el DOM antes de continuar.</p>
+                </div>
+                <div class="score-board" id="scoreBoard">Puntos: 0 / 5</div>
+            </div>
+
+            <!-- PREGUNTA 1 -->
+            <div class="quiz-card" id="q1">
+                <div class="quiz-question">1. En el ciclo de vida de renderizado de una página web, ¿cuál de las siguientes tecnologías es la ÚLTIMA en entrar en acción?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! El HTML se parsea al inicio para formar el DOM.')">A) El parser HTML</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! El CSS se procesa en segundo lugar para formar el Render Tree.')">B) Las reglas de estilos CSS</button>
+                    <button class="option-btn" onclick="checkAnswer(1, true, this, '¡Correcto! JavaScript se ejecuta al final para manipular el árbol de nodos ya generado.')">C) JavaScript</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! Las imágenes se cargan en paralelo.')">D) Las imágenes multimedia</button>
+                </div>
+                <div class="quiz-feedback" id="fb1"></div>
+            </div>
+
+            <!-- PREGUNTA 2 -->
+            <div class="quiz-card" id="q2">
+                <div class="quiz-question">2. ¿Qué diferencia principal existe entre el método <code>querySelector()</code> y <code>querySelectorAll()</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! Ambos aceptan selectores CSS.')">A) querySelector solo acepta IDs y querySelectorAll solo acepta Clases</button>
+                    <button class="option-btn" onclick="checkAnswer(2, true, this, '¡Excelente! querySelector retorna solo el primer elemento coincidente, mientras que querySelectorAll retorna un NodeList con todos los coincidentes.')">B) querySelector retorna el primer elemento coincidente; querySelectorAll retorna un NodeList con todos los coincidentes</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! querySelectorAll sí existe en JS.')">C) querySelectorAll no existe en JavaScript</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! Ambos métodos son estándar.')">D) querySelector se ejecuta en el servidor y querySelectorAll en el cliente</button>
+                </div>
+                <div class="quiz-feedback" id="fb2"></div>
+            </div>
+
+            <!-- PREGUNTA 3 -->
+            <div class="quiz-card" id="q3">
+                <div class="quiz-question">3. ¿Qué propiedad debemos utilizar si deseamos modificar el contenido e interpretar etiquetas HTML como <code>&lt;strong&gt;</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! innerText sólo asigna texto plano.')">A) innerText</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! textContent asigna texto crudo sin interpretar HTML.')">B) textContent</button>
+                    <button class="option-btn" onclick="checkAnswer(3, true, this, '¡Correcto! innerHTML interpreta y convierte strings con marcado HTML en nodos reales del DOM.')">C) innerHTML</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! style.html no existe.')">D) style.html</button>
+                </div>
+                <div class="quiz-feedback" id="fb3"></div>
+            </div>
+
+            <!-- PREGUNTA 4 -->
+            <div class="quiz-card" id="q4">
+                <div class="quiz-question">4. ¿Cómo se debe escribir en JavaScript la propiedad CSS <code>background-color</code> al modificar <code>element.style</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! En JS los guiones no están permitidos en identificadores de propiedad.')">A) elem.style.background-color</button>
+                    <button class="option-btn" onclick="checkAnswer(4, true, this, '¡Muy bien! Las propiedades CSS con guión se escriben en regla camelCase (backgroundColor).')">B) elem.style.backgroundColor</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! La sintaxis no lleva mayúscula inicial.')">C) elem.style.BackgroundColor</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! No se usa guión bajo.')">D) elem.style.background_color</button>
+                </div>
+                <div class="quiz-feedback" id="fb4"></div>
+            </div>
+
+            <!-- PREGUNTA 5 -->
+            <div class="quiz-card" id="q5">
+                <div class="quiz-question">5. ¿Qué ventaja ofrece usar <code>element.classList.toggle("clase")</code>?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! toggle borra y agrega dinámicamente.')">A) Borra permanentemente todas las clases del elemento</button>
+                    <button class="option-btn" onclick="checkAnswer(5, true, this, '¡Exacto! toggle agrega la clase si no existe, o la remueve si ya está presente.')">B) Agrega la clase si no está presente, o la remueve si ya existe</button>
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! No duplica elementos.')">C) Duplica el elemento en el DOM</button>
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! No altera el texto del elemento.')">D) Convierte el texto a mayúsculas</button>
+                </div>
+                <div class="quiz-feedback" id="fb5"></div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>Programación II • Universidad Nacional de Entre Ríos (UNER)</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Recuerda probar tus propios ejercicios en la consola del navegador con <code>F12</code>.</p>
+        </footer>
+    </div>
+
+    <!-- MODAL DE CÓDIGO CONSOLA -->
+    <div class="modal-overlay" id="modalCodigoOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Título del Desafío</div>
+                <button class="modal-close-btn" onclick="cerrarModal()" title="Cerrar modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-instruction" id="modalExplicacion">
+                    Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), pega el siguiente código y presiona <code>Enter</code>:
+                </p>
+                <div class="modal-code-wrapper" style="margin-top: 10px;">
+                    <pre class="modal-code-block" id="modalCodeBlock"></pre>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 12px;">
+                    💡 <em>Nota: Este código se ejecuta directamente en la consola de JavaScript para modificar la página.</em>
+                </p>
+                <div class="modal-footer">
+                    <button class="btn btn-copy" id="btnCopyCode" onclick="copiarCodigoModal()">📋 Copiar Código</button>
+                    <button class="btn" style="background: var(--accent-green); color: #0f172a;" onclick="ejecutarEnConsolaModal()">▶ Probar en Consola</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA INTERACTIVA -->
+    <script>
+        // PROBADOR SELECCIÓN DOM
+        function testSeleccionDOM() {
+            const metodo = document.getElementById("selectMetodoPrueba").value;
+            let res = "";
+
+            if (metodo === "getElementById") {
+                const elem = document.getElementById("demo-box");
+                res = `getElementById("demo-box") -> Retornó 1 Element:\n<div id="demo-box">${elem.innerText}</div>`;
+            } else if (metodo === "querySelector") {
+                const elem = document.querySelector(".demo-item");
+                res = `querySelector(".demo-item") -> Retornó el PRIMER Element coincidido:\nTexto: "${elem.innerText}"`;
+            } else if (metodo === "querySelectorAll") {
+                const nodos = document.querySelectorAll(".demo-item");
+                res = `querySelectorAll(".demo-item") -> Retornó NodeList con ${nodos.length} elementos:\n1. ${nodos[0].innerText}\n2. ${nodos[1].innerText}`;
+            }
+
+            document.getElementById("resSeleccionDOM").innerText = res;
+        }
+
+        // SANDBOX LOGIC
+        const sbTarget = document.getElementById("sandboxTarget");
+        const sbCodeConsole = document.getElementById("sbCodeConsole");
+
+        function sbChangeText() {
+            const txt = document.getElementById("sbInputText").value || "Texto de Sandbox";
+            sbTarget.innerText = txt;
+            sbCodeConsole.innerText = `let elem = document.getElementById("sandboxTarget");\nelem.innerText = "${txt}";`;
+        }
+
+        function sbChangeHTML() {
+            const txt = document.getElementById("sbInputText").value || "Texto";
+            sbTarget.innerHTML = `<strong>${txt}</strong> (HTML Interpretado 🔥)`;
+            sbCodeConsole.innerText = `let elem = document.getElementById("sandboxTarget");\nelem.innerHTML = "<strong>${txt}</strong> (HTML Interpretado 🔥)";`;
+        }
+
+        function sbSetColor(colorHex) {
+            sbTarget.style.backgroundColor = colorHex;
+            sbCodeConsole.innerText = `let elem = document.getElementById("sandboxTarget");\nelem.style.backgroundColor = "${colorHex}"; // Estilo en línea (especificidad 1000)`;
+        }
+
+        function sbToggleGlow() {
+            sbTarget.classList.toggle("custom-glow");
+            const hasClass = sbTarget.classList.contains("custom-glow");
+            sbCodeConsole.innerText = `let elem = document.getElementById("sandboxTarget");\nelem.classList.toggle("custom-glow"); // Estado actual de la clase: ${hasClass}`;
+        }
+
+        function sbToggleDarkMode() {
+            sbTarget.classList.toggle("dark-style");
+            const hasClass = sbTarget.classList.contains("dark-style");
+            sbCodeConsole.innerText = `let elem = document.getElementById("sandboxTarget");\nelem.classList.toggle("dark-style"); // Estado actual de la clase: ${hasClass}`;
+        }
+
+        // MODAL Y DESAFÍOS
+        const solucionesDesafios = {
+            1: {
+                titulo: "Ejercicio 1: Tarjeta de Perfil Dinámica (Texto y Clases)",
+                explicacion: "Abre la consola con <code>F12</code>, copia el siguiente código y presiona <code>Enter</code>:",
+                codigo: `// Ejercicio 1: Modificar Tarjeta de Perfil Dinámica
+// 1. Seleccionar el elemento del nombre y cambiar su contenido
+let nombreUsuario = document.querySelector(".target-element");
+if (nombreUsuario) {
+    nombreUsuario.innerText = "Usuario: Carlos Gómez";
+}
+
+// 2. Modificar estilos y alternar clase de estado en línea
+nombreUsuario.style.backgroundColor = "rgba(74, 222, 128, 0.2)";
+nombreUsuario.style.borderColor = "#4ade80";
+nombreUsuario.style.color = "#4ade80";
+
+console.log("¡Tarjeta de perfil actualizada a En Línea con éxito! ✅");`
+            },
+            2: {
+                titulo: "Ejercicio 2: Cambiador de Tema Dinámico (Modo Oscuro / Claro)",
+                explicacion: "Abre la consola con <code>F12</code>, copia el siguiente código y presiona <code>Enter</code>:",
+                codigo: `// Ejercicio 2: Cambiador de Tema Dinámico (Fondo y Estilos)
+// 1. Modificar directamente el estilo de fondo del cuerpo del documento
+let body = document.body;
+
+if (body.style.backgroundColor === "rgb(15, 23, 42)" || body.style.backgroundColor === "" || !body.style.backgroundColor) {
+    body.style.backgroundColor = "#020617"; // Fondo aún más oscuro
+    console.log("Modo Ultra Oscuro Activado 🌙");
+} else {
+    body.style.backgroundColor = "#0f172a";
+    console.log("Modo Oscuro Estándar Restablecido ☀️");
+}
+
+// 2. Modificar el título principal
+let titulo = document.querySelector("h1");
+if (titulo) {
+    titulo.style.color = "#c084fc"; // Cambiar a acento morado
+}`
+            }
+        };
+
+        let codigoActualModal = "";
+
+        function abrirModalDesafio(nivel) {
+            const data = solucionesDesafios[nivel];
+            if (!data) return;
+
+            document.getElementById("modalTitle").innerText = data.titulo;
+            document.getElementById("modalExplicacion").innerHTML = data.explicacion;
+            document.getElementById("modalCodeBlock").innerText = data.codigo;
+            codigoActualModal = data.codigo;
+
+            const btnCopy = document.getElementById("btnCopyCode");
+            btnCopy.innerText = "📋 Copiar Código";
+
+            const overlay = document.getElementById("modalCodigoOverlay");
+            overlay.classList.add("active");
+        }
+
+        function cerrarModal() {
+            const overlay = document.getElementById("modalCodigoOverlay");
+            overlay.classList.remove("active");
+        }
+
+        function copiarCodigoModal() {
+            navigator.clipboard.writeText(codigoActualModal).then(() => {
+                const btn = document.getElementById("btnCopyCode");
+                btn.innerText = "✅ ¡Copiado!";
+                setTimeout(() => {
+                    btn.innerText = "📋 Copiar Código";
+                }, 2000);
+            }).catch(err => {
+                console.error("Error al copiar código: ", err);
+            });
+        }
+
+        function ejecutarEnConsolaModal() {
+            console.clear();
+            console.log("%c=== EJECUTANDO MODIFICACIÓN DEL DOM ===", "color: #c084fc; font-weight: bold; font-size: 14px;");
+            try {
+                new Function(codigoActualModal)();
+            } catch(e) {
+                console.error("Error en ejecución: ", e);
+            }
+            console.log("%c========================================", "color: #c084fc; font-weight: bold;");
+            alert("¡Código ejecutado! Presiona F12 y abre la pestaña 'Consola' para ver la confirmación.");
+        }
+
+        // QUIZ LOGIC
+        let score = 0;
+        const answeredQuestions = new Set();
+
+        function checkAnswer(questionNum, isCorrect, btnElement, feedbackText) {
+            if (answeredQuestions.has(questionNum)) return;
+
+            const card = document.getElementById(`q${questionNum}`);
+            const buttons = card.querySelectorAll(".option-btn");
+            const feedbackEl = document.getElementById(`fb${questionNum}`);
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                btnElement.classList.add("correct");
+                feedbackEl.className = "quiz-feedback show success";
+                feedbackEl.innerHTML = `✅ <b>¡Correcto!</b> ${feedbackText}`;
+                score++;
+            } else {
+                btnElement.classList.add("incorrect");
+                feedbackEl.className = "quiz-feedback show error";
+                feedbackEl.innerHTML = `❌ ${feedbackText}`;
+            }
+
+            answeredQuestions.add(questionNum);
+            document.getElementById("scoreBoard").innerText = `Puntos: ${score} / 5`;
+        }
+
+        // INICIALIZACIÓN
+        document.addEventListener("DOMContentLoaded", () => {
+            const overlay = document.getElementById("modalCodigoOverlay");
+            if (overlay) {
+                overlay.addEventListener("click", (e) => {
+                    if (e.target === overlay) cerrarModal();
+                });
+            }
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") cerrarModal();
+            });
+        });
+    </script>
+</body>
+
+</html>

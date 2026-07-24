@@ -420,6 +420,139 @@
             border-top: 1px solid var(--border);
             font-size: 0.9rem;
         }
+
+        /* MODAL PARA CÓDIGO DE CONSOLA */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(9, 13, 22, 0.8);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 650px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-instruction {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .modal-instruction code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-blue);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .modal-code-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .modal-code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 320px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-copy {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-copy:hover {
+            background: rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-run-console {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-run-console:hover {
+            background: rgba(74, 222, 128, 0.3);
+        }
     </style>
 </head>
 
@@ -582,7 +715,7 @@
         <!-- SECCIÓN 3: DESAFÍOS PROGRESIVOS -->
         <h2 class="section-title desafios">🏆 3. Desafíos Progresivos de Código (Nivel 1 al 5)</h2>
         <p style="color: var(--text-muted); margin-bottom: 15px;">
-            Pon a prueba tu lógica resolviendo estos desafíos de dificultad creciente que aplican todo lo aprendido.
+            En esta sección aprenderás a resolver problemas mediante código directo ejecutable en la consola del navegador (<code>F12</code>), sin depender de formularios o entradas del DOM. Haz clic en el botón de cada desafío para ver la solución en código puro.
         </p>
 
         <div class="challenge-container">
@@ -592,15 +725,11 @@
                     <h3 style="font-size: 1.15rem;">Nivel 1: Verificador de Entrada al Cine</h3>
                     <span class="level-badge lvl-1">🟢 Fácil</span>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
                     <strong>Enunciado:</strong> Si la persona tiene 18 años o más, la entrada vale $1000. Si tiene entre 12 y 17 años, vale $700. Si es menor de 12, entra gratis ($0).
                 </p>
                 <div class="interactive-tool" style="margin-top:0;">
-                    <div class="form-row">
-                        <input type="number" id="desafíoEdad" placeholder="Edad del espectador" value="15" style="width: 160px;">
-                        <button class="btn btn-green" onclick="resolverDesafío1()">Calcular Precio Ticket</button>
-                    </div>
-                    <div class="res-box" id="resDesafío1" style="color: var(--accent-green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.1);">Respuesta: Haz clic en el botón...</div>
+                    <button class="btn btn-green" onclick="abrirModalDesafio(1)">💻 Ver Código para Consola</button>
                 </div>
             </div>
 
@@ -610,21 +739,11 @@
                     <h3 style="font-size: 1.15rem;">Nivel 2: Descuento por Categoría de Cliente (Switch)</h3>
                     <span class="level-badge lvl-2">🔵 Fácil - Medio</span>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
                     <strong>Enunciado:</strong> Usa un <code>switch</code> para determinar el descuento: "ESTUDIANTE" (20%), "SOCIO" (30%), "JUBILADO" (50%), otros (0%).
                 </p>
                 <div class="interactive-tool" style="margin-top:0;">
-                    <div class="form-row">
-                        <input type="number" id="desafíoMonto" placeholder="Monto base ($)" value="1000" style="width: 140px;">
-                        <select id="desafíoRol">
-                            <option value="ESTUDIANTE">Estudiante (-20%)</option>
-                            <option value="SOCIO">Socio (-30%)</option>
-                            <option value="JUBILADO">Jubilado (-50%)</option>
-                            <option value="GENERAL">General (Sin desc)</option>
-                        </select>
-                        <button class="btn" onclick="resolverDesafío2()">Aplicar Descuento</button>
-                    </div>
-                    <div class="res-box" id="resDesafío2">Respuesta: Haz clic en el botón...</div>
+                    <button class="btn" style="background: var(--accent-blue); color: #0f172a;" onclick="abrirModalDesafio(2)">💻 Ver Código para Consola</button>
                 </div>
             </div>
 
@@ -634,15 +753,11 @@
                     <h3 style="font-size: 1.15rem;">Nivel 3: Simulador de Carga de Batería (While)</h3>
                     <span class="level-badge lvl-3">🟣 Medio</span>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
                     <strong>Enunciado:</strong> Partiendo de un % de carga inicial, simula una carga rápida en bucle <code>while</code> aumentando un +25% por segundo hasta llegar al 100%.
                 </p>
                 <div class="interactive-tool" style="margin-top:0;">
-                    <div class="form-row">
-                        <input type="number" id="desafíoBateria" value="20" min="0" max="90" style="width: 140px;" placeholder="% Carga Inicial">
-                        <button class="btn btn-purple" onclick="resolverDesafío3()">Simular Carga</button>
-                    </div>
-                    <div class="res-box" id="resDesafío3" style="color: var(--accent-purple); border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.1);">Respuesta: Haz clic en el botón...</div>
+                    <button class="btn btn-purple" onclick="abrirModalDesafio(3)">💻 Ver Código para Consola</button>
                 </div>
             </div>
 
@@ -652,15 +767,11 @@
                     <h3 style="font-size: 1.15rem;">Nivel 4: Filtro de Números Pares en Tabla de Multiplicar (For + If)</h3>
                     <span class="level-badge lvl-4">🟠 Intermedio</span>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
                     <strong>Enunciado:</strong> Recorre con un <code>for</code> del 1 al 10 para una tabla de multiplicar dada, pero muestra <strong>únicamente los resultados que sean PARES</strong> (usando <code>resultado % 2 === 0</code>).
                 </p>
                 <div class="interactive-tool" style="margin-top:0;">
-                    <div class="form-row">
-                        <input type="number" id="desafíoTabla" value="7" min="1" max="10" style="width: 120px;" placeholder="Tabla del...">
-                        <button class="btn btn-orange" onclick="resolverDesafío4()">Generar Filtro Pares</button>
-                    </div>
-                    <div class="res-box" id="resDesafío4" style="color: var(--accent-orange); border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.1);">Respuesta: Haz clic en el botón...</div>
+                    <button class="btn btn-orange" onclick="abrirModalDesafio(4)">💻 Ver Código para Consola</button>
                 </div>
             </div>
 
@@ -670,14 +781,11 @@
                     <h3 style="font-size: 1.15rem;">Nivel 5: El Algoritmo Clásico "FizzBuzz"</h3>
                     <span class="level-badge lvl-5">🔴 Avanzado</span>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
                     <strong>Enunciado:</strong> Imprime números del 1 al 15. Si el número es divisible por 3 imprime <code>"Fizz"</code>, si es divisible por 5 imprime <code>"Buzz"</code>, si es divisible por ambos (3 y 5) imprime <code>"FizzBuzz"</code>, y si no, imprime el número.
                 </p>
                 <div class="interactive-tool" style="margin-top:0;">
-                    <div class="form-row">
-                        <button class="btn" style="background: var(--accent-red); color: white;" onclick="resolverDesafío5()">Ejecutar Algoritmo FizzBuzz</button>
-                    </div>
-                    <div class="res-box" id="resDesafío5" style="color: var(--accent-red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.1);">Respuesta: Haz clic en el botón...</div>
+                    <button class="btn" style="background: var(--accent-red); color: white;" onclick="abrirModalDesafio(5)">💻 Ver Código para Consola</button>
                 </div>
             </div>
         </div>
@@ -760,6 +868,31 @@
         </footer>
     </div>
 
+    <!-- MODAL DE CÓDIGO CONSOLA -->
+    <div class="modal-overlay" id="modalCodigoOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Título del Desafío</div>
+                <button class="modal-close-btn" onclick="cerrarModal()" title="Cerrar modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-instruction" id="modalExplicacion">
+                    Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), pega el siguiente código y presiona <code>Enter</code>:
+                </p>
+                <div class="modal-code-wrapper">
+                    <pre class="modal-code-block" id="modalCodeBlock"></pre>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 15px;">
+                    💡 <em>Nota: Este código es autónomo, sin dependencia de elementos de formulario en el HTML. Se ejecuta 100% en la consola de JavaScript.</em>
+                </p>
+                <div class="modal-footer">
+                    <button class="btn btn-copy" id="btnCopyCode" onclick="copiarCodigoModal()">📋 Copiar Código</button>
+                    <button class="btn btn-run-console" onclick="ejecutarEnConsolaModal()">▶ Probar en Consola</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT DE LÓGICA INTERACTIVA -->
     <script>
         // DEMOS SECCIÓN 1 Y 2
@@ -810,95 +943,169 @@
             document.getElementById("resFor").innerText = lineas.join("\n");
         }
 
-        // RESOLUCIÓN DE DESAFÍOS
-        function resolverDesafío1() {
-            const edad = parseInt(document.getElementById("desafíoEdad").value);
-            let precio = 0;
-            if (isNaN(edad) || edad < 0) {
-                document.getElementById("resDesafío1").innerText = "Ingresa una edad válida.";
-                return;
+        // OBJETOS Y FUNCIONALIDAD DE SOLUCIONES EN CONSOLA (MODAL)
+        const solucionesDesafios = {
+            1: {
+                titulo: "Nivel 1: Verificador de Entrada al Cine",
+                explicacion: "Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), copia el código de abajo y presiona <code>Enter</code>:",
+                codigo: `// Nivel 1: Verificador de Entrada al Cine
+let edad = 15; // Cambia este valor para probar distintas edades (ej: 8, 15, 22)
+let precio = 0;
+
+if (edad >= 18) {
+    precio = 1000;
+} else if (edad >= 12) {
+    precio = 700;
+} else {
+    precio = 0;
+}
+
+console.log(\`Edad evaluada: \${edad} años\`);
+console.log(\`Precio del ticket: $\${precio} \${precio === 0 ? "(¡Gratis!)" : ""}\`);`
+            },
+            2: {
+                titulo: "Nivel 2: Descuento por Categoría de Cliente",
+                explicacion: "Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), copia el código de abajo y presiona <code>Enter</code>:",
+                codigo: `// Nivel 2: Descuento por Categoría (Switch)
+let montoBase = 1000;
+let categoria = "SOCIO"; // Opciones: "ESTUDIANTE", "SOCIO", "JUBILADO", "GENERAL"
+let porcentajeDescuento = 0;
+
+switch (categoria) {
+    case "ESTUDIANTE":
+        porcentajeDescuento = 20;
+        break;
+    case "SOCIO":
+        porcentajeDescuento = 30;
+        break;
+    case "JUBILADO":
+        porcentajeDescuento = 50;
+        break;
+    default:
+        porcentajeDescuento = 0;
+        break;
+}
+
+let descuento = (montoBase * porcentajeDescuento) / 100;
+let totalPagar = montoBase - descuento;
+
+console.log(\`Monto Base: $\${montoBase}\`);
+console.log(\`Categoría: \${categoria} (\${porcentajeDescuento}% desc.)\`);
+console.log(\`Total a Pagar: $\${totalPagar}\`);`
+            },
+            3: {
+                titulo: "Nivel 3: Simulador de Carga de Batería",
+                explicacion: "Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), copia el código de abajo y presiona <code>Enter</code>:",
+                codigo: `// Nivel 3: Simulador de Carga de Batería (While)
+let carga = 20; // Porcentaje inicial
+let segundo = 1;
+
+console.log(\`⚡ Estado Inicial de Batería: \${carga}%\`);
+
+while (carga < 100) {
+    carga += 25;
+    if (carga > 100) {
+        carga = 100;
+    }
+    console.log(\`Segundo \${segundo}: Carga al \${carga}%\`);
+    segundo++;
+}
+
+console.log("🔋 ¡Carga completa! Batería al 100%");`
+            },
+            4: {
+                titulo: "Nivel 4: Filtro de Números Pares en Tabla de Multiplicar",
+                explicacion: "Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), copia el código de abajo y presiona <code>Enter</code>:",
+                codigo: `// Nivel 4: Filtro de Números Pares en Tabla de Multiplicar (For + If)
+let tabla = 7; // Número de la tabla
+
+console.log(\`--- Tabla del \${tabla} (Solo Pares) ---\`);
+
+for (let i = 1; i <= 10; i++) {
+    let resultado = tabla * i;
+    if (resultado % 2 === 0) {
+        console.log(\`\${tabla} x \${i} = \${resultado} (Es PAR)\`);
+    }
+}`
+            },
+            5: {
+                titulo: "Nivel 5: El Algoritmo Clásico FizzBuzz",
+                explicacion: "Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), copia el código de abajo y presiona <code>Enter</code>:",
+                codigo: `// Nivel 5: Algoritmo FizzBuzz (1 a 15)
+console.log("--- Ejecutando Algoritmo FizzBuzz ---");
+
+for (let i = 1; i <= 15; i++) {
+    if (i % 3 === 0 && i % 5 === 0) {
+        console.log(\`\${i}: FizzBuzz 🔥\`);
+    } else if (i % 3 === 0) {
+        console.log(\`\${i}: Fizz ⚡\`);
+    } else if (i % 5 === 0) {
+        console.log(\`\${i}: Buzz 🎯\`);
+    } else {
+        console.log(i);
+    }
+}`
             }
-            if (edad >= 18) {
-                precio = 1000;
-            } else if (edad >= 12) {
-                precio = 700;
-            } else {
-                precio = 0;
-            }
-            document.getElementById("resDesafío1").innerText = 
-                `Para edad = ${edad} años: Entrada = $${precio} ${precio === 0 ? "(¡Gratis!)" : ""}`;
+        };
+
+        let codigoActualModal = "";
+
+        function abrirModalDesafio(nivel) {
+            const data = solucionesDesafios[nivel];
+            if (!data) return;
+
+            document.getElementById("modalTitle").innerText = data.titulo;
+            document.getElementById("modalExplicacion").innerHTML = data.explicacion;
+            document.getElementById("modalCodeBlock").innerText = data.codigo;
+            codigoActualModal = data.codigo;
+
+            const btnCopy = document.getElementById("btnCopyCode");
+            btnCopy.innerText = "📋 Copiar Código";
+
+            const overlay = document.getElementById("modalCodigoOverlay");
+            overlay.classList.add("active");
         }
 
-        function resolverDesafío2() {
-            const monto = parseFloat(document.getElementById("desafíoMonto").value) || 1000;
-            const rol = document.getElementById("desafíoRol").value;
-            let descPorcentaje = 0;
-
-            switch (rol) {
-                case "ESTUDIANTE": descPorcentaje = 20; break;
-                case "SOCIO": descPorcentaje = 30; break;
-                case "JUBILADO": descPorcentaje = 50; break;
-                default: descPorcentaje = 0; break;
-            }
-
-            const descuento = (monto * descPorcentaje) / 100;
-            const total = monto - descuento;
-
-            document.getElementById("resDesafío2").innerText = 
-                `Base: $${monto} | Rol: ${rol} (${descPorcentaje}% desc)\nTotal a pagar: $${total}`;
+        function cerrarModal() {
+            const overlay = document.getElementById("modalCodigoOverlay");
+            overlay.classList.remove("active");
         }
 
-        function resolverDesafío3() {
-            let carga = parseInt(document.getElementById("desafíoBateria").value) || 0;
-            if (carga < 0) carga = 0;
-            if (carga >= 100) {
-                document.getElementById("resDesafío3").innerText = "La batería ya está al 100%.";
-                return;
-            }
-
-            let log = [`Carga inicial: ${carga}%`];
-            let segundo = 1;
-
-            while (carga < 100) {
-                carga += 25;
-                if (carga > 100) carga = 100;
-                log.push(`Segundo ${segundo}: Carga al ${carga}%`);
-                segundo++;
-            }
-            log.push("⚡ ¡Batería completamente cargada!");
-            document.getElementById("resDesafío3").innerText = log.join("\n");
+        function copiarCodigoModal() {
+            navigator.clipboard.writeText(codigoActualModal).then(() => {
+                const btn = document.getElementById("btnCopyCode");
+                btn.innerText = "✅ ¡Copiado!";
+                setTimeout(() => {
+                    btn.innerText = "📋 Copiar Código";
+                }, 2000);
+            }).catch(err => {
+                console.error("Error al copiar código: ", err);
+            });
         }
 
-        function resolverDesafío4() {
-            const tabla = parseInt(document.getElementById("desafíoTabla").value) || 7;
-            let pares = [];
-
-            for (let i = 1; i <= 10; i++) {
-                let res = tabla * i;
-                if (res % 2 === 0) {
-                    pares.push(`${tabla} x ${i} = ${res} (Es PAR)`);
-                }
+        function ejecutarEnConsolaModal() {
+            console.clear();
+            console.log("%c=== EJECUTANDO SOLUCIÓN EN CONSOLA ===", "color: #38bdf8; font-weight: bold; font-size: 14px;");
+            try {
+                new Function(codigoActualModal)();
+            } catch(e) {
+                console.error("Error en ejecución: ", e);
             }
-
-            document.getElementById("resDesafío4").innerText = 
-                `Resultados PARES para la tabla del ${tabla}:\n` + pares.join("\n");
+            console.log("%c========================================", "color: #38bdf8; font-weight: bold;");
+            alert("¡Código ejecutado! Presiona F12 y abre la pestaña 'Consola' para ver la salida.");
         }
 
-        function resolverDesafío5() {
-            let resultado = [];
-            for (let i = 1; i <= 15; i++) {
-                if (i % 3 === 0 && i % 5 === 0) {
-                    resultado.push(`${i}: FizzBuzz 🔥`);
-                } else if (i % 3 === 0) {
-                    resultado.push(`${i}: Fizz ⚡`);
-                } else if (i % 5 === 0) {
-                    resultado.push(`${i}: Buzz 🎯`);
-                } else {
-                    resultado.push(`${i}`);
-                }
+        document.addEventListener("DOMContentLoaded", () => {
+            const overlay = document.getElementById("modalCodigoOverlay");
+            if (overlay) {
+                overlay.addEventListener("click", (e) => {
+                    if (e.target === overlay) cerrarModal();
+                });
             }
-            document.getElementById("resDesafío5").innerText = resultado.join(" | ");
-        }
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") cerrarModal();
+            });
+        });
 
         // QUIZ LOGIC
         let score = 0;

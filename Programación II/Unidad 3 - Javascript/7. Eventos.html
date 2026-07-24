@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidad 3: JS - Eventos y Manejo de Interacciones</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --bg-console: #090d16;
+            --accent-js: #f7df1e;
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-red: #f87171;
+            --accent-pink: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        /* HEADER MOBILE FIRST */
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            body { padding: 24px; }
+            header { padding: 32px; margin-bottom: 35px; }
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 2.3rem; }
+        }
+
+        h1 span.logo-js {
+            background: var(--accent-js);
+            color: #000;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 1.5rem;
+        }
+
+        /* BANNER DE COMANDOS MÍNIMOS ESENCIALES */
+        .commands-banner {
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.12), rgba(244, 114, 182, 0.08));
+            border: 1px solid rgba(251, 146, 60, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .commands-title {
+            color: var(--accent-orange);
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .commands-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        @media (min-width: 768px) {
+            .commands-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .command-card {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .command-card code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: var(--accent-green);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* INSPECTOR DE EVENTOS EN VIVO CON TABS */
+        .event-inspector-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 35px;
+            box-shadow: var(--shadow);
+        }
+
+        .inspector-title {
+            color: var(--accent-orange);
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .inspector-tabs-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card-hover);
+            color: var(--accent-orange);
+            border-color: var(--accent-orange);
+            border-bottom-color: transparent;
+        }
+
+        .tab-pane {
+            display: none;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 20px;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .event-stage {
+            background: var(--bg-console);
+            border: 2px dashed rgba(251, 146, 60, 0.35);
+            border-radius: 12px;
+            padding: 25px 15px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .event-stage:hover {
+            border-color: var(--accent-orange);
+            background: rgba(251, 146, 60, 0.05);
+        }
+
+        .mini-console-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(251, 146, 60, 0.2);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.86rem;
+            color: var(--accent-green);
+            margin-top: 14px;
+            white-space: pre-wrap;
+        }
+
+        .mini-console-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* SECTION TITLES */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 35px 0 18px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title.sintaxis { color: var(--accent-orange); }
+        .section-title.objeto-e { color: var(--accent-blue); }
+        .section-title.curiosidades { color: var(--accent-pink); }
+        .section-title.desafios { color: var(--accent-purple); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.18rem;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.86rem;
+            color: #e2e8f0;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .code-block .keyword { color: #f472b6; }
+        .code-block .string { color: #4ade80; }
+        .code-block .number { color: #fb923c; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            background: var(--bg-console);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-orange);
+        }
+
+        .btn {
+            background: var(--accent-orange);
+            color: #0f172a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-purple { background: var(--accent-purple); color: #0f172a; }
+        .btn-green { background: var(--accent-green); color: #0f172a; }
+        .btn-blue { background: var(--accent-blue); color: #0f172a; }
+        .btn-red { background: var(--accent-red); color: white; }
+
+        .res-box {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: rgba(251, 146, 60, 0.1);
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            color: var(--accent-orange);
+            width: 100%;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+
+        /* CURIOSITY CARD */
+        .curiosity-card {
+            background: linear-gradient(135deg, rgba(244, 114, 182, 0.1), rgba(192, 132, 252, 0.05));
+            border: 1px dashed rgba(244, 114, 182, 0.4);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 30px 0;
+        }
+
+        /* CHALLENGES */
+        .challenge-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .challenge-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .level-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .lvl-1 { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); border: 1px solid rgba(74, 222, 128, 0.3); }
+        .lvl-2 { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .lvl-3 { background: rgba(192, 132, 252, 0.2); color: var(--accent-purple); border: 1px solid rgba(192, 132, 252, 0.3); }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title { font-size: 1.1rem; font-weight: 700; }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .modal-body { padding: 20px; }
+
+        .modal-code-block {
+            background: var(--bg-console);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.86rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 320px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        /* QUIZ */
+        .quiz-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 40px;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .score-board {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--accent-js);
+        }
+
+        .quiz-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .quiz-question {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .option-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+        }
+
+        .option-btn.correct {
+            background: rgba(74, 222, 128, 0.2) !important;
+            border-color: var(--accent-green) !important;
+            color: var(--accent-green) !important;
+            font-weight: 600;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(248, 113, 113, 0.2) !important;
+            border-color: var(--accent-red) !important;
+            color: var(--accent-red) !important;
+        }
+
+        .quiz-feedback {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        .quiz-feedback.show { display: block; }
+        .quiz-feedback.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+        .quiz-feedback.error {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 45px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.88rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="badge">Programación II • Unidad 3</div>
+            <h1><span class="logo-js">JS</span> Eventos y Manejo de Interacciones</h1>
+            <p>Los eventos son señales que se emiten en la página (clics, teclas, movimientos de mouse o envío de formularios) y que JavaScript escucha para responder dinámicamente.</p>
+        </header>
+
+        <!-- BANNER DE COMANDOS MÍNIMOS ESENCIALES -->
+        <div class="commands-banner">
+            <div class="commands-title">
+                <span>⚡ Comandos Mínimos Esenciales para el Manejo de Eventos</span>
+            </div>
+            <p style="font-size: 0.92rem; color: var(--text-main);">
+                Para escuchar y responder a cualquier evento en JavaScript sólo necesitas dominar esta pequeña cheatsheet de comandos:
+            </p>
+
+            <div class="commands-grid">
+                <div class="command-card">
+                    <code>elemento.addEventListener("click", callback);</code>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">
+                        Registra un "escuchador" de eventos. Ejecuta la función <code>callback</code> cada vez que el evento ocurre.
+                    </p>
+                </div>
+
+                <div class="command-card">
+                    <code>elemento.removeEventListener("click", funcionRef);</code>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">
+                        Remueve un listener previamente registrado (requiere la misma referencia a la función).
+                    </p>
+                </div>
+
+                <div class="command-card">
+                    <code>e.preventDefault();</code>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">
+                        Cancela la acción nativa por defecto (ej: recargar la página en <code>&lt;form&gt;</code> o navegar en <code>&lt;a&gt;</code>).
+                    </p>
+                </div>
+
+                <div class="command-card">
+                    <code>e.stopPropagation();</code>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">
+                        Detiene la propagación del evento hacia arriba en el árbol DOM (Burbujeo de eventos).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSPECTOR DE EVENTOS EN VIVO CON TABS -->
+        <div class="event-inspector-card">
+            <div class="inspector-title">
+                <span>🔍 Inspector / Playground Gráfico de Eventos en Vivo</span>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">
+                Interactúa con las distintas pestañas para probar cómo reacciona el navegador ante eventos de mouse, teclado, formularios y propagación.
+            </p>
+
+            <!-- NAVEGACIÓN DE TABS DE EVENTOS -->
+            <div class="inspector-tabs-header">
+                <button class="tab-btn active" onclick="switchEventTab('tabMouse', this)">🖱️ Mouse</button>
+                <button class="tab-btn" onclick="switchEventTab('tabTeclado', this)">⌨️ Teclado y Entrada</button>
+                <button class="tab-btn" onclick="switchEventTab('tabFormulario', this)">📄 Formularios</button>
+                <button class="tab-btn" onclick="switchEventTab('tabPropagacion', this)">🛑 Propagación (Burbujeo)</button>
+            </div>
+
+            <!-- TAB MOUSE -->
+            <div class="tab-pane active" id="tabMouse">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Prueba hacer <strong>clic</strong>, <strong>doble clic</strong> o <strong>pasar el mouse</strong> por la zona de pruebas:
+                </p>
+                <div class="event-stage" id="stageMouse">
+                    <span style="font-size: 1.1rem; font-weight: 700; color: var(--accent-orange);" id="txtStageMouse">¡Haz Clic o Pasa el Mouse Por Aquí! 🖱️</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;" id="subStageMouse">Esperando interacción...</span>
+                </div>
+                <div class="mini-console-block">
+                    <div class="mini-console-title">🖥️ Instrucción JS y Evento Capturado:</div>
+                    <code id="codeTabMouse">// Interactúa con el recuadro de arriba para ver el log...</code>
+                </div>
+            </div>
+
+            <!-- TAB TECLADO -->
+            <div class="tab-pane" id="tabTeclado">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Escribe en el campo de texto para capturar eventos <code>input</code>, <code>keydown</code> y <code>keyup</code>:
+                </p>
+                <input type="text" id="inputTecladoStage" placeholder="Tipea algo aquí..." style="width: 100%; padding: 12px; margin-bottom: 10px;">
+                <div class="mini-console-block">
+                    <div class="mini-console-title">🖥️ Instrucción JS y Tecla Capturada:</div>
+                    <code id="codeTabTeclado">// Empieza a tipear para ver e.key y e.target.value...</code>
+                </div>
+            </div>
+
+            <!-- TAB FORMULARIO -->
+            <div class="tab-pane" id="tabFormulario">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Prueba hacer foco (<code>focus</code>) / desenfoque (<code>blur</code>) en los campos o intentar enviar el formulario:
+                </p>
+                <form id="formStageDemo" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="text" id="inputFormNombre" placeholder="Tu Nombre (Prueba focus y blur)" style="padding: 10px;">
+                    <button type="submit" class="btn btn-green" id="btnSubmitStage">Probar Submit (Formulario)</button>
+                </form>
+                <div class="mini-console-block">
+                    <div class="mini-console-title">🖥️ Instrucción JS de Formulario:</div>
+                    <code id="codeTabFormulario">// Haz clic dentro o fuera del input o presiona Submit...</code>
+                </div>
+            </div>
+
+            <!-- TAB PROPAGACIÓN -->
+            <div class="tab-pane" id="tabPropagacion">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Demostración de <strong>Burbujeo (Event Bubbling)</strong>. Al hacer clic en el botón hijo, el evento "sube" hacia el contenedor padre a menos que uses <code>e.stopPropagation()</code>.
+                </p>
+                <div id="propPadreStage" style="background: rgba(192, 132, 252, 0.15); border: 2px dashed var(--accent-purple); padding: 20px; border-radius: 10px; text-align: center;">
+                    <strong style="color: var(--accent-purple);">Contenedor Padre (ID: #propPadre)</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label style="font-size: 0.85rem; color: var(--text-main);">
+                            <input type="checkbox" id="chkStopProp"> Activar <code>e.stopPropagation()</code> en el botón
+                        </label>
+                    </div>
+                    <button class="btn btn-orange" id="btnHijoStage">Botón Hijo (ID: #btnHijo)</button>
+                </div>
+                <div class="mini-console-block">
+                    <div class="mini-console-title">🖥️ Rastro de Registro de Propagación:</div>
+                    <code id="codeTabPropagacion">// Haz clic en el Botón Hijo...</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 1: SINTAXIS Y FORMAS DE ESCUCHAR -->
+        <h2 class="section-title sintaxis">📝 1. Formas de Escuchar Eventos</h2>
+
+        <div class="grid-2">
+            <!-- FORMA OBSOLETA Y LIMITADA -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-red);">1. Atributos HTML y Propiedad JS</span>
+                    <span style="font-size: 0.8rem; background: rgba(248,113,113,0.15); color: var(--accent-red); padding: 2px 8px; border-radius: 4px;">Limitado</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Usar atributos HTML (<code>onclick="..."</code>) o asignar propiedades (<code>elem.onclick = funcion</code>) es una mala práctica pues solo permite 1 función escuchando al mismo tiempo (sobrescribe la anterior).
+                </p>
+                <div class="code-block">
+                    <span class="comment">// ❌ Mala práctica en HTML:</span><br>
+                    &lt;button onclick=<span class="string">"saludar()"</span>&gt;Clic&lt;/button&gt;<br><br>
+                    <span class="comment">// ⚠️ Limitado en JS (sobrescribe el anterior):</span><br>
+                    elem.onclick = <span class="keyword">function</span>() { ... };
+                </div>
+            </div>
+
+            <!-- ADDEVENTLISTENER RECOMENDADO -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-green);">2. addEventListener()</span>
+                    <span style="font-size: 0.8rem; background: rgba(74,222,128,0.15); color: var(--accent-green); padding: 2px 8px; border-radius: 4px;">Estándar</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Es el método profesional recomendado. Permite adjuntar múltiples funciones escuchando el mismo evento sin sobrescribirse y separar la lógica JS del marcado HTML.
+                </p>
+                <div class="code-block">
+                    <span class="keyword">let</span> btn = document.getElementById(<span class="string">"miBtn"</span>);<br>
+                    btn.addEventListener(<span class="string">"click"</span>, <span class="keyword">function</span>(e) {<br>
+                    &nbsp;&nbsp;console.log(<span class="string">"¡Múltiples escuchadores activos!"</span>);<br>
+                    });
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: EL OBJETO EVENT E -->
+        <h2 class="section-title objeto-e">📦 2. El Objeto Event (`e` / `event`) y Métodos Clave</h2>
+
+        <div class="grid-2">
+            <!-- TARGET Y CURRENTTARGET -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-blue);">`e.target` vs `e.currentTarget`</span>
+                    <span style="font-size: 0.8rem; background: rgba(56,189,248,0.15); color: var(--accent-blue); padding: 2px 8px; border-radius: 4px;">Propiedades</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Cuando se dispara una función listener, recibe automáticamente un parámetro (usualmente nombrado <code>e</code> o <code>event</code>) con información contextual.
+                </p>
+                <ul style="font-size: 0.88rem; color: var(--text-muted); margin-left: 18px; margin-top: 6px;">
+                    <li><code>e.target</code>: El elemento exacto que fue cliqueado o accionado.</li>
+                    <li><code>e.currentTarget</code>: El elemento que tiene registrado el listener.</li>
+                </ul>
+            </div>
+
+            <!-- PREVENTDEFAULT -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--accent-purple);">`e.preventDefault()`</span>
+                    <span style="font-size: 0.8rem; background: rgba(192,132,252,0.15); color: var(--accent-purple); padding: 2px 8px; border-radius: 4px;">Control</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    Evita el comportamiento por defecto de ciertos elementos HTML (como recargar la página en un <code>&lt;form&gt;</code> o navegar a una URL en un enlace <code>&lt;a&gt;</code>).
+                </p>
+                <div class="code-block">
+                    form.addEventListener(<span class="string">"submit"</span>, <span class="keyword">function</span>(e) {<br>
+                    &nbsp;&nbsp;e.preventDefault(); <span class="comment">// Detiene el envío por defecto</span><br>
+                    &nbsp;&nbsp;console.log(<span class="string">"Formulario procesado con JS sin recargar"</span>);<br>
+                    });
+                </div>
+            </div>
+        </div>
+
+        <!-- CURIOSIDADES Y PROBLEMAS COMUNES -->
+        <div class="curiosity-card">
+            <div style="color: var(--accent-pink); font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                💡 Curiosidades: Delegación de Eventos y Funciones Anónimas
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 12px;">
+                <div>
+                    <h5 style="color: var(--accent-purple); margin-bottom: 4px;">🚀 1. Delegación de Eventos (Event Delegation):</h5>
+                    <p style="font-size: 0.9rem; color: var(--text-main);">
+                        En lugar de agregar 100 listeners a 100 etiquetas <code>&lt;li&gt;</code> en una lista, adjunta <strong>UN solo listener al padre <code>&lt;ul&gt;</code></strong> y usa <code>e.target</code> para averiguar a qué hijo se le hizo clic. ¡Ahorra memoria y procesador!
+                    </p>
+                </div>
+
+                <div>
+                    <h5 style="color: var(--accent-pink); margin-bottom: 4px;">⚠️ 2. ¿Por qué falla `removeEventListener` con funciones anónimas?:</h5>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        <code>removeEventListener</code> requiere exactamente la misma referencia de memoria que <code>addEventListener</code>. Si usaste <code>function() {}</code> anónima, JavaScript crea dos funciones distintas en memoria y nunca podrá removerla. Debes usar funciones con nombre referenciado.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: DESAFÍOS PRÁCTICOS DE CÓDIGO -->
+        <h2 class="section-title desafios">🏆 3. Desafíos Prácticos de Código (Nivel 1 al 3)</h2>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">
+            Aprende a resolver estos desafíos de escucha de eventos mediante código puro ejecutable directamente en la consola (<code>F12</code>).
+        </p>
+
+        <div class="challenge-container">
+            <!-- NIVEL 1 -->
+            <div class="challenge-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="font-size: 1.12rem;">Ejercicio 1: Formulario con `preventDefault()` y Confirmación Dinámica</h3>
+                    <span class="level-badge lvl-1">🟢 Fácil</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+                    <strong>Enunciado:</strong> Selecciona un formulario mediante `document.querySelector('form')`, intercepta su evento `submit`, previene la recarga del navegador usando `e.preventDefault()`, extrae el valor del input y muestra una alerta en consola de envío exitoso.
+                </p>
+                <div class="interactive-tool" style="margin-top:0;">
+                    <button class="btn btn-green" onclick="abrirModalDesafio(1)">💻 Ver Código para Consola</button>
+                </div>
+            </div>
+
+            <!-- NIVEL 2 -->
+            <div class="challenge-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="font-size: 1.12rem;">Ejercicio 2: Contador de Caracteres en Tiempo Real (`input`)</h3>
+                    <span class="level-badge lvl-2">🔵 Fácil - Medio</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+                    <strong>Enunciado:</strong> Adjunta un listener al evento `input` en un campo de texto, calcula cuántos caracteres lleva tipeados el usuario y actualiza en tiempo real el contador en pantalla.
+                </p>
+                <div class="interactive-tool" style="margin-top:0;">
+                    <button class="btn btn-blue" onclick="abrirModalDesafio(2)">💻 Ver Código para Consola</button>
+                </div>
+            </div>
+
+            <!-- NIVEL 3 -->
+            <div class="challenge-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="font-size: 1.12rem;">Ejercicio 3: Delegación de Eventos en Lista Dinámica de Tareas</h3>
+                    <span class="level-badge lvl-3">🟣 Medio</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+                    <strong>Enunciado:</strong> Aplica el patrón de Delegación de Eventos adjuntando un único listener de `click` al contenedor de la lista `<ul>`. Verifica con `e.target.tagName` si el elemento presionado es un `LI` y conmuta la clase `.completada`.
+                </p>
+                <div class="interactive-tool" style="margin-top:0;">
+                    <button class="btn btn-purple" onclick="abrirModalDesafio(3)">💻 Ver Código para Consola</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ FINAL DE MEMORIZACIÓN -->
+        <div class="quiz-section">
+            <div class="quiz-header">
+                <div>
+                    <h2 style="font-size: 1.35rem;">🎯 Cuestionario Final de Memorización</h2>
+                    <p style="color: var(--text-muted); font-size: 0.88rem;">Verifica tus conocimientos sobre Eventos en JS antes de continuar.</p>
+                </div>
+                <div class="score-board" id="scoreBoard">Puntos: 0 / 5</div>
+            </div>
+
+            <!-- PREGUNTA 1 -->
+            <div class="quiz-card" id="q1">
+                <div class="quiz-question">1. ¿Cuál es el método estándar recomendado para registrar un escuchador de eventos en JavaScript?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! Usar onclick en HTML es una práctica obsoleta.')">A) Atributo HTML onclick="..."</button>
+                    <button class="option-btn" onclick="checkAnswer(1, true, this, '¡Correcto! addEventListener() es el estándar profesional que permite múltipleslisteners.')">B) elemento.addEventListener("evento", callback)</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! attachEvent era exclusivo de Internet Explorer antiguo.')">C) elemento.attachEvent()</button>
+                    <button class="option-btn" onclick="checkAnswer(1, false, this, '¡Incorrecto! setEventListener no existe.')">D) elemento.setEventListener()</button>
+                </div>
+                <div class="quiz-feedback" id="fb1"></div>
+            </div>
+
+            <!-- PREGUNTA 2 -->
+            <div class="quiz-card" id="q2">
+                <div class="quiz-question">2. ¿Qué instrucción del objeto de evento permite cancelar el envío y recarga automática por defecto de un formulario?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! stopPropagation detiene el burbujeo, no la recarga por defecto.')">A) e.stopPropagation()</button>
+                    <button class="option-btn" onclick="checkAnswer(2, true, this, '¡Excelente! e.preventDefault() cancela la acción predeterminada del navegador.')">B) e.preventDefault()</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! stopDefault no existe.')">C) e.stopDefault()</button>
+                    <button class="option-btn" onclick="checkAnswer(2, false, this, '¡Incorrecto! return false es una técnica antigua no recomendada.')">D) return false</button>
+                </div>
+                <div class="quiz-feedback" id="fb2"></div>
+            </div>
+
+            <!-- PREGUNTA 3 -->
+            <div class="quiz-card" id="q3">
+                <div class="quiz-question">3. ¿Qué propiedad del objeto evento (<code>e</code>) hace referencia al elemento exacto que detonó el evento?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(3, true, this, '¡Correcto! e.target es la referencia al nodo exacto que originó el evento.')">A) e.target</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! e.currentTarget es el elemento que posee el listener.')">B) e.currentTarget</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! e.srcNode no existe en el estándar.')">C) e.srcNode</button>
+                    <button class="option-btn" onclick="checkAnswer(3, false, this, '¡Incorrecto! e.element no existe.')">D) e.element</button>
+                </div>
+                <div class="quiz-feedback" id="fb3"></div>
+            </div>
+
+            <!-- PREGUNTA 4 -->
+            <div class="quiz-card" id="q4">
+                <div class="quiz-question">4. ¿En qué consiste la técnica de "Delegación de Eventos" (Event Delegation)?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! Eso sería asignación directa individual.')">A) Asignar un listener individual a cada uno de los elementos hijos</button>
+                    <button class="option-btn" onclick="checkAnswer(4, true, this, '¡Muy bien! Se registra 1 solo listener en un elemento padre y se aprovecha el burbujeo para gestionar los clics de sus hijos mediante e.target.')">B) Registrar un solo listener en un elemento padre para gestionar las acciones de sus elementos hijos mediante burbujeo</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! No tiene que ver con delegar a Web Workers.')">C) Delegar la ejecución del evento a un hilo secundario del procesador</button>
+                    <button class="option-btn" onclick="checkAnswer(4, false, this, '¡Incorrecto! No es eliminación automática.')">D) Eliminar todos los eventos registrados en el documento</button>
+                </div>
+                <div class="quiz-feedback" id="fb4"></div>
+            </div>
+
+            <!-- PREGUNTA 5 -->
+            <div class="quiz-card" id="q5">
+                <div class="quiz-question">5. ¿Por qué falla <code>removeEventListener("click", function(){})</code> al intentar remover un listener creado con función anónima?</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! removeEventListener sí está soportado.')">A) Porque removeEventListener no soporta el evento click</button>
+                    <button class="option-btn" onclick="checkAnswer(5, true, this, '¡Exacto! Las funciones anónimas crean referencias de memoria distintas; removeEventListener exige pasar la misma referencia de función.')">B) Porque cada función anónima crea una nueva referencia en memoria, por lo que JS no puede emparejarlas</button>
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! No requiere permisos del navegador.')">C) Porque el navegador bloquea la remoción por seguridad</button>
+                    <button class="option-btn" onclick="checkAnswer(5, false, this, '¡Incorrecto! No es un error sintáctico.')">D) Porque produce un error sintáctico en consola</button>
+                </div>
+                <div class="quiz-feedback" id="fb5"></div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>Programación II • Universidad Nacional de Entre Ríos (UNER)</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">Recuerda probar tus propios ejercicios en la consola del navegador con <code>F12</code>.</p>
+        </footer>
+    </div>
+
+    <!-- MODAL DE CÓDIGO CONSOLA -->
+    <div class="modal-overlay" id="modalCodigoOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Título del Desafío</div>
+                <button class="modal-close-btn" onclick="cerrarModal()" title="Cerrar modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-instruction" id="modalExplicacion">
+                    Abre la consola con <code>F12</code> (o clic derecho > Inspeccionar > Consola), pega el siguiente código y presiona <code>Enter</code>:
+                </p>
+                <div class="modal-code-wrapper" style="margin-top: 10px;">
+                    <pre class="modal-code-block" id="modalCodeBlock"></pre>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 12px;">
+                    💡 <em>Nota: Este código se ejecuta directamente en la consola de JavaScript para escuchar y responder a eventos.</em>
+                </p>
+                <div class="modal-footer">
+                    <button class="btn btn-copy" id="btnCopyCode" onclick="copiarCodigoModal()">📋 Copiar Código</button>
+                    <button class="btn" style="background: var(--accent-green); color: #0f172a;" onclick="ejecutarEnConsolaModal()">▶ Probar en Consola</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA INTERACTIVA -->
+    <script>
+        // CONTROL DE PESTAÑAS DEL INSPECTOR
+        function switchEventTab(tabId, btnElement) {
+            document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+
+            document.getElementById(tabId).classList.add("active");
+            btnElement.classList.add("active");
+        }
+
+        // LÓGICA DE EVENTOS DEL PLAYGROUND / INSPECTOR
+        document.addEventListener("DOMContentLoaded", () => {
+            // TAB 1: MOUSE
+            const stageMouse = document.getElementById("stageMouse");
+            const codeTabMouse = document.getElementById("codeTabMouse");
+            const txtStageMouse = document.getElementById("txtStageMouse");
+            const subStageMouse = document.getElementById("subStageMouse");
+
+            let mouseClicks = 0;
+
+            if (stageMouse) {
+                stageMouse.addEventListener("click", (e) => {
+                    mouseClicks++;
+                    txtStageMouse.innerText = `¡Evento 'click' Capturado! (${mouseClicks})`;
+                    subStageMouse.innerText = `Coordenadas: X=${e.clientX}, Y=${e.clientY}`;
+                    codeTabMouse.innerText = `stageMouse.addEventListener("click", function(e) {\n    // Clic #${mouseClicks} capturado en X:${e.clientX}, Y:${e.clientY}\n    console.log("e.type: " + e.type);\n});`;
+                });
+
+                stageMouse.addEventListener("dblclick", (e) => {
+                    txtStageMouse.innerText = `⚡ ¡Evento 'dblclick' (Doble Clic)!`;
+                    codeTabMouse.innerText = `stageMouse.addEventListener("dblclick", function(e) {\n    alert("¡Doble clic ejecutado!");\n});`;
+                });
+
+                stageMouse.addEventListener("mouseover", () => {
+                    stageMouse.style.borderColor = "#4ade80";
+                });
+
+                stageMouse.addEventListener("mouseout", () => {
+                    stageMouse.style.borderColor = "rgba(251, 146, 60, 0.35)";
+                });
+            }
+
+            // TAB 2: TECLADO
+            const inputTecladoStage = document.getElementById("inputTecladoStage");
+            const codeTabTeclado = document.getElementById("codeTabTeclado");
+
+            if (inputTecladoStage) {
+                inputTecladoStage.addEventListener("input", (e) => {
+                    codeTabTeclado.innerText = `input.addEventListener("input", function(e) {\n    // Valor actual: "${e.target.value}"\n    // Longitud: ${e.target.value.length} caracteres\n});`;
+                });
+
+                inputTecladoStage.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        codeTabTeclado.innerText = `// TECLA ENTER PRESIONADA! (e.key === "Enter")\nconsole.log("Formulario listo para enviar");`;
+                    }
+                });
+            }
+
+            // TAB 3: FORMULARIO
+            const inputFormNombre = document.getElementById("inputFormNombre");
+            const btnSubmitStage = document.getElementById("btnSubmitStage");
+            const codeTabFormulario = document.getElementById("codeTabFormulario");
+
+            if (inputFormNombre) {
+                inputFormNombre.addEventListener("focus", () => {
+                    codeTabFormulario.innerText = `input.addEventListener("focus", function(e) {\n    // El usuario hizo foco en el input (cursor activo)\n});`;
+                });
+
+                inputFormNombre.addEventListener("blur", () => {
+                    codeTabFormulario.innerText = `input.addEventListener("blur", function(e) {\n    // El usuario quitó el foco del input\n});`;
+                });
+            }
+
+            if (btnSubmitStage) {
+                btnSubmitStage.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    codeTabFormulario.innerText = `form.addEventListener("submit", function(e) {\n    e.preventDefault(); // 🛑 Evitó la recarga automática de página\n    console.log("Datos capturados: ${inputFormNombre.value}");\n});`;
+                });
+            }
+
+            // TAB 4: PROPAGACIÓN
+            const btnHijoStage = document.getElementById("btnHijoStage");
+            const propPadreStage = document.getElementById("propPadreStage");
+            const chkStopProp = document.getElementById("chkStopProp");
+            const codeTabPropagacion = document.getElementById("codeTabPropagacion");
+
+            if (btnHijoStage && propPadreStage) {
+                propPadreStage.addEventListener("click", () => {
+                    codeTabPropagacion.innerText += `\n➔ 🔴 EVENTO BURBUJEÓ hasta el Padre (#propPadre)`;
+                });
+
+                btnHijoStage.addEventListener("click", (e) => {
+                    codeTabPropagacion.innerText = `➔ 🔵 EVENTO DETONADO en Botón Hijo (#btnHijo)`;
+                    if (chkStopProp.checked) {
+                        e.stopPropagation();
+                        codeTabPropagacion.innerText += `\n🛑 e.stopPropagation() ejecutado: ¡Se detuvo el burbujeo al Padre!`;
+                    }
+                });
+            }
+
+            // MODAL CONFIG
+            const overlay = document.getElementById("modalCodigoOverlay");
+            if (overlay) {
+                overlay.addEventListener("click", (e) => {
+                    if (e.target === overlay) cerrarModal();
+                });
+            }
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") cerrarModal();
+            });
+        });
+
+        // DESAFÍOS Y MODAL
+        const solucionesDesafios = {
+            1: {
+                titulo: "Ejercicio 1: Formulario con preventDefault() y Validación",
+                explicacion: "Abre la consola con <code>F12</code>, copia el siguiente código y presiona <code>Enter</code>:",
+                codigo: `// Ejercicio 1: Interceptar Formulario y Cancelar Recarga
+let formulario = document.querySelector("form");
+
+if (formulario) {
+    formulario.addEventListener("submit", function(e) {
+        // 1. Detener el comportamiento por defecto de recargar la página
+        e.preventDefault();
+        
+        console.log("--- FORMULARIO DETENIDO Y PROCESADO CON JS ---");
+        console.log("Evento submit interceptado con e.preventDefault()");
+        alert("¡Formulario procesado correctamente sin recargar la página!");
+    });
+    console.log("Escuchador de evento submit registrado en el formulario.");
+}`
+            },
+            2: {
+                titulo: "Ejercicio 2: Contador de Caracteres en Tiempo Real (input)",
+                explicacion: "Abre la consola con <code>F12</code>, copia el siguiente código y presiona <code>Enter</code>:",
+                codigo: `// Ejercicio 2: Contador de Caracteres con Evento Input
+let input = document.querySelector("input[type='text']");
+
+if (input) {
+    input.addEventListener("input", function(e) {
+        let texto = e.target.value;
+        let longitud = texto.length;
+        
+        console.log(\`Tipeo detectado: "\${texto}" | Total Caracteres: \${longitud}\`);
+        
+        if (longitud > 20) {
+            console.warn("⚠️ Advertencia: Has superado los 20 caracteres recomendados.");
+        }
+    });
+    console.log("Escuchador 'input' activado en el campo de texto.");
+}`
+            },
+            3: {
+                titulo: "Ejercicio 3: Delegación de Eventos en Lista Dinámica de Tareas",
+                explicacion: "Abre la consola con <code>F12</code>, copia el siguiente código y presiona <code>Enter</code>:",
+                codigo: `// Ejercicio 3: Delegación de Eventos en el Contenedor Padre
+let contenedor = document.body; // Se escucha globalmente o en la lista <ul>
+
+contenedor.addEventListener("click", function(e) {
+    // Verificar cuál elemento fue presionado (e.target)
+    console.log("Elemento presionado:", e.target.tagName, e.target);
+    
+    if (e.target.tagName === "BUTTON") {
+        console.log("¡Se hizo clic en un botón! Texto:", e.target.innerText);
+    }
+});
+console.log("Delegación de eventos activa en la página.");`
+            }
+        };
+
+        let codigoActualModal = "";
+
+        function abrirModalDesafio(nivel) {
+            const data = solucionesDesafios[nivel];
+            if (!data) return;
+
+            document.getElementById("modalTitle").innerText = data.titulo;
+            document.getElementById("modalExplicacion").innerHTML = data.explicacion;
+            document.getElementById("modalCodeBlock").innerText = data.codigo;
+            codigoActualModal = data.codigo;
+
+            const btnCopy = document.getElementById("btnCopyCode");
+            btnCopy.innerText = "📋 Copiar Código";
+
+            const overlay = document.getElementById("modalCodigoOverlay");
+            overlay.classList.add("active");
+        }
+
+        function cerrarModal() {
+            const overlay = document.getElementById("modalCodigoOverlay");
+            overlay.classList.remove("active");
+        }
+
+        function copiarCodigoModal() {
+            navigator.clipboard.writeText(codigoActualModal).then(() => {
+                const btn = document.getElementById("btnCopyCode");
+                btn.innerText = "✅ ¡Copiado!";
+                setTimeout(() => {
+                    btn.innerText = "📋 Copiar Código";
+                }, 2000);
+            }).catch(err => {
+                console.error("Error al copiar código: ", err);
+            });
+        }
+
+        function ejecutarEnConsolaModal() {
+            console.clear();
+            console.log("%c=== REGISTRANDO ESCUCHADOR DE EVENTOS ===", "color: #fb923c; font-weight: bold; font-size: 14px;");
+            try {
+                new Function(codigoActualModal)();
+            } catch(e) {
+                console.error("Error en ejecución: ", e);
+            }
+            console.log("%c==========================================", "color: #fb923c; font-weight: bold;");
+            alert("¡Escuchador de eventos activo! Interactúa con la página o presiona F12 para ver las salidas en Consola.");
+        }
+
+        // QUIZ LOGIC
+        let score = 0;
+        const answeredQuestions = new Set();
+
+        function checkAnswer(questionNum, isCorrect, btnElement, feedbackText) {
+            if (answeredQuestions.has(questionNum)) return;
+
+            const card = document.getElementById(`q${questionNum}`);
+            const buttons = card.querySelectorAll(".option-btn");
+            const feedbackEl = document.getElementById(`fb${questionNum}`);
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                btnElement.classList.add("correct");
+                feedbackEl.className = "quiz-feedback show success";
+                feedbackEl.innerHTML = `✅ <b>¡Correcto!</b> ${feedbackText}`;
+                score++;
+            } else {
+                btnElement.classList.add("incorrect");
+                feedbackEl.className = "quiz-feedback show error";
+                feedbackEl.innerHTML = `❌ ${feedbackText}`;
+            }
+
+            answeredQuestions.add(questionNum);
+            document.getElementById("scoreBoard").innerText = `Puntos: ${score} / 5`;
+        }
+    </script>
+</body>
+
+</html>
