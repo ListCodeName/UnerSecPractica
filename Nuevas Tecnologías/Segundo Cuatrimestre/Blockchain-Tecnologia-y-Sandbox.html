@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blockchain & Sandbox Interactivo | Nuevas Tecnologías</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #090d16;
+  --surface: #111726;
+  --surface2: #182238;
+  --border: #1e2c4a;
+  --border-glow: rgba(0, 242, 254, 0.3);
+  --accent: #00f2fe;
+  --accent-secondary: #4facfe;
+  --purple: #8b5cf6;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.25);
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.25);
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --glow-cyan: 0 0 25px rgba(0, 242, 254, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
+
+/* Layout Containers */
+.container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* Header & Navigation */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(9, 13, 22, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-brand span {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1.25rem 3rem;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(0, 242, 254, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 40%);
+  z-index: 0;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(30, 44, 74, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 44, 74, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 840px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, #ffffff 30%, var(--accent) 70%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--text-muted);
+  max-width: 680px;
+  margin: 0 auto 2.2rem;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.8rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: #090d16;
+  box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 242, 254, 0.5);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+  color: var(--accent);
+}
+
+.btn-info {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-info:hover {
+  background: rgba(139, 92, 246, 0.3);
+  color: #fff;
+}
+
+/* Interactive Technical Terms styling */
+.tech-term {
+  border-bottom: 1px dashed var(--accent);
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0 0.2rem;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.tech-term:hover {
+  background: rgba(0, 242, 254, 0.15);
+}
+
+.term-help-icon {
+  font-size: 0.75rem;
+  color: var(--accent);
+  cursor: pointer;
+  margin-left: 0.2rem;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.term-help-icon:hover {
+  opacity: 1;
+}
+
+/* Sections */
+section {
+  padding: 4.5rem 0;
+  border-bottom: 1px solid rgba(30, 44, 74, 0.4);
+}
+
+.section-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+}
+
+.section-tag {
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin-bottom: 0.8rem;
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* Cards & Grids */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.8rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-secondary);
+  box-shadow: var(--glow-cyan);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  color: var(--accent);
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.card p {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* Accordion for Deep Dives */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.acc-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.acc-header {
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.acc-header:hover {
+  background: var(--surface2);
+}
+
+.acc-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.05rem;
+}
+
+.acc-num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.acc-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+
+.acc-item.open .acc-icon {
+  transform: rotate(180deg);
+}
+
+.acc-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.acc-item.open .acc-content {
+  max-height: 1000px;
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid rgba(30, 44, 74, 0.5);
+}
+
+.acc-content ul {
+  padding-left: 1.2rem;
+  margin-top: 0.6rem;
+}
+
+.acc-content li {
+  margin-bottom: 0.4rem;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin-top: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.6rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--purple), transparent);
+}
+
+.tl-item {
+  position: relative;
+  margin-bottom: 2.2rem;
+}
+
+.tl-dot {
+  position: absolute;
+  left: -2rem;
+  top: 0.2rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.tl-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+
+.tl-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.tl-desc {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* Trivia Cards Grid */
+.trivia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.trivia-card {
+  background: linear-gradient(145deg, var(--surface), var(--surface2));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.trivia-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+}
+
+.trivia-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.trivia-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Interactive Crypto Demo */
+.crypto-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.input-control {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.input-control:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+}
+
+.hash-output {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+  color: var(--accent);
+}
+
+/* ========================================== */
+/* SANDBOX SECTION - CORE INTERACTIVE FEATURE */
+/* ========================================== */
+.sandbox-wrapper {
+  background: #0b111e;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.8rem 1.2rem;
+  margin-top: 2rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.sandbox-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sandbox-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sandbox-title-group h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diff-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.diff-selector select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+}
+
+/* Horizontal Blockchain Visualizer */
+.chain-container {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 1rem 0.5rem 2rem;
+  scroll-snap-type: x mandatory;
+}
+
+.block-card {
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 1.25rem;
+  transition: all 0.35s ease;
+  position: relative;
+}
+
+.block-card.valid {
+  border-color: var(--success);
+  box-shadow: var(--success-glow);
+}
+
+.block-card.invalid {
+  border-color: var(--danger);
+  box-shadow: var(--danger-glow);
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.block-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.block-status {
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.block-status.valid {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.block-status.invalid {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.block-field {
+  margin-bottom: 0.85rem;
+}
+
+.block-field label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.block-field textarea, .block-field input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  resize: vertical;
+}
+
+.block-hash-box {
+  background: #060a12;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  word-break: break-all;
+  color: var(--text-muted);
+}
+
+.block-card.valid .current-hash {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.block-card.invalid .current-hash {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--accent);
+  padding: 0 0.5rem;
+}
+
+.mine-btn {
+  width: 100%;
+  padding: 0.65rem;
+  margin-top: 0.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: #090d16;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.mine-btn:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+}
+
+/* Modals System & Emulated Mining */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 13, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 620px;
+  padding: 2rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-overlay.active .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.modal-footer {
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+}
+
+/* Mining Simulator Dashboard */
+.mining-dashboard {
+  background: #060a12;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin: 1.2rem 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.mining-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.stat-box .val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.stat-box .lbl {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+.hash-stream-container {
+  background: #03060c;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.stream-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.hash-stream {
+  font-size: 0.88rem;
+  word-break: break-all;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.hash-prefix-match {
+  color: var(--success);
+  font-weight: 800;
+  background: rgba(16, 185, 129, 0.2);
+  padding: 0 0.2rem;
+  border-radius: 3px;
+}
+
+.hash-prefix-nomatch {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.mining-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
+.mining-status-banner.searching {
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  color: var(--accent);
+}
+
+.mining-status-banner.success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+/* Glossary Section Cards */
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.glossary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: border-color 0.2s;
+}
+
+.glossary-card:hover {
+  border-color: var(--accent);
+}
+
+.glossary-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.glossary-card p {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* Quiz Styling */
+.quiz-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.quiz-q {
+  margin-bottom: 2rem;
+}
+
+.quiz-q h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.quiz-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.quiz-opt {
+  padding: 0.9rem 1.2rem;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.92rem;
+}
+
+.quiz-opt:hover {
+  border-color: var(--accent);
+  background: rgba(0, 242, 254, 0.05);
+}
+
+.quiz-opt.correct {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #fff;
+}
+
+.quiz-opt.wrong {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fff;
+}
+
+.quiz-feedback {
+  margin-top: 0.8rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  display: none;
+}
+
+.quiz-feedback.show {
+  display: block;
+}
+
+.quiz-feedback.correct {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.quiz-feedback.wrong {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+/* Table Responsive */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--surface2);
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 3rem 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <a href="#" class="nav-brand">
+    🔗 <span>Blockchain.edu</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#temario">Temario</a></li>
+    <li><a href="#historia">Historia</a></li>
+    <li><a href="#curiosidades">Trivia</a></li>
+    <li><a href="#como-funciona">Funcionamiento</a></li>
+    <li><a href="#sandbox">Sandbox Interactivo</a></li>
+    <li><a href="#glosario">Glosario Técnico</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="badge">Nuevas Tecnologías · 2º Cuatrimestre</div>
+    <h1>Blockchain & Cadenas de Bloques</h1>
+    <p>Guía didáctica e interactiva sobre la tecnología que transformó la confianza digital, los contratos inteligentes y la descentralización global.</p>
+    <div class="hero-btns">
+      <a href="#sandbox" class="btn btn-primary">⚡ Probar Sandbox Interactivo</a>
+      <a href="#glosario" class="btn btn-secondary">📖 Glosario de Términos</a>
+    </div>
+  </div>
+</header>
+
+<!-- Main Container -->
+<main class="container">
+
+  <!-- SECTION 1: TEMARIO (4.1 a 4.4) -->
+  <section id="temario">
+    <div class="section-header">
+      <span class="section-tag">Sección 4 del Temario</span>
+      <h2 class="section-title">Contenidos Curriculares de Blockchain</h2>
+      <p class="section-desc">Haz clic en los términos destacados como <span class="tech-term" onclick="showTermHelp('nonce')">Nonce 💡</span> o <span class="tech-term" onclick="showTermHelp('sha256')">SHA-256 💡</span> para ver su definición rápida.</p>
+    </div>
+
+    <div class="accordion">
+      
+      <!-- 4.1 -->
+      <div class="acc-item open">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-title">
+            <span class="acc-num">4.1</span>
+            <span>¿Qué es Blockchain?</span>
+          </div>
+          <span class="acc-icon">▼</span>
+        </div>
+        <div class="acc-content">
+          <p><strong>Blockchain (Cadena de Bloques)</strong> es una base de datos distribuida, descentralizada e <span class="tech-term" onclick="showTermHelp('immutability')">inmutable 💡</span> que registra transacciones y activos mediante criptografía. En lugar de depender de una autoridad central, la red se sostiene sobre una red <span class="tech-term" onclick="showTermHelp('p2p')">Peer-to-Peer (P2P) 💡</span>.</p>
+          <br>
+          <p><strong>Los 5 Pilares Fundamentales:</strong></p>
+          <ul>
+            <li><strong>Descentralización:</strong> Ninguna entidad única posee el control total del <span class="tech-term" onclick="showTermHelp('ledger')">Ledger 💡</span>.</li>
+            <li><strong>Inmutabilidad:</strong> Una vez insertado un bloque, no se puede alterar sin romper la cadena.</li>
+            <li><strong>Criptografía:</strong> Uso de funciones <span class="tech-term" onclick="showTermHelp('sha256')">SHA-256 💡</span> y claves asimétricas.</li>
+            <li><strong>Consenso:</strong> Algoritmos como <span class="tech-term" onclick="showTermHelp('pow')">Proof of Work (PoW) 💡</span> o <span class="tech-term" onclick="showTermHelp('pos')">Proof of Stake (PoS) 💡</span>.</li>
+            <li><strong>Transparencia:</strong> Historial contable auditable en todo momento.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4.2 -->
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-title">
+            <span class="acc-num">4.2</span>
+            <span>Tipos de Blockchain</span>
+          </div>
+          <span class="acc-icon">▼</span>
+        </div>
+        <div class="acc-content">
+          <p>Las redes blockchain se clasifican según el nivel de acceso y validación:</p>
+          
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Acceso / Lectura</th>
+                  <th>Control / Validadores</th>
+                  <th>Velocidad</th>
+                  <th>Ejemplos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pública (Sin Permiso)</strong></td>
+                  <td>Abierto a cualquiera</td>
+                  <td>Descentralizado (Cualquiera mina)</td>
+                  <td>Lenta (alta seguridad)</td>
+                  <td>Bitcoin, Ethereum</td>
+                </tr>
+                <tr>
+                  <td><strong>Privada (Con Permiso)</strong></td>
+                  <td>Restringido</td>
+                  <td>Una sola organización</td>
+                  <td>Muy rápida</td>
+                  <td>Hyperledger Fabric</td>
+                </tr>
+                <tr>
+                  <td><strong>Consorcio / Híbrida</strong></td>
+                  <td>Miembros seleccionados</td>
+                  <td>Grupo predeterminado de empresas</td>
+                  <td>Media / Rápida</td>
+                  <td>R3 Corda, BSN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.3 -->
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-title">
+            <span class="acc-num">4.3</span>
+            <span>Aplicaciones de Blockchain</span>
+          </div>
+          <span class="acc-icon">▼</span>
+        </div>
+        <div class="acc-content">
+          <div class="grid-3" style="margin-top: 1rem;">
+            <div class="card">
+              <div class="card-icon">📄</div>
+              <h3>Smart Contracts <span class="term-help-icon" onclick="showTermHelp('smartContracts')">❓</span></h3>
+              <p>Programas informáticos autoejecutables que se activan al cumplirse reglas predeterminadas sin intermediarios.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">💸</div>
+              <h3>DeFi & Cripto</h3>
+              <p>Servicios financieros (prestamos, intercambios) abiertos, globales y autónomos sin bancos centrales.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">📦</div>
+              <h3>Cadena de Suministro</h3>
+              <p>Rastreo inalterable de mercancías desde su origen hasta el consumidor final.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">🪪</div>
+              <h3>Identidad Digital</h3>
+              <p>Soberanía sobre datos personales y credenciales académicas verificables.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">🏥</div>
+              <h3>Salud Pública</h3>
+              <p>Historiales médicos unificados y encriptados accesibles por médicos autorizados.</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">🎨</div>
+              <h3>Tokenización & NFTs</h3>
+              <p>Representación digital de propiedad de activos reales o digitales.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4.4 -->
+      <div class="acc-item">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <div class="acc-title">
+            <span class="acc-num">4.4</span>
+            <span>El Futuro de Blockchain</span>
+          </div>
+          <span class="acc-icon">▼</span>
+        </div>
+        <div class="acc-content">
+          <p>Tendencias tecnológicas a futuro:</p>
+          <ul>
+            <li><strong>Escalabilidad Capa 2:</strong> Transacciones procesadas fuera de la cadena principal.</li>
+            <li><strong>Sostenibilidad (Proof of Stake):</strong> Reducción del 99.9% del gasto de energía sustituyendo mineros por validadores.</li>
+            <li><strong>CBDCs:</strong> Monedas digitales emitidas por Bancos Centrales.</li>
+            <li><strong>Resistencia Cuántica:</strong> Criptografía avanzada para prevenir ataques informáticos cuánticos.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 2: HISTORIA E HITOS CLAVE -->
+  <section id="historia">
+    <div class="section-header">
+      <span class="section-tag">Cronología</span>
+      <h2 class="section-title">Historia e Hitos Fundamentales</h2>
+      <p class="section-desc">Evolución desde los primeros conceptos criptográficos hasta las redes descentralizadas globales.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">1991</div>
+        <div class="tl-title">Primer Sellado de Tiempo Criptográfico</div>
+        <div class="tl-desc">Stuart Haber y W. Scott Stornetta proponen una solución computacional para certificar digitalmente que un documento no ha sido alterado.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">1998</div>
+        <div class="tl-title">Bit Gold (Nick Szabo)</div>
+        <div class="tl-desc">Diseño teórico de una moneda digital descentralizada basada en resolver rompecabezas de <span class="tech-term" onclick="showTermHelp('pow')">Proof of Work 💡</span>.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2008</div>
+        <div class="tl-title">Publicación del Whitepaper de Bitcoin</div>
+        <div class="tl-desc">Bajo el seudónimo de <strong>Satoshi Nakamoto</strong>, se publica el documento fundador: <em>"Bitcoin: A Peer-to-Peer Electronic Cash System"</em>.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2009</div>
+        <div class="tl-title">El Bloque Génesis (#0) <span class="term-help-icon" onclick="showTermHelp('genesis')">❓</span></div>
+        <div class="tl-desc">Se mina el primer bloque de Bitcoin, incluyendo el famoso mensaje del periódico Times sobre el rescate financiero de los bancos.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2015</div>
+        <div class="tl-title">Nacimiento de Ethereum</div>
+        <div class="tl-desc">Vitalik Buterin lanza Ethereum, introduciendo los <span class="tech-term" onclick="showTermHelp('smartContracts')">Smart Contracts 💡</span>.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2022</div>
+        <div class="tl-title">El "Merge" de Ethereum</div>
+        <div class="tl-desc">Ethereum migra de Proof of Work a <span class="tech-term" onclick="showTermHelp('pos')">Proof of Stake (PoS) 💡</span>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: DATOS CURIOSOS -->
+  <section id="curiosidades">
+    <div class="section-header">
+      <span class="section-tag">Curiosidades</span>
+      <h2 class="section-title">Datos Curiosos & Trivia</h2>
+      <p class="section-desc">Hechos sorprendentes que marcaron el ecosistema cripto.</p>
+    </div>
+
+    <div class="trivia-grid">
+      <div class="trivia-card">
+        <div class="trivia-badge">🍕</div>
+        <h4>La Pizza de 10.000 BTC</h4>
+        <p>En mayo de 2010 se realizó la primera compra con Bitcoin: Laszlo Hanyecz pagó 10.000 BTC por 2 pizzas de Papa John's. ¡Hoy equivaldrían a cientos de millones de dólares!</p>
+      </div>
+
+      <div class="trivia-card">
+        <div class="trivia-badge">🔑</div>
+        <h4>La Fortuna Inactiva de Satoshi</h4>
+        <p>Se calcula que Satoshi Nakamoto minó más de 1.1 millones de Bitcoin en los primeros meses de la red. Esas monedas jamás han sido movidas.</p>
+      </div>
+
+      <div class="trivia-card">
+        <div class="trivia-badge">🗑️</div>
+        <h4>El Basurero de 8.000 Bitcoin</h4>
+        <p>Un programador británico perdió las claves de su billetera con 8.000 BTC en un disco duro tirado a la basura en 2013 y lleva más de una década intentando excavar el vertedero local.</p>
+      </div>
+
+      <div class="trivia-card">
+        <div class="trivia-badge">📜</div>
+        <h4>El Término Original</h4>
+        <p>En el Whitepaper de Bitcoin de 2008 la palabra "blockchain" nunca aparece escrita junta. Nakamoto la mencionaba por separado como "chain of blocks".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: ¿CÓMO FUNCIONA LA CRIPTOGRAFÍA? -->
+  <section id="como-funciona">
+    <div class="section-header">
+      <span class="section-tag">Fundamento Criptográfico</span>
+      <h2 class="section-title">¿Cómo Funciona el Hash SHA-256?</h2>
+      <p class="section-desc">El motor matemático de inmutabilidad en una cadena de bloques.</p>
+    </div>
+
+    <div class="crypto-demo">
+      <p style="margin-bottom: 1.2rem; color: var(--text-muted);">
+        Una <strong>función hash criptográfica</strong> (como <span class="tech-term" onclick="showTermHelp('sha256')">SHA-256 💡</span>) toma cualquier entrada y produce una huella digital única e irreversible de 64 caracteres hexadecimales. Si cambias una sola letra o espacio, la salida cambia radicalmente (<span class="tech-term" onclick="showTermHelp('avalanche')">Efecto Avalancha 💡</span>).
+      </p>
+
+      <div class="input-group">
+        <label for="hashInput">Prueba escribir un texto (Input):</label>
+        <input type="text" id="hashInput" class="input-control" value="Hola Blockchain 2026" oninput="updateDemoHash()">
+      </div>
+
+      <div class="input-group">
+        <label>Resultado Hash SHA-256 (64 caracteres):</label>
+        <div id="hashOutput" class="hash-output">Calculando...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SANDBOX INTERACTIVO (CORE FEATURE) -->
+  <section id="sandbox">
+    <div class="section-header">
+      <span class="section-tag">Laboratorio Práctico</span>
+      <h2 class="section-title">Sandbox Interactivo de Blockchain</h2>
+      <p class="section-desc">Crea, edita y mina bloques en vivo. Haz clic en las etiquetas como <span class="tech-term" onclick="showTermHelp('nonce')">Nonce 💡</span> o <span class="tech-term" onclick="showTermHelp('prevHash')">Previous Hash 💡</span> para resolver dudas técnicas.</p>
+    </div>
+
+    <div class="sandbox-wrapper">
+      
+      <div class="sandbox-header-top">
+        <div class="sandbox-title-group">
+          <h3>⛓️ Cadena de Bloques Activa</h3>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn-info" onclick="showActionInfo('editData')">❓ ¿Qué pasa al editar datos?</button>
+          <button class="btn-info" onclick="showActionInfo('mining')">❓ Explicar Minería PoW</button>
+        </div>
+      </div>
+
+      <div class="sandbox-controls">
+        <div class="diff-selector">
+          <label for="difficultySelect">Dificultad de Minado:</label>
+          <select id="difficultySelect" onchange="onDifficultyChange()">
+            <option value="0">0 ceros (Sin dificultad)</option>
+            <option value="00" selected>00 (Fácil - 2 ceros)</option>
+            <option value="000">000 (Medio - 3 ceros)</option>
+            <option value="0000">0000 (Difícil - 4 ceros)</option>
+          </select>
+          <button class="btn-info" style="padding:0.25rem 0.5rem;" onclick="showActionInfo('difficulty')">❓ Explicar</button>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="addBlockAction()">➕ Insertar Nuevo Bloque</button>
+          <button class="btn btn-secondary" onclick="resetChainAction()">🔄 Resetear Cadena</button>
+        </div>
+      </div>
+
+      <!-- Blockchain Container -->
+      <div id="chainContainer" class="chain-container">
+        <!-- Generated by JavaScript -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 6: GLOSARIO TÉCNICO INTERACTIVO -->
+  <section id="glosario">
+    <div class="section-header">
+      <span class="section-tag">Diccionario de Conceptos</span>
+      <h2 class="section-title">Glosario Técnico de Blockchain</h2>
+      <p class="section-desc">Explicaciones claras y didácticas de las palabras clave más utilizadas en criptografía y redes distribuidas.</p>
+    </div>
+
+    <div class="glossary-grid">
+      
+      <div class="glossary-card" onclick="showTermHelp('nonce')" style="cursor:pointer;">
+        <h4>🔑 Nonce (Number Used Once)</h4>
+        <p>Número arbitrario de un solo uso que los mineros modifican repetidamente para encontrar un Hash que cumpla con la dificultad de la red.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('sha256')" style="cursor:pointer;">
+        <h4>🔒 Hash SHA-256</h4>
+        <p>Función criptográfica que transforma cualquier volumen de información en un resumen hexadecimal de 64 caracteres único e irreversible.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('avalanche')" style="cursor:pointer;">
+        <h4>🌊 Efecto Avalancha</h4>
+        <p>Propiedad matemática en la cual el cambio de un solo carácter en la entrada modifica drásticamente más del 50% de los caracteres del Hash de salida.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('prevHash')" style="cursor:pointer;">
+        <h4>🔗 Previous Hash (Hash Anterior)</h4>
+        <p>La huella digital del bloque previo. Funciona como un pegamento criptográfico que vincula cada bloque con su antecesor inmediato.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('genesis')" style="cursor:pointer;">
+        <h4>🏛️ Bloque Génesis</h4>
+        <p>El primer bloque registrado en la historia de una blockchain (Bloque #0), a partir del cual se origina toda la cadena.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('pow')" style="cursor:pointer;">
+        <h4>⚙️ Proof of Work (PoW)</h4>
+        <p>Algoritmo de consenso donde los mineros compiten demostrando haber invertido potencia de cálculo para validar bloques.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('pos')" style="cursor:pointer;">
+        <h4>🌱 Proof of Stake (PoS)</h4>
+        <p>Mecanismo alternativo donde los validadores son seleccionados según la cantidad de criptomonedas que bloquean como garantía (Staking).</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('ledger')" style="cursor:pointer;">
+        <h4>📖 Ledger (Registro Distribuido)</h4>
+        <p>Libro de contabilidad digital replicado de manera idéntica en miles de nodos alrededor del mundo sin un servidor central.</p>
+      </div>
+
+      <div class="glossary-card" onclick="showTermHelp('smartContracts')" style="cursor:pointer;">
+        <h4>📜 Smart Contracts</h4>
+        <p>Contratos inteligentes escritos en código que se ejecutan automáticamente cuando se cumplen sus condiciones acordadas.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 7: QUIZ INTERACTIVO -->
+  <section id="quiz">
+    <div class="section-header">
+      <span class="section-tag">Comprobación de Aprendizaje</span>
+      <h2 class="section-title">Autoevaluación de Conocimientos</h2>
+      <p class="section-desc">Demuestra lo aprendido sobre Blockchain respondiendo estas preguntas clave.</p>
+    </div>
+
+    <div class="quiz-container">
+      
+      <div class="quiz-q" id="q1">
+        <h4>1. ¿Cuál es la función principal del valor "Nonce" durante la minería de un bloque?</h4>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(1, 0, this)">A) Guardar el nombre del minero que creó el bloque.</div>
+          <div class="quiz-opt" onclick="checkQuiz(1, 1, this)">B) Servir como contador variable para cambiar el Hash resultante hasta cumplir la dificultad.</div>
+          <div class="quiz-opt" onclick="checkQuiz(1, 2, this)">C) Almacenar las contraseñas privadas de los usuarios de la red.</div>
+          <div class="quiz-opt" onclick="checkQuiz(1, 3, this)">D) Conectar la red blockchain a servidores en la nube.</div>
+        </div>
+        <div class="quiz-feedback" id="fb1"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <h4>2. ¿Qué ocurre si se modifica un dato en un bloque antiguo dentro de una cadena de bloques?</h4>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(2, 0, this)">A) Nada, la cadena se actualiza automáticamente de forma transparente.</div>
+          <div class="quiz-opt" onclick="checkQuiz(2, 1, this)">B) El hash de ese bloque cambia, invalidando ese bloque y todos los posteriores.</div>
+          <div class="quiz-opt" onclick="checkQuiz(2, 2, this)">C) Se eliminan todos los Bitcoin de la red.</div>
+          <div class="quiz-opt" onclick="checkQuiz(2, 3, this)">D) La red se convierte automáticamente en una red privada.</div>
+        </div>
+        <div class="quiz-feedback" id="fb2"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <h4>3. ¿En qué año se publicó el célebre Whitepaper de Bitcoin por Satoshi Nakamoto?</h4>
+        <div class="quiz-opts">
+          <div class="quiz-opt" onclick="checkQuiz(3, 0, this)">A) 1998</div>
+          <div class="quiz-opt" onclick="checkQuiz(3, 1, this)">B) 2008</div>
+          <div class="quiz-opt" onclick="checkQuiz(3, 2, this)">C) 2015</div>
+          <div class="quiz-opt" onclick="checkQuiz(3, 3, this)">D) 2021</div>
+        </div>
+        <div class="quiz-feedback" id="fb3"></div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL 1: EXPLICACIÓN DE ACCIONES EN EL SANDBOX -->
+<div id="actionModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span id="actionModalIcon">📘</span>
+        <span id="actionModalTitle">Explicación de la Acción</span>
+      </div>
+      <button class="modal-close" onclick="closeActionModal()">✕</button>
+    </div>
+    <div class="modal-body" id="actionModalBody">
+      <!-- Dynamic Content -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeActionModal()">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: VISUALIZADOR INTERACTIVO DE MINERÍA (EMULACIÓN POW EN VIVO) -->
+<div id="miningModal" class="modal-overlay">
+  <div class="modal-card" style="max-width: 680px;">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span>⚙️</span>
+        <span>Proceso Interno de Minería (Proof of Work)</span>
+      </div>
+      <button class="modal-close" onclick="closeMiningModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="miningModalIntro">
+        Emulando el algoritmo de consenso <strong>Proof of Work (PoW)</strong>. El nodo minero debe encontrar un valor numérico llamado <span class="tech-term" onclick="showTermHelp('nonce')">Nonce 💡</span> que, al combinarse con los datos del bloque, genere un hash SHA-256 que cumpla la dificultad objetivo.
+      </p>
+
+      <div class="mining-dashboard">
+        <div class="mining-stat-grid">
+          <div class="stat-box">
+            <div class="val" id="miningBlockNum">#0</div>
+            <div class="lbl">Bloque</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" id="miningDiffTarget">00</div>
+            <div class="lbl">Dificultad (Ceros)</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" id="miningNonceVal">0</div>
+            <div class="lbl">Nonce Actual</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" id="miningSpeedVal">0 H/s</div>
+            <div class="lbl">Velocidad</div>
+          </div>
+        </div>
+
+        <div class="hash-stream-container">
+          <div class="stream-label">
+            <span>Cálculo SHA-256 en tiempo real:</span>
+            <span id="miningStepLabel">Paso 1/3: Preparando inputs</span>
+          </div>
+          <div id="miningHashStream" class="hash-stream">
+            Esperando inicio de cálculo...
+          </div>
+        </div>
+
+        <div id="miningStatusBanner" class="mining-status-banner searching">
+          <span class="spinner">⚙️</span>
+          <span id="miningStatusText">Iniciando búsqueda de Nonce válido...</span>
+        </div>
+      </div>
+
+      <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; font-size: 0.88rem;">
+        <strong>Fórmula de entrada SHA-256:</strong><br>
+        <code style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;" id="miningFormulaText">
+          Hash = SHA-256( Index + Timestamp + PrevHash + Data + Nonce )
+        </code>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="justify-content: space-between;">
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.85rem;" onclick="stepMineModal()">⏯️ Paso a Paso</button>
+        <button class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.85rem;" onclick="autoMineModal()">⚡ Auto-Minar</button>
+      </div>
+      <button id="miningConfirmBtn" class="btn btn-primary" style="display:none;" onclick="confirmMiningResult()">✅ Confirmar Bloque Minado</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 3: HELPER EXPANDIDO DE TÉRMINOS TÉCNICOS -->
+<div id="termModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span id="termModalIcon">💡</span>
+        <span id="termModalTitle">Definición Técnica</span>
+      </div>
+      <button class="modal-close" onclick="closeTermModal()">✕</button>
+    </div>
+    <div class="modal-body" id="termModalBody">
+      <!-- Dynamic Term Content -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeTermModal()">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>Nuevas Tecnologías · Universidad Nacional de Entre Ríos (UNER) · 2º Cuatrimestre</p>
+    <p style="margin-top: 0.5rem; color: var(--accent);">Diseño Interactivo & Mobile First</p>
+  </div>
+</footer>
+
+<!-- JavaScript Core Logic -->
+<script>
+// --- UTILITY: SHA-256 Browser Crypto API ---
+async function sha256(str) {
+  const buf = new TextEncoder().encode(str);
+  const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+  const hashArray = Array.from(new Uint8Array(hashBuf));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// --- ACCORDION CONTROLLER ---
+function toggleAcc(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+// --- DEMO SHA-256 INPUT ---
+async function updateDemoHash() {
+  const text = document.getElementById('hashInput').value;
+  const hash = await sha256(text);
+  document.getElementById('hashOutput').textContent = hash;
+}
+updateDemoHash();
+
+// ==========================================
+// TECHNICAL TERMS GLOSSARY DICTIONARY
+// ==========================================
+const technicalTerms = {
+  nonce: {
+    icon: '🔑',
+    name: 'Nonce (Number Used Once)',
+    definition: 'Es un número entero arbitrario que se utiliza una sola vez en un cálculo criptográfico.',
+    metaphor: '💡 <strong>Analogía del Candado:</strong> Imagina un candado cuya combinación cambia cada segundo. El Nonce es la rueda de números que debes girar probar por probar (0, 1, 2...) hasta que encaja perfectamente.',
+    details: 'Dado que los datos del bloque y el Hash anterior son fijos, el <strong>Nonce</strong> es el único valor variable que tiene el minero para cambiar el resultado del Hash SHA-256 y cumplir con la cantidad de ceros de la dificultad exigida por la red.'
+  },
+  sha256: {
+    icon: '🔒',
+    name: 'Hash SHA-256',
+    definition: 'Función matemática criptográfica desarrollada por la NSA que convierte cualquier cantidad de texto en un resumen fijo de 64 caracteres hexadecimales.',
+    metaphor: '💡 <strong>Analogía:</strong> Es como la huella dactilar digital de un archivo. No se puede reconstruir el archivo original a partir de la huella, pero sirve para confirmar al 100% su autenticidad.',
+    details: 'Es determinista (misma entrada produce siempre la misma salida) e unidireccional (es imposible revertir el proceso para obtener el mensaje original).'
+  },
+  avalanche: {
+    icon: '🌊',
+    name: 'Efecto Avalancha (Avalanche Effect)',
+    definition: 'Propiedad deseable de los algoritmos de encriptación donde un cambio insignificante en la entrada altera drásticamente toda la salida.',
+    metaphor: '💡 <strong>Analogía:</strong> Cambiar una sola letra en una novela completa altera radicalmente el 50% o más del código final generado.',
+    details: 'Garantiza que nadie pueda adivinar cómo alterar un dato de entrada para intentar conseguir un hash específico.'
+  },
+  prevHash: {
+    icon: '🔗',
+    name: 'Previous Hash (Hash Anterior)',
+    definition: 'La huella digital criptográfica del bloque anterior dentro de la cadena.',
+    metaphor: '💡 <strong>Analogía:</strong> Es el pegamento que une los eslabones. Si alteras un eslabón antiguo, el pegamento de todos los eslabones futuros se rompe inmediatamente.',
+    details: 'Asegura la inmutabilidad de la cadena, ya que cambiar un bloque del pasado invalida automáticamente todos los bloques que le siguen.'
+  },
+  genesis: {
+    icon: '🏛️',
+    name: 'Bloque Génesis (#0)',
+    definition: 'El primer bloque minado de la historia de una blockchain.',
+    metaphor: '💡 <strong>Analogía:</strong> La primera piedra angular de un edificio sobre la cual descansan todos los demás pisos.',
+    details: 'Al no tener bloque previo, su <code>Previous Hash</code> consiste en 64 ceros seguidos.'
+  },
+  pow: {
+    icon: '⚙️',
+    name: 'Proof of Work (PoW - Prueba de Trabajo)',
+    definition: 'Mecanismo de consenso basado en la resolución computacional de acertijos criptográficos.',
+    metaphor: '💡 <strong>Analogía:</strong> Un billete de lotería donde para ganar debes gastar energía raspando millones de tarjetas hasta encontrar el premio.',
+    details: 'Previene ataques a la red exigiendo que quien proponga un bloque gaste electricidad y potencia de procesamiento.'
+  },
+  pos: {
+    icon: '🌱',
+    name: 'Proof of Stake (PoS - Prueba de Participación)',
+    definition: 'Mecanismo de consenso donde los validadores son elegidos según las monedas que bloquean como fianza.',
+    metaphor: '💡 <strong>Analogía:</strong> Un depósito de garantía. Si actúas honestamente ganas intereses; si intentas hacer trampa pierdes tu depósito.',
+    details: 'Consume 99.9% menos electricidad que Proof of Work al no requerir minería computacional intensiva.'
+  },
+  ledger: {
+    icon: '📖',
+    name: 'Ledger (Libro Mayor Distribuido)',
+    definition: 'Registro contable donde se anotan todas las transacciones de forma cronológica.',
+    metaphor: '💡 <strong>Analogía:</strong> Un gran libro contable de una empresa, pero copiado de forma idéntica en miles de computadoras del mundo.',
+    details: 'Todos los nodos de la red P2P poseen una copia exacta y sincronizada en tiempo real.'
+  },
+  p2p: {
+    icon: '👥',
+    name: 'Red Peer-to-Peer (P2P)',
+    definition: 'Red de computadoras conectadas entre sí directamente sin un servidor central.',
+    metaphor: '💡 <strong>Analogía:</strong> Una conversación grupal en círculo donde todos los participantes hablan y se escuchan directamente.',
+    details: 'Garantiza la alta disponibilidad y tolerancia a fallos: si un nodo cae, la red sigue funcionando sin interrupción.'
+  },
+  smartContracts: {
+    icon: '📜',
+    name: 'Smart Contracts (Contratos Inteligentes)',
+    definition: 'Programas de computadora almacenados en la blockchain que se ejecutan automáticamente.',
+    metaphor: '💡 <strong>Analogía:</strong> Una máquina expendedora. Metes el dinero correcto, la máquina verifica la condición y dispensa la bebida automáticamente sin intermediarios.',
+    details: 'Fueron popularizados por Ethereum en 2015 y permiten crear finanzas descentralizadas (DeFi) y dApps.'
+  },
+  immutability: {
+    icon: '🛡️',
+    name: 'Inmutabilidad',
+    definition: 'Propiedad que asegura que los registros una vez confirmados en la red no pueden ser modificados ni eliminados jamás.',
+    metaphor: '💡 <strong>Analogía:</strong> Grabar un texto sobre piedra tallada frente a escribirlo con lápiz sobre papel.',
+    details: 'Es la clave de la confianza digital en blockchain.'
+  }
+};
+
+function showTermHelp(termKey) {
+  const term = technicalTerms[termKey];
+  if (!term) return;
+
+  document.getElementById('termModalIcon').textContent = term.icon;
+  document.getElementById('termModalTitle').textContent = term.name;
+  document.getElementById('termModalBody').innerHTML = `
+    <p style="font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 0.8rem;">${term.definition}</p>
+    <div style="background: rgba(0, 242, 254, 0.08); border-left: 4px solid var(--accent); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+      ${term.metaphor}
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.92rem;">${term.details}</p>
+  `;
+
+  document.getElementById('termModal').classList.add('active');
+}
+
+function closeTermModal() {
+  document.getElementById('termModal').classList.remove('active');
+}
+
+// ==========================================
+// BLOCKCHAIN SANDBOX ENGINE
+// ==========================================
+let blockchain = [];
+let targetPrefix = '00';
+
+class Block {
+  constructor(index, timestamp, data, previousHash = '') {
+    this.index = index;
+    this.timestamp = timestamp;
+    this.data = data;
+    this.previousHash = previousHash;
+    this.nonce = 0;
+    this.hash = '';
+    this.isValid = false;
+  }
+
+  async calculateHash() {
+    const raw = this.index + this.timestamp + this.previousHash + this.data + this.nonce;
+    return await sha256(raw);
+  }
+}
+
+// Initialize default chain
+async function initSandbox() {
+  targetPrefix = document.getElementById('difficultySelect').value;
+  blockchain = [];
+
+  // Genesis Block
+  const genesis = new Block(
+    0, 
+    "2026-01-01 00:00", 
+    "Bloque Génesis: Transacciones iniciales de la red.", 
+    "0000000000000000000000000000000000000000000000000000000000000000"
+  );
+  await mineBlockObject(genesis);
+  blockchain.push(genesis);
+
+  // Block 1
+  const block1 = new Block(
+    1, 
+    "2026-01-02 10:15", 
+    "Alice envía 5.0 BTC a Bob", 
+    genesis.hash
+  );
+  await mineBlockObject(block1);
+  blockchain.push(block1);
+
+  // Block 2
+  const block2 = new Block(
+    2, 
+    "2026-01-02 11:30", 
+    "Smart Contract: Depósito de garantía en custodia", 
+    block1.hash
+  );
+  await mineBlockObject(block2);
+  blockchain.push(block2);
+
+  await validateAndRenderChain();
+}
+
+async function mineBlockObject(block) {
+  block.nonce = 0;
+  let h = await block.calculateHash();
+  while (targetPrefix.length > 0 && !h.startsWith(targetPrefix)) {
+    block.nonce++;
+    h = await block.calculateHash();
+  }
+  block.hash = h;
+  block.isValid = true;
+}
+
+// Re-validate the integrity of the whole chain
+async function validateAndRenderChain() {
+  for (let i = 0; i < blockchain.length; i++) {
+    const current = blockchain[i];
+    
+    if (i > 0) {
+      current.previousHash = blockchain[i - 1].hash;
+    }
+
+    const computed = await current.calculateHash();
+    current.hash = computed;
+
+    const hashMatchesDiff = targetPrefix.length === 0 || computed.startsWith(targetPrefix);
+    const prevValid = (i === 0) || blockchain[i - 1].isValid;
+
+    current.isValid = hashMatchesDiff && prevValid;
+  }
+
+  renderChainUI();
+}
+
+function renderChainUI() {
+  const container = document.getElementById('chainContainer');
+  container.innerHTML = '';
+
+  blockchain.forEach((block, idx) => {
+    const isGenesis = idx === 0;
+
+    const blockEl = document.createElement('div');
+    blockEl.className = `block-card ${block.isValid ? 'valid' : 'invalid'}`;
+
+    blockEl.innerHTML = `
+      <div class="block-header">
+        <span class="block-number">${isGenesis ? '🏛️ Bloque #0 (Génesis)' : '📦 Bloque #' + block.index}</span>
+        <span class="block-status ${block.isValid ? 'valid' : 'invalid'}">
+          ${block.isValid ? '✅ Válido' : '⚠️ Inválido'}
+        </span>
+      </div>
+
+      <div class="block-field">
+        <label>Datos / Transacciones:</label>
+        <textarea rows="2" oninput="onBlockDataChange(${idx}, this.value)">${block.data}</textarea>
+      </div>
+
+      <div class="block-field">
+        <label>
+          <span>Nonce (Prueba de Trabajo)</span>
+          <span class="term-help-icon" onclick="showTermHelp('nonce')" title="¿Qué es el Nonce?">💡 ¿Qué es?</span>
+        </label>
+        <input type="number" value="${block.nonce}" oninput="onNonceChange(${idx}, this.value)">
+      </div>
+
+      <div class="block-field">
+        <label>
+          <span>Hash Anterior (Previous Hash)</span>
+          <span class="term-help-icon" onclick="showTermHelp('prevHash')" title="¿Qué es el Hash Anterior?">💡</span>
+        </label>
+        <div class="block-hash-box" style="font-size:0.68rem;">${block.previousHash}</div>
+      </div>
+
+      <div class="block-field">
+        <label>
+          <span>Hash Actual SHA-256</span>
+          <span class="term-help-icon" onclick="showTermHelp('sha256')" title="¿Qué es el Hash SHA-256?">💡</span>
+        </label>
+        <div class="block-hash-box current-hash">${block.hash}</div>
+      </div>
+
+      <button id="mineBtn-${idx}" class="mine-btn" onclick="openMiningModal(${idx})">
+        ⛏️ Minar Bloque en Vivo
+      </button>
+    `;
+
+    container.appendChild(blockEl);
+
+    if (idx < blockchain.length - 1) {
+      const conn = document.createElement('div');
+      conn.className = 'connector';
+      conn.innerHTML = '🔗';
+      container.appendChild(conn);
+    }
+  });
+}
+
+// Event Handlers for Sandbox Data Change
+async function onBlockDataChange(index, value) {
+  blockchain[index].data = value;
+  await validateAndRenderChain();
+}
+
+async function onNonceChange(index, value) {
+  blockchain[index].nonce = parseInt(value) || 0;
+  await validateAndRenderChain();
+}
+
+async function addBlockAction() {
+  const last = blockchain[blockchain.length - 1];
+  const newIndex = blockchain.length;
+  const dateStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
+  
+  const newBlock = new Block(
+    newIndex,
+    dateStr,
+    `Transacción #${newIndex}: Registro de nueva operación`,
+    last ? last.hash : '0000000000000000000000000000000000000000000000000000000000000000'
+  );
+
+  await mineBlockObject(newBlock);
+  blockchain.push(newBlock);
+  await validateAndRenderChain();
+
+  showActionInfoCustom(
+    '➕ Nuevo Bloque Insertado',
+    `Se ha empaquetado e insertado el Bloque #${newIndex} al final de la cadena.<br><br>` +
+    `<strong>Detalles técnicos:</strong><br>` +
+    `• Enlazado automáticamente con el <code>Previous Hash</code> del bloque #${newIndex - 1}.<br>` +
+    `• Se realizó el minado previo para hallar un <code>Nonce</code> válido.`
+  );
+}
+
+async function resetChainAction() {
+  await initSandbox();
+  showActionInfoCustom(
+    '🔄 Cadena Reseteada',
+    `Se ha restaurado el estado original del registro contable a la configuración inicial del Bloque Génesis (#0).`
+  );
+}
+
+async function onDifficultyChange() {
+  targetPrefix = document.getElementById('difficultySelect').value;
+  await validateAndRenderChain();
+}
+
+// ==========================================
+// ACTION EXPLANATION MODAL ENGINE
+// ==========================================
+const actionDetails = {
+  editData: {
+    icon: '📝',
+    title: '¿Qué ocurre al editar datos en un bloque?',
+    html: `
+      Al cambiar cualquier letra o carácter en el campo de datos de un bloque:<br><br>
+      1. <strong>Cambio de Hash:</strong> El Hash del bloque actual se recalcula y cambia completamente (Efecto Avalancha).<br>
+      2. <strong>Ruptura del Enlace:</strong> El bloque siguiente esperaba el <code>Previous Hash</code> original. Al no coincidir, ese bloque y todos los posteriores quedan invalidados automáticamente (⚠️ <em>Marcados en Rojo</em>).<br>
+      3. <strong>Demostración de Inmutabilidad:</strong> Para que un atacante alterase un dato del pasado, tendría que volver a minar computacionalmente ese bloque y TODOS los bloques que le siguen en la red antes de que los demás mineros añadan nuevos bloques.
+    `
+  },
+  mining: {
+    icon: '⛏️',
+    title: '¿Qué es el proceso de Minería (Proof of Work)?',
+    html: `
+      La <strong>Prueba de Trabajo (Proof of Work)</strong> es el mecanismo criptográfico mediante el cual los nodos compiten para validar bloques:<br><br>
+      • Los datos del bloque y el hash previo son fijos.<br>
+      • El minero altera repetidamente un número variable llamado <span class="tech-term" onclick="showTermHelp('nonce')">Nonce 💡</span> (0, 1, 2, 3...).<br>
+      • Calcula el <code>SHA-256</code> en cada intento hasta encontrar un hash que empiece con la cantidad de ceros exigida por la dificultad (ej. <code>00...</code>).<br>
+      • El minero que lo encuentra primero demuestra haber gastado energía/cómputo y gana el derecho de agregar el bloque a la cadena.
+    `
+  },
+  difficulty: {
+    icon: '🎯',
+    title: '¿Cómo funciona la Dificultad de Minado?',
+    html: `
+      La dificultad establece cuántos ceros consecutivos deben aparecer al principio del Hash resultante.<br><br>
+      • <strong>0 ceros:</strong> Cualquier Hash es válido (no requiere trabajo computacional).<br>
+      • <strong>2 ceros (00):</strong> Relativamente fácil (requiere ~256 intentos de media).<br>
+      • <strong>4 ceros (0000):</strong> Exponencialmente más difícil (requiere decenas de miles de intentos).<br><br>
+      En redes como Bitcoin, la dificultad se reajusta automáticamente cada 2016 bloques para garantizar que se mine un nuevo bloque aproximadamente cada 10 minutos.
+    `
+  }
+};
+
+function showActionInfo(key) {
+  const info = actionDetails[key];
+  if (!info) return;
+  showActionInfoCustom(info.icon + ' ' + info.title, info.html);
+}
+
+function showActionInfoCustom(title, html) {
+  document.getElementById('actionModalIcon').textContent = '📘';
+  document.getElementById('actionModalTitle').innerHTML = title;
+  document.getElementById('actionModalBody').innerHTML = html;
+  document.getElementById('actionModal').classList.add('active');
+}
+
+function closeActionModal() {
+  document.getElementById('actionModal').classList.remove('active');
+}
+
+// ==========================================
+// LIVE EMULATED MINING MODAL ENGINE
+// ==========================================
+let activeMiningIndex = null;
+let activeMiningBlock = null;
+let isMiningLooping = false;
+let miningStartTime = 0;
+
+function openMiningModal(blockIdx) {
+  activeMiningIndex = blockIdx;
+  activeMiningBlock = blockchain[blockIdx];
+
+  document.getElementById('miningBlockNum').textContent = '#' + activeMiningBlock.index;
+  document.getElementById('miningDiffTarget').textContent = targetPrefix.length === 0 ? 'Sin límite' : targetPrefix;
+  document.getElementById('miningNonceVal').textContent = '0';
+  document.getElementById('miningSpeedVal').textContent = '0 H/s';
+
+  document.getElementById('miningFormulaText').textContent = 
+    `Hash = SHA-256( Index:${activeMiningBlock.index} + PrevHash:${activeMiningBlock.previousHash.slice(0,8)}... + Data:"${activeMiningBlock.data.slice(0,15)}..." + Nonce )`;
+
+  document.getElementById('miningStatusBanner').className = 'mining-status-banner searching';
+  document.getElementById('miningStatusText').textContent = 'Listo para emular el proceso de minado...';
+  document.getElementById('miningStepLabel').textContent = 'Estado: Esperando comando';
+  document.getElementById('miningHashStream').innerHTML = 'Haz clic en <strong>Paso a Paso</strong> o <strong>Auto-Minar</strong> para ver el algoritmo en acción.';
+  
+  document.getElementById('miningConfirmBtn').style.display = 'none';
+
+  document.getElementById('miningModal').classList.add('active');
+}
+
+function closeMiningModal() {
+  isMiningLooping = false;
+  document.getElementById('miningModal').classList.remove('active');
+}
+
+async function stepMineModal() {
+  isMiningLooping = false;
+  activeMiningBlock.nonce++;
+  const h = await activeMiningBlock.calculateHash();
+  activeMiningBlock.hash = h;
+
+  updateMiningModalUI(h, activeMiningBlock.nonce, 1);
+}
+
+async function autoMineModal() {
+  if (isMiningLooping) return;
+  isMiningLooping = true;
+  activeMiningBlock.nonce = 0;
+  miningStartTime = performance.now();
+
+  let attempts = 0;
+
+  const loop = async () => {
+    if (!isMiningLooping) return;
+
+    for (let i = 0; i < 25; i++) {
+      attempts++;
+      const h = await activeMiningBlock.calculateHash();
+      activeMiningBlock.hash = h;
+
+      const matches = targetPrefix.length === 0 || h.startsWith(targetPrefix);
+      if (matches) {
+        isMiningLooping = false;
+        const elapsedSec = (performance.now() - miningStartTime) / 1000;
+        const hps = Math.round(attempts / (elapsedSec || 0.001));
+        updateMiningModalUI(h, activeMiningBlock.nonce, hps, true);
+        return;
+      }
+      activeMiningBlock.nonce++;
+    }
+
+    const elapsedSec = (performance.now() - miningStartTime) / 1000;
+    const hps = Math.round(attempts / (elapsedSec || 0.001));
+    updateMiningModalUI(activeMiningBlock.hash, activeMiningBlock.nonce, hps, false);
+
+    requestAnimationFrame(loop);
+  };
+
+  requestAnimationFrame(loop);
+}
+
+function updateMiningModalUI(hash, nonce, hps, isSuccess = false) {
+  document.getElementById('miningNonceVal').textContent = nonce;
+  document.getElementById('miningSpeedVal').textContent = hps + ' H/s';
+
+  const prefixLen = targetPrefix.length;
+  let formattedHash = '';
+
+  if (prefixLen > 0) {
+    const pfx = hash.slice(0, prefixLen);
+    const rest = hash.slice(prefixLen);
+    const matchesPfx = pfx === targetPrefix;
+    formattedHash = `<span class="${matchesPfx ? 'hash-prefix-match' : 'hash-prefix-nomatch'}">${pfx}</span>${rest}`;
+  } else {
+    formattedHash = `<span class="hash-prefix-match">${hash}</span>`;
+  }
+
+  document.getElementById('miningHashStream').innerHTML = formattedHash;
+
+  const matches = prefixLen === 0 || hash.startsWith(targetPrefix);
+
+  if (matches || isSuccess) {
+    document.getElementById('miningStatusBanner').className = 'mining-status-banner success';
+    document.getElementById('miningStatusText').innerHTML = `🎉 ¡PRUEBA DE TRABAJO COMPLETADA! Nonce Ganador: <strong>${nonce}</strong>`;
+    document.getElementById('miningStepLabel').textContent = 'Estado: ✅ ¡Hash Válido Encontrado!';
+    document.getElementById('miningConfirmBtn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('miningStatusBanner').className = 'mining-status-banner searching';
+    document.getElementById('miningStatusText').textContent = `Buscando Nonce... El hash actual no comienza con "${targetPrefix}"`;
+    document.getElementById('miningStepLabel').textContent = `Probando Nonce: ${nonce}`;
+  }
+}
+
+async function confirmMiningResult() {
+  await validateAndRenderChain();
+  closeMiningModal();
+}
+
+// ==========================================
+// QUIZ ENGINE
+// ==========================================
+const quizAnswers = {
+  1: { correct: 1, exp: "Correcto! El Nonce es un número variable de un solo uso que los mineros modifican iterativamente para alterar el resultado del Hash SHA-256 hasta cumplir la dificultad." },
+  2: { correct: 1, exp: "Correcto! Al cambiar un dato, el Hash del bloque cambia completamente, rompiendo la coincidencia con el 'Previous Hash' de los bloques siguientes." },
+  3: { correct: 1, exp: "Correcto! Satoshi Nakamoto publicó el Whitepaper de Bitcoin el 31 de octubre de 2008." }
+};
+
+function checkQuiz(qNum, optIdx, el) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(opt => opt.classList.remove('correct', 'wrong'));
+
+  const fb = document.getElementById(`fb${qNum}`);
+  fb.classList.add('show');
+
+  if (optIdx === quizAnswers[qNum].correct) {
+    el.classList.add('correct');
+    fb.className = 'quiz-feedback show correct';
+    fb.textContent = '✅ ' + quizAnswers[qNum].exp;
+  } else {
+    el.classList.add('wrong');
+    fb.className = 'quiz-feedback show wrong';
+    fb.textContent = '❌ Respuesta incorrecta. Inténtalo de nuevo.';
+  }
+}
+
+// Start sandbox on load
+window.addEventListener('DOMContentLoaded', () => {
+  initSandbox();
+});
+</script>
+</body>
+</html>
