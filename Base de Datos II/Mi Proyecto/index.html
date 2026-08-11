@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto Integrador | Base de Datos II & Emprendimientos</title>
+  <meta name="description" content="Guía interactiva y portal de pautas para el desarrollo del Proyecto Integrador articulado entre Base de Datos II y Emprendimientos usando SQLite.">
+  
+  <!-- Modern Font Families & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- HERO HEADER & PROGRESS BAR -->
+  <header class="hero">
+    <div class="container hero-header">
+      <div class="hero-title-group">
+        <h1>Proyecto Integrador <span class="gradient-text">Base de Datos II</span></h1>
+        <p class="hero-subtitle">
+          Portal interactivo de pautas, arquitectura de datos en SQLite, sistema de diseño asistido por IA y flujo agéntico para tu emprendimiento.
+        </p>
+        <div class="hero-badges">
+          <span class="badge badge-primary"><i class="fa-solid fa-layer-group"></i> Articulación Emprendimientos</span>
+          <span class="badge badge-success"><i class="fa-brands fa-laravel"></i> Laravel + Pure CSS</span>
+          <span class="badge badge-primary"><i class="fa-solid fa-database"></i> SQLite (Sin MySQL/XAMPP)</span>
+          <span class="badge"><i class="fa-solid fa-robot"></i> Entorno Agéntico Antigravity</span>
+        </div>
+      </div>
+
+      <!-- Live Overall Progress Card -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <span><i class="fa-solid fa-chart-line" style="color: var(--primary-400);"></i> Progreso del Proyecto</span>
+          <span id="overall-progress-text">0% Completo</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="overall-progress-fill"></div>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
+          Tus micro-pasos completados se guardan automáticamente.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN NAVIGATION TABS -->
+  <main class="container">
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-contexto">
+        <i class="fa-solid fa-compass"></i> 1. Visión & Contexto
+      </button>
+      <button class="tab-btn" data-tab="tab-diseno">
+        <i class="fa-solid fa-palette"></i> 2. Sistema de Diseño (IA)
+      </button>
+      <button class="tab-btn" data-tab="tab-bd">
+        <i class="fa-solid fa-database"></i> 3. Base de Datos (SQLite) & Procesos
+      </button>
+      <button class="tab-btn" data-tab="tab-guias">
+        <i class="fa-solid fa-terminal"></i> 4. Guía GitHub & Laravel
+      </button>
+      <button class="tab-btn" data-tab="tab-agent">
+        <i class="fa-solid fa-brain"></i> 5. Entorno Agéntico & AGENT.md
+      </button>
+      <button class="tab-btn" data-tab="tab-docs">
+        <i class="fa-solid fa-list-check"></i> 6. Documentación & Checklist
+      </button>
+    </nav>
+
+    <!-- ===================================================================
+         TAB 1: VISIÓN GENERAL Y CONTEXTO
+         =================================================================== -->
+    <section id="tab-contexto" class="tab-content active">
+      <div class="section-header">
+        <h2>Articulación Interdisciplinaria</h2>
+        <p>Unión sinérgica entre la estrategia comercial (Emprendimientos) y la ingeniería de software (Base de Datos II).</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Emprendimiento Aspect -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-solid fa-lightbulb"></i></div>
+            <h3>Materia: Emprendimientos</h3>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Definición del modelo de negocio, identidad de marca y seguimiento comercial.
+          </p>
+          <ul style="color: var(--text-main); line-height: 1.8; padding-left: 20px;">
+            <li><strong>Branding & Eslogan:</strong> Creación del nombre, propuesta de valor y logotipo del proyecto.</li>
+            <li><strong>Estrategia Comercial:</strong> Definición de clientes ideales, canales de venta y precios.</li>
+            <li><strong>Gestión de Operaciones:</strong> Identificación del circuito de materia prima y productos.</li>
+          </ul>
+        </div>
+
+        <!-- Base de Datos 2 Aspect -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-solid fa-server"></i></div>
+            <h3>Materia: Base de Datos II</h3>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Diseño e implementación del sistema web funcional que soporta las operaciones.
+          </p>
+          <ul style="color: var(--text-main); line-height: 1.8; padding-left: 20px;">
+            <li><strong>Modelo Relacional en SQLite:</strong> Tablas, campos y claves sin requerir servidor MySQL.</li>
+            <li><strong>Desarrollo Web en Laravel:</strong> Implementación con PHP, HTML, JavaScript y Vanilla CSS.</li>
+            <li><strong>Flujo Agéntico (Antigravity):</strong> Automatización de un proceso estratégico clave de negocio.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Secuencia Lógica de Pasos -->
+      <div class="card" style="margin-top: 24px;">
+        <h3 style="margin-bottom: 16px;"><i class="fa-solid fa-diagram-project" style="color: var(--primary-400);"></i> Secuencia Lógica de Ejecución</h3>
+        <div class="grid-3">
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); margin-bottom: 8px;">Paso 1: Identidad Comercial</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Definir el emprendimiento, eslogan, logotipo y paleta cromática principal.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); margin-bottom: 8px;">Paso 2: Modelo SQLite</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Diseñar el esquema relacional SQLite para pedidos, clientes, materia prima e inventario.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); margin-bottom: 8px;">Paso 3: Desarrollo Agéntico</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Crear el proyecto Laravel en <code style="color: #38bdf8;">c:/xampp/htdocs</code> usando Antigravity y Pure CSS.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 2: SISTEMA DE DISEÑO CON IA
+         =================================================================== -->
+    <section id="tab-diseno" class="tab-content">
+      <div class="section-header">
+        <h2>Sistema de Diseño & Identidad Visual (IA Assisted)</h2>
+        <p>Utiliza herramientas como ChatGPT o Gemini junto a tu logotipo para definir los estilos de tu web.</p>
+      </div>
+
+      <!-- Generador Interactivo de Paletas de Color -->
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-sliders"></i></div>
+          Estudio Interactivo de Paleta de Colores
+        </h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Selecciona el color primario de tu marca. El sistema generará automáticamente la escala cromática de 50 a 900 y aplicará las variables en tiempo real a los componentes de muestra.
+        </p>
+
+        <div class="color-studio-wrapper">
+          <div class="color-controls">
+            <div class="form-group">
+              <label for="primary-color-picker">Color Primario de la Marca</label>
+              <div class="color-picker-group">
+                <input type="color" id="primary-color-picker" value="#6366f1">
+                <input type="text" id="primary-color-hex" class="input-text" value="#6366f1" placeholder="#6366f1">
+              </div>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              Usa este color base para los botones de acción principal, bordes destacados y elementos interactivos.
+            </p>
+          </div>
+
+          <div>
+            <h4 style="font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Escala Armónica Generada (50 a 900)</h4>
+            <div class="swatch-scale" id="swatch-scale-container">
+              <!-- Swatches generated dynamically via app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Muestra en vivo de Componentes UI -->
+        <div class="ui-specimen-box">
+          <div class="specimen-header"><i class="fa-solid fa-eye"></i> Vista Previa de Componentes UI</div>
+          <div class="specimen-row">
+            <button class="btn-demo btn-demo-primary"><i class="fa-solid fa-cart-shopping"></i> Botón Primario</button>
+            <button class="btn-demo btn-demo-secondary"><i class="fa-solid fa-filter"></i> Botón Secundario</button>
+            <span class="badge badge-primary">Badge Activo</span>
+            <span class="badge badge-success">En Stock</span>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Caja de Texto de Ejemplo</label>
+            <input type="text" class="input-text" placeholder="Ej: Nombre de la Materia Prima..." style="max-width: 400px;">
+          </div>
+        </div>
+
+        <!-- Bloque de Código CSS Generado -->
+        <div class="code-container" style="margin-top: 20px;">
+          <div class="code-header">
+            <span>variables-css-marca.css</span>
+            <button class="btn-copy" data-copy-target="generated-css-code"><i class="fa-solid fa-copy"></i> Copiar CSS</button>
+          </div>
+          <pre><code id="generated-css-code">:root {
+  --primary-50: #eef2ff;
+  --primary-500: #6366f1;
+  --primary-900: #312e81;
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Prompt para Consultar a la IA -->
+      <div class="card">
+        <h3><i class="fa-solid fa-robot" style="color: var(--primary-400);"></i> Prompt Sugerido para ChatGPT / Gemini</h3>
+        <p style="color: var(--text-muted); margin-bottom: 12px;">Copia y adapta este prompt para obtener recomendaciones exactas de diseño:</p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>prompt_diseño_ia.txt</span>
+            <button class="btn-copy" data-copy-target="prompt-ia-text"><i class="fa-solid fa-copy"></i> Copiar Prompt</button>
+          </div>
+          <pre><code id="prompt-ia-text">Hola! Tengo un emprendimiento llamado [NOMBRE_EMPRENDIMIENTO] dedicado a [RUBRO/PRODUCTO]. 
+Mi slogan es "[ESLOGAN]" y mi color principal es [COLOR_HEX]. 
+Necesito que me sugieras:
+1. Una escala armónica de colores primarios y secundarios para CSS Puro (Vanilla CSS).
+2. Estilos para cajas de texto, botones con estados hover/active, cabeceras y tarjetas.
+3. Formato visual y tipografías de Google Fonts que combinen con la personalidad de mi marca.</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 3: BASE DE DATOS (SQLITE) & PROCESOS
+         =================================================================== -->
+    <section id="tab-bd" class="tab-content">
+      <div class="section-header">
+        <h2>Modelado de Datos (SQLite) & Procesos de Negocio</h2>
+        <p>Diseño estructural de tablas relacionales sobre motor SQLite, evitando la necesidad de ejecutar MySQL en XAMPP.</p>
+      </div>
+
+      <!-- Configuración de SQLite Highlight Card -->
+      <div class="card" style="margin-bottom: 24px; border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05);">
+        <h3 style="color: #6ee7b7;"><i class="fa-solid fa-database"></i> Formato de Base de Datos: SQLite Embebido</h3>
+        <p style="color: var(--text-muted); margin-top: 8px;">
+          Para este proyecto <strong>no utilizaremos el servidor MySQL de XAMPP</strong>. La base de datos será un archivo liviano <strong>SQLite</strong> almacenado en <code>database/database.sqlite</code> dentro de tu proyecto Laravel.
+        </p>
+        <div class="code-container" style="margin-top: 12px;">
+          <div class="code-header">
+            <span>Configuración en archivo .env de Laravel</span>
+            <button class="btn-copy" data-copy-target="sqlite-env-code"><i class="fa-solid fa-copy"></i> Copiar .env</button>
+          </div>
+          <pre><code id="sqlite-env-code">DB_CONNECTION=sqlite
+# No se requieren campos DB_HOST, DB_PORT, DB_USERNAME ni DB_PASSWORD</code></pre>
+        </div>
+      </div>
+
+      <!-- Sub-navegación por Circuitos -->
+      <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+        <button class="tab-btn db-tab-btn active" data-dbtab="dbtab-ventas"><i class="fa-solid fa-receipt"></i> Circuito de Ventas</button>
+        <button class="tab-btn db-tab-btn" data-dbtab="dbtab-materia"><i class="fa-solid fa-boxes-packing"></i> Materia Prima & Compras</button>
+        <button class="tab-btn db-tab-btn" data-dbtab="dbtab-stock"><i class="fa-solid fa-warehouse"></i> Stock e Inventario</button>
+      </div>
+
+      <!-- Circuito 1: Ventas -->
+      <div id="dbtab-ventas" class="db-tab-content active">
+        <div class="card">
+          <h3><i class="fa-solid fa-cash-register" style="color: var(--secondary-color);"></i> Circuito de Ventas y Pedidos de Clientes</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Gestiona la facturación, los pedidos efectuados por los clientes y la deducción automática de stock en SQLite.
+          </p>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Tabla</th>
+                <th>Campo</th>
+                <th>Tipo de Dato (SQLite)</th>
+                <th>Clave</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="4" style="font-weight: bold; color: #fff;">ventas</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>Identificador único autoincremental</td>
+              </tr>
+              <tr>
+                <td class="field-name">cliente_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>Referencia a la tabla clientes</td>
+              </tr>
+              <tr>
+                <td class="field-name">fecha_emision</td>
+                <td><span class="type-tag">DATETIME</span></td>
+                <td>-</td>
+                <td>Fecha y hora del pedido</td>
+              </tr>
+              <tr>
+                <td class="field-name">total</td>
+                <td><span class="type-tag">REAL</span></td>
+                <td>-</td>
+                <td>Monto total calculado</td>
+              </tr>
+              <tr>
+                <td rowspan="3" style="font-weight: bold; color: #fff;">detalle_ventas</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>ID del ítem en detalle</td>
+              </tr>
+              <tr>
+                <td class="field-name">producto_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>Referencia al producto vendido</td>
+              </tr>
+              <tr>
+                <td class="field-name">cantidad</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td>-</td>
+                <td>Unidades vendidas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Circuito 2: Materia Prima -->
+      <div id="dbtab-materia" class="db-tab-content">
+        <div class="card">
+          <h3><i class="fa-solid fa-truck-ramp-box" style="color: var(--primary-400);"></i> Adquisición de Materia Prima y Gestión de Compras</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Permite registrar las órdenes de compra a proveedores y el ingreso de insumos para la producción.
+          </p>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Tabla</th>
+                <th>Campo</th>
+                <th>Tipo de Dato (SQLite)</th>
+                <th>Clave</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="3" style="font-weight: bold; color: #fff;">materias_primas</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>ID único del insumo</td>
+              </tr>
+              <tr>
+                <td class="field-name">nombre_insumo</td>
+                <td><span class="type-tag">TEXT</span></td>
+                <td>-</td>
+                <td>Nombre de la materia prima</td>
+              </tr>
+              <tr>
+                <td class="field-name">unidad_medida</td>
+                <td><span class="type-tag">TEXT</span></td>
+                <td>-</td>
+                <td>Kg, Litros, Unidades, Metros</td>
+              </tr>
+              <tr>
+                <td rowspan="3" style="font-weight: bold; color: #fff;">ordenes_compra</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>Número de orden de compra</td>
+              </tr>
+              <tr>
+                <td class="field-name">proveedor_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>Proveedor adjudicado</td>
+              </tr>
+              <tr>
+                <td class="field-name">estado</td>
+                <td><span class="type-tag">TEXT</span></td>
+                <td>-</td>
+                <td>Pendiente, Recibido, Cancelado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Circuito 3: Stock -->
+      <div id="dbtab-stock" class="db-tab-content">
+        <div class="card">
+          <h3><i class="fa-solid fa-boxes-stacked" style="color: #f59e0b;"></i> Control de Stock y Alertas de Reorden</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Monitoreo en tiempo real de las existencias disponibles y cálculo de alertas de stock mínimo.
+          </p>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Tabla</th>
+                <th>Campo</th>
+                <th>Tipo de Dato (SQLite)</th>
+                <th>Clave</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="4" style="font-weight: bold; color: #fff;">inventario</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>ID del registro de stock</td>
+              </tr>
+              <tr>
+                <td class="field-name">item_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>ID de producto o materia prima</td>
+              </tr>
+              <tr>
+                <td class="field-name">stock_actual</td>
+                <td><span class="type-tag">REAL</span></td>
+                <td>-</td>
+                <td>Cantidad física disponible</td>
+              </tr>
+              <tr>
+                <td class="field-name">stock_minimo</td>
+                <td><span class="type-tag">REAL</span></td>
+                <td>-</td>
+                <td>Umbral para disparar reorden</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Requerimiento Clave Agéntico -->
+      <div class="card" style="margin-top: 24px; border-left: 4px solid var(--primary-500);">
+        <h4 style="color: var(--primary-300);"><i class="fa-solid fa-circle-exclamation"></i> Requerimiento de Proceso Estratégico</h4>
+        <p style="color: var(--text-muted); margin-top: 6px;">
+          El desarrollo en Laravel <strong>no debe limitarse a un simple CRUD</strong> (Altas, Bajas y Modificaciones). Debes implementar un proceso estratégico como:
+        </p>
+        <ul style="color: var(--text-main); margin-top: 8px; padding-left: 20px;">
+          <li>Deducción automática de materias primas e insumos al confirmar un pedido de producción.</li>
+          <li>Cálculo dinámico del margen de ganancia en base al costo actualizado de insumos.</li>
+          <li>Generación automática de sugerencia de compras cuando el stock cae debajo del mínimo.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 4: GUÍAS PASO A PASO (GITHUB & LARAVEL)
+         =================================================================== -->
+    <section id="tab-guias" class="tab-content">
+      <div class="section-header">
+        <h2>Guía de Configuración & Entorno de Desarrollo</h2>
+        <p>Pautas paso a paso para GitHub, Composer y la creación de tu proyecto Laravel con SQLite.</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Guía GitHub -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-brands fa-github"></i></div>
+            <h3>Mini Guía: Dar de alta en GitHub</h3>
+          </div>
+          <ol style="color: var(--text-muted); line-height: 1.8; padding-left: 20px;">
+            <li>Ingresa a <a href="https://github.com" target="_blank" style="color: #38bdf8;">github.com</a> y crea una cuenta gratuita.</li>
+            <li>Crea un repositorio llamado <code>mi-proyecto-bd2</code> (marca la opción Público o Privado).</li>
+            <li>Abre la consola de comandos en tu computadora y navega a la carpeta de XAMPP:</li>
+          </ol>
+
+          <div class="code-container" style="margin-top: 12px;">
+            <div class="code-header">
+              <span>Terminal / PowerShell</span>
+              <button class="btn-copy" data-copy-target="cmd-git-clone"><i class="fa-solid fa-copy"></i> Copiar</button>
+            </div>
+            <pre><code id="cmd-git-clone">cd c:/xampp/htdocs
+git clone https://github.com/tu-usuario/mi-proyecto-bd2.git</code></pre>
+          </div>
+        </div>
+
+        <!-- Guía Composer & Laravel -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-brands fa-laravel"></i></div>
+            <h3>Mini Guía: Composer, Laravel & SQLite</h3>
+          </div>
+          <ol style="color: var(--text-muted); line-height: 1.8; padding-left: 20px;">
+            <li>Verifica si tienes Composer instalado ejecutando <code>composer --version</code>. Si no lo tienes, descárgalo de <a href="https://getcomposer.org" target="_blank" style="color: #38bdf8;">getcomposer.org</a>.</li>
+            <li>Crea el proyecto Laravel en <code>c:/xampp/htdocs</code> y ejecuta las migraciones SQLite:</li>
+          </ol>
+
+          <div class="code-container" style="margin-top: 12px;">
+            <div class="code-header">
+              <span>Terminal / PowerShell</span>
+              <button class="btn-copy" data-copy-target="cmd-laravel-create"><i class="fa-solid fa-copy"></i> Copiar</button>
+            </div>
+            <pre><code id="cmd-laravel-create">cd c:/xampp/htdocs
+composer create-project laravel/laravel mi-proyecto-bd2
+cd mi-proyecto-bd2
+php artisan migrate</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Requerimiento Tecnológico Stack -->
+      <div class="card" style="margin-top: 24px;">
+        <h3><i class="fa-solid fa-code" style="color: var(--secondary-color);"></i> Requerimientos Obligatorios del Stack Web</h3>
+        <div class="hero-badges" style="margin-top: 12px;">
+          <span class="badge badge-primary"><i class="fa-brands fa-php"></i> PHP 8.x</span>
+          <span class="badge badge-primary"><i class="fa-brands fa-laravel"></i> Laravel Framework</span>
+          <span class="badge badge-success"><i class="fa-solid fa-database"></i> Base de datos SQLite</span>
+          <span class="badge badge-primary"><i class="fa-brands fa-html5"></i> HTML5 Semántico</span>
+          <span class="badge badge-primary"><i class="fa-brands fa-js"></i> Vanilla JavaScript</span>
+          <span class="badge badge-success"><i class="fa-brands fa-css3-alt"></i> CSS Puro (Vanilla CSS)</span>
+        </div>
+        <p style="color: var(--text-muted); margin-top: 12px; font-size: 0.95rem;">
+          ⚠️ <strong>Nota sobre estilos:</strong> Se requiere el uso de <strong>CSS Puro</strong> estructurado en archivos dentro de <code>public/css/</code>, manteniendo el control total sobre las clases y variables cromáticas sin depender obligatoriamente de utilidades externas como Tailwind.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 5: ENTORNO AGÉNTICO & AGENT.MD
+         =================================================================== -->
+    <section id="tab-agent" class="tab-content">
+      <div class="section-header">
+        <h2>Entorno Agéntico (Antigravity) & Memoria AGENT.md</h2>
+        <p>Configuración del archivo de memoria persistente para el trabajo agéntico asistido por IA.</p>
+      </div>
+
+      <div class="card" style="margin-bottom: 24px;">
+        <h3><i class="fa-solid fa-anchor" style="color: var(--primary-400);"></i> Propósito del archivo AGENT.md</h3>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          El archivo <code>AGENT.md</code> se ubica en la raíz de tu proyecto Laravel y actúa como el ancla conceptual y memoria de contexto para el asistente IA (Antigravity). Garantiza que cada decisión de diseño, paleta de colores y arquitectura de base de datos en SQLite se mantenga coherente.
+        </p>
+      </div>
+
+      <!-- Generador / Copiador de AGENT.md -->
+      <div class="card">
+        <h3 class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-gears"></i></div>
+          Generador de Plantilla AGENT.md Personalizada
+        </h3>
+
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label for="agent-startup-name">Nombre de tu Emprendimiento</label>
+            <input type="text" id="agent-startup-name" class="input-text" value="Mi Emprendimiento" placeholder="Ej: EcoInsumos Concordia">
+          </div>
+          <div class="form-group">
+            <label for="agent-startup-slogan">Eslogan de la Marca</label>
+            <input type="text" id="agent-startup-slogan" class="input-text" value="Calidad y sustentabilidad en cada detalle" placeholder="Ej: Tu solución rápida y confiable">
+          </div>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <span>AGENT.md (Raíz del proyecto)</span>
+            <button class="btn-copy" data-copy-target="agent-memory-template-code"><i class="fa-solid fa-copy"></i> Copiar AGENT.md</button>
+          </div>
+          <pre><code id="agent-memory-template-code"># MEMORIA DEL PROYECTO: MI EMPRENDIMIENTO
+...</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 6: DOCUMENTACIÓN & CHECKLIST
+         =================================================================== -->
+    <section id="tab-docs" class="tab-content">
+      <div class="section-header">
+        <h2>Documentación & Lista de Verificación</h2>
+        <p>Seguimiento interactivo para asegurar el cumplimiento total del proyecto integrador.</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Requerimiento de Documentación -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-solid fa-book"></i></div>
+            <h3>Documentación de Flujos de Trabajo</h3>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 12px;">
+            Deberás crear una carpeta <code>docs/</code> en la raíz del proyecto conteniendo archivos Markdown para cada circuito:
+          </p>
+          <ul style="color: var(--text-main); line-height: 1.8; padding-left: 20px;">
+            <li><code>docs/circuito_ventas.md</code>: Diagrama de flujo e interacción de tablas en SQLite.</li>
+            <li><code>docs/materia_prima.md</code>: Proceso de adquisición y cálculo de rendimiento.</li>
+            <li><code>docs/stock_y_pedidos.md</code>: Reglas de deducción e inventario mínimo.</li>
+          </ul>
+        </div>
+
+        <!-- Checklist Interactivo del Alumno -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-solid fa-square-check"></i></div>
+            <h3>Checklist de Micro-Pasos</h3>
+          </div>
+          <ul class="checklist">
+            <li class="check-item">
+              <input type="checkbox" id="chk-1">
+              <label for="chk-1">Definir el emprendimiento, logotipo y eslogan comercial.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-2">
+              <label for="chk-2">Crear cuenta en GitHub y repositorio <code>mi-proyecto-bd2</code>.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-3">
+              <label for="chk-3">Clonar repositorio en <code>c:/xampp/htdocs/</code>.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-4">
+              <label for="chk-4">Verificar Composer y crear proyecto Laravel.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-5">
+              <label for="chk-5">Definir el color primario y generar la paleta cromática CSS.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-6">
+              <label for="chk-6">Crear el archivo <code>AGENT.md</code> en la raíz del proyecto.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-7">
+              <label for="chk-7">Configurar SQLite en <code>.env</code> y crear las migraciones relacionales de Ventas, Compras y Stock.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-8">
+              <label for="chk-8">Desarrollar el proceso estratégico clave con Antigravity en Laravel.</label>
+            </li>
+            <li class="check-item">
+              <input type="checkbox" id="chk-9">
+              <label for="chk-9">Redactar la documentación en la carpeta <code>docs/</code>.</label>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Base de Datos II & Emprendimientos — Cátedra Proyecto Integrador &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
