@@ -5,43 +5,134 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
+  initStepNavigation();
   initChecklistProgress();
   initColorPaletteGenerator();
   initDbExplorer();
   initAgentMemoryGenerator();
   initCopyButtons();
+  initUiModal();
 });
+
+// Step sequence definition
+const STEPS = [
+  { id: 'tab-contexto', num: 1, title: '1. Visión & Contexto', nextId: 'tab-diseno', nextTitle: '2. Sistema de Diseño (IA)' },
+  { id: 'tab-diseno', num: 2, title: '2. Sistema de Diseño (IA)', prevId: 'tab-contexto', prevTitle: '1. Visión & Contexto', nextId: 'tab-bd', nextTitle: '3. Modelo E-R en DRAWIO' },
+  { id: 'tab-bd', num: 3, title: '3. Modelo E-R en DRAWIO', prevId: 'tab-diseno', prevTitle: '2. Sistema de Diseño', nextId: 'tab-guias', nextTitle: '4. Guía GitHub & Laravel' },
+  { id: 'tab-guias', num: 4, title: '4. Guía GitHub & Laravel', prevId: 'tab-bd', prevTitle: '3. Modelo E-R en DRAWIO', nextId: 'tab-agent', nextTitle: '5. Entorno Agéntico (AGENT.md)' },
+  { id: 'tab-agent', num: 5, title: '5. Entorno Agéntico (AGENT.md)', prevId: 'tab-guias', prevTitle: '4. Guía GitHub & Laravel', nextId: 'tab-docs', nextTitle: '6. Interfaz, Backend & Guía UI' },
+  { id: 'tab-docs', num: 6, title: '6. Interfaz, Backend & Guía UI', prevId: 'tab-agent', prevTitle: '5. Entorno Agéntico', nextId: null, nextTitle: null }
+];
 
 /* ==========================================================================
    1. Tab Navigation System
    ========================================================================== */
-function initTabs() {
-  const tabButtons = document.querySelectorAll('.tab-btn');
+function switchTab(targetId, shouldScroll = false) {
+  const tabButtons = document.querySelectorAll('.tab-btn:not(.db-tab-btn)');
   const tabContents = document.querySelectorAll('.tab-content');
 
+  tabButtons.forEach(b => {
+    if (b.getAttribute('data-tab') === targetId) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
+  });
+
+  tabContents.forEach(c => {
+    if (c.id === targetId) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+
+  updateStepIndicators(targetId);
+
+  if (shouldScroll) {
+    const mainSection = document.querySelector('main');
+    if (mainSection) {
+      const topOffset = mainSection.getBoundingClientRect().top + window.pageYOffset - 30;
+      window.scrollTo({ top: topOffset, behavior: 'smooth' });
+    }
+  }
+}
+
+function initTabs() {
+  const tabButtons = document.querySelectorAll('.tab-btn:not(.db-tab-btn)');
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-tab');
-
-      tabButtons.forEach(b => b.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
-
-      btn.classList.add('active');
-      const targetContent = document.getElementById(targetId);
-      if (targetContent) {
-        targetContent.classList.add('active');
-      }
+      if (targetId) switchTab(targetId, false);
     });
   });
 }
 
 /* ==========================================================================
-   2. Checklist & Progress Tracking System (localStorage)
+   1.1 Step-by-Step Navigation System
+   ========================================================================== */
+function initStepNavigation() {
+  document.querySelectorAll('.btn-step-next').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const nextTab = btn.getAttribute('data-next-tab');
+      if (nextTab) {
+        switchTab(nextTab, true);
+      }
+    });
+  });
+
+  document.querySelectorAll('.btn-step-prev').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const prevTab = btn.getAttribute('data-prev-tab');
+      if (prevTab) {
+        switchTab(prevTab, true);
+      }
+    });
+  });
+
+  document.querySelectorAll('.btn-step-finish').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const checklistSection = document.querySelector('.checklist');
+      if (checklistSection) {
+        checklistSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  updateStepIndicators('tab-contexto');
+}
+
+function updateStepIndicators(activeTabId) {
+  const currentStep = STEPS.find(s => s.id === activeTabId) || STEPS[0];
+  const stepPercent = Math.round((currentStep.num / STEPS.length) * 100);
+
+  // Update step badges and mini progress bars in all step navigation footers
+  document.querySelectorAll('.step-nav-footer').forEach(footer => {
+    const badgeCurrent = footer.querySelector('.step-badge-current');
+    if (badgeCurrent) {
+      badgeCurrent.innerHTML = `<i class="fa-solid fa-shoe-prints"></i> Paso ${currentStep.num} de ${STEPS.length}`;
+    }
+
+    const badgeProgress = footer.querySelector('.step-badge-progress');
+    if (badgeProgress) {
+      badgeProgress.innerHTML = `<i class="fa-solid fa-chart-line"></i> Progreso de Pasos: ${stepPercent}%`;
+    }
+
+    const miniFill = footer.querySelector('.step-mini-fill');
+    if (miniFill) {
+      miniFill.style.width = `${stepPercent}%`;
+    }
+  });
+}
+
+/* ==========================================================================
+   2. Checklist Tracking System (localStorage)
    ========================================================================== */
 function initChecklistProgress() {
   const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
-  const progressBarFill = document.getElementById('overall-progress-fill');
-  const progressPercentText = document.getElementById('overall-progress-text');
   const STORAGE_KEY = 'uner_sec_mi_proyecto_progress';
 
   // Load saved state
@@ -66,22 +157,8 @@ function initChecklistProgress() {
       // Save state
       savedState[itemKey] = isChecked;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(savedState));
-
-      updateProgress();
     });
   });
-
-  function updateProgress() {
-    const total = checkboxes.length;
-    if (total === 0) return;
-    const checkedCount = document.querySelectorAll('.check-item input[type="checkbox"]:checked').length;
-    const percent = Math.round((checkedCount / total) * 100);
-
-    if (progressBarFill) progressBarFill.style.width = `${percent}%`;
-    if (progressPercentText) progressPercentText.textContent = `${percent}% Completo (${checkedCount}/${total})`;
-  }
-
-  updateProgress();
 }
 
 /* ==========================================================================
@@ -321,5 +398,49 @@ function initCopyButtons() {
         });
       }
     });
+  });
+}
+
+/* ==========================================================================
+   8. Interactive UI Components Modal Logic
+   ========================================================================== */
+function initUiModal() {
+  const modalOverlay = document.getElementById('ui-components-modal');
+  const btnOpen = document.getElementById('btn-open-ui-hint');
+  const btnClose = document.getElementById('btn-close-ui-modal');
+  const btnCloseFooter = document.getElementById('btn-modal-close-footer');
+
+  if (!modalOverlay || !btnOpen) return;
+
+  function openModal() {
+    modalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  btnOpen.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal();
+  });
+
+  if (btnClose) btnClose.addEventListener('click', closeModal);
+  if (btnCloseFooter) btnCloseFooter.addEventListener('click', closeModal);
+
+  // Close when clicking on backdrop
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeModal();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+      closeModal();
+    }
   });
 }

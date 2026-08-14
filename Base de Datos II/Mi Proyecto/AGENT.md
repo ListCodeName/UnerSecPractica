@@ -23,10 +23,11 @@ Este archivo sirve como ancla de contexto y memoria persistente para el entorno 
 
 ---
 
-## 🗄️ 3. Modelo de Base de Datos y Motor (SQLite)
-El sistema utiliza **SQLite** como motor de base de datos relacional (almacenado en un archivo embebido `database/database.sqlite`), evitando la necesidad de instalar o ejecutar el servidor MySQL en XAMPP.
+## 🗄️ 3. Modelo de Base de Datos, Diagrama DRAWIO y Motor (SQLite)
+- **Modelado en Draw.io**: Se debe diseñar el diagrama entidad-relación (DER) en **Draw.io** y guardarlo dentro de la carpeta del proyecto (ej: `docs/modelo_entidad_relacion.drawio` o `.png`).
+- **Motor de Base de Datos**: El sistema utiliza **SQLite** como motor relacional (almacenado en un archivo embebido `database/database.sqlite`), evitando la necesidad de instalar o ejecutar el servidor MySQL en XAMPP.
 
-### Circuitos requeridos:
+### Circuitos requeridos en el DER:
 1. **Circuito de Ventas y Pedidos**: Clientes, Pedidos, Detalle de Pedidos, Facturación.
 2. **Circuito de Compras y Materia Prima**: Proveedores, Insumos, Órdenes de Compra.
 3. **Circuito de Stock e Inventario**: Movimientos de Stock, Almacenes, Alertas de Reorden.
@@ -38,10 +39,14 @@ Cuando solicites código o refactorizaciones al asistente IA:
 - **Base de Datos**: Configurar el archivo `.env` con `DB_CONNECTION=sqlite` sin requerir servidor MySQL externo.
 - **No limitarse a un simple CRUD**: El desarrollo debe resolver un proceso estratégico (ejemplo: deducción automática de materias primas al confirmar una venta, cálculo de rendimientos, algoritmo de reposición de stock).
 - **Mantener la separación de responsabilidades**: Controladores limpios en Laravel, modelos con relaciones Eloquent claras, y vistas estructuradas.
-- **Preservar la documentación**: Cada circuito debe contar con su correspondiente archivo markdown en la carpeta `docs/`.
+- **Preservar la documentación**: Cada circuito debe contar con su correspondiente archivo markdown en la carpeta `docs/` junto con el diagrama `docs/modelo_entidad_relacion.drawio`.
 
 ---
 
 ## 📜 5. Historial de Cambios y Decisiones de Diseño
 - `2026-08-11`: Creación de la estructura base y portal interactivo de pautas.
 - `2026-08-11`: Actualización del motor de base de datos a SQLite (sin dependencia de MySQL en XAMPP).
+- `2026-08-14`: Integración del sistema de navegación paso a paso (`step-nav-footer`) con progresión basada exclusivamente en los pasos del proyecto.
+- `2026-08-14`: Ajuste del Paso 3 a "Realizar un modelo entidad-relación en DRAWIO" guardado en la carpeta del proyecto y corrección de la visibilidad de sub-tabs de circuitos.
+
+
