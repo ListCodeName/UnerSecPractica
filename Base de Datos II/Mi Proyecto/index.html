@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto Integrador | Base de Datos II & Emprendimientos</title>
+  <meta name="description" content="Guía interactiva y portal de pautas para el desarrollo del Proyecto Integrador articulado entre Base de Datos II y Emprendimientos usando SQLite.">
+  
+  <!-- Modern Font Families & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- HERO HEADER & PROGRESS BAR -->
+  <header class="hero">
+    <div class="container hero-header">
+      <div class="hero-title-group">
+        <h1>Proyecto Integrador <span class="gradient-text">Base de Datos II</span></h1>
+        <p class="hero-subtitle">
+          Portal interactivo de pautas, arquitectura de datos en SQLite, sistema de diseño asistido por IA y flujo agéntico para tu emprendimiento.
+        </p>
+        <div class="hero-badges">
+          <span class="badge badge-primary"><i class="fa-solid fa-layer-group"></i> Articulación Emprendimientos</span>
+          <span class="badge badge-success"><i class="fa-brands fa-laravel"></i> Laravel + Pure CSS</span>
+          <span class="badge badge-primary"><i class="fa-solid fa-database"></i> SQLite (Sin MySQL/XAMPP)</span>
+          <span class="badge"><i class="fa-solid fa-robot"></i> Entorno Agéntico Antigravity</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN NAVIGATION TABS -->
+  <main class="container">
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-contexto">
+        <i class="fa-solid fa-compass"></i> 1. Visión & Contexto
+      </button>
+      <button class="tab-btn" data-tab="tab-diseno">
+        <i class="fa-solid fa-palette"></i> 2. Sistema de Diseño (IA)
+      </button>
+      <button class="tab-btn" data-tab="tab-bd">
+        <i class="fa-solid fa-diagram-project"></i> 3. Modelo E-R (DRAWIO)
+      </button>
+      <button class="tab-btn" data-tab="tab-guias">
+        <i class="fa-solid fa-terminal"></i> 4. Guía GitHub & Laravel
+      </button>
+      <button class="tab-btn" data-tab="tab-agent">
+        <i class="fa-solid fa-brain"></i> 5. Entorno Agéntico & AGENT.md
+      </button>
+      <button class="tab-btn" data-tab="tab-docs">
+        <i class="fa-solid fa-cubes"></i> 6. Interfaz, Backend & Guía UI
+      </button>
+    </nav>
+
+    <!-- ===================================================================
+         TAB 1: VISIÓN GENERAL Y CONTEXTO
+         =================================================================== -->
+    <section id="tab-contexto" class="tab-content active">
+      <div class="section-header">
+        <h2>Articulación Interdisciplinaria</h2>
+        <p>Unión sinérgica entre la estrategia comercial (Emprendimientos) y la ingeniería de software (Base de Datos II).</p>
+      </div>
+
+      <!-- Factor Clave Callout -->
+      <div class="key-factor-card">
+        <div class="key-factor-icon"><i class="fa-solid fa-key"></i></div>
+        <div class="key-factor-content">
+          <h4>Factor Clave 1: Enfoque en un Emprendimiento Real</h4>
+          <p>
+            El proyecto no es un ejercicio teórico aislado: digitaliza la operación de tu propio emprendimiento definiendo su identidad de marca, modelo comercial y los procesos operativos que el sistema web automatizará.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Emprendimiento Aspect -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-solid fa-lightbulb"></i></div>
+            <h3>Materia: Emprendimientos</h3>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Definición del modelo de negocio, identidad de marca y seguimiento comercial.
+          </p>
+          <ul style="color: var(--text-main); line-height: 1.8; padding-left: 20px;">
+            <li><strong>Branding & Eslogan:</strong> Creación del nombre, propuesta de valor y logotipo del proyecto.</li>
+            <li><strong>Estrategia Comercial:</strong> Definición de clientes ideales, canales de venta y precios.</li>
+            <li><strong>Gestión de Operaciones:</strong> Identificación del circuito de materia prima y productos.</li>
+          </ul>
+        </div>
+
+        <!-- Base de Datos 2 Aspect -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-icon"><i class="fa-solid fa-server"></i></div>
+            <h3>Materia: Base de Datos II</h3>
+          </div>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Diseño e implementación del sistema web funcional que soporta las operaciones.
+          </p>
+          <ul style="color: var(--text-main); line-height: 1.8; padding-left: 20px;">
+            <li><strong>Modelo Relacional en SQLite:</strong> Tablas, campos y claves sin requerir servidor MySQL.</li>
+            <li><strong>Desarrollo Web en Laravel:</strong> Implementación con PHP, HTML, JavaScript y Vanilla CSS.</li>
+            <li><strong>Flujo Agéntico (Antigravity):</strong> Automatización de un proceso estratégico clave de negocio.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Secuencia Lógica de Pasos -->
+      <div class="card" style="margin-top: 24px;">
+        <h3 style="margin-bottom: 16px;"><i class="fa-solid fa-diagram-project" style="color: var(--primary-400);"></i> Secuencia Lógica de Ejecución</h3>
+        <div class="grid-3">
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); margin-bottom: 8px;">Paso 1: Identidad Comercial</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Definir el emprendimiento, eslogan, logotipo y paleta cromática principal.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); margin-bottom: 8px;">Paso 2: Modelo E-R en DRAWIO</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Diseñar el diagrama relacional DER en Draw.io y guardarlo en la carpeta del proyecto.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); margin-bottom: 8px;">Paso 3: Desarrollo Agéntico</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Crear el proyecto Laravel en <code style="color: #38bdf8;">c:/xampp/htdocs</code> usando Antigravity y Pure CSS.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Navegación de Paso 1 -->
+      <div class="step-nav-footer">
+        <div style="min-width: 140px;"></div>
+        <div class="step-progress-info">
+          <div class="step-indicator-badges">
+            <span class="step-badge-current"><i class="fa-solid fa-shoe-prints"></i> Paso 1 de 6</span>
+            <span class="step-badge-progress"><i class="fa-solid fa-chart-line"></i> Progreso de Pasos: 17%</span>
+          </div>
+          <div class="step-mini-bar"><div class="step-mini-fill"></div></div>
+        </div>
+        <button class="btn-step btn-step-next" data-next-tab="tab-diseno">
+          Siguiente: 2. Sistema de Diseño (IA) <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 2: SISTEMA DE DISEÑO CON IA
+         =================================================================== -->
+    <section id="tab-diseno" class="tab-content">
+      <div class="section-header">
+        <h2>Sistema de Diseño & Identidad Visual (IA Assisted)</h2>
+        <p>Utiliza herramientas como ChatGPT o Gemini junto a tu logotipo para definir los estilos de tu web.</p>
+      </div>
+
+      <!-- Factor Clave Callout -->
+      <div class="key-factor-card">
+        <div class="key-factor-icon"><i class="fa-solid fa-palette"></i></div>
+        <div class="key-factor-content">
+          <h4>Factor Clave 2: Pure CSS con Tokens Nativos</h4>
+          <p>
+            Construirás la interfaz utilizando <strong>Vanilla CSS (Pure CSS)</strong> con variables personalizadas (escala 50 a 900) generadas a partir del color de tu marca, sin depender de frameworks CSS pesados.
+          </p>
+        </div>
+      </div>
+
+      <!-- Generador Interactivo de Paletas de Color -->
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-sliders"></i></div>
+          Estudio Interactivo de Paleta de Colores
+        </h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Selecciona el color primario de tu marca. El sistema generará automáticamente la escala cromática de 50 a 900 y aplicará las variables en tiempo real a los componentes de muestra.
+        </p>
+
+        <div class="color-studio-wrapper">
+          <div class="color-controls">
+            <div class="form-group">
+              <label for="primary-color-picker">Color Primario de la Marca</label>
+              <div class="color-picker-group">
+                <input type="color" id="primary-color-picker" value="#6366f1">
+                <input type="text" id="primary-color-hex" class="input-text" value="#6366f1" placeholder="#6366f1">
+              </div>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              Usa este color base para los botones de acción principal, bordes destacados y elementos interactivos.
+            </p>
+          </div>
+
+          <div>
+            <h4 style="font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Escala Armónica Generada (50 a 900)</h4>
+            <div class="swatch-scale" id="swatch-scale-container">
+              <!-- Swatches generated dynamically via app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Muestra en vivo de Componentes UI -->
+        <div class="ui-specimen-box">
+          <div class="specimen-header"><i class="fa-solid fa-eye"></i> Vista Previa de Componentes UI</div>
+          <div class="specimen-row">
+            <button class="btn-demo btn-demo-primary"><i class="fa-solid fa-cart-shopping"></i> Botón Primario</button>
+            <button class="btn-demo btn-demo-secondary"><i class="fa-solid fa-filter"></i> Botón Secundario</button>
+            <span class="badge badge-primary">Badge Activo</span>
+            <span class="badge badge-success">En Stock</span>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Caja de Texto de Ejemplo</label>
+            <input type="text" class="input-text" placeholder="Ej: Nombre de la Materia Prima..." style="max-width: 400px;">
+          </div>
+        </div>
+
+        <!-- Bloque de Código CSS Generado -->
+        <div class="code-container" style="margin-top: 20px;">
+          <div class="code-header">
+            <span>variables-css-marca.css</span>
+            <button class="btn-copy" data-copy-target="generated-css-code"><i class="fa-solid fa-copy"></i> Copiar CSS</button>
+          </div>
+          <pre><code id="generated-css-code">:root {
+  --primary-50: #eef2ff;
+  --primary-500: #6366f1;
+  --primary-900: #312e81;
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Prompt para Consultar a la IA -->
+      <div class="card">
+        <h3><i class="fa-solid fa-robot" style="color: var(--primary-400);"></i> Prompt Sugerido para ChatGPT / Gemini</h3>
+        <p style="color: var(--text-muted); margin-bottom: 12px;">Copia y adapta este prompt para obtener recomendaciones exactas de diseño:</p>
+        <div class="code-container">
+          <div class="code-header">
+            <span>prompt_diseño_ia.txt</span>
+            <button class="btn-copy" data-copy-target="prompt-ia-text"><i class="fa-solid fa-copy"></i> Copiar Prompt</button>
+          </div>
+          <pre><code id="prompt-ia-text">Hola! Tengo un emprendimiento llamado [NOMBRE_EMPRENDIMIENTO] dedicado a [RUBRO/PRODUCTO]. 
+Mi slogan es "[ESLOGAN]" y mi color principal es [COLOR_HEX]. 
+Necesito que me sugieras:
+1. Una escala armónica de colores primarios y secundarios para CSS Puro (Vanilla CSS).
+2. Estilos para cajas de texto, botones con estados hover/active, cabeceras y tarjetas.
+3. Formato visual y tipografías de Google Fonts que combinen con la personalidad de mi marca.</code></pre>
+        </div>
+      </div>
+
+      <!-- Barra de Navegación de Paso 2 -->
+      <div class="step-nav-footer">
+        <button class="btn-step btn-step-prev" data-prev-tab="tab-contexto">
+          <i class="fa-solid fa-arrow-left"></i> Anterior: 1. Visión & Contexto
+        </button>
+        <div class="step-progress-info">
+          <div class="step-indicator-badges">
+            <span class="step-badge-current"><i class="fa-solid fa-shoe-prints"></i> Paso 2 de 6</span>
+            <span class="step-badge-progress"><i class="fa-solid fa-chart-line"></i> Progreso de Pasos: 17%</span>
+          </div>
+          <div class="step-mini-bar"><div class="step-mini-fill"></div></div>
+        </div>
+        <button class="btn-step btn-step-next" data-next-tab="tab-bd">
+          Siguiente: 3. Modelo E-R en DRAWIO <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 3: MODELO ENTIDAD-RELACIÓN EN DRAWIO & CIRCUITOS
+         =================================================================== -->
+    <section id="tab-bd" class="tab-content">
+      <div class="section-header">
+        <h2>3. Realizar un Modelo Entidad-Relación en DRAWIO</h2>
+        <p>Diseño y modelado visual del diagrama entidad-relación (DER) de tu emprendimiento en Draw.io, guardado dentro de la carpeta creada para el proyecto.</p>
+      </div>
+
+      <!-- Factor Clave Callout -->
+      <div class="key-factor-card">
+        <div class="key-factor-icon"><i class="fa-solid fa-diagram-project"></i></div>
+        <div class="key-factor-content">
+          <h4>Factor Clave 3: Realizar un Modelo Entidad-Relación en DRAWIO</h4>
+          <p>
+            Deberás modelar el diagrama entidad-relación completo utilizando <strong>Draw.io</strong> contemplando los circuitos de <strong>Ventas, Materia Prima/Compras y Stock/Inventario</strong>, especificando claves primarias (PK), foráneas (FK) y cardinalidad (1:N, N:M), y <strong>guardar el archivo (.drawio y su exportación .png/.pdf) en la carpeta creada para el proyecto</strong> (ej. dentro de <code>docs/modelo_entidad_relacion.drawio</code>).
+          </p>
+        </div>
+      </div>
+
+      <!-- Pautas para Draw.io Card -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+          <h3>Pautas de Modelado en Draw.io & Almacenamiento</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">
+          Diseña el diagrama utilizando la herramienta web gratuita <a href="https://app.diagrams.net/" target="_blank" style="color: #38bdf8; font-weight: 600; text-decoration: underline;">draw.io (app.diagrams.net)</a> y asegúrate de guardar el archivo dentro de tu repositorio local:
+        </p>
+        <div class="grid-3" style="gap: 16px;">
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-folder-arrow-down"></i> 1. Carpeta del Proyecto</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Guardar el archivo como <code>docs/modelo_entidad_relacion.drawio</code> (o exportación <code>.png</code>) dentro del directorio de tu proyecto.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-key"></i> 2. Claves y Atributos</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Indicar claves primarias (PK), claves foráneas (FK), tipos de datos SQLite y restricciones de cada entidad.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-network-wired"></i> 3. Cardinalidad y Circuitos</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Representar las relaciones (1 a N, N a M con tablas intermedias) para Ventas, Materias Primas e Inventario.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-navegación por Circuitos (Tabs para tablas de ejemplo) -->
+      <div class="db-tabs-nav">
+        <button class="db-tab-btn active" data-dbtab="dbtab-ventas"><i class="fa-solid fa-receipt"></i> Circuito de Ventas</button>
+        <button class="db-tab-btn" data-dbtab="dbtab-materia"><i class="fa-solid fa-boxes-packing"></i> Materia Prima & Compras</button>
+        <button class="db-tab-btn" data-dbtab="dbtab-stock"><i class="fa-solid fa-warehouse"></i> Stock e Inventario</button>
+      </div>
+
+      <!-- Circuito 1: Ventas -->
+      <div id="dbtab-ventas" class="db-tab-content active">
+        <div class="card">
+          <h3><i class="fa-solid fa-cash-register" style="color: var(--secondary-color);"></i> Circuito de Ventas y Pedidos de Clientes</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Gestiona la facturación, los pedidos efectuados por los clientes y la deducción automática de stock en SQLite.
+          </p>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Tabla</th>
+                <th>Campo</th>
+                <th>Tipo de Dato (SQLite)</th>
+                <th>Clave</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="4" style="font-weight: bold; color: #fff;">ventas</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>Identificador único autoincremental</td>
+              </tr>
+              <tr>
+                <td class="field-name">cliente_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>Referencia a la tabla clientes</td>
+              </tr>
+              <tr>
+                <td class="field-name">fecha_emision</td>
+                <td><span class="type-tag">DATETIME</span></td>
+                <td>-</td>
+                <td>Fecha y hora del pedido</td>
+              </tr>
+              <tr>
+                <td class="field-name">total</td>
+                <td><span class="type-tag">REAL</span></td>
+                <td>-</td>
+                <td>Monto total calculado</td>
+              </tr>
+              <tr>
+                <td rowspan="3" style="font-weight: bold; color: #fff;">detalle_ventas</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>ID del ítem en detalle</td>
+              </tr>
+              <tr>
+                <td class="field-name">producto_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>Referencia al producto vendido</td>
+              </tr>
+              <tr>
+                <td class="field-name">cantidad</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td>-</td>
+                <td>Unidades vendidas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Circuito 2: Materia Prima -->
+      <div id="dbtab-materia" class="db-tab-content">
+        <div class="card">
+          <h3><i class="fa-solid fa-truck-ramp-box" style="color: var(--primary-400);"></i> Adquisición de Materia Prima y Gestión de Compras</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Permite registrar las órdenes de compra a proveedores y el ingreso de insumos para la producción.
+          </p>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Tabla</th>
+                <th>Campo</th>
+                <th>Tipo de Dato (SQLite)</th>
+                <th>Clave</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="3" style="font-weight: bold; color: #fff;">materias_primas</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>ID único del insumo</td>
+              </tr>
+              <tr>
+                <td class="field-name">nombre_insumo</td>
+                <td><span class="type-tag">TEXT</span></td>
+                <td>-</td>
+                <td>Nombre de la materia prima</td>
+              </tr>
+              <tr>
+                <td class="field-name">unidad_medida</td>
+                <td><span class="type-tag">TEXT</span></td>
+                <td>-</td>
+                <td>Kg, Litros, Unidades, Metros</td>
+              </tr>
+              <tr>
+                <td rowspan="3" style="font-weight: bold; color: #fff;">ordenes_compra</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>Número de orden de compra</td>
+              </tr>
+              <tr>
+                <td class="field-name">proveedor_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>Proveedor adjudicado</td>
+              </tr>
+              <tr>
+                <td class="field-name">estado</td>
+                <td><span class="type-tag">TEXT</span></td>
+                <td>-</td>
+                <td>Pendiente, Recibido, Cancelado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Circuito 3: Stock -->
+      <div id="dbtab-stock" class="db-tab-content">
+        <div class="card">
+          <h3><i class="fa-solid fa-boxes-stacked" style="color: #f59e0b;"></i> Control de Stock y Alertas de Reorden</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Monitoreo en tiempo real de las existencias disponibles y cálculo de alertas de stock mínimo.
+          </p>
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Tabla</th>
+                <th>Campo</th>
+                <th>Tipo de Dato (SQLite)</th>
+                <th>Clave</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="4" style="font-weight: bold; color: #fff;">inventario</td>
+                <td class="field-name">id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="pk-tag">PK</span></td>
+                <td>ID del registro de stock</td>
+              </tr>
+              <tr>
+                <td class="field-name">item_id</td>
+                <td><span class="type-tag">INTEGER</span></td>
+                <td><span class="fk-tag">FK</span></td>
+                <td>ID de producto o materia prima</td>
+              </tr>
+              <tr>
+                <td class="field-name">stock_actual</td>
+                <td><span class="type-tag">REAL</span></td>
+                <td>-</td>
+                <td>Cantidad física disponible</td>
+              </tr>
+              <tr>
+                <td class="field-name">stock_minimo</td>
+                <td><span class="type-tag">REAL</span></td>
+                <td>-</td>
+                <td>Umbral para disparar reorden</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Requerimiento Clave Agéntico -->
+      <div class="card" style="margin-top: 24px; border-left: 4px solid var(--primary-500);">
+        <h4 style="color: var(--primary-300);"><i class="fa-solid fa-circle-exclamation"></i> Requerimiento de Proceso Estratégico</h4>
+        <p style="color: var(--text-muted); margin-top: 6px;">
+          El desarrollo en Laravel <strong>no debe limitarse a un simple CRUD</strong> (Altas, Bajas y Modificaciones). Debes implementar un proceso estratégico como:
+        </p>
+        <ul style="color: var(--text-main); margin-top: 8px; padding-left: 20px;">
+          <li>Deducción automática de materias primas e insumos al confirmar un pedido de producción.</li>
+          <li>Cálculo dinámico del margen de ganancia en base al costo actualizado de insumos.</li>
+          <li>Generación automática de sugerencia de compras cuando el stock cae debajo del mínimo.</li>
+        </ul>
+      </div>
+
+      <!-- Barra de Navegación de Paso 3 -->
+      <div class="step-nav-footer">
+        <button class="btn-step btn-step-prev" data-prev-tab="tab-diseno">
+          <i class="fa-solid fa-arrow-left"></i> Anterior: 2. Sistema de Diseño
+        </button>
+        <div class="step-progress-info">
+          <div class="step-indicator-badges">
+            <span class="step-badge-current"><i class="fa-solid fa-shoe-prints"></i> Paso 3 de 6</span>
+            <span class="step-badge-progress"><i class="fa-solid fa-chart-line"></i> Progreso de Pasos: 17%</span>
+          </div>
+          <div class="step-mini-bar"><div class="step-mini-fill"></div></div>
+        </div>
+        <button class="btn-step btn-step-next" data-next-tab="tab-guias">
+          Siguiente: 4. Guía GitHub & Laravel <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 4: GUÍAS PASO A PASO (GITHUB & LARAVEL)
+         =================================================================== -->
+    <section id="tab-guias" class="tab-content">
+      <div class="section-header">
+        <h2>4. Guía de GitHub, Variables de Entorno & Laravel Asistido</h2>
+        <p>Configuración integral de Git en tu PC, flujo de trabajo con comandos de sincronización e instalación asistida de Laravel con el Agente.</p>
+      </div>
+
+      <!-- Factor Clave Callout -->
+      <div class="key-factor-card">
+        <div class="key-factor-icon"><i class="fa-brands fa-git-alt"></i></div>
+        <div class="key-factor-content">
+          <h4>Factor Clave 4: Configuración Global de Git y Setup Asistido</h4>
+          <p>
+            Configurarás tus variables globales de Git para autorizar y registrar cada cambio (add, commit, push, fetch, pull) y utilizarás la asistencia del agente IA (Antigravity) para inicializar Laravel con SQLite en tu repositorio local.
+          </p>
+        </div>
+      </div>
+
+      <!-- BLOQUE 1: Dar de alta en GitHub -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-brands fa-github"></i></div>
+          <h3>1. Dar de alta en GitHub & Crear el Repositorio</h3>
+        </div>
+        <ol style="color: var(--text-muted); line-height: 1.8; padding-left: 20px; margin-bottom: 14px;">
+          <li>Ingresa a <a href="https://github.com" target="_blank" style="color: #38bdf8; font-weight: 600; text-decoration: underline;">github.com</a> y crea una cuenta gratuita (o inicia sesión si ya posees una).</li>
+          <li>Haz clic en <strong>New repository</strong> y nómbralo <code>mi-proyecto-bd2</code>.</li>
+          <li>Puedes marcarlo como <strong>Público</strong> o <strong>Privado</strong> y marcar la casilla <em>"Add a README file"</em>.</li>
+          <li>Haz clic en <strong>Create repository</strong> y copia la URL HTTPS de clonado (ejemplo: <code>https://github.com/tu-usuario/mi-proyecto-bd2.git</code>).</li>
+        </ol>
+      </div>
+
+      <!-- BLOQUE 2: Variables Globales de Git -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-sliders"></i></div>
+          <h3>2. Configurar Variables de Entorno Globales de Git en tu PC</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          Antes de interactuar con el repositorio, debes configurar tu identidad en la terminal (PowerShell o Git Bash). Estos datos identificarán la autoría de tus commits:
+        </p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <span>Terminal / PowerShell (Configuración de Identidad)</span>
+            <button class="btn-copy" data-copy-target="cmd-git-config"><i class="fa-solid fa-copy"></i> Copiar Comandos</button>
+          </div>
+          <pre><code id="cmd-git-config"># 1. Configurar tu nombre de autor
+git config --global user.name "Tu Nombre y Apellido"
+
+# 2. Configurar tu correo vinculado a GitHub
+git config --global user.email "tu-email@ejemplo.com"
+
+# 3. Establecer 'main' como rama por defecto
+git config --global init.defaultBranch main
+
+# 4. Verificar que los datos se guardaron correctamente
+git config --list</code></pre>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
+          💡 <strong>Nota:</strong> Solo necesitas ejecutar esta configuración una sola vez en tu computadora.
+        </p>
+      </div>
+
+      <!-- BLOQUE 3: Clonar, Probar Modificación y Flujo de Push/Pull -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-code-commit"></i></div>
+          <h3>3. Clonar, Modificación de Prueba & Flujo Completo de Envíos (Push)</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          Sigue esta secuencia paso a paso para clonar en XAMPP, hacer un cambio de prueba y enviarlo a GitHub:
+        </p>
+
+        <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 8px;"><i class="fa-solid fa-cloud-arrow-down"></i> Paso A: Clonar en XAMPP</h4>
+            <div class="code-container" style="margin: 0;">
+              <div class="code-header">
+                <span>PowerShell / CMD</span>
+                <button class="btn-copy" data-copy-target="cmd-git-clone-step"><i class="fa-solid fa-copy"></i> Copiar</button>
+              </div>
+              <pre><code id="cmd-git-clone-step">cd c:/xampp/htdocs
+git clone https://github.com/tu-usuario/mi-proyecto-bd2.git
+cd mi-proyecto-bd2</code></pre>
+            </div>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 8px;"><i class="fa-solid fa-pen-to-square"></i> Paso B: Modificación Simple de Prueba</h4>
+            <div class="code-container" style="margin: 0;">
+              <div class="code-header">
+                <span>PowerShell / CMD</span>
+                <button class="btn-copy" data-copy-target="cmd-git-edit-step"><i class="fa-solid fa-copy"></i> Copiar</button>
+              </div>
+              <pre><code id="cmd-git-edit-step"># Agregar una línea de prueba al README.md
+echo "Prueba de conexion Git - Base de Datos 2" >> README.md</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: var(--text-main); font-size: 0.95rem; margin: 16px 0 8px 0;"><i class="fa-solid fa-terminal" style="color: var(--secondary-color);"></i> Paso C: Secuencia de Comandos para Confirmar y Enviar (Push)</h4>
+        
+        <div class="code-container">
+          <div class="code-header">
+            <span>PowerShell / CMD (Ciclo Git Completo)</span>
+            <button class="btn-copy" data-copy-target="cmd-git-flow"><i class="fa-solid fa-copy"></i> Copiar Flujo</button>
+          </div>
+          <pre><code id="cmd-git-flow"># 1. Ver qué archivos cambiaron
+git status
+
+# 2. Agregar todos los cambios al área de preparación
+git add .
+
+# 3. Guardar el commit con un mensaje descriptivo
+git commit -m "Primer commit de prueba: configuracion de entorno"
+
+# 4. Enviar los cambios a la rama principal en GitHub
+git push origin main</code></pre>
+        </div>
+
+        <div style="margin-top: 14px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); padding: 12px 16px; border-radius: var(--radius-sm);">
+          <p style="font-size: 0.88rem; color: #a7f3d0;">
+            🔄 <strong>Comandos de Sincronización para más adelante:</strong>
+          </p>
+          <ul style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; padding-left: 20px; line-height: 1.6;">
+            <li><code>git fetch</code>: Consulta los cambios existentes en GitHub sin alterar tus archivos locales.</li>
+            <li><code>git pull origin main</code>: Descarga y combina automáticamente las actualizaciones remotas en tu proyecto.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- BLOQUE 4: Mini Guía Composer & Laravel Asistida por el Agente -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-brands fa-laravel"></i></div>
+          <h3>4. Composer & Instalación de Laravel Asistida por el Agente</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">
+          Para evitar complicaciones manuales con dependencias y entorno, la instalación y configuración de Laravel se realizará con la <strong>asistencia directa del Agente IA (Antigravity)</strong>.
+        </p>
+
+        <!-- Sub-paso: Composer -->
+        <div style="background: rgba(15, 23, 42, 0.5); padding: 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 18px;">
+          <h4 style="color: var(--primary-300); font-size: 1rem; margin-bottom: 8px;"><i class="fa-solid fa-box-archive"></i> Paso 4.1: Descarga y Verificación de Composer</h4>
+          <ol style="color: var(--text-muted); line-height: 1.7; padding-left: 20px; font-size: 0.9rem;">
+            <li>Abre tu terminal y verifica si Composer ya está instalado:
+              <div class="code-container" style="margin: 8px 0;">
+                <div class="code-header">
+                  <span>Terminal</span>
+                  <button class="btn-copy" data-copy-target="cmd-composer-check"><i class="fa-solid fa-copy"></i> Copiar</button>
+                </div>
+                <pre><code id="cmd-composer-check">composer --version</code></pre>
+              </div>
+            </li>
+            <li>Si no está instalado, ingresa a <a href="https://getcomposer.org" target="_blank" style="color: #38bdf8; font-weight: 600; text-decoration: underline;">getcomposer.org</a>, descarga el instalador <strong>Composer-Setup.exe</strong> para Windows y ejecútalo.</li>
+            <li>Durante la instalación, asegúrate de que seleccione la ruta de PHP de XAMPP (habitualmente <code>C:\xampp\php\php.exe</code>).</li>
+          </ol>
+        </div>
+
+        <!-- Sub-paso: Asistencia de Antigravity -->
+        <div style="background: rgba(15, 23, 42, 0.5); padding: 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--secondary-color); font-size: 1rem; margin-bottom: 8px;"><i class="fa-solid fa-robot"></i> Paso 4.2: Solicitar la Instalación de Laravel a Antigravity</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">
+            Una vez clonado el repositorio y con Composer listo, pídele a tu Agente IA que cree el proyecto Laravel y configure SQLite ejecutando el siguiente prompt:
+          </p>
+
+          <div class="code-container">
+            <div class="code-header">
+              <span>Prompt para el Agente Antigravity</span>
+              <button class="btn-copy" data-copy-target="prompt-install-laravel"><i class="fa-solid fa-copy"></i> Copiar Prompt</button>
+            </div>
+            <pre><code id="prompt-install-laravel">Hola Antigravity! Estoy ubicado en la carpeta de mi repositorio clonado en c:/xampp/htdocs/mi-proyecto-bd2.
+Por favor:
+1. Instala Laravel en esta carpeta (composer create-project laravel/laravel .).
+2. Configura el archivo .env para usar SQLite (DB_CONNECTION=sqlite) y crea database/database.sqlite si no existe.
+3. Ejecuta las migraciones iniciales (php artisan migrate).
+4. Asegúrate de configurar la estructura para usar Pure CSS en public/css/ y JavaScript Vanilla sin dependencias pesadas.</code></pre>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 8px;">
+            ⚡ <em>El agente se encargará de ejecutar los comandos en segundo plano, validar la estructura y dejar el entorno listo para desarrollar los circuitos.</em>
+          </p>
+        </div>
+      </div>
+
+      <!-- Requerimiento Tecnológico Stack -->
+      <div class="card" style="margin-top: 24px;">
+        <h3><i class="fa-solid fa-code" style="color: var(--secondary-color);"></i> Requerimientos Obligatorios del Stack Web</h3>
+        <div class="hero-badges" style="margin-top: 12px;">
+          <span class="badge badge-primary"><i class="fa-brands fa-php"></i> PHP 8.x</span>
+          <span class="badge badge-primary"><i class="fa-brands fa-laravel"></i> Laravel Framework</span>
+          <span class="badge badge-success"><i class="fa-solid fa-database"></i> Base de datos SQLite</span>
+          <span class="badge badge-primary"><i class="fa-brands fa-html5"></i> HTML5 Semántico</span>
+          <span class="badge badge-primary"><i class="fa-brands fa-js"></i> Vanilla JavaScript</span>
+          <span class="badge badge-success"><i class="fa-brands fa-css3-alt"></i> CSS Puro (Vanilla CSS)</span>
+        </div>
+        <p style="color: var(--text-muted); margin-top: 12px; font-size: 0.95rem;">
+          ⚠️ <strong>Nota sobre estilos:</strong> Se requiere el uso de <strong>CSS Puro</strong> estructurado en archivos dentro de <code>public/css/</code>, manteniendo el control total sobre las clases y variables cromáticas sin depender obligatoriamente de utilidades externas como Tailwind.
+        </p>
+      </div>
+
+      <!-- Barra de Navegación de Paso 4 -->
+      <div class="step-nav-footer">
+        <button class="btn-step btn-step-prev" data-prev-tab="tab-bd">
+          <i class="fa-solid fa-arrow-left"></i> Anterior: 3. Modelo E-R en DRAWIO
+        </button>
+        <div class="step-progress-info">
+          <div class="step-indicator-badges">
+            <span class="step-badge-current"><i class="fa-solid fa-shoe-prints"></i> Paso 4 de 6</span>
+            <span class="step-badge-progress"><i class="fa-solid fa-chart-line"></i> Progreso de Pasos: 17%</span>
+          </div>
+          <div class="step-mini-bar"><div class="step-mini-fill"></div></div>
+        </div>
+        <button class="btn-step btn-step-next" data-next-tab="tab-agent">
+          Siguiente: 5. Entorno Agéntico (AGENT.md) <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 5: ENTORNO AGÉNTICO & AGENT.MD
+         =================================================================== -->
+    <section id="tab-agent" class="tab-content">
+      <div class="section-header">
+        <h2>Entorno Agéntico (Antigravity) & Memoria AGENT.md</h2>
+        <p>Configuración del archivo de memoria persistente para el trabajo agéntico asistido por IA.</p>
+      </div>
+
+      <!-- Factor Clave Callout -->
+      <div class="key-factor-card">
+        <div class="key-factor-icon"><i class="fa-solid fa-brain"></i></div>
+        <div class="key-factor-content">
+          <h4>Factor Clave 5: Memoria de Contexto Viva en AGENT.md</h4>
+          <p>
+            El archivo <code>AGENT.md</code> en la raíz del proyecto evita la pérdida de directivas arquitectónicas y asegura que el agente IA respete la paleta cromática, SQLite y las reglas del negocio.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 24px;">
+        <h3><i class="fa-solid fa-anchor" style="color: var(--primary-400);"></i> Propósito del archivo AGENT.md</h3>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          El archivo <code>AGENT.md</code> se ubica en la raíz de tu proyecto Laravel y actúa como el ancla conceptual y memoria de contexto para el asistente IA (Antigravity). Garantiza que cada decisión de diseño, paleta de colores y arquitectura de base de datos en SQLite se mantenga coherente.
+        </p>
+      </div>
+
+      <!-- Generador / Copiador de AGENT.md -->
+      <div class="card">
+        <h3 class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-gears"></i></div>
+          Generador de Plantilla AGENT.md Personalizada
+        </h3>
+
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label for="agent-startup-name">Nombre de tu Emprendimiento</label>
+            <input type="text" id="agent-startup-name" class="input-text" value="Mi Emprendimiento" placeholder="Ej: EcoInsumos Concordia">
+          </div>
+          <div class="form-group">
+            <label for="agent-startup-slogan">Eslogan de la Marca</label>
+            <input type="text" id="agent-startup-slogan" class="input-text" value="Calidad y sustentabilidad en cada detalle" placeholder="Ej: Tu solución rápida y confiable">
+          </div>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <span>AGENT.md (Raíz del proyecto)</span>
+            <button class="btn-copy" data-copy-target="agent-memory-template-code"><i class="fa-solid fa-copy"></i> Copiar AGENT.md</button>
+          </div>
+          <pre><code id="agent-memory-template-code"># MEMORIA DEL PROYECTO: MI EMPRENDIMIENTO
+...</code></pre>
+        </div>
+      </div>
+
+      <!-- Barra de Navegación de Paso 5 -->
+      <div class="step-nav-footer">
+        <button class="btn-step btn-step-prev" data-prev-tab="tab-guias">
+          <i class="fa-solid fa-arrow-left"></i> Anterior: 4. Guía GitHub & Laravel
+        </button>
+        <div class="step-progress-info">
+          <div class="step-indicator-badges">
+            <span class="step-badge-current"><i class="fa-solid fa-shoe-prints"></i> Paso 5 de 6</span>
+            <span class="step-badge-progress"><i class="fa-solid fa-chart-line"></i> Progreso de Pasos: 17%</span>
+          </div>
+          <div class="step-mini-bar"><div class="step-mini-fill"></div></div>
+        </div>
+        <button class="btn-step btn-step-next" data-next-tab="tab-docs">
+          Siguiente: 6. Interfaz, Backend & Guía UI <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         TAB 6: INTERFAZ SÓLIDA, BACKEND & GUÍA DE COMPONENTES UI
+         =================================================================== -->
+    <section id="tab-docs" class="tab-content">
+      <div class="section-header">
+        <h2>6. Diseño de Interfaz Sólida, Backend & Componentes UI</h2>
+        <p>Preguntas clave para el diseño frontend/backend, flujo ordenado de un módulo CRUD con filtros, prompts para conectar la base de datos y guía de componentes.</p>
+      </div>
+
+      <!-- Factor Clave Callout -->
+      <div class="key-factor-card">
+        <div class="key-factor-icon"><i class="fa-solid fa-cubes"></i></div>
+        <div class="key-factor-content">
+          <h4>Factor Clave 6: Interfaz Sólida Conectada al Backend</h4>
+          <p>
+            Una aplicación sólida responde a preguntas de experiencia de usuario antes de codificar, utiliza componentes modulares consistentes y conecta los endpoints de Laravel mediante peticiones asíncronas limpias con SQLite.
+          </p>
+        </div>
+      </div>
+
+      <!-- BLOQUE 1: Preguntas Clave para Diseñar la Interfaz -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-circle-question"></i></div>
+          <h3>1. Preguntas Clave para Diseñar una Interfaz Sólida y Funcional con Backend</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">
+          Antes de redactar prompts o maquetar pantallas, responde a estas preguntas para asegurar una experiencia robusta y conectada:
+        </p>
+
+        <div class="grid-3" style="gap: 16px;">
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-eye"></i> 1. Visualización & Jerarquía</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Qué datos son indispensables ver a primera vista? (Tablas limpias, tarjetas con totales y badges de estado).</p>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-pen-to-square"></i> 2. Captura & Validación</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Cómo ingresa la información el usuario? (Modales con inputs controlados y validación en frontend y Laravel).</p>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--primary-300); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-filter"></i> 3. Búsqueda & Filtrado</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Cómo filtrará el operador? (Buscador instantáneo por texto, selects por categoría/estado y ordenamiento).</p>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--secondary-color); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-bell"></i> 4. Feedback & Carga</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Qué respuesta recibe el usuario al interactuar? (Spinners durante peticiones, alertas toast y confirmaciones).</p>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--secondary-color); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-gears"></i> 5. Proceso Estratégico</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Qué lógica de negocio se dispara? (Descuento automático de inventario, recálculo de costos y alerta de stock mínimo).</p>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <h4 style="color: var(--secondary-color); font-size: 0.95rem; margin-bottom: 6px;"><i class="fa-solid fa-database"></i> 6. Integridad de Datos</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">¿Las operaciones multi-tabla son atómicas? (Uso de DB::transaction en Laravel para evitar inconsistencias).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOQUE 2: Instrucciones Ordenadas de Ejemplo para Módulo CRUD + Filtrado -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-list-ol"></i></div>
+          <h3>2. Instrucciones Ordenadas de Ejemplo: Módulo CRUD + Filtrados</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">
+          Secuencia recomendada para construir un módulo completo (ej: Gestión de Ventas o Materia Prima):
+        </p>
+
+        <ol style="color: var(--text-muted); line-height: 1.8; padding-left: 20px; font-size: 0.92rem;">
+          <li><strong>Paso 1: Rutas y Controlador en Laravel</strong> — Definir el recurso en <code>routes/web.php</code> y crear el controlador con los métodos <code>index()</code>, <code>store()</code>, <code>update()</code>, <code>destroy()</code> y <code>filter()</code>.</li>
+          <li><strong>Paso 2: Maquetación Base (HTML Semántico & Pure CSS)</strong> — Crear la vista con la barra superior de acciones (Buscador, Selects de filtro, Botón <em>"Nuevo Registro"</em>) y la tabla de datos con cabeceras claras.</li>
+          <li><strong>Paso 3: Ventana Modal de Alta / Edición</strong> — Implementar un modal emergente con el formulario de carga para que el usuario registre datos sin cambiar de página.</li>
+          <li><strong>Paso 4: Conexión Asíncrona con Fetch API (Vanilla JS)</strong> — Enviar los datos del formulario en formato JSON o FormData a Laravel, cerrar el modal, actualizar la tabla en vivo y disparar un toast de éxito.</li>
+          <li><strong>Paso 5: Filtrado y Búsqueda en Tiempo Real</strong> — Escuchar eventos <code>input</code> en el buscador y <code>change</code> en los selects para filtrar dinámicamente las filas de la tabla.</li>
+        </ol>
+      </div>
+
+      <!-- BLOQUE 3: Guía de Prompting para Vincular Base de Datos -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-robot"></i></div>
+          <h3>3. Guía de Prompting: Cómo Pedirle a la IA Vincular la Base de Datos</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          Para obtener código preciso del asistente agéntico (Antigravity), incluye siempre los nombres de tablas del DER de Draw.io y el comportamiento esperado:
+        </p>
+
+        <div class="code-container">
+          <div class="code-header">
+            <span>Prompt Sugerido para Conexión Frontend & Backend</span>
+            <button class="btn-copy" data-copy-target="prompt-backend-crud"><i class="fa-solid fa-copy"></i> Copiar Prompt</button>
+          </div>
+          <pre><code id="prompt-backend-crud">Hola Antigravity! Necesito implementar el módulo de [NOMBRE_MODULO, ej: Ventas] conectado a SQLite en Laravel.
+Por favor:
+1. En el controlador [Nombre]Controller, implementa el método store() que valide los campos requeridos y use DB::transaction para guardar el registro en la tabla [tabla_principal] y actualizar automáticamente la tabla [tabla_relacionada, ej: inventario].
+2. Implementa el método index() y filter() que devuelva los registros en formato JSON filtrados por fecha, estado o cliente.
+3. En la vista (HTML/Pure CSS), crea la tabla con badges de estado y un modal para registrar nuevos datos.
+4. En el archivo JavaScript (Vanilla JS), agrega la función asíncrona con Fetch API para enviar los datos del modal, refrescar la tabla dinámicamente y mostrar una notificación toast sin recargar la página.</code></pre>
+        </div>
+      </div>
+
+      <!-- BLOQUE 4: Hint / Botón para Desplegar el Modal de Componentes UI -->
+      <div class="card" style="margin-bottom: 24px; border: 1px solid rgba(99, 102, 241, 0.35); background: rgba(99, 102, 241, 0.06);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 4px;">
+              <i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i> ¿Dudas sobre qué elementos visuales utilizar?
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+              Despliega la guía interactiva para conocer los nombres técnicos y funciones de cada componente de interfaz (header, sidebar, modals, spinners, dash buttons, etc.).
+            </p>
+          </div>
+          <button id="btn-open-ui-hint" class="btn-hint">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 💡 Desplegar Guía de Componentes UI
+          </button>
+        </div>
+      </div>
+
+      <!-- BLOQUE 5: Checklist Interactivo del Proyecto -->
+      <div class="card">
+        <div class="card-title">
+          <div class="card-icon"><i class="fa-solid fa-square-check"></i></div>
+          <h3>Checklist de Micro-Pasos del Proyecto Integrador</h3>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+          Marca cada micro-paso a medida que avances. Tu estado se guarda automáticamente:
+        </p>
+
+        <ul class="checklist">
+          <li class="check-item">
+            <input type="checkbox" id="chk-1">
+            <label for="chk-1">Definir el emprendimiento, logotipo y eslogan comercial.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-2">
+            <label for="chk-2">Crear cuenta en GitHub y repositorio <code>mi-proyecto-bd2</code>.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-3">
+            <label for="chk-3">Configurar variables globales de Git en la PC y clonar repositorio en <code>c:/xampp/htdocs/</code>.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-4">
+            <label for="chk-4">Verificar Composer y solicitar la creación de Laravel + SQLite a Antigravity.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-5">
+            <label for="chk-5">Definir el color primario y generar la paleta cromática en Pure CSS.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-6">
+            <label for="chk-6">Crear el archivo <code>AGENT.md</code> en la raíz del proyecto.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-7">
+            <label for="chk-7">Realizar el Modelo Entidad-Relación en DRAWIO, guardarlo en la carpeta del proyecto y configurar las migraciones.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-8">
+            <label for="chk-8">Desarrollar el proceso estratégico clave con Antigravity en Laravel.</label>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" id="chk-9">
+            <label for="chk-9">Diseñar la interfaz funcional con modales, tabla y filtros conectada a SQLite.</label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Barra de Navegación de Paso 6 (Final) -->
+      <div class="step-nav-footer">
+        <button class="btn-step btn-step-prev" data-prev-tab="tab-agent">
+          <i class="fa-solid fa-arrow-left"></i> Anterior: 5. Entorno Agéntico (AGENT.md)
+        </button>
+        <div class="step-progress-info">
+          <div class="step-indicator-badges">
+            <span class="step-badge-current"><i class="fa-solid fa-shoe-prints"></i> Paso 6 de 6</span>
+            <span class="step-badge-progress"><i class="fa-solid fa-chart-line"></i> Progreso de Pasos: 17%</span>
+          </div>
+          <div class="step-mini-bar"><div class="step-mini-fill"></div></div>
+        </div>
+        <button class="btn-step btn-step-finish">
+          <i class="fa-solid fa-flag-checkered"></i> Revisar Checklist Final
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================
+       MODAL INTERACTIVO: GUÍA DE COMPONENTES UI
+       =================================================================== -->
+  <div id="ui-components-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title"><i class="fa-solid fa-shapes" style="color: var(--primary-400);"></i> Catálogo de Elementos & Componentes de Interfaz</h3>
+        <button id="btn-close-ui-modal" class="modal-close" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
+          Utiliza esta referencia para estructurar tus pantallas y comunicarte con precisión al solicitar estilos y componentes al Agente IA:
+        </p>
+
+        <h4 style="color: var(--primary-300); font-size: 1rem; margin-top: 10px;"><i class="fa-solid fa-layer-group"></i> 1. Estructura & Layout</h4>
+        <div class="ui-components-grid">
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-window-maximize"></i>
+              <h4>Header (Cabecera)</h4>
+            </div>
+            <p>Barra superior con el logo del emprendimiento, título del módulo activo y perfil del usuario.</p>
+            <div class="ui-comp-specimen">
+              <span class="badge badge-primary"><i class="fa-solid fa-bars"></i> Logo | Módulo Ventas</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-table-columns"></i>
+              <h4>Sidebar / Sidemenu</h4>
+            </div>
+            <p>Menú lateral con iconos y enlaces directos a cada circuito (Ventas, Compras, Stock).</p>
+            <div class="ui-comp-specimen">
+              <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-chart-pie"></i> Ventas | <i class="fa-solid fa-boxes-stacked"></i> Stock</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-id-card"></i>
+              <h4>Cards / Paneles</h4>
+            </div>
+            <p>Contenedores modulares con bordes redondeados y glassmorphism para agrupar información.</p>
+            <div class="ui-comp-specimen">
+              <span style="font-size: 0.8rem; color: var(--primary-300);">Card Contenedor UI</span>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: var(--primary-300); font-size: 1rem; margin-top: 20px;"><i class="fa-solid fa-hand-pointer"></i> 2. Acciones & Navegación</h4>
+        <div class="ui-components-grid">
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-circle-plus"></i>
+              <h4>Buttons (Botones)</h4>
+            </div>
+            <p>Botones de acción principal (guardar), secundaria (cancelar), peligro (eliminar) o ghost.</p>
+            <div class="ui-comp-specimen">
+              <button class="btn-demo btn-demo-primary" style="padding: 4px 10px; font-size: 0.75rem;">Guardar</button>
+              <button class="btn-demo btn-demo-secondary" style="padding: 4px 10px; font-size: 0.75rem;">Cancelar</button>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-grip"></i>
+              <h4>Dash Buttons</h4>
+            </div>
+            <p>Botones destacados estilo tarjeta/tablero con icono prominente para accesos rápidos.</p>
+            <div class="ui-comp-specimen">
+              <span class="dash-btn-demo"><i class="fa-solid fa-plus"></i> Nueva Venta</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-folder-tree"></i>
+              <h4>Tabs (Pestañas)</h4>
+            </div>
+            <p>Navegación segmentada para cambiar de vista sin recargar la página.</p>
+            <div class="ui-comp-specimen">
+              <span class="tab-btn active" style="padding: 4px 8px; font-size: 0.75rem;">Tab Activo</span>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: var(--primary-300); font-size: 1rem; margin-top: 20px;"><i class="fa-solid fa-message"></i> 3. Diálogos, Entradas & Feedback</h4>
+        <div class="ui-components-grid">
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-window-restore"></i>
+              <h4>Modals (Ventanas Modales)</h4>
+            </div>
+            <p>Ventana emergente sobrepuesta para altas, ediciones rápidas o confirmaciones críticas.</p>
+            <div class="ui-comp-specimen">
+              <span style="font-size: 0.8rem; color: #a5b4fc;"><i class="fa-solid fa-square-check"></i> Modal de Alta</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-spinner"></i>
+              <h4>Spinners / Loaders</h4>
+            </div>
+            <p>Indicador animado de espera mientras se procesa una petición asíncrona (Fetch).</p>
+            <div class="ui-comp-specimen">
+              <div class="spinner-demo"></div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Cargando...</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-tags"></i>
+              <h4>Badges / Pills</h4>
+            </div>
+            <p>Etiquetas de colores para estados rápidos (En Stock, Pendiente, Entregado, Alerta).</p>
+            <div class="ui-comp-specimen">
+              <span class="badge badge-success">Completado</span>
+              <span class="badge badge-primary">En Proceso</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <h4>Search Bar & Filtros</h4>
+            </div>
+            <p>Caja de búsqueda con icono de lupa y selects desplegables para filtrar registros en vivo.</p>
+            <div class="ui-comp-specimen">
+              <input type="text" placeholder="Buscar..." class="input-text" style="padding: 4px 8px; font-size: 0.75rem; max-width: 140px;">
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-table"></i>
+              <h4>Tables / Data Grid</h4>
+            </div>
+            <p>Tablas responsivas con cabeceras destacadas, filas alternadas y botones de acción por fila.</p>
+            <div class="ui-comp-specimen">
+              <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-pen"></i> Editar | <i class="fa-solid fa-trash"></i> Borrar</span>
+            </div>
+          </div>
+
+          <div class="ui-comp-card">
+            <div class="ui-comp-header">
+              <i class="fa-solid fa-bell"></i>
+              <h4>Toast / Alerts</h4>
+            </div>
+            <p>Notificaciones flotantes temporales para confirmar éxito o advertir errores en operaciones.</p>
+            <div class="ui-comp-specimen">
+              <span style="font-size: 0.8rem; color: #34d399;"><i class="fa-solid fa-check"></i> ¡Guardado con éxito!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-modal-close-footer" class="btn-demo btn-demo-secondary"><i class="fa-solid fa-check"></i> Entendido</button>
+      </div>
+    </div>
+  </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Base de Datos II & Emprendimientos — Cátedra Proyecto Integrador &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
