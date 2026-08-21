@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anexo: Lenguajes Formales, Gramáticas y Sintaxis | Programación II</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           VARIABLES & PALETA DE COLORES PASTEL
+           ========================================================================== */
+        :root {
+            /* Superficies */
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --bg-code: #1e293b;
+            
+            /* Textos */
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-code: #e2e8f0;
+
+            /* Bordes y Sombras */
+            --border-soft: rgba(203, 213, 225, 0.75);
+            --border-highlight: rgba(148, 163, 184, 0.4);
+            --shadow-sm: 0 2px 8px rgba(100, 116, 139, 0.06);
+            --shadow-md: 0 8px 24px rgba(100, 116, 139, 0.08);
+            --shadow-lg: 0 16px 36px rgba(100, 116, 139, 0.12);
+
+            /* Tonos Pastel Armónicos */
+            /* Menta Pastel */
+            --pastel-mint: #d1fae5;
+            --pastel-mint-deep: #059669;
+            --pastel-mint-border: #a7f3d0;
+            --pastel-mint-text: #065f46;
+
+            /* Lavanda / Violeta Pastel */
+            --pastel-lavender: #ede9fe;
+            --pastel-lavender-deep: #7c3aed;
+            --pastel-lavender-border: #ddd6fe;
+            --pastel-lavender-text: #5b21b6;
+
+            /* Cielo / Azul Pastel */
+            --pastel-sky: #e0f2fe;
+            --pastel-sky-deep: #0284c7;
+            --pastel-sky-border: #bae6fd;
+            --pastel-sky-text: #075985;
+
+            /* Melocotón / Ámbar Pastel */
+            --pastel-peach: #ffedd5;
+            --pastel-peach-deep: #d97706;
+            --pastel-peach-border: #fed7aa;
+            --pastel-peach-text: #9a3412;
+
+            /* Rosa / Coral Pastel */
+            --pastel-rose: #ffe4e6;
+            --pastel-rose-deep: #e11d48;
+            --pastel-rose-border: #fecdd3;
+            --pastel-rose-text: #9f1239;
+
+            /* Tipografía y Espaciado */
+            --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+
+            --transition-fast: 0.18s ease;
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ==========================================================================
+           RESET & ESTILOS BASE (MOBILE-FIRST)
+           ========================================================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-bottom: 80px;
+        }
+
+        /* Barra de Progreso Superior */
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            width: 0%;
+            background: linear-gradient(90deg, #7c3aed, #0284c7, #059669, #f97316);
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .page-container {
+                padding: 24px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .page-container {
+                padding: 36px 30px;
+            }
+        }
+
+        /* ==========================================================================
+           ANIMACIONES & ICONOS VIVOS
+           ========================================================================== */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(1deg); }
+        }
+
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.92; }
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes bounceSubtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+
+        @keyframes ruleHighlightGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(124, 58, 237, 0); }
+            50% { transform: scale(1.02); box-shadow: 0 0 16px rgba(124, 58, 237, 0.25); }
+        }
+
+        .anim-float { animation: floatSlow 4s ease-in-out infinite; }
+        .anim-pulse { animation: pulseSoft 2.5s ease-in-out infinite; }
+        .anim-spin { animation: spinSlow 16s linear infinite; }
+        .anim-bounce { animation: bounceSubtle 2s ease-in-out infinite; }
+        .anim-wiggle { animation: wiggle 2s ease-in-out infinite; }
+
+        .svg-icon {
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+            vertical-align: middle;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ==========================================================================
+           HEADER / HERO DE LA CLASE
+           ========================================================================== */
+        .hero-banner {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf4ff 40%, #f0fdf4 100%);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 24px 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .hero-banner {
+                padding: 36px 36px;
+                margin-bottom: 32px;
+            }
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #7c3aed, #0284c7, #10b981, #f59e0b);
+        }
+
+        .hero-top-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--pastel-lavender);
+            color: var(--pastel-lavender-text);
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            border: 1px solid var(--pastel-lavender-border);
+        }
+
+        .hero-title {
+            font-size: clamp(1.6rem, 4vw, 2.5rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(120deg, #7c3aed, #0284c7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 780px;
+            margin-bottom: 20px;
+        }
+
+        .hero-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 500;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            color: var(--text-secondary);
+        }
+
+        .meta-pill.mint { background: var(--pastel-mint); color: var(--pastel-mint-text); border-color: var(--pastel-mint-border); }
+        .meta-pill.sky { background: var(--pastel-sky); color: var(--pastel-sky-text); border-color: var(--pastel-sky-border); }
+        .meta-pill.peach { background: var(--pastel-peach); color: var(--pastel-peach-text); border-color: var(--pastel-peach-border); }
+
+        /* ==========================================================================
+           BARRA DE NAVEGACIÓN RÁPIDA (STICKY)
+           ========================================================================== */
+        .nav-scroller {
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            margin-bottom: 28px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-pill-list {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 2px;
+        }
+
+        .nav-pill-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-pill-btn {
+            white-space: nowrap;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition-normal);
+        }
+
+        .nav-pill-btn:hover {
+            background: var(--pastel-lavender);
+            color: var(--pastel-lavender-text);
+        }
+
+        .nav-pill-btn.active {
+            background: #7c3aed;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+        }
+
+        /* ==========================================================================
+           CONTENEDORES DE SECCIÓN
+           ========================================================================== */
+        .section-block {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 22px 18px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+        }
+
+        @media (min-width: 768px) {
+            .section-block {
+                padding: 32px 30px;
+                margin-bottom: 36px;
+            }
+        }
+
+        .section-block:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border-soft);
+            padding-bottom: 16px;
+        }
+
+        .section-icon-box {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-icon-box.mint { background: var(--pastel-mint); color: var(--pastel-mint-text); border: 1px solid var(--pastel-mint-border); }
+        .section-icon-box.lavender { background: var(--pastel-lavender); color: var(--pastel-lavender-text); border: 1px solid var(--pastel-lavender-border); }
+        .section-icon-box.sky { background: var(--pastel-sky); color: var(--pastel-sky-text); border: 1px solid var(--pastel-sky-border); }
+        .section-icon-box.peach { background: var(--pastel-peach); color: var(--pastel-peach-text); border: 1px solid var(--pastel-peach-border); }
+        .section-icon-box.rose { background: var(--pastel-rose); color: var(--pastel-rose-text); border: 1px solid var(--pastel-rose-border); }
+
+        .section-title {
+            font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ==========================================================================
+           TARJETAS Y COMPONENTES VISUALES
+           ========================================================================== */
+        .card-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin: 18px 0;
+        }
+
+        @media (min-width: 768px) {
+            .card-grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        .card-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin: 18px 0;
+        }
+
+        @media (min-width: 640px) {
+            .card-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .card-grid-3 {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 18px;
+            }
+        }
+
+        .feature-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            transition: var(--transition-bounce);
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            background: #ffffff;
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-highlight);
+        }
+
+        .feature-card.mint { border-top: 4px solid var(--pastel-mint-deep); }
+        .feature-card.lavender { border-top: 4px solid var(--pastel-lavender-deep); }
+        .feature-card.sky { border-top: 4px solid var(--pastel-sky-deep); }
+        .feature-card.peach { border-top: 4px solid var(--pastel-peach-deep); }
+        .feature-card.rose { border-top: 4px solid var(--pastel-rose-deep); }
+
+        .feature-card h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .badge-inline {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .badge-inline.mint { background: var(--pastel-mint); color: var(--pastel-mint-text); border-color: var(--pastel-mint-border); }
+        .badge-inline.lavender { background: var(--pastel-lavender); color: var(--pastel-lavender-text); border-color: var(--pastel-lavender-border); }
+        .badge-inline.sky { background: var(--pastel-sky); color: var(--pastel-sky-text); border-color: var(--pastel-sky-border); }
+        .badge-inline.peach { background: var(--pastel-peach); color: var(--pastel-peach-text); border-color: var(--pastel-peach-border); }
+        .badge-inline.rose { background: var(--pastel-rose); color: var(--pastel-rose-text); border-color: var(--pastel-rose-border); }
+
+        /* ==========================================================================
+           SECCIÓN 2: SIMBOLOGÍA INTERACTIVA
+           ========================================================================== */
+        .symbols-interactive-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        @media (min-width: 860px) {
+            .symbols-interactive-layout {
+                grid-template-columns: 1.05fr 0.95fr;
+            }
+        }
+
+        .symbol-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 10px;
+        }
+
+        .symbol-chip {
+            background: #ffffff;
+            border: 1.5px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 12px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .symbol-chip:hover {
+            border-color: var(--pastel-sky-deep);
+            background: var(--pastel-sky);
+            transform: translateY(-2px);
+        }
+
+        .symbol-chip.active {
+            background: var(--pastel-lavender);
+            border-color: var(--pastel-lavender-deep);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.18);
+        }
+
+        .symbol-chip .char {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #7c3aed;
+        }
+
+        .symbol-chip .label {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .symbol-detail-card {
+            background: linear-gradient(145deg, #ffffff, #faf5ff);
+            border: 1.5px solid var(--pastel-lavender-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .symbol-detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .symbol-detail-char {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 800;
+            color: #7c3aed;
+            background: var(--pastel-lavender);
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--pastel-lavender-border);
+        }
+
+        .symbol-detail-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .symbol-detail-meaning {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        .detail-sub-box {
+            background: #ffffff;
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-soft);
+            font-size: 0.85rem;
+        }
+
+        .detail-sub-box strong {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        /* ==========================================================================
+           SECCIÓN 3: DERIVADOR BNF DETALLADO
+           ========================================================================== */
+        .derivation-container-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        @media (min-width: 920px) {
+            .derivation-container-layout {
+                grid-template-columns: 0.95fr 1.05fr;
+            }
+        }
+
+        /* Panel de Reglas Gramaticales */
+        .grammar-rules-card {
+            background: #ffffff;
+            border: 1.5px solid var(--pastel-sky-border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .grammar-rules-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-soft);
+        }
+
+        .grammar-rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .grammar-rule-row {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.45;
+            transition: var(--transition-fast);
+            color: var(--text-secondary);
+        }
+
+        .grammar-rule-row.active-rule {
+            background: var(--pastel-lavender);
+            border-color: var(--pastel-lavender-deep);
+            color: var(--pastel-lavender-text);
+            font-weight: 700;
+            box-shadow: 0 0 12px rgba(124, 58, 237, 0.2);
+            animation: ruleHighlightGlow 1.5s ease-in-out infinite;
+        }
+
+        .grammar-rule-row .nt-label { color: #7c3aed; font-weight: 700; }
+        .grammar-rule-row .t-label { color: #059669; font-weight: 700; }
+        .grammar-rule-row .op-label { color: #0284c7; font-weight: 700; }
+
+        /* Panel Interactivo del Stepper */
+        .derivation-stepper-card {
+            background: #ffffff;
+            border: 1.5px solid var(--pastel-lavender-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stepper-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .stepper-dots-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .step-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .step-dot.active {
+            background: #7c3aed;
+            color: #ffffff;
+            border-color: #7c3aed;
+            transform: scale(1.1);
+        }
+
+        .step-dot.completed {
+            background: var(--pastel-mint);
+            color: var(--pastel-mint-text);
+            border-color: var(--pastel-mint-border);
+        }
+
+        .derivation-screen {
+            background: var(--bg-code);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 14px;
+        }
+
+        .derivation-screen-content {
+            font-size: 1.18rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .derivation-screen-content .nt {
+            background: rgba(192, 132, 252, 0.28);
+            border-bottom: 2px solid #c084fc;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #f5d0fe;
+            font-weight: 600;
+        }
+
+        .derivation-screen-content .t {
+            color: #4ade80;
+            font-weight: 700;
+        }
+
+        .derivation-screen-content .lit-val {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .derivation-explanation-box {
+            background: var(--pastel-sky);
+            border: 1px solid var(--pastel-sky-border);
+            border-left: 4px solid var(--pastel-sky-deep);
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            color: var(--pastel-sky-text);
+            margin-bottom: 16px;
+            line-height: 1.55;
+        }
+
+        .derivation-explanation-box strong {
+            display: block;
+            color: var(--pastel-sky-text);
+            margin-bottom: 2px;
+        }
+
+        .btn-action {
+            background: #ffffff;
+            border: 1px solid var(--border-soft);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition-fast);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background: var(--pastel-sky);
+            border-color: var(--pastel-sky-deep);
+            color: var(--pastel-sky-text);
+        }
+
+        .btn-action.primary {
+            background: #7c3aed;
+            color: #ffffff;
+            border-color: #7c3aed;
+        }
+
+        .btn-action.primary:hover:not(:disabled) {
+            background: #6d28d9;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ==========================================================================
+           SECCIÓN 4: LABORATORIO EN TIEMPO REAL
+           ========================================================================== */
+        .sandbox-panel {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1.5px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin: 18px 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sandbox-presets-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .preset-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-soft);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--pastel-mint-deep);
+            background: var(--pastel-mint);
+            color: var(--pastel-mint-text);
+        }
+
+        .preset-btn.active {
+            background: var(--pastel-mint);
+            border-color: var(--pastel-mint-deep);
+            color: var(--pastel-mint-text);
+            font-weight: 700;
+        }
+
+        .rule-display-banner {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .rule-display-banner strong {
+            color: var(--text-primary);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .rule-bnf-code {
+            font-family: var(--font-mono);
+            color: #7c3aed;
+            font-weight: 600;
+        }
+
+        .sandbox-input-wrapper {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .sandbox-input {
+            width: 100%;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            padding: 14px 48px 14px 16px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-soft);
+            background: #ffffff;
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition-fast);
+        }
+
+        .sandbox-input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+        }
+
+        .sandbox-status-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .sandbox-feedback-card {
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: var(--transition-normal);
+        }
+
+        .sandbox-feedback-card.valid {
+            background: var(--pastel-mint);
+            border: 1px solid var(--pastel-mint-border);
+            color: var(--pastel-mint-text);
+        }
+
+        .sandbox-feedback-card.invalid {
+            background: var(--pastel-rose);
+            border: 1px solid var(--pastel-rose-border);
+            color: var(--pastel-rose-text);
+        }
+
+        .token-breakdown-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .token-pill {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ==========================================================================
+           SECCIÓN 5: ACORDEONES / TIPS Y EXCEPCIONES
+           ========================================================================== */
+        .accordion-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .accordion-item {
+            background: #ffffff;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: var(--transition-normal);
+        }
+
+        .accordion-item:hover {
+            border-color: var(--border-highlight);
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 16px 20px;
+            background: #ffffff;
+            border: none;
+            text-align: left;
+            font-family: var(--font-main);
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .accordion-header:hover {
+            background: var(--bg-subtle);
+        }
+
+        .accordion-chevron {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+            stroke: var(--text-muted);
+        }
+
+        .accordion-item.open .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .accordion-item.open .accordion-header {
+            background: var(--pastel-peach);
+            color: var(--pastel-peach-text);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 18px 20px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-soft);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .accordion-item.open .accordion-content {
+            display: block;
+        }
+
+        /* ==========================================================================
+           SECCIÓN 6: QUIZ MULTIPLE CHOICE
+           ========================================================================== */
+        .quiz-container {
+            background: #ffffff;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 24px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @media (min-width: 768px) {
+            .quiz-container {
+                padding: 30px;
+            }
+        }
+
+        .quiz-stats-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .quiz-progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-subtle);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .quiz-progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7c3aed, #0284c7);
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 18px;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #7c3aed;
+            background: var(--pastel-lavender);
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            margin-bottom: 10px;
+        }
+
+        .question-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            line-height: 1.45;
+        }
+
+        .question-code-block {
+            background: var(--bg-code);
+            color: #e2e8f0;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .quiz-option-btn {
+            width: 100%;
+            background: #ffffff;
+            border: 1.5px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            text-align: left;
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .quiz-option-btn:hover:not(:disabled) {
+            border-color: #7c3aed;
+            background: #faf5ff;
+            transform: translateX(4px);
+        }
+
+        .quiz-option-letter {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .quiz-option-btn.selected-correct {
+            background: var(--pastel-mint) !important;
+            border-color: var(--pastel-mint-deep) !important;
+            color: var(--pastel-mint-text) !important;
+            font-weight: 600;
+        }
+
+        .quiz-option-btn.selected-correct .quiz-option-letter {
+            background: var(--pastel-mint-deep);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .quiz-option-btn.selected-incorrect {
+            background: var(--pastel-rose) !important;
+            border-color: var(--pastel-rose-deep) !important;
+            color: var(--pastel-rose-text) !important;
+        }
+
+        .quiz-option-btn.selected-incorrect .quiz-option-letter {
+            background: var(--pastel-rose-deep);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .quiz-option-btn:disabled {
+            cursor: default;
+        }
+
+        .quiz-explanation-box {
+            display: none;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            line-height: 1.55;
+            margin-top: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quiz-explanation-box.correct {
+            background: var(--pastel-mint);
+            border: 1px solid var(--pastel-mint-border);
+            color: var(--pastel-mint-text);
+        }
+
+        .quiz-explanation-box.incorrect {
+            background: var(--pastel-rose);
+            border: 1px solid var(--pastel-rose-border);
+            color: var(--pastel-rose-text);
+        }
+
+        .quiz-nav-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .quiz-result-card {
+            display: none;
+            text-align: center;
+            padding: 36px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .quiz-score-badge {
+            font-size: clamp(2.5rem, 6vw, 3.8rem);
+            font-weight: 800;
+            color: #7c3aed;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        /* ==========================================================================
+           FOOTER
+           ========================================================================== */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 24px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        footer strong {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de progreso de lectura superior -->
+    <div id="reading-progress"></div>
+
+    <div class="page-container">
+
+        <!-- ==========================================
+             HERO HEADER
+             ========================================== -->
+        <header class="hero-banner">
+            <div class="hero-top-tag">
+                <svg class="svg-icon anim-pulse" viewBox="0 0 24 24">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+                    <path d="M6 6h10"></path>
+                    <path d="M6 10h10"></path>
+                </svg>
+                Programación II &bull; Material de Anexo
+            </div>
+            <h1 class="hero-title">
+                Lenguajes Formales, <span class="highlight">Gramáticas & Sintaxis</span>
+            </h1>
+            <p class="hero-description">
+                Comprende cómo los compiladores e intérpretes construyen, leen y validan el código fuente mediante alfabetos, símbolos terminales, reglas de derivación BNF/EBNF y metacaracteres de repetición.
+            </p>
+            <div class="hero-meta-row">
+                <span class="meta-pill lavender">
+                    <svg class="svg-icon anim-spin" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Sintaxis vs Semántica
+                </span>
+                <span class="meta-pill sky">
+                    <svg class="svg-icon anim-float" viewBox="0 0 24 24">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                    BNF / EBNF / Regex
+                </span>
+                <span class="meta-pill mint">
+                    <svg class="svg-icon anim-bounce" viewBox="0 0 24 24">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Autoevaluación Interactiva
+                </span>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             BARRA DE NAVEGACIÓN RÁPIDA (STICKY)
+             ========================================== -->
+        <nav class="nav-scroller" aria-label="Secciones del documento">
+            <div class="nav-pill-list">
+                <a href="#teoria" class="nav-pill-btn active">
+                    <span>📖</span> 1. Fundamentos
+                </a>
+                <a href="#simbologia" class="nav-pill-btn">
+                    <span>🔣</span> 2. Simbología
+                </a>
+                <a href="#gramaticas" class="nav-pill-btn">
+                    <span>📐</span> 3. Gramáticas BNF
+                </a>
+                <a href="#laboratorio" class="nav-pill-btn">
+                    <span>🧪</span> 4. Validador en Vivo
+                </a>
+                <a href="#tips" class="nav-pill-btn">
+                    <span>💡</span> 5. Tips & Excepciones
+                </a>
+                <a href="#quiz" class="nav-pill-btn">
+                    <span>🎯</span> 6. Autoevaluación
+                </a>
+            </div>
+        </nav>
+
+        <!-- ==========================================
+             SECCIÓN 1: FUNDAMENTOS TEÓRICOS
+             ========================================== -->
+        <section id="teoria" class="section-block">
+            <div class="section-header">
+                <div class="section-icon-box lavender">
+                    <svg class="svg-icon anim-float" viewBox="0 0 24 24">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="section-title">1. ¿Qué es un Lenguaje Formal?</h2>
+                    <p class="section-subtitle">Estructura matemática y componentes esenciales de cualquier lenguaje de programación</p>
+                </div>
+            </div>
+
+            <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px;">
+                A diferencia del lenguaje humano (lenguaje natural), que está lleno de ambigüedades y dobles sentidos, un <strong>lenguaje formal</strong> es un conjunto de cadenas de símbolos definido con precisión matemática mediante un conjunto finito de reglas llamadas <strong>gramática</strong>.
+            </p>
+
+            <div class="card-grid-3">
+                <div class="feature-card sky">
+                    <h4>
+                        <span class="badge-inline sky">&Sigma;</span> Alfabeto
+                    </h4>
+                    <p>
+                        Conjunto finito y no vacío de símbolos elementales. Por ejemplo: el alfabeto binario <span class="badge-inline">{0, 1}</span>, caracteres ASCII o el conjunto Unicode de JavaScript.
+                    </p>
+                </div>
+
+                <div class="feature-card mint">
+                    <h4>
+                        <span class="badge-inline mint">w</span> Cadena o Palabra
+                    </h4>
+                    <p>
+                        Secuencia finita de símbolos elegidos de un alfabeto. La longitud de una cadena es <span class="badge-inline">|w|</span>. La cadena de longitud cero se llama <strong>cadena vacía</strong> (<span class="badge-inline">&epsilon;</span> o <span class="badge-inline">&lambda;</span>).
+                    </p>
+                </div>
+
+                <div class="feature-card lavender">
+                    <h4>
+                        <span class="badge-inline lavender">L</span> Lenguaje
+                    </h4>
+                    <p>
+                        Cualquier subconjunto de cadenas formadas sobre un alfabeto (<span class="badge-inline">L &sube; &Sigma;*</span>). Un lenguaje de programación como JavaScript o Python es el conjunto de todos los programas válidos que compilan o ejecutan sin error sintáctico.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Pipeline de análisis -->
+            <div style="background: linear-gradient(135deg, #fdf4ff, #f0fdf4); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 18px; margin-top: 20px;">
+                <h4 style="font-size: 1rem; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <svg class="svg-icon anim-wiggle" viewBox="0 0 24 24" style="stroke: #7c3aed;">
+                        <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline>
+                    </svg>
+                    El Camino del Código: De Texto a Ejecución
+                </h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+                    <div style="background: #ffffff; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-soft); flex: 1; min-width: 140px; text-align: center;">
+                        <strong style="color: var(--text-primary); display: block;">1. Código Fuente</strong>
+                        <span style="color: var(--text-muted); font-size: 0.78rem;">Flujo de Caracteres</span>
+                    </div>
+                    <span style="color: #7c3aed; font-weight: bold; font-size: 1.2rem;">&rarr;</span>
+                    <div style="background: #ffffff; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--pastel-sky-border); flex: 1; min-width: 140px; text-align: center;">
+                        <strong style="color: var(--pastel-sky-text); display: block;">2. Analizador Léxico</strong>
+                        <span style="color: var(--text-muted); font-size: 0.78rem;">Tokens (palabras, signos)</span>
+                    </div>
+                    <span style="color: #7c3aed; font-weight: bold; font-size: 1.2rem;">&rarr;</span>
+                    <div style="background: #ffffff; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--pastel-lavender-border); flex: 1; min-width: 140px; text-align: center;">
+                        <strong style="color: var(--pastel-lavender-text); display: block;">3. Analizador Sintáctico</strong>
+                        <span style="color: var(--text-muted); font-size: 0.78rem;">Árbol de Sintaxis (AST)</span>
+                    </div>
+                    <span style="color: #7c3aed; font-weight: bold; font-size: 1.2rem;">&rarr;</span>
+                    <div style="background: #ffffff; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--pastel-mint-border); flex: 1; min-width: 140px; text-align: center;">
+                        <strong style="color: var(--pastel-mint-text); display: block;">4. Analizador Semántico</strong>
+                        <span style="color: var(--text-muted); font-size: 0.78rem;">Tipos y Ámbitos válidos</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECCIÓN 2: SIMBOLOGÍA Y METACARACTERES
+             ========================================== -->
+        <section id="simbologia" class="section-block">
+            <div class="section-header">
+                <div class="section-icon-box sky">
+                    <svg class="svg-icon anim-spin" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="m4.93 4.93 4.24 4.24"></path>
+                        <path d="m14.83 9.17 4.24-4.24"></path>
+                        <path d="m14.83 14.83 4.24 4.24"></path>
+                        <path d="m9.17 14.83-4.24 4.24"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="section-title">2. Simbología, Repetición y Operadores</h2>
+                    <p class="section-subtitle">Metacaracteres universales para definir patrones de repetición, opcionales y alternativas</p>
+                </div>
+            </div>
+
+            <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 14px;">
+                Haz clic en cada símbolo para explorar su regla de cardinalidad, patrones pedagógicos, casos de uso en lenguajes de programación y cadenas aceptadas vs rechazadas:
+            </p>
+
+            <div class="symbols-interactive-layout">
+                <!-- Panel izquierdo: Botones/Chips de símbolos -->
+                <div class="symbol-chips-grid" id="symbol-buttons-container">
+                    <button class="symbol-chip active" data-symbol="*">
+                        <span class="char">*</span>
+                        <span class="label">Cerradura Kleene</span>
+                    </button>
+                    <button class="symbol-chip" data-symbol="+">
+                        <span class="char">+</span>
+                        <span class="label">Cerradura Positiva</span>
+                    </button>
+                    <button class="symbol-chip" data-symbol="?">
+                        <span class="char">? / [ ]</span>
+                        <span class="label">Opcional</span>
+                    </button>
+                    <button class="symbol-chip" data-symbol="|">
+                        <span class="char">|</span>
+                        <span class="label">Alternativa (O)</span>
+                    </button>
+                    <button class="symbol-chip" data-symbol="()">
+                        <span class="char">( )</span>
+                        <span class="label">Agrupación</span>
+                    </button>
+                    <button class="symbol-chip" data-symbol="range">
+                        <span class="char">[a-z]</span>
+                        <span class="label">Rango / Clase</span>
+                    </button>
+                </div>
+
+                <!-- Panel derecho: Detalle interactivo del símbolo -->
+                <div class="symbol-detail-card" id="symbol-detail-view">
+                    <div class="symbol-detail-header">
+                        <div>
+                            <div class="symbol-detail-name" id="sym-detail-title">Cerradura de Kleene (*)</div>
+                            <span class="badge-inline lavender" id="sym-detail-badge">0 o más repeticiones (0..&infin;)</span>
+                        </div>
+                        <div class="symbol-detail-char" id="sym-detail-icon">*</div>
+                    </div>
+                    <p class="symbol-detail-meaning" id="sym-detail-desc">
+                        Indica que el elemento precedente puede aparecer <strong>cero veces, una vez o infinitas veces</strong>. Por eso, la cadena vacía (&epsilon;) siempre forma parte del lenguaje resultante para ese elemento.
+                    </p>
+
+                    <div class="detail-sub-box">
+                        <strong>Patrón de Ejemplo en Código:</strong>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                            <code class="badge-inline sky" id="sym-detail-pattern">let[ ]*=[ ]*[0-9]+</code>
+                            <span style="font-size: 0.78rem; color: var(--text-muted); align-self: center;">(Permite 0 o más espacios alrededor del signo '=')</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-sub-box">
+                        <strong style="color: var(--pastel-mint-text);">✅ Cadenas Válidas Aceptadas:</strong>
+                        <div id="sym-detail-valids" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--pastel-mint-text);">
+                            "let=50" (0 espacios), "let = 50" (1 espacio), "let   =   50" (múltiples espacios)
+                        </div>
+                    </div>
+
+                    <div class="detail-sub-box">
+                        <strong style="color: var(--pastel-rose-text);">❌ Cadenas Inválidas (Rechazadas):</strong>
+                        <div id="sym-detail-invalids" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--pastel-rose-text);">
+                            "let == 50" (el operador '=' no tiene repetición '*'), "let = abc" (se exigían dígitos)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECCIÓN 3: GRAMÁTICAS FORMALES Y DERIVADOR BNF PASO A PASO
+             ========================================== -->
+        <section id="gramaticas" class="section-block">
+            <div class="section-header">
+                <div class="section-icon-box lavender">
+                    <svg class="svg-icon anim-pulse" viewBox="0 0 24 24">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="section-title">3. Gramáticas BNF y Derivación Paso a Paso</h2>
+                    <p class="section-subtitle">Cómo se definen las reglas sintácticas y cómo se derivan paso a paso hasta construir código real</p>
+                </div>
+            </div>
+
+            <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 14px;">
+                Una gramática formal en formato <strong>BNF (Backus-Naur Form)</strong> define cómo las construcciones complejas se componen de reglas menores. A continuación, observa el conjunto de reglas y cómo se aplica cada una en secuencia para derivar la expresión <code>let suma = 20 + 30;</code>:
+            </p>
+
+            <div class="derivation-container-layout">
+                <!-- Panel 1: Conjunto de Reglas Gramaticales BNF -->
+                <div class="grammar-rules-card">
+                    <div class="grammar-rules-header">
+                        <strong style="font-size: 0.88rem; color: var(--text-primary);">
+                            📐 Conjunto de Reglas Gramaticales (BNF)
+                        </strong>
+                        <span class="badge-inline sky" style="font-size: 0.72rem;">Gramática JS Simplificada</span>
+                    </div>
+
+                    <div class="grammar-rules-list">
+                        <div class="grammar-rule-row active-rule" id="rule-ref-1">
+                            <strong>(R1)</strong> <span class="nt-label">&lt;DeclaracionVar&gt;</span> <span class="op-label">::=</span> <span class="nt-label">&lt;DefinidorVar&gt;</span> <span class="nt-label">&lt;NombreVariable&gt;</span> <span class="t-label">"="</span> <span class="nt-label">&lt;Expresion&gt;</span> <span class="t-label">";"</span>
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-2">
+                            <strong>(R2)</strong> <span class="nt-label">&lt;DefinidorVar&gt;</span> <span class="op-label">::=</span> <span class="t-label">"let"</span> <span class="op-label">|</span> <span class="t-label">"var"</span> <span class="op-label">|</span> <span class="t-label">"const"</span>
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-3">
+                            <strong>(R3)</strong> <span class="nt-label">&lt;NombreVariable&gt;</span> <span class="op-label">::=</span> <span class="nt-label">&lt;Letra&gt;</span> (<span class="nt-label">&lt;Letra&gt;</span> <span class="op-label">|</span> <span class="nt-label">&lt;Digito&gt;</span> <span class="op-label">|</span> <span class="t-label">"_"</span>)*
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-4">
+                            <strong>(R4)</strong> <span class="nt-label">&lt;Expresion&gt;</span> <span class="op-label">::=</span> <span class="nt-label">&lt;Termino&gt;</span> <span class="op-label">|</span> <span class="nt-label">&lt;Termino&gt;</span> <span class="nt-label">&lt;OperadorAritmetico&gt;</span> <span class="nt-label">&lt;Termino&gt;</span>
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-5">
+                            <strong>(R5)</strong> <span class="nt-label">&lt;OperadorAritmetico&gt;</span> <span class="op-label">::=</span> <span class="t-label">"+"</span> <span class="op-label">|</span> <span class="t-label">"-"</span> <span class="op-label">|</span> <span class="t-label">"*"</span> <span class="op-label">|</span> <span class="t-label">"/"</span>
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-6">
+                            <strong>(R6)</strong> <span class="nt-label">&lt;Termino&gt;</span> <span class="op-label">::=</span> <span class="nt-label">&lt;Numero&gt;</span> <span class="op-label">|</span> <span class="nt-label">&lt;NombreVariable&gt;</span>
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-7">
+                            <strong>(R7)</strong> <span class="nt-label">&lt;Numero&gt;</span> <span class="op-label">::=</span> <span class="nt-label">&lt;Digito&gt;</span>+
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-8">
+                            <strong>(R8)</strong> <span class="nt-label">&lt;Letra&gt;</span> <span class="op-label">::=</span> <span class="t-label">"a"</span> <span class="op-label">|</span> <span class="t-label">"b"</span> <span class="op-label">|</span> <span class="t-label">...</span> <span class="op-label">|</span> <span class="t-label">"z"</span>
+                        </div>
+
+                        <div class="grammar-rule-row" id="rule-ref-9">
+                            <strong>(R9)</strong> <span class="nt-label">&lt;Digito&gt;</span> <span class="op-label">::=</span> <span class="t-label">"0"</span> <span class="op-label">|</span> <span class="t-label">"1"</span> <span class="op-label">|</span> <span class="t-label">...</span> <span class="op-label">|</span> <span class="t-label">"9"</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Stepper de Derivación Visual -->
+                <div class="derivation-stepper-card">
+                    <div>
+                        <div class="stepper-header-row">
+                            <div>
+                                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary);">
+                                    Visualizador de Derivación Sintáctica
+                                </h4>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);" id="derivation-target-label">
+                                    Objetivo: Armar <code class="badge-inline mint">let suma = 20 + 30;</code>
+                                </span>
+                            </div>
+                            <span class="badge-inline lavender" id="derivation-step-badge">Paso 1 de 9</span>
+                        </div>
+
+                        <!-- Indicadores de Pasos Clickeables -->
+                        <div class="stepper-dots-row" id="stepper-dots-container">
+                            <!-- Generados dinámicamente con JS -->
+                        </div>
+
+                        <!-- Pantalla de Código Derivado -->
+                        <div class="derivation-screen">
+                            <div class="derivation-screen-content" id="derivation-content">
+                                &lt;DeclaracionVar&gt;
+                            </div>
+                        </div>
+
+                        <!-- Explicación Didáctica del Paso -->
+                        <div class="derivation-explanation-box" id="derivation-note">
+                            <strong>Paso 1: Símbolo Raíz Inicial</strong>
+                            Comenzamos con el símbolo no terminal raíz <code>&lt;DeclaracionVar&gt;</code> que representa toda la sentencia.
+                        </div>
+                    </div>
+
+                    <!-- Botones de Control -->
+                    <div style="display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; margin-top: 10px;">
+                        <button class="btn-action" id="btn-prev-step" disabled>
+                            &larr; Anterior
+                        </button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-action" id="btn-reset-step">
+                                Reiniciar
+                            </button>
+                            <button class="btn-action primary" id="btn-next-step">
+                                Siguiente Paso &rarr;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECCIÓN 4: LABORATORIO / VALIDADOR EN VIVO
+             ========================================== -->
+        <section id="laboratorio" class="section-block">
+            <div class="section-header">
+                <div class="section-icon-box mint">
+                    <svg class="svg-icon anim-float" viewBox="0 0 24 24">
+                        <path d="M10 2v7.31"></path>
+                        <path d="M14 9.3V1.99"></path>
+                        <path d="M8.5 2h7"></path>
+                        <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+                        <path d="M5.52 16h12.96"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="section-title">4. Laboratorio & Validador en Vivo</h2>
+                    <p class="section-subtitle">Prueba tus propias cadenas y comprueba en tiempo real si cumplen las reglas sintácticas</p>
+                </div>
+            </div>
+
+            <div class="sandbox-panel">
+                <!-- Selector de preset -->
+                <div style="margin-bottom: 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                    Selecciona una regla a evaluar:
+                </div>
+                <div class="sandbox-presets-row" id="sandbox-presets">
+                    <button class="preset-btn active" data-preset="identificador">
+                        1. Identificador de Variable
+                    </button>
+                    <button class="preset-btn" data-preset="numero">
+                        2. Número Decimal con Signo
+                    </button>
+                    <button class="preset-btn" data-preset="declaracion_js">
+                        3. Declaración 'let' en JS
+                    </button>
+                    <button class="preset-btn" data-preset="email">
+                        4. Formato de Email Simple
+                    </button>
+                </div>
+
+                <!-- Banner de la regla actual -->
+                <div class="rule-display-banner">
+                    <strong>Gramática BNF de la regla:</strong>
+                    <div class="rule-bnf-code" id="sandbox-rule-code">
+                        &lt;Identificador&gt; ::= (&lt;Letra&gt; | "_") (&lt;Letra&gt; | &lt;Digito&gt; | "_")*
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);" id="sandbox-rule-desc">
+                        Debe iniciar con una letra o guion bajo, seguido de 0 o más letras, números o guiones bajos.
+                    </div>
+                </div>
+
+                <!-- Input en vivo -->
+                <div class="sandbox-input-wrapper">
+                    <input type="text" id="sandbox-input" class="sandbox-input" placeholder="Escribe aquí para probar..." value="miVariable_99" spellcheck="false" autocomplete="off">
+                    <div class="sandbox-status-icon" id="sandbox-icon-status">✅</div>
+                </div>
+
+                <!-- Tarjeta de Feedback -->
+                <div class="sandbox-feedback-card valid" id="sandbox-feedback">
+                    <div style="font-size: 1.3rem;" id="sandbox-emoji">🎉</div>
+                    <div style="flex: 1;">
+                        <strong id="sandbox-result-title" style="display: block; margin-bottom: 2px;">¡Cadena Sintácticamente Válida!</strong>
+                        <div id="sandbox-result-msg" style="font-size: 0.86rem;">
+                            Cumple la regla formal: inicia con letra y continúa con caracteres permitidos.
+                        </div>
+                        <div class="token-breakdown-row" id="sandbox-tokens">
+                            <!-- Tokens resaltados -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECCIÓN 5: TIPS, EXCEPCIONES Y TRAMPAS
+             ========================================== -->
+        <section id="tips" class="section-block">
+            <div class="section-header">
+                <div class="section-icon-box peach">
+                    <svg class="svg-icon anim-wiggle" viewBox="0 0 24 24">
+                        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                        <path d="M9 18h6"></path>
+                        <path d="M10 22h4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="section-title">5. Tips, Excepciones y Trampas Frecuentes</h2>
+                    <p class="section-subtitle">Preguntas clave y errores habituales al diseñar y validar gramáticas</p>
+                </div>
+            </div>
+
+            <div class="accordion-group">
+                <!-- Acordeón 1 -->
+                <div class="accordion-item open">
+                    <button class="accordion-header">
+                        <span>💡 ¿Por qué un identificador NO puede empezar con un número?</span>
+                        <svg class="accordion-chevron" viewBox="0 0 24 24">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="accordion-content">
+                        El analizador léxico (lexer) procesa el código carácter por carácter de izquierda a derecha. Si encuentra un dígito como <code>7</code>, asume inmediatamente que está leyendo un <strong>literal numérico</strong> (por ejemplo <code>750</code> o <code>7.25</code>). Si permitiéramos nombres como <code>7dias</code>, el analizador no sabría si es un número hexadecimal, un error o una variable hasta llegar al final, provocando ambigüedad y requiriendo retroceso (backtracking) ineficiente.
+                    </div>
+                </div>
+
+                <!-- Acordeón 2 -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        <span>⚠️ Error Léxico vs Sintáctico vs Semántico: ¿Cuál es la diferencia?</span>
+                        <svg class="accordion-chevron" viewBox="0 0 24 24">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="accordion-content">
+                        <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <li><strong>Error Léxico:</strong> Caracteres extraños no reconocidos en el alfabeto. Ej: <code>let nombre @ 10;</code> (el símbolo <code>@</code> no existe como operador en esa posición).</li>
+                            <li><strong>Error Sintáctico:</strong> El orden de los tokens no coincide con la gramática. Ej: <code>let = 10 nombre;</code> (tokens válidos pero en orden incorrecto).</li>
+                            <li><strong>Error Semántico:</strong> La sintaxis es perfecta, pero no tiene sentido lógico o de tipos. Ej: <code>const x = 10; x = 20;</code> (reasignación a una constante) o llamar a una variable inexistente.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Acordeón 3 -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        <span>🔑 La regla de las Palabras Reservadas (Keywords)</span>
+                        <svg class="accordion-chevron" viewBox="0 0 24 24">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="accordion-content">
+                        Aunque la palabra <code>class</code>, <code>while</code> o <code>function</code> cumple perfectamente la regla léxica de un identificador (empieza con letra y sigue con letras), <strong>las palabras reservadas tienen prioridad máxima en la tabla de símbolos</strong>. Por eso, la gramática define una regla de exclusión: <code>&lt;Identificador&gt; ::= &lt;TextoValido&gt; - &lt;PalabrasReservadas&gt;</code>.
+                    </div>
+                </div>
+
+                <!-- Acordeón 4 -->
+                <div class="accordion-item">
+                    <button class="accordion-header">
+                        <span>🎯 Truco infalible: Recordar '*', '+', y '?' en un segundo</span>
+                        <svg class="accordion-chevron" viewBox="0 0 24 24">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="accordion-content">
+                        <p>Memoriza esta regla de cardinalidad:</p>
+                        <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span class="badge-inline lavender"><strong>* (Kleene):</strong> 0 a &infin; (opcional + repetible)</span>
+                            <span class="badge-inline mint"><strong>+ (Positiva):</strong> 1 a &infin; (obligatorio al menos uno)</span>
+                            <span class="badge-inline peach"><strong>? (Opcional):</strong> 0 o 1 (puede estar o no, máximo uno)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECCIÓN 6: EJERCITACIÓN MULTIPLE CHOICE
+             ========================================== -->
+        <section id="quiz" class="section-block">
+            <div class="section-header">
+                <div class="section-icon-box rose">
+                    <svg class="svg-icon anim-bounce" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="section-title">6. Autoevaluación Multiple Choice</h2>
+                    <p class="section-subtitle">Pon a prueba tus conocimientos sobre reglas formales, metacaracteres y validación de expresiones</p>
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <!-- Barra superior de estadísticas del Quiz -->
+                <div class="quiz-stats-header">
+                    <div>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Progreso de Evaluación:</span>
+                        <strong id="quiz-question-counter" style="color: var(--text-primary); margin-left: 4px;">Pregunta 1 de 8</strong>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span class="meta-pill mint" id="quiz-score-pill">
+                            🏆 Aciertos: <strong id="quiz-score-num">0</strong> / 8
+                        </span>
+                    </div>
+                </div>
+
+                <div class="quiz-progress-bar-bg">
+                    <div class="quiz-progress-bar-fill" id="quiz-progress-fill"></div>
+                </div>
+
+                <!-- Contenedor dinámico de Preguntas -->
+                <div id="quiz-questions-wrapper">
+                    <!-- Las preguntas se renderizan dinámicamente con JS -->
+                </div>
+
+                <!-- Tarjeta de Resultado Final (Oculta al inicio) -->
+                <div class="quiz-result-card" id="quiz-result-card">
+                    <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+                    <div class="quiz-score-badge" id="quiz-final-score">8 / 8</div>
+                    <h3 style="font-size: 1.4rem; color: var(--text-primary); margin-bottom: 8px;" id="quiz-result-title">
+                        ¡Excelente dominio de Lenguajes Formales!
+                    </h3>
+                    <p style="font-size: 0.95rem; color: var(--text-secondary); max-width: 540px; margin: 0 auto 24px auto;" id="quiz-result-feedback">
+                        Has comprendido con precisión las reglas de derivación, los metacaracteres de repetición y las validaciones léxicas y sintácticas.
+                    </p>
+                    <button class="btn-action primary" id="btn-restart-quiz" style="padding: 10px 24px; font-size: 0.95rem;">
+                        🔄 Reiniciar y Practicar Nuevamente
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             PIE DE PÁGINA
+             ========================================== -->
+        <footer>
+            <p>
+                <strong>Universidad Nacional de Entre Ríos (UNER)</strong> &bull; Programación II
+            </p>
+            <p style="margin-top: 4px; font-size: 0.8rem;">
+                Material Didáctico e Interactivo sobre Teoría de Autómatas, Gramáticas y Lenguajes Formales.
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- ==========================================================================
+         LÓGICA JAVASCRIPT
+         ========================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ----------------------------------------------------------------------
+            // 1. BARRA DE PROGRESO DE LECTURA & ACTIVE NAV PILLS
+            // ----------------------------------------------------------------------
+            const progressBar = document.getElementById('reading-progress');
+            const navLinks = document.querySelectorAll('.nav-pill-btn');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+                progressBar.style.width = `${progress}%`;
+
+                // Actualizar pestaña activa según scroll
+                let currentSection = '';
+                sections.forEach(sec => {
+                    const top = sec.offsetTop - 120;
+                    if (window.scrollY >= top) {
+                        currentSection = sec.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // ----------------------------------------------------------------------
+            // 2. EXPLORADOR INTERACTIVO DE SIMBOLOGÍA
+            // ----------------------------------------------------------------------
+            const symbolsData = {
+                '*': {
+                    title: 'Cerradura de Kleene (*)',
+                    badge: '0 o más repeticiones (0..∞)',
+                    icon: '*',
+                    desc: 'Indica que el elemento precedente puede aparecer <strong>cero veces, una vez o infinitas veces</strong>. La ausencia total (cadena vacía &epsilon;) es completamente válida para esta parte del patrón.',
+                    pattern: 'let[ ]*=[ ]*[0-9]+',
+                    patternSub: '(Permite 0 o más espacios alrededor del signo \'=\')',
+                    valids: '"let=50" (0 espacios), "let = 50" (1 espacio), "let   =   50" (múltiples espacios)',
+                    invalids: '"let == 50" (\'=\' no tiene repetición *), "let = abc" (se exigían dígitos al final)'
+                },
+                '+': {
+                    title: 'Cerradura Positiva (+)',
+                    badge: '1 o más repeticiones (1..∞)',
+                    icon: '+',
+                    desc: 'Exige que el elemento aparezca <strong>obligatoriamente al menos una vez</strong>, pudiendo repetirse de forma ilimitada. Nunca acepta que el elemento esté ausente.',
+                    pattern: 'let[ ]+[a-z]+',
+                    patternSub: '(Exige al menos 1 espacio entre \'let\' y el nombre de la variable)',
+                    valids: '"let x" (1 espacio y 1 letra), "let   total" (varios espacios y varias letras)',
+                    invalids: '"letx" (0 espacios &rarr; error léxico: se une la palabra), "let " (faltan letras)'
+                },
+                '?': {
+                    title: 'Elemento Opcional (? o [ ] en EBNF)',
+                    badge: '0 o 1 aparición (máximo 1)',
+                    icon: '?',
+                    desc: 'Indica que el elemento o grupo es opcional: <strong>puede aparecer una única vez o no aparecer</strong>. Esencial para signos numéricos (+/-) o inicialización opcional de variables.',
+                    pattern: 'let <Nombre> ( = <Valor> )? ;',
+                    patternSub: '(Permite declarar la variable con o sin inicialización de valor)',
+                    valids: '"let contador;" (sin asignación), "let contador = 100;" (con asignación)',
+                    invalids: '"let contador = 10 = 20;" (asignación duplicada), "let ;" (falta el nombre)'
+                },
+                '|': {
+                    title: 'Alternativa o Selección (|)',
+                    badge: 'Operador de Unión / O lógico',
+                    icon: '|',
+                    desc: 'Permite elegir <strong>exactamente una de las alternativas</strong> definidas en el conjunto. Si la entrada coincide con cualquiera de las opciones, la regla es satisfecha.',
+                    pattern: '"let" | "const" | "var"',
+                    patternSub: '(Define los 3 definidores de variable válidos en JavaScript)',
+                    valids: '"let", "const", "var"',
+                    invalids: '"letvar" (no se pueden combinar), "define", "val", "mut"'
+                },
+                '()': {
+                    title: 'Agrupación Jerárquica ( ( ) )',
+                    badge: 'Precedencia y subexpresiones',
+                    icon: '( )',
+                    desc: 'Agrupa un conjunto de símbolos para tratarlos como una <strong>unidad atómica</strong> a la que se le aplican operadores como repetición (* o +) o selección (|).',
+                    pattern: '(ab)+c',
+                    patternSub: '(El bloque completo "ab" se repite 1 o más veces antes de "c")',
+                    valids: '"abc" (1 vez ab), "ababc" (2 veces ab), "ababababc"',
+                    invalids: '"c" (0 veces ab), "abbc" (la \'b\' no se repite sola sin la \'a\'), "ac"'
+                },
+                'range': {
+                    title: 'Rangos y Clases de Caracteres [ ]',
+                    badge: 'Conjunto de caracteres permitidos',
+                    icon: '[a-z]',
+                    desc: 'Define un conjunto o rango de caracteres donde <strong>cualquiera de ellos</strong> satisface esa posición individual única. Muy utilizado para definir letras o dígitos.',
+                    pattern: '[a-zA-Z_][a-zA-Z0-9_]*',
+                    patternSub: '(Regla canónica de identificadores: inicia con letra/_ y sigue con letras/números/_)',
+                    valids: '"x", "sumaTotal", "_temp", "pixel_1080", "A1"',
+                    invalids: '"1080pixel" (no puede iniciar con número), "total-suma" (el guion \'-\' es operador de resta)'
+                }
+            };
+
+            const symbolButtons = document.querySelectorAll('.symbol-chip');
+            const symTitle = document.getElementById('sym-detail-title');
+            const symBadge = document.getElementById('sym-detail-badge');
+            const symIcon = document.getElementById('sym-detail-icon');
+            const symDesc = document.getElementById('sym-detail-desc');
+            const symPattern = document.getElementById('sym-detail-pattern');
+            const symValids = document.getElementById('sym-detail-valids');
+            const symInvalids = document.getElementById('sym-detail-invalids');
+
+            symbolButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    symbolButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const symKey = btn.getAttribute('data-symbol');
+                    const data = symbolsData[symKey];
+                    if (data) {
+                        symTitle.textContent = data.title;
+                        symBadge.textContent = data.badge;
+                        symIcon.textContent = data.icon;
+                        symDesc.innerHTML = data.desc;
+                        symPattern.textContent = data.pattern;
+                        symValids.textContent = data.valids;
+                        symInvalids.textContent = data.invalids;
+                    }
+                });
+            });
+
+            // ----------------------------------------------------------------------
+            // 3. VISUALIZADOR DE DERIVACIÓN BNF DETALLADO (9 PASOS)
+            // ----------------------------------------------------------------------
+            const derivationSteps = [
+                {
+                    ruleId: 'rule-ref-1',
+                    content: '<span class="nt">&lt;DeclaracionVar&gt;</span>',
+                    title: 'Paso 1: Símbolo Raíz Inicial',
+                    note: 'Comenzamos con el símbolo no terminal inicial <code>&lt;DeclaracionVar&gt;</code> que representa la regla superior de la gramática.',
+                    badge: 'Paso 1 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-1',
+                    content: '<span class="nt">&lt;DefinidorVar&gt;</span> <span class="nt">&lt;NombreVariable&gt;</span> <span class="t">=</span> <span class="nt">&lt;Expresion&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 2: Expansión de la Estructura Mayor (R1)',
+                    note: 'Aplicamos la regla <strong>(R1)</strong>: <code>&lt;DeclaracionVar&gt; ::= &lt;DefinidorVar&gt; &lt;NombreVariable&gt; "=" &lt;Expresion&gt; ";"</code>. Se generan 3 no terminales y 2 símbolos terminales fijos (<code>=</code> y <code>;</code>).',
+                    badge: 'Paso 2 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-2',
+                    content: '<span class="t">let</span> <span class="nt">&lt;NombreVariable&gt;</span> <span class="t">=</span> <span class="nt">&lt;Expresion&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 3: Elección del Definidor de Variable (R2)',
+                    note: 'Aplicamos la regla <strong>(R2)</strong>: <code>&lt;DefinidorVar&gt; ::= "let" | "var" | "const"</code>. De las 3 alternativas disponibles, seleccionamos la opción terminal <code>"let"</code>.',
+                    badge: 'Paso 3 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-3',
+                    content: '<span class="t">let</span> <span class="nt">&lt;Letra&gt;&lt;Letra&gt;&lt;Letra&gt;&lt;Letra&gt;</span> <span class="t">=</span> <span class="nt">&lt;Expresion&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 4: Expansión del Nombre de Variable (R3)',
+                    note: 'Aplicamos la regla <strong>(R3)</strong>: <code>&lt;NombreVariable&gt; ::= &lt;Letra&gt; (&lt;Letra&gt; | &lt;Digito&gt; | "_")*</code>. Para nuestro ejemplo "suma", expandimos en una secuencia de 4 letras.',
+                    badge: 'Paso 4 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-8',
+                    content: '<span class="t">let suma</span> <span class="t">=</span> <span class="nt">&lt;Expresion&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 5: Derivación a los Terminales \'s\',\'u\',\'m\',\'a\' (R8)',
+                    note: 'Aplicamos la regla <strong>(R8)</strong> para sustituir cada <code>&lt;Letra&gt;</code> por los caracteres terminales "s", "u", "m", "a". El identificador queda completamente derivado.',
+                    badge: 'Paso 5 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-4',
+                    content: '<span class="t">let suma =</span> <span class="nt">&lt;Termino&gt;</span> <span class="nt">&lt;OperadorAritmetico&gt;</span> <span class="nt">&lt;Termino&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 6: Expansión de la Expresión en Operación Binaria (R4)',
+                    note: 'Aplicamos la regla <strong>(R4)</strong>: <code>&lt;Expresion&gt; ::= &lt;Termino&gt; &lt;OperadorAritmetico&gt; &lt;Termino&gt;</code>. La expresión se compone ahora de dos operandos y un operador intermedio.',
+                    badge: 'Paso 6 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-5',
+                    content: '<span class="t">let suma =</span> <span class="nt">&lt;Termino&gt;</span> <span class="t">+</span> <span class="nt">&lt;Termino&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 7: Elección del Operador Aritmético (R5)',
+                    note: 'Aplicamos la regla <strong>(R5)</strong>: <code>&lt;OperadorAritmetico&gt; ::= "+" | "-" | "*" | "/"</code>. Seleccionamos el operador terminal de suma <code>"+"</code>.',
+                    badge: 'Paso 7 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-7',
+                    content: '<span class="t">let suma =</span> <span class="lit-val">20</span> <span class="t">+</span> <span class="nt">&lt;Termino&gt;</span> <span class="t">;</span>',
+                    title: 'Paso 8: Derivación del Primer Término Numérico (R6, R7, R9)',
+                    note: 'El primer <code>&lt;Termino&gt;</code> se expande en <code>&lt;Numero&gt;</code> (R6), luego en dos dígitos <code>&lt;Digito&gt;+</code> (R7) y finalmente en los terminales <code>"2"</code> y <code>"0"</code> (R9).',
+                    badge: 'Paso 8 de 9'
+                },
+                {
+                    ruleId: 'rule-ref-7',
+                    content: '<span class="t">let suma = 20 + 30;</span>',
+                    title: 'Paso 9: Derivación del Segundo Término y Sentencia Completa (R9)',
+                    note: 'El segundo <code>&lt;Termino&gt;</code> se deriva en <code>"30"</code>. <strong>¡Sentencia totalmente derivada!</strong> Ya no queda ningún no terminal. El código es sintácticamente perfecto para el compilador/intérprete.',
+                    badge: 'Paso 9 de 9'
+                }
+            ];
+
+            let currentDerivationIdx = 0;
+            const btnPrevStep = document.getElementById('btn-prev-step');
+            const btnNextStep = document.getElementById('btn-next-step');
+            const btnResetStep = document.getElementById('btn-reset-step');
+            const derivationContent = document.getElementById('derivation-content');
+            const derivationNote = document.getElementById('derivation-note');
+            const derivationStepBadge = document.getElementById('derivation-step-badge');
+            const stepperDotsContainer = document.getElementById('stepper-dots-container');
+
+            // Renderizar bolitas de pasos
+            function renderStepperDots() {
+                stepperDotsContainer.innerHTML = derivationSteps.map((_, idx) => `
+                    <div class="step-dot ${idx === 0 ? 'active' : ''}" data-step="${idx}" id="step-dot-${idx}">
+                        ${idx + 1}
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.step-dot').forEach(dot => {
+                    dot.addEventListener('click', () => {
+                        const stepNum = parseInt(dot.getAttribute('data-step'), 10);
+                        goToDerivationStep(stepNum);
+                    });
+                });
+            }
+
+            function goToDerivationStep(stepIdx) {
+                currentDerivationIdx = stepIdx;
+                const stepData = derivationSteps[currentDerivationIdx];
+
+                derivationContent.innerHTML = stepData.content;
+                derivationNote.innerHTML = `<strong>${stepData.title}</strong>${stepData.note}`;
+                derivationStepBadge.textContent = stepData.badge;
+
+                // Actualizar resaltado de reglas en el panel izquierdo
+                document.querySelectorAll('.grammar-rule-row').forEach(row => {
+                    row.classList.remove('active-rule');
+                });
+                const activeRuleElem = document.getElementById(stepData.ruleId);
+                if (activeRuleElem) {
+                    activeRuleElem.classList.add('active-rule');
+                }
+
+                // Actualizar bolitas
+                document.querySelectorAll('.step-dot').forEach((dot, dIdx) => {
+                    dot.classList.remove('active');
+                    dot.classList.remove('completed');
+                    if (dIdx === currentDerivationIdx) {
+                        dot.classList.add('active');
+                    } else if (dIdx < currentDerivationIdx) {
+                        dot.classList.add('completed');
+                    }
+                });
+
+                btnPrevStep.disabled = (currentDerivationIdx === 0);
+                btnNextStep.disabled = (currentDerivationIdx === derivationSteps.length - 1);
+            }
+
+            btnNextStep.addEventListener('click', () => {
+                if (currentDerivationIdx < derivationSteps.length - 1) {
+                    goToDerivationStep(currentDerivationIdx + 1);
+                }
+            });
+
+            btnPrevStep.addEventListener('click', () => {
+                if (currentDerivationIdx > 0) {
+                    goToDerivationStep(currentDerivationIdx - 1);
+                }
+            });
+
+            btnResetStep.addEventListener('click', () => {
+                goToDerivationStep(0);
+            });
+
+            renderStepperDots();
+            goToDerivationStep(0);
+
+            // ----------------------------------------------------------------------
+            // 4. LABORATORIO & VALIDADOR EN TIEMPO REAL
+            // ----------------------------------------------------------------------
+            const presetConfigs = {
+                identificador: {
+                    name: 'Identificador de Variable',
+                    ruleBnf: '<Identificador> ::= (<Letra> | "_") (<Letra> | <Digito> | "_")*',
+                    ruleDesc: 'Debe iniciar obligatoriamente con una letra (a-z, A-Z) o guión bajo (_), seguido de 0 o más letras, números o guiones bajos. No puede contener espacios ni operadores.',
+                    regex: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+                    defaultVal: 'miVariable_99',
+                    tokens: (val) => {
+                        if (!val) return [];
+                        const first = val[0];
+                        const rest = val.slice(1);
+                        return [
+                            { label: 'Inicio ([a-zA-Z_])', text: first, valid: /^[a-zA-Z_]$/.test(first) },
+                            { label: 'Cuerpo (*)', text: rest || '(vacío)', valid: /^[a-zA-Z0-9_]*$/.test(rest) }
+                        ];
+                    }
+                },
+                numero: {
+                    name: 'Número Decimal con Signo',
+                    ruleBnf: '<Numero> ::= ["+"|"-"]? <Digito>+ ("." <Digito>+)?',
+                    ruleDesc: 'Signo opcional (+/-), seguido de al menos un dígito entero. Opcionalmente puede tener un punto "." seguido de al menos un dígito decimal.',
+                    regex: /^[+-]?[0-9]+(\.[0-9]+)?$/,
+                    defaultVal: '-3.1415',
+                    tokens: (val) => {
+                        const match = val.match(/^([+-])?([0-9]+)(\.([0-9]+))?$/);
+                        if (!match) return [{ label: 'Patrón', text: val, valid: false }];
+                        return [
+                            { label: 'Signo (?)', text: match[1] || '(sin signo)', valid: true },
+                            { label: 'Enteros (+)', text: match[2] || '', valid: true },
+                            { label: 'Decimales (?)', text: match[3] || '(sin decimales)', valid: true }
+                        ];
+                    }
+                },
+                declaracion_js: {
+                    name: "Declaración 'let' en JS",
+                    ruleBnf: "<Sentencia> ::= 'let' <Espacio>+ <Identificador> <Espacio>* '=' <Espacio>* <Numero> ';'",
+                    ruleDesc: "Estructura completa de declaración e inicialización: palabra clave 'let', nombre de variable, '=', valor numérico y ';' final.",
+                    regex: /^let\s+[a-zA-Z_][a-zA-Z0-9_]*\s*=\s*[+-]?[0-9]+(\.[0-9]+)?\s*;$/,
+                    defaultVal: 'let total = 100;',
+                    tokens: (val) => {
+                        const regexJS = /^(let)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(=)\s*([+-]?[0-9]+(?:\.[0-9]+)?)\s*(;)$/;
+                        const match = val.trim().match(regexJS);
+                        if (!match) return [{ label: 'Estructura', text: val, valid: false }];
+                        return [
+                            { label: 'Keyword', text: match[1], valid: true },
+                            { label: 'Identificador', text: match[2], valid: true },
+                            { label: 'Operador', text: match[3], valid: true },
+                            { label: 'Literal Num', text: match[4], valid: true },
+                            { label: 'Delimitador', text: match[5], valid: true }
+                        ];
+                    }
+                },
+                email: {
+                    name: 'Formato de Email Simple',
+                    ruleBnf: '<Email> ::= <Usuario> "@" <Dominio> "." <Extension>',
+                    ruleDesc: 'Cadena de usuario alfanumérica, seguida del símbolo terminal "@", nombre de dominio, punto y extensión de 2 a 4 letras.',
+                    regex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    defaultVal: 'alumno.uner@facultad.edu',
+                    tokens: (val) => {
+                        const match = val.match(/^([^@]+)@([^.]+)\.(.+)$/);
+                        if (!match) return [{ label: 'Estructura Email', text: val, valid: false }];
+                        return [
+                            { label: 'Usuario', text: match[1], valid: true },
+                            { label: 'Arroba', text: '@', valid: true },
+                            { label: 'Dominio', text: match[2], valid: true },
+                            { label: 'Extensión', text: '.' + match[3], valid: true }
+                        ];
+                    }
+                }
+            };
+
+            let currentPresetKey = 'identificador';
+            const sandboxInput = document.getElementById('sandbox-input');
+            const sandboxIconStatus = document.getElementById('sandbox-icon-status');
+            const sandboxFeedback = document.getElementById('sandbox-feedback');
+            const sandboxEmoji = document.getElementById('sandbox-emoji');
+            const sandboxResultTitle = document.getElementById('sandbox-result-title');
+            const sandboxResultMsg = document.getElementById('sandbox-result-msg');
+            const sandboxTokens = document.getElementById('sandbox-tokens');
+            const sandboxRuleCode = document.getElementById('sandbox-rule-code');
+            const sandboxRuleDesc = document.getElementById('sandbox-rule-desc');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+
+            function evaluateSandbox() {
+                const config = presetConfigs[currentPresetKey];
+                const inputVal = sandboxInput.value;
+                const isValid = config.regex.test(inputVal);
+
+                if (inputVal.trim() === '') {
+                    sandboxIconStatus.textContent = '⚪';
+                    sandboxFeedback.className = 'sandbox-feedback-card';
+                    sandboxFeedback.style.background = '#f1f5f9';
+                    sandboxFeedback.style.borderColor = '#cbd5e1';
+                    sandboxFeedback.style.color = '#475569';
+                    sandboxEmoji.textContent = '✍️';
+                    sandboxResultTitle.textContent = 'Esperando texto...';
+                    sandboxResultMsg.textContent = 'Ingresa una expresión en el campo superior para analizarla contra la gramática.';
+                    sandboxTokens.innerHTML = '';
+                    return;
+                }
+
+                if (isValid) {
+                    sandboxIconStatus.textContent = '✅';
+                    sandboxFeedback.className = 'sandbox-feedback-card valid';
+                    sandboxFeedback.style.background = '';
+                    sandboxFeedback.style.borderColor = '';
+                    sandboxFeedback.style.color = '';
+                    sandboxEmoji.textContent = '🎉';
+                    sandboxResultTitle.textContent = '¡Cadena Sintácticamente Válida!';
+                    sandboxResultMsg.textContent = `La expresión coincide perfectamente con las reglas de la gramática (${config.name}).`;
+                } else {
+                    sandboxIconStatus.textContent = '❌';
+                    sandboxFeedback.className = 'sandbox-feedback-card invalid';
+                    sandboxFeedback.style.background = '';
+                    sandboxFeedback.style.borderColor = '';
+                    sandboxFeedback.style.color = '';
+                    sandboxEmoji.textContent = '⚠️';
+                    sandboxResultTitle.textContent = 'Error de Sintaxis / Cadena Rechazada';
+                    sandboxResultMsg.textContent = `No cumple la regla formal. Revisa caracteres prohibidos, orden o metacaracteres obligatorios.`;
+                }
+
+                // Generar badges de tokens
+                const tokens = config.tokens(inputVal);
+                sandboxTokens.innerHTML = tokens.map(t => `
+                    <span class="token-pill" style="border-color: ${t.valid ? 'var(--pastel-mint-border)' : 'var(--pastel-rose-border)'}; background: ${t.valid ? 'var(--pastel-mint)' : 'var(--pastel-rose)'}; color: ${t.valid ? 'var(--pastel-mint-text)' : 'var(--pastel-rose-text)'}">
+                        <strong>${t.label}:</strong> "${t.text}"
+                    </span>
+                `).join('');
+            }
+
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    currentPresetKey = btn.getAttribute('data-preset');
+                    const config = presetConfigs[currentPresetKey];
+                    sandboxRuleCode.textContent = config.ruleBnf;
+                    sandboxRuleDesc.textContent = config.ruleDesc;
+                    sandboxInput.value = config.defaultVal;
+                    evaluateSandbox();
+                });
+            });
+
+            sandboxInput.addEventListener('input', evaluateSandbox);
+            evaluateSandbox(); // Primera evaluación
+
+            // ----------------------------------------------------------------------
+            // 5. ACORDEONES
+            // ----------------------------------------------------------------------
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const item = header.parentElement;
+                    item.classList.toggle('open');
+                });
+            });
+
+            // ----------------------------------------------------------------------
+            // 6. QUIZ MULTIPLE CHOICE INTERACTIVO
+            // ----------------------------------------------------------------------
+            const quizData = [
+                {
+                    id: 1,
+                    category: "Cerradura de Kleene vs Positiva",
+                    question: "¿Cuál es la diferencia fundamental entre el operador de cerradura de Kleene (*) y la cerradura positiva (+)?",
+                    code: null,
+                    options: [
+                        "El operador * solo acepta números y el operador + solo acepta letras.",
+                        "El operador * permite cero o más repeticiones (acepta cadena vacía ε), mientras que + exige al menos una repetición (no acepta ε).",
+                        "El operador * es para terminales y el operador + es únicamente para no terminales.",
+                        "Ambos operadores son exactamente idénticos y se pueden intercambiar libremente."
+                    ],
+                    correctIndex: 1,
+                    explanation: "¡Exacto! Kleene (*) abarca de 0 a infinito repeticiones (por lo que la cadena vacía ε es válida). En cambio, la cerradura positiva (+) exige como mínimo 1 elemento (1 a infinito)."
+                },
+                {
+                    id: 2,
+                    category: "Validación de Identificadores",
+                    question: "Dada la regla formal: <Id> ::= [a-zA-Z_][a-zA-Z0-9_]*, ¿cuál de las siguientes opciones es un identificador INVÁLIDO?",
+                    code: "<Id> ::= [a-zA-Z_][a-zA-Z0-9_]*",
+                    options: [
+                        "_contadorTotal",
+                        "valor_2",
+                        "3cervezas",
+                        "X"
+                    ],
+                    correctIndex: 2,
+                    explanation: "¡Correcto! '3cervezas' es inválido porque comienza con el dígito '3'. La regla exige que el primer carácter sea una letra ([a-zA-Z]) o un guión bajo (_)."
+                },
+                {
+                    id: 3,
+                    category: "Gramáticas BNF y Alternativas",
+                    question: "Si tenemos la regla BNF: <Bebida> ::= ('cafe' | 'te') ['con_leche']?, ¿cuál de las siguientes cadenas NO pertenece al lenguaje generado?",
+                    code: "<Bebida> ::= ('cafe' | 'te') ['con_leche']?",
+                    options: [
+                        "cafe",
+                        "te con_leche",
+                        "cafe con_leche",
+                        "agua"
+                    ],
+                    correctIndex: 3,
+                    explanation: "¡Muy bien! 'agua' no pertenece al lenguaje porque la regla solo ofrece la alternativa entre 'cafe' o 'te'. 'agua' no es un símbolo terminal contemplado."
+                },
+                {
+                    id: 4,
+                    category: "Metacaracteres de Opcionalidad",
+                    question: "¿Qué símbolo o notación se utiliza formalmente para indicar que un elemento es opcional (puede aparecer 0 o 1 vez)?",
+                    code: null,
+                    options: [
+                        "El signo de interrogación '?' o corchetes '[ ]'",
+                        "El signo de suma '+'",
+                        "El asterisco '*'",
+                        "La barra vertical '|'"
+                    ],
+                    correctIndex: 0,
+                    explanation: "¡Correcto! Tanto el metarácter '?' en expresiones regulares como los corchetes '[ ]' en EBNF denotan opcionalidad (cardinalidad 0 o 1)."
+                },
+                {
+                    id: 5,
+                    category: "Diferenciación de Errores",
+                    question: "En JavaScript, si un estudiante escribe el código: 'const pi = 3.14; pi = 3.1415;', ¿qué tipo de error se produce?",
+                    code: "const pi = 3.14;\npi = 3.1415;",
+                    options: [
+                        "Error Léxico (el compilador no reconoce los caracteres).",
+                        "Error Sintáctico (la estructura de asignación está mal ordenada).",
+                        "Error Semántico (la sintaxis es válida según la gramática, pero viola la regla de inmutabilidad de 'const').",
+                        "Ningún error, se compila perfectamente."
+                    ],
+                    correctIndex: 2,
+                    explanation: "¡Excelente análisis! La estructura 'identificador = numero;' cumple con la gramática sintáctica de asignación. Sin embargo, viola el significado/lógica de una variable constante, lo cual es un error semántico."
+                },
+                {
+                    id: 6,
+                    category: "Construcción de Reglas",
+                    question: "¿Qué regla gramatical o expresión es necesaria para validar números enteros con signo opcional (+ o -) como +50, -12 o 99?",
+                    code: null,
+                    options: [
+                        "['+' | '-']? [0-9]+",
+                        "('+' | '-')* [0-9]*",
+                        "[0-9]+ ['+' | '-']",
+                        "['+' | '-']+ [0-9]?"
+                    ],
+                    correctIndex: 0,
+                    explanation: "¡Exacto! '['+' | '-']?' permite que el signo sea opcional (0 o 1 vez), y '[0-9]+' exige al menos un dígito entero."
+                },
+                {
+                    id: 7,
+                    category: "Símbolos Terminales vs No Terminales",
+                    question: "En la regla BNF: <Asignacion> ::= <Variable> '=' <Valor> ';', ¿cuáles son los símbolos TERMINALES?",
+                    code: "<Asignacion> ::= <Variable> '=' <Valor> ';'",
+                    options: [
+                        "<Asignacion>, <Variable> y <Valor>",
+                        "Únicamente los caracteres '=' y ';'",
+                        "El operador '::=' y <Asignacion>",
+                        "No existen símbolos terminales en esa regla."
+                    ],
+                    correctIndex: 1,
+                    explanation: "¡Correcto! Los símbolos que van entre comillas o literales ('=' y ';') son terminales porque no se expanden más; son los caracteres exactos que aparecen en el código fuente."
+                },
+                {
+                    id: 8,
+                    category: "Repeticiones y Agrupación",
+                    question: "Dada la expresión '(ab)+c', ¿cuál de las siguientes cadenas es aceptada?",
+                    code: "(ab)+c",
+                    options: [
+                        "c (cero veces ab)",
+                        "abc",
+                        "abbc",
+                        "aabc"
+                    ],
+                    correctIndex: 1,
+                    explanation: "¡Perfecto! '(ab)+c' requiere que el bloque 'ab' se repita al menos una vez (ab, abab, ababab...) seguido de 'c'. Por tanto, 'abc' y 'abababac' son válidas."
+                }
+            ];
+
+            let currentQuestionIdx = 0;
+            let score = 0;
+            const answersHistory = new Array(quizData.length).fill(null);
+
+            const quizQuestionsWrapper = document.getElementById('quiz-questions-wrapper');
+            const quizCounter = document.getElementById('quiz-question-counter');
+            const quizScoreNum = document.getElementById('quiz-score-num');
+            const quizProgressFill = document.getElementById('quiz-progress-fill');
+            const quizResultCard = document.getElementById('quiz-result-card');
+            const btnRestartQuiz = document.getElementById('btn-restart-quiz');
+
+            function renderQuizQuestions() {
+                quizQuestionsWrapper.innerHTML = quizData.map((q, idx) => `
+                    <div class="question-card ${idx === 0 ? 'active' : ''}" id="q-card-${idx}">
+                        <span class="question-badge">${q.category}</span>
+                        <h4 class="question-title">${idx + 1}. ${q.question}</h4>
+                        ${q.code ? `<div class="question-code-block">${q.code}</div>` : ''}
+                        
+                        <div class="options-list">
+                            ${q.options.map((opt, optIdx) => `
+                                <button class="quiz-option-btn" data-qidx="${idx}" data-optidx="${optIdx}" id="opt-btn-${idx}-${optIdx}">
+                                    <span class="quiz-option-letter">${String.fromCharCode(65 + optIdx)}</span>
+                                    <span>${opt}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div class="quiz-explanation-box" id="explanation-${idx}"></div>
+
+                        <div class="quiz-nav-footer">
+                            <button class="btn-action" id="btn-prev-q-${idx}" ${idx === 0 ? 'disabled' : ''}>
+                                &larr; Anterior
+                            </button>
+                            <button class="btn-action primary" id="btn-next-q-${idx}" disabled>
+                                ${idx === quizData.length - 1 ? 'Ver Resultado Final 🏆' : 'Siguiente Pregunta &rarr;'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Asignar Event Listeners a las opciones
+                quizData.forEach((q, qIdx) => {
+                    q.options.forEach((_, optIdx) => {
+                        const optBtn = document.getElementById(`opt-btn-${qIdx}-${optIdx}`);
+                        optBtn.addEventListener('click', () => handleOptionSelect(qIdx, optIdx));
+                    });
+
+                    const prevBtn = document.getElementById(`btn-prev-q-${qIdx}`);
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', () => navigateQuestion(qIdx - 1));
+                    }
+
+                    const nextBtn = document.getElementById(`btn-next-q-${qIdx}`);
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', () => {
+                            if (qIdx === quizData.length - 1) {
+                                showQuizResults();
+                            } else {
+                                navigateQuestion(qIdx + 1);
+                            }
+                        });
+                    }
+                });
+
+                updateQuizHeader();
+            }
+
+            function handleOptionSelect(qIdx, selectedOptIdx) {
+                if (answersHistory[qIdx] !== null) return; // Ya respondida
+
+                answersHistory[qIdx] = selectedOptIdx;
+                const q = quizData[qIdx];
+                const isCorrect = (selectedOptIdx === q.correctIndex);
+
+                if (isCorrect) {
+                    score++;
+                }
+
+                // Estilar opciones
+                q.options.forEach((_, optIdx) => {
+                    const btn = document.getElementById(`opt-btn-${qIdx}-${optIdx}`);
+                    btn.disabled = true;
+                    if (optIdx === q.correctIndex) {
+                        btn.classList.add('selected-correct');
+                    } else if (optIdx === selectedOptIdx && !isCorrect) {
+                        btn.classList.add('selected-incorrect');
+                    }
+                });
+
+                // Mostrar explicación
+                const expBox = document.getElementById(`explanation-${qIdx}`);
+                expBox.className = `quiz-explanation-box ${isCorrect ? 'correct' : 'incorrect'}`;
+                expBox.style.display = 'block';
+                expBox.innerHTML = `
+                    <strong>${isCorrect ? '🎉 ¡Respuesta Correcta!' : '❌ Respuesta Incorrecta'}</strong>
+                    <p style="margin-top: 4px;">${q.explanation}</p>
+                `;
+
+                // Habilitar botón siguiente
+                const nextBtn = document.getElementById(`btn-next-q-${qIdx}`);
+                if (nextBtn) nextBtn.disabled = false;
+
+                updateQuizHeader();
+            }
+
+            function navigateQuestion(newIdx) {
+                if (newIdx < 0 || newIdx >= quizData.length) return;
+
+                document.getElementById(`q-card-${currentQuestionIdx}`).classList.remove('active');
+                currentQuestionIdx = newIdx;
+                document.getElementById(`q-card-${currentQuestionIdx}`).classList.add('active');
+
+                updateQuizHeader();
+            }
+
+            function updateQuizHeader() {
+                quizCounter.textContent = `Pregunta ${currentQuestionIdx + 1} de ${quizData.length}`;
+                quizScoreNum.textContent = score;
+                const answeredCount = answersHistory.filter(a => a !== null).length;
+                const progressPct = (answeredCount / quizData.length) * 100;
+                quizProgressFill.style.width = `${progressPct}%`;
+            }
+
+            function showQuizResults() {
+                document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+                quizResultCard.style.display = 'block';
+
+                const finalScore = document.getElementById('quiz-final-score');
+                const resultTitle = document.getElementById('quiz-result-title');
+                const resultFeedback = document.getElementById('quiz-result-feedback');
+
+                finalScore.textContent = `${score} / ${quizData.length}`;
+
+                if (score === quizData.length) {
+                    resultTitle.textContent = '🌟 ¡Puntaje Perfecto! Dominio Absoluto';
+                    resultFeedback.textContent = 'Has demostrado una comprensión impecable de la teoría de lenguajes formales, gramáticas BNF y análisis sintáctico.';
+                } else if (score >= 5) {
+                    resultTitle.textContent = '👏 ¡Muy Buen Trabajo!';
+                    resultFeedback.textContent = 'Tienes bases sólidas sobre simbología y reglas sintácticas. Revisa los conceptos donde tuviste dudas para afianzar al 100%.';
+                } else {
+                    resultTitle.textContent = '📚 Te sugerimos repasar la teoría';
+                    resultFeedback.textContent = 'Vuelve a revisar la sección de simbología (*, +, ?) y el derivador BNF interactivo para aclarar las reglas de producción.';
+                }
+            }
+
+            btnRestartQuiz.addEventListener('click', () => {
+                currentQuestionIdx = 0;
+                score = 0;
+                answersHistory.fill(null);
+                quizResultCard.style.display = 'none';
+                renderQuizQuestions();
+            });
+
+            // Inicializar Quiz
+            renderQuizQuestions();
+
+        });
+    </script>
+</body>
+</html>

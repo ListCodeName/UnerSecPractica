@@ -298,6 +298,40 @@
             </div>
 
         </div>
+
+        <!-- SECCIÓN DE ANEXOS Y DESAFÍOS TEÓRICO-PRÁCTICOS -->
+        <h2 style="font-family: var(--font-title); font-size: 1.5rem; color: #fff; margin: 40px 0 20px 0; display: flex; align-items: center; gap: 10px;">
+            <span>📚 Anexos y Refuerzo Didáctico</span>
+            <span style="font-size: 0.75rem; background: rgba(0, 245, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 3px 10px; border-radius: 99px;">NUEVO</span>
+        </h2>
+
+        <div class="hub-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+            <!-- Anexo 1 Card -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #00f5ff, #ff2e93)">
+                <div class="hub-card-number" style="font-size: 1.6rem; color: var(--neon-cyan);">A1</div>
+                <div>
+                    <h3 class="hub-card-title">Anexo 1: Operaciones y Lógica</h3>
+                    <p class="hub-card-desc">Práctica autónoma con ejercicios de Opción Múltiple y Completar Código: sustitución de variables, fórmulas, concatenación de cadenas y expresiones lógicas.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Sustitución</span>
+                        <span class="concept-tag">Fórmulas</span>
+                        <span class="concept-tag">Concatenación</span>
+                        <span class="concept-tag">Lógica Bool</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-anexo1"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-anexo1">0/12 aciertos</span>
+                        <span id="pct-anexo1">0%</span>
+                    </div>
+                    <a href="anexo-01-operaciones-tipos-datos.html" class="hub-card-btn" style="margin-top: 15px; background: linear-gradient(135deg, #00f5ff 0%, #ff2e93 100%);">Ingresar al Anexo 1</a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- PIE DE PÁGINA -->
@@ -345,6 +379,29 @@
                     pctEl.innerText = `${Math.round(pct)}%`;
                 }
             });
+
+            // Anexo 1 Stats
+            const savedAnexo1 = localStorage.getItem('js_practica_anexo1_answers');
+            let anexo1Count = 0;
+            if (savedAnexo1) {
+                try {
+                    const parsed = JSON.parse(savedAnexo1);
+                    Object.values(parsed).forEach(item => {
+                        if (item.isCorrect) anexo1Count++;
+                    });
+                } catch (e) {
+                    anexo1Count = 0;
+                }
+            }
+            const fillA1 = document.getElementById('fill-anexo1');
+            const textA1 = document.getElementById('text-anexo1');
+            const pctA1 = document.getElementById('pct-anexo1');
+            if (fillA1 && textA1 && pctA1) {
+                const pct = (anexo1Count / 12) * 100;
+                fillA1.style.width = `${pct}%`;
+                textA1.innerHTML = `<strong>${anexo1Count}</strong>/12 aciertos`;
+                pctA1.innerText = `${Math.round(pct)}%`;
+            }
 
             // Global stats
             const globalCompletedEl = document.getElementById('global-completed');

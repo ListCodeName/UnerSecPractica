@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anexo 1: Operaciones, Tipos de Datos y Expresiones Lógicas</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .anexo-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            width: 100%;
+        }
+
+        /* Banner de Progreso */
+        .anexo-stats-card {
+            background-color: var(--surface);
+            background-image: linear-gradient(135deg, var(--surface-card) 0%, rgba(22, 17, 43, 0.6) 100%);
+            border: var(--border-neon);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--glow-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .anexo-stats-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--grad-sunset);
+        }
+
+        .anexo-info h2 {
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .anexo-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stats-badge-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 12px;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .stat-pill-val {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
+        }
+
+        .stat-pill-lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* Filtros por Categoría */
+        .filter-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .filter-btn {
+            background: rgba(22, 17, 43, 0.8);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 99px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        .filter-btn.active {
+            background: var(--grad-sunset);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: var(--glow-pink);
+        }
+
+        /* Tarjeta de Ejercicio */
+        .exercise-card {
+            background: var(--surface-card);
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .exercise-card.status-correct {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+        }
+
+        .exercise-card.status-incorrect {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 46, 147, 0.2);
+        }
+
+        .ex-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ex-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-category {
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid var(--neon-purple);
+            color: #d8b4fe;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tag-type {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+        }
+
+        .ex-number {
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .ex-title-text {
+            font-family: var(--font-title);
+            font-size: 1.15rem;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        /* Bloque de Código de Consigna */
+        .code-box {
+            background: #060410;
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            color: #f1ecfc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Opciones Multiple Choice */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            background: rgba(10, 8, 22, 0.7);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .option-item.selected {
+            border-color: var(--neon-pink);
+            background: rgba(255, 46, 147, 0.12);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        .option-item.correct-ans {
+            border-color: var(--neon-green) !important;
+            background: rgba(57, 255, 20, 0.15) !important;
+            color: #fff !important;
+            box-shadow: 0 0 12px rgba(57, 255, 20, 0.3) !important;
+        }
+
+        .option-item.incorrect-ans {
+            border-color: var(--neon-pink) !important;
+            background: rgba(255, 46, 147, 0.15) !important;
+            color: #ff99c8 !important;
+        }
+
+        .option-radio {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .option-radio:checked {
+            border-color: var(--neon-pink);
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* Completar Código Input */
+        .fill-blank-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .fill-input {
+            background: #060410;
+            border: 2px solid var(--neon-purple);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--neon-cyan);
+            outline: none;
+            width: 100%;
+            max-width: 560px;
+            min-width: 280px;
+            transition: all 0.25s;
+        }
+
+        .fill-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-check-fill {
+            background: var(--grad-sunset);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 11px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: var(--glow-pink);
+        }
+
+        .btn-check-fill:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Caja de Retroalimentación / Explicación */
+        .feedback-box {
+            display: none;
+            padding: 15px 18px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-box.correct {
+            background: rgba(57, 255, 20, 0.08);
+            border: 1px solid var(--neon-green);
+            color: #c2ffb3;
+        }
+
+        .feedback-box.incorrect {
+            background: rgba(255, 46, 147, 0.08);
+            border: 1px solid var(--neon-pink);
+            color: #ffd1e8;
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body data-workshop-id="anexo1">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Anexo 01 - Fundamentos JS</div>
+        <h1>Operaciones, Tipos de Datos y Expresiones Lógicas</h1>
+        <p>Aplica sustitución de variables, formulación de ecuaciones, concatenación de cadenas y evaluación de expresiones lógicas mediante ejercicios de Opción Múltiple y Completado de Código.</p>
+        <div class="header-meta">
+            <span>Modalidad: <strong>Práctica Interactiva Autónoma</strong></span>
+            <span>Ejercicios: <strong>12 Actividades</strong></span>
+            <span>Navegación: <a href="index.html" style="color: var(--neon-pink); text-decoration: none; font-weight: 600;">&larr; Volver al Portal de Práctica</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="anexo-container">
+
+        <!-- BANNER DE PROGRESO -->
+        <div class="anexo-stats-card">
+            <div class="anexo-info">
+                <h2>Panel de Avance del Anexo 1</h2>
+                <p>Resuelve cada consigna. Tu puntaje y progreso se guardan automáticamente en tu navegador.</p>
+            </div>
+            <div class="stats-badge-group">
+                <div class="stat-pill">
+                    <div class="stat-pill-val" id="score-counter">0 / 12</div>
+                    <div class="stat-pill-lbl">Aciertos</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-pill-val" id="pct-counter" style="color: var(--neon-pink); text-shadow: var(--glow-pink);">0%</div>
+                    <div class="stat-pill-lbl">Completado</div>
+                </div>
+                <button class="filter-btn" id="reset-btn" style="border-color: rgba(255, 70, 70, 0.5); color: #ff8585;">↺ Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- FILTROS POR CATEGORÍA -->
+        <div class="filter-nav">
+            <button class="filter-btn active" data-filter="all">Todos (12)</button>
+            <button class="filter-btn" data-filter="sustitucion">1. Sustitución de Variables</button>
+            <button class="filter-btn" data-filter="formulas">2. Planteos de Fórmulas</button>
+            <button class="filter-btn" data-filter="concatenacion">3. Concatenación de Cadenas</button>
+            <button class="filter-btn" data-filter="logica">4. Expresiones Lógicas</button>
+        </div>
+
+        <!-- CONTENEDOR DE EJERCICIOS RENDERIZADOS DINÁMICAMENTE -->
+        <div id="exercises-list"></div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- LÓGICA INTERACTIVA DE EJERCICIOS -->
+    <script>
+        const exercisesData = [
+            // EJE 1: SUSTITUCIÓN DE VARIABLES
+            {
+                id: 1,
+                category: "sustitucion",
+                categoryLabel: "Sustitución de Variables",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Rastreo de Valores e Intercambio sin Variable Auxiliar",
+                code: `let x = 5;\nlet y = 12;\nx = x + y;\ny = x - y;\nx = x - y;`,
+                question: "¿Cuáles son los valores finales de las variables 'x' e 'y' al finalizar la ejecución?",
+                options: [
+                    "x = 5, y = 12",
+                    "x = 12, y = 5",
+                    "x = 17, y = 17",
+                    "x = 17, y = 12"
+                ],
+                correctAnswer: 1,
+                explanation: "En la línea 3, x se convierte en 17. En la línea 4, y = 17 - 12 (y resulta 5). En la línea 5, x = 17 - 5 (x resulta 12). Este algoritmo intercambia los valores de dos variables numéricas sin usar una variable auxiliar."
+            },
+            {
+                id: 2,
+                category: "sustitucion",
+                categoryLabel: "Sustitución de Variables",
+                type: "fill",
+                typeLabel: "Completar Código",
+                title: "Actualización Completa de Saldo con Comisión",
+                code: `let s = 1000; // Saldo inicial\nlet d = 350;  // Depósito\nlet c = 25;   // Comisión\ns = ____________;`,
+                question: "Escribe la expresión matemática completa para calcular el nuevo saldo 's' (sumando deposito 'd' y restando comision 'c'):",
+                acceptedAnswers: [
+                    "s + d - c",
+                    "s + (d - c)",
+                    "(s + d) - c",
+                    "s + d - 25"
+                ],
+                explanation: "La expresión 's + d - c' evalúa 1000 + 350 - 25 = 1325 y reasigna el resultado directamente en la variable 's'."
+            },
+            {
+                id: 3,
+                category: "sustitucion",
+                categoryLabel: "Sustitución de Variables",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Secuencia de Operaciones en Cadena",
+                code: `let a = 2;\na = a * 3;\na = a + 4;\na = a / 2;`,
+                question: "¿Cuál es el valor final almacenado en la variable 'a'?",
+                options: [
+                    "a = 5",
+                    "a = 7",
+                    "a = 10",
+                    "a = 4"
+                ],
+                correctAnswer: 0,
+                explanation: "Paso a paso: 1) a=2. 2) a=2*3=6. 3) a=6+4=10. 4) a=10/2=5."
+            },
+
+            // EJE 2: PLANTEOS DE FÓRMULAS
+            {
+                id: 4,
+                category: "formulas",
+                categoryLabel: "Planteos de Fórmulas",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Cálculo de Descuento Porcentual",
+                code: `let p = 2000; // Precio Base\nlet d = 15;   // Descuento %\nlet pf = ???;  // Precio Final`,
+                question: "¿Cuál es la fórmula en JavaScript para calcular 'pf' aplicando el descuento porcentual 'd' sobre 'p'?",
+                options: [
+                    "let pf = p - (p * d / 100);",
+                    "let pf = p - d;",
+                    "let pf = p * (100 - d);",
+                    "let pf = p / (d * 100);"
+                ],
+                correctAnswer: 0,
+                explanation: "El valor a descontar se obtiene multiplicando el precio base (p) por el porcentaje (d) dividido entre 100: (2000 * 15 / 100 = 300). Restando 300 a 2000 obtenemos 1700."
+            },
+            {
+                id: 5,
+                category: "formulas",
+                categoryLabel: "Planteos de Fórmulas",
+                type: "fill",
+                typeLabel: "Completar Código",
+                title: "Fórmula de Promedio Ponderado de Notas",
+                code: `let a = 7; // Nota 1 (coeficiente: 0.2)\nlet b = 9; // Nota 2 (coeficiente: 0.3)\nlet c = 8; // Nota 3 (coeficiente: 0.5)\nlet p = ____________;`,
+                question: "Escribe la expresión completa para calcular el promedio ponderado 'p' multiplicando cada nota (a, b, c) por su coeficiente (0.2, 0.3 y 0.5):",
+                acceptedAnswers: [
+                    "(a * 0.2) + (b * 0.3) + (c * 0.5)",
+                    "a * 0.2 + b * 0.3 + c * 0.5",
+                    "(a * 20 / 100) + (b * 30 / 100) + (c * 50 / 100)",
+                    "a * 20 / 100 + b * 30 / 100 + c * 50 / 100"
+                ],
+                explanation: "El promedio ponderado multiplica cada calificación por su porcentaje relativo: (7 * 0.2) + (9 * 0.3) + (8 * 0.5) = 1.4 + 2.7 + 4.0 = 8.1."
+            },
+            {
+                id: 6,
+                category: "formulas",
+                categoryLabel: "Planteos de Fórmulas",
+                type: "fill",
+                typeLabel: "Completar Código",
+                title: "Conversión de Temperatura Celsius a Fahrenheit",
+                code: `let C = 25; // Grados Celsius\n// Fórmula de conversión: F = (C * 9/5) + 32\nlet F = ____________;`,
+                question: "Escribe la fórmula completa en JavaScript para asignar la temperatura en Fahrenheit 'F' utilizando 'C':",
+                acceptedAnswers: [
+                    "(C * 9 / 5) + 32",
+                    "C * 9 / 5 + 32",
+                    "(C * 9/5) + 32",
+                    "C * 9/5 + 32",
+                    "C * 1.8 + 32",
+                    "(C * 1.8) + 32",
+                    "(c * 9 / 5) + 32",
+                    "c * 9 / 5 + 32",
+                    "(c * 9/5) + 32",
+                    "c * 9/5 + 32",
+                    "c * 1.8 + 32",
+                    "(c * 1.8) + 32"
+                ],
+                explanation: "Se multiplica la temperatura en grados Celsius (C) por 9/5 (o 1.8) y se suma 32 para obtener la temperatura en Fahrenheit (F): (25 * 1.8) + 32 = 77."
+            },
+
+            // EJE 3: CONCATENACIÓN DE CADENAS
+            {
+                id: 7,
+                category: "concatenacion",
+                categoryLabel: "Concatenación de Cadenas",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Formateo con Template Literals",
+                code: `const producto = "Teclado Mechanical";\nconst stock = 8;`,
+                question: "¿Qué expresión en JS genera EXACTAMENTE la cadena 'Stock disponible: 8 unidades de Teclado Mechanical'?",
+                options: [
+                    "`Stock disponible: \${stock} unidades de \${producto}`",
+                    "\"Stock disponible: \" + stock + \"unidades de\" + producto",
+                    "\"Stock disponible: \${stock} unidades de \${producto}\"",
+                    "`Stock disponible: $stock unidades de $producto`"
+                ],
+                correctAnswer: 0,
+                explanation: "Los Template Literals delimitan con comillas invertidas (backticks `` ` ``) y permiten interpolar expresiones mediante el formato \${variable}."
+            },
+            {
+                id: 8,
+                category: "concatenacion",
+                categoryLabel: "Concatenación de Cadenas",
+                type: "fill",
+                typeLabel: "Completar Código",
+                title: "Ficha Completa de Usuario con Template Literals",
+                code: `let nombre = "Carlos";\nlet rol = "Admin";\nlet nivel = 5;\n// Debes generar exactamente la cadena: "Usuario: Carlos | Rol: Admin (Nivel 5)"\nlet ficha = ____________;`,
+                question: "Escribe la plantilla Template Literal completa (utilizando comillas invertidas `` ` `` y sintaxis ${}):",
+                acceptedAnswers: [
+                    "`Usuario: ${nombre} | Rol: ${rol} (Nivel ${nivel})`",
+                    "\"Usuario: \" + nombre + \" | Rol: \" + rol + \" (Nivel \" + nivel + \")\""
+                ],
+                explanation: "La expresión `` `Usuario: ${nombre} | Rol: ${rol} (Nivel ${nivel})` `` combina adecuadamente el texto estático con las 3 variables."
+            },
+            {
+                id: 9,
+                category: "concatenacion",
+                categoryLabel: "Concatenación de Cadenas",
+                type: "fill",
+                typeLabel: "Completar Código",
+                title: "Formateo de Resumen con Operador +",
+                code: `let item = "Monitor";\nlet cantidad = 3;\n// Debes generar exactamente la cadena: "3 unidades de Monitor"\nlet resumen = ____________;`,
+                question: "Escribe la expresión completa concatenando con el operador '+' (respetando los espacios en blanco):",
+                acceptedAnswers: [
+                    "cantidad + \" unidades de \" + item",
+                    "cantidad + ' unidades de ' + item"
+                ],
+                explanation: "La concatenación une el número 3 con la cadena literal ' unidades de ' (con espacios alrededor) y la variable item."
+            },
+
+            // EJE 4: EXPRESIONES LÓGICAS SIMPLES Y COMPLEJAS
+            {
+                id: 10,
+                category: "logica",
+                categoryLabel: "Expresiones Lógicas",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Evaluación Compleja de Acceso al Evento",
+                code: `let edad = 20;\nlet tienePase = "SI";\nlet esVIP = false;\nlet resultado = (edad >= 18 && tienePase === "SI") || esVIP;`,
+                question: "¿Cuál es el valor booleano resultante almacenado en la variable 'resultado'?",
+                options: [
+                    "true",
+                    "false",
+                    "undefined",
+                    "null"
+                ],
+                correctAnswer: 0,
+                explanation: "Evaluamos por partes: (20 >= 18) es true. ('SI' === 'SI') es true. true && true da true. Luego (true || false) resulta true."
+            },
+            {
+                id: 11,
+                category: "logica",
+                categoryLabel: "Expresiones Lógicas",
+                type: "fill",
+                typeLabel: "Completar Código",
+                title: "Validación Lógica Compuesta de Inicios de Sesión",
+                code: `let email = "alumno@uner.edu.ar";\nlet edad = 21;\nlet cuentaActiva = true;\n// Queremos verificar que email NO sea vacíos (""), edad sea >= 18 Y cuentaActiva sea true\nlet accesoConcedido = ____________;`,
+                question: "Escribe la expresión lógica completa que evalúe simultáneamente las tres condiciones con el operador AND (&&):",
+                acceptedAnswers: [
+                    "email !== \"\" && edad >= 18 && cuentaActiva",
+                    "email != \"\" && edad >= 18 && cuentaActiva",
+                    "email !== '' && edad >= 18 && cuentaActiva",
+                    "email != '' && edad >= 18 && cuentaActiva",
+                    "(email !== \"\") && (edad >= 18) && cuentaActiva",
+                    "(email !== \"\") && (edad >= 18) && (cuentaActiva === true)",
+                    "email !== \"\" && edad >= 18 && cuentaActiva === true"
+                ],
+                explanation: "Se evalúa que la cadena email no esté vacía (email !== ''), que la edad cumpla ser mayor o igual a 18 (edad >= 18) y que la bandera cuentaActiva sea verdadera."
+            },
+            {
+                id: 12,
+                category: "logica",
+                categoryLabel: "Expresiones Lógicas",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Coerción de Tipos y Comparación Estricta",
+                code: `let exp1 = "5" + 3 === "53";\nlet exp2 = 5 + "3" === 8;`,
+                question: "¿Cuáles son los valores booleanos resultantes para exp1 y exp2 respectivamente?",
+                options: [
+                    "exp1 = true, exp2 = false",
+                    "exp1 = false, exp2 = true",
+                    "exp1 = true, exp2 = true",
+                    "exp1 = false, exp2 = false"
+                ],
+                correctAnswer: 0,
+                explanation: "En exp1, '5' + 3 coerciona a la string '53', y '53' === '53' es true. En exp2, 5 + '3' también coerciona a '53', pero '53' === 8 es false."
+            }
+        ];
+
+        // ESTADO DE LA APLICACIÓN
+        let userAnswers = {};
+        let activeFilter = 'all';
+
+        // CARGAR PROGRESO GUARDADO
+        function loadSavedState() {
+            const saved = localStorage.getItem('js_practica_anexo1_answers');
+            if (saved) {
+                try {
+                    userAnswers = JSON.parse(saved);
+                } catch (e) {
+                    userAnswers = {};
+                }
+            }
+        }
+
+        // GUARDAR ESTADO
+        function saveState() {
+            localStorage.setItem('js_practica_anexo1_answers', JSON.stringify(userAnswers));
+            updateHeaderStats();
+        }
+
+        // CALCULAR Y ACTUALIZAR MÉTRICAS
+        function updateHeaderStats() {
+            let correctCount = 0;
+            const total = exercisesData.length;
+
+            exercisesData.forEach(ex => {
+                const ans = userAnswers[ex.id];
+                if (ans && ans.isCorrect) {
+                    correctCount++;
+                }
+            });
+
+            const pct = Math.round((correctCount / total) * 100);
+            document.getElementById('score-counter').innerText = `${correctCount} / ${total}`;
+            document.getElementById('pct-counter').innerText = `${pct}%`;
+        }
+
+        // RENDERIZAR EJERCICIOS
+        function renderExercises() {
+            const container = document.getElementById('exercises-list');
+            container.innerHTML = '';
+
+            const filteredData = activeFilter === 'all' 
+                ? exercisesData 
+                : exercisesData.filter(ex => ex.category === activeFilter);
+
+            filteredData.forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                card.id = `ex-card-${ex.id}`;
+
+                const ansState = userAnswers[ex.id];
+                if (ansState) {
+                    card.classList.add(ansState.isCorrect ? 'status-correct' : 'status-incorrect');
+                }
+
+                // Header Card
+                let html = `
+                    <div class="ex-header">
+                        <div class="ex-tags">
+                            <span class="tag-category">${ex.categoryLabel}</span>
+                            <span class="tag-type">${ex.typeLabel}</span>
+                        </div>
+                        <span class="ex-number">Ejercicio #${ex.id}</span>
+                    </div>
+                    <div class="ex-title-text">${ex.title}</div>
+                    <div class="code-box">${escapeHtml(ex.code)}</div>
+                    <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 15px;">${ex.question}</p>
+                `;
+
+                // Render por tipo (MC vs Fill)
+                if (ex.type === 'mc') {
+                    html += `<div class="options-grid" id="options-group-${ex.id}">`;
+                    ex.options.forEach((optText, optIdx) => {
+                        let optClass = 'option-item';
+                        let isChecked = false;
+
+                        if (ansState) {
+                            if (optIdx === ex.correctAnswer) {
+                                optClass += ' correct-ans';
+                            }
+                            if (ansState.selectedIndex === optIdx && !ansState.isCorrect) {
+                                optClass += ' incorrect-ans';
+                            }
+                            if (ansState.selectedIndex === optIdx) {
+                                isChecked = true;
+                                optClass += ' selected';
+                            }
+                        }
+
+                        html += `
+                            <label class="${optClass}" onclick="selectOption(${ex.id}, ${optIdx})">
+                                <input type="radio" name="mc-${ex.id}" class="option-radio" ${isChecked ? 'checked' : ''} ${ansState ? 'disabled' : ''}>
+                                <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(optText)}</span>
+                            </label>
+                        `;
+                    });
+                    html += `</div>`;
+                } else if (ex.type === 'fill') {
+                    const currentVal = ansState ? ansState.userValue : '';
+                    const isSubmitted = !!ansState;
+
+                    html += `
+                        <div class="fill-blank-container">
+                            <input type="text" class="fill-input" id="fill-input-${ex.id}" 
+                                placeholder="Escribe tu respuesta..." 
+                                value="${escapeHtml(currentVal)}" 
+                                ${isSubmitted ? 'disabled' : ''}>
+                            ${!isSubmitted ? `<button class="btn-check-fill" onclick="checkFillAnswer(${ex.id})">✓ Verificar</button>` : ''}
+                        </div>
+                    `;
+                }
+
+                // Feedback Box
+                let feedbackClass = 'feedback-box';
+                let feedbackContent = '';
+
+                if (ansState) {
+                    feedbackClass += ' show ' + (ansState.isCorrect ? 'correct' : 'incorrect');
+                    const icon = ansState.isCorrect ? '✓ Correcto' : '✗ Respuesta Incorrecta';
+                    feedbackContent = `
+                        <div class="feedback-title">${icon}</div>
+                        <div>${ex.explanation}</div>
+                    `;
+                }
+
+                html += `<div class="${feedbackClass}" id="feedback-${ex.id}">${feedbackContent}</div>`;
+
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        // SELECCIONAR OPCIÓN EN MULTIPLE CHOICE
+        window.selectOption = function(exerciseId, optionIndex) {
+            if (userAnswers[exerciseId]) return; // Ya respondido
+
+            const ex = exercisesData.find(e => e.id === exerciseId);
+            const isCorrect = (optionIndex === ex.correctAnswer);
+
+            userAnswers[exerciseId] = {
+                isCorrect: isCorrect,
+                selectedIndex: optionIndex
+            };
+
+            saveState();
+            renderExercises();
+        };
+
+        // NORMALIZADOR FLEXIBLE DE CÓDIGO
+        function normalizeCode(str) {
+            return str
+                .replace(/\s+/g, '')
+                .replace(/['`]/g, '"')
+                .toLowerCase();
+        }
+
+        // VERIFICAR RESPUESTA EN COMPLETAR CÓDIGO
+        window.checkFillAnswer = function(exerciseId) {
+            const inputEl = document.getElementById(`fill-input-${exerciseId}`);
+            if (!inputEl) return;
+
+            const val = inputEl.value.trim();
+            if (!val) return;
+
+            const ex = exercisesData.find(e => e.id === exerciseId);
+            const normalizedUserVal = normalizeCode(val);
+
+            const isCorrect = ex.acceptedAnswers.some(ans => {
+                return normalizeCode(ans) === normalizedUserVal || ans.toLowerCase() === val.toLowerCase();
+            });
+
+            userAnswers[exerciseId] = {
+                isCorrect: isCorrect,
+                userValue: val
+            };
+
+            saveState();
+            renderExercises();
+        };
+
+        // UTILIDAD ESCAPE HTML
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // EVENT LISTENERS DE FILTROS Y REINICIO
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedState();
+            updateHeaderStats();
+            renderExercises();
+
+            // Filtros
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    activeFilter = e.target.dataset.filter;
+                    renderExercises();
+                });
+            });
+
+            // Reinicio
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (confirm('¿Estás seguro de reiniciar todos tus ejercicios del Anexo 1?')) {
+                    userAnswers = {};
+                    saveState();
+                    renderExercises();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
