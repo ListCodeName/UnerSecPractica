@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anexo 2: Control de Flujo, Condicionales y Bucles | Programación II</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .anexo-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            width: 100%;
+        }
+
+        /* Banner de Progreso */
+        .anexo-stats-card {
+            background-color: var(--surface);
+            background-image: linear-gradient(135deg, var(--surface-card) 0%, rgba(22, 17, 43, 0.6) 100%);
+            border: var(--border-neon);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--glow-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .anexo-stats-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--grad-sunset);
+        }
+
+        .anexo-info h2 {
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .anexo-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stats-badge-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 12px;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .stat-pill-val {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
+        }
+
+        .stat-pill-lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* Filtros por Categoría */
+        .filter-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .filter-btn {
+            background: rgba(22, 17, 43, 0.8);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 99px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        .filter-btn.active {
+            background: var(--grad-sunset);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: var(--glow-pink);
+        }
+
+        /* Tarjeta de Ejercicio */
+        .exercise-card {
+            background: var(--surface-card);
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .exercise-card.status-correct {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+        }
+
+        .exercise-card.status-incorrect {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 46, 147, 0.2);
+        }
+
+        .ex-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ex-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-category {
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid var(--neon-purple);
+            color: #d8b4fe;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tag-type {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+        }
+
+        .ex-number {
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .ex-title-text {
+            font-family: var(--font-title);
+            font-size: 1.15rem;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        /* Bloque de Código de Consigna */
+        .code-box {
+            background: #060410;
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            color: #f1ecfc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Opciones Multiple Choice */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            background: rgba(10, 8, 22, 0.7);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .option-item.selected {
+            border-color: var(--neon-pink);
+            background: rgba(255, 46, 147, 0.12);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        .option-item.correct-ans {
+            border-color: var(--neon-green) !important;
+            background: rgba(57, 255, 20, 0.15) !important;
+            color: #fff !important;
+            box-shadow: 0 0 12px rgba(57, 255, 20, 0.3) !important;
+        }
+
+        .option-item.incorrect-ans {
+            border-color: var(--neon-pink) !important;
+            background: rgba(255, 46, 147, 0.15) !important;
+            color: #ff99c8 !important;
+        }
+
+        .option-radio {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .option-radio:checked {
+            border-color: var(--neon-pink);
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* Caja de Retroalimentación / Explicación */
+        .feedback-box {
+            display: none;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-box.correct {
+            background: rgba(57, 255, 20, 0.08);
+            border: 1px solid var(--neon-green);
+            color: #c2ffb3;
+        }
+
+        .feedback-box.incorrect {
+            background: rgba(255, 46, 147, 0.08);
+            border: 1px solid var(--neon-pink);
+            color: #ffd1e8;
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Tablas de traza en retroalimentación */
+        .trace-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.82rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .trace-table th, .trace-table td {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .trace-table th {
+            background: rgba(157, 78, 221, 0.2);
+            color: var(--neon-cyan);
+            font-family: var(--font-title);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body data-workshop-id="anexo2">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Anexo 02 - Control de Flujo</div>
+        <h1>Pruebas de Escritorio: Condicionales y Bucles</h1>
+        <p>Entrena el seguimiento de valores de variables en memoria con bifurcaciones (if / else), anidaciones y ciclos iterativos (while, for, break y continue).</p>
+        <div class="header-meta">
+            <span>Modalidad: <strong>Práctica Autónoma con Tracing</strong></span>
+            <span>Ejercicios: <strong>12 Desafíos Multiple Choice</strong></span>
+            <span>Navegación: <a href="index.html" style="color: var(--neon-pink); text-decoration: none; font-weight: 600;">&larr; Volver al Portal de Práctica</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="anexo-container">
+
+        <!-- BANNER DE PROGRESO -->
+        <div class="anexo-stats-card">
+            <div class="anexo-info">
+                <h2>Panel de Avance del Anexo 2</h2>
+                <p>Analiza el código y determina los valores finales de las variables en memoria. Tus respuestas se guardan automáticamente.</p>
+            </div>
+            <div class="stats-badge-group">
+                <div class="stat-pill">
+                    <div class="stat-pill-val" id="score-counter">0 / 12</div>
+                    <div class="stat-pill-lbl">Aciertos</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-pill-val" id="pct-counter" style="color: var(--neon-pink); text-shadow: var(--glow-pink);">0%</div>
+                    <div class="stat-pill-lbl">Completado</div>
+                </div>
+                <button class="filter-btn" id="reset-btn" style="border-color: rgba(255, 70, 70, 0.5); color: #ff8585;">↺ Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- FILTROS POR CATEGORÍA -->
+        <div class="filter-nav">
+            <button class="filter-btn active" data-filter="all">Todos (12)</button>
+            <button class="filter-btn" data-filter="condicionales">1. Condicionales e If/Else</button>
+            <button class="filter-btn" data-filter="while">2. Bucles While</button>
+            <button class="filter-btn" data-filter="for">3. Bucles For</button>
+            <button class="filter-btn" data-filter="anidados">4. Anidaciones y Combinaciones</button>
+        </div>
+
+        <!-- CONTENEDOR DE EJERCICIOS RENDERIZADOS DINÁMICAMENTE -->
+        <div id="exercises-list"></div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- LÓGICA INTERACTIVA DE EJERCICIOS -->
+    <script>
+        const exercisesData = [
+            // =========================================================================
+            // EJE 1: CONDICIONALES E IF/ELSE ANIDADOS
+            // =========================================================================
+            {
+                id: 1,
+                category: "condicionales",
+                categoryLabel: "Condicionales e If/Else",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Rastreo de Bifurcación Condicional Anidada",
+                code: `let x = 10;\nlet y = 4;\nlet z = 0;\n\nif (x > 15) {\n    z = x + y;\n} else if (y >= 4) {\n    x = x - 2;\n    if (x * 2 > 15) {\n        z = x * y;\n        y = y + 1;\n    } else {\n        z = x + y;\n        y = y - 1;\n    }\n} else {\n    z = y;\n}`,
+                question: "¿Cuáles son los valores finales de las variables 'x', 'y' y 'z' al terminar la ejecución?",
+                options: [
+                    "x = 10, y = 4, z = 14",
+                    "x = 8, y = 3, z = 12",
+                    "x = 8, y = 5, z = 32",
+                    "x = 8, y = 4, z = 32"
+                ],
+                correctAnswer: 2,
+                explanation: `
+                    <strong>Traza de Ejecución Paso a Paso:</strong><br>
+                    1) <code>x > 15</code> (10 > 15) es <em>false</em>.<br>
+                    2) <code>else if (y >= 4)</code> (4 >= 4) es <strong>true</strong>.<br>
+                    3) Se modifica <code>x = 10 - 2 = 8</code>.<br>
+                    4) Condición anidada: <code>x * 2 > 15</code> (8 * 2 = 16 > 15) es <strong>true</strong>.<br>
+                    5) <code>z = 8 * 4 = 32</code>.<br>
+                    6) <code>y = 4 + 1 = 5</code>.<br>
+                    <strong>Resultado Final:</strong> <code>x = 8, y = 5, z = 32</code>.
+                `
+            },
+            {
+                id: 2,
+                category: "condicionales",
+                categoryLabel: "Condicionales e If/Else",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Control de Saldo, Banderas Lógicas y Comisiones",
+                code: `let saldo = 500;\nlet intentos = 0;\nlet bloqueado = false;\nlet retiro = 200;\n\nif (retiro <= saldo) {\n    saldo = saldo - retiro;\n    intentos = intentos + 1;\n    if (saldo < 100) {\n        bloqueado = true;\n    } else {\n        bloqueado = false;\n        if (intentos === 1) {\n            saldo = saldo - 15; // Comisión primer retiro\n        }\n    }\n} else {\n    intentos = intentos + 2;\n    bloqueado = true;\n}`,
+                question: "¿Cuáles son los valores finales de 'saldo', 'intentos' y 'bloqueado' al terminar la ejecución?",
+                options: [
+                    "saldo = 300, intentos = 1, bloqueado = false",
+                    "saldo = 285, intentos = 1, bloqueado = false",
+                    "saldo = 285, intentos = 1, bloqueado = true",
+                    "saldo = 500, intentos = 2, bloqueado = true"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Traza de Ejecución:</strong><br>
+                    1) <code>retiro <= saldo</code> (200 <= 500) es <strong>true</strong>.<br>
+                    2) <code>saldo = 500 - 200 = 300</code> e <code>intentos = 0 + 1 = 1</code>.<br>
+                    3) <code>saldo < 100</code> (300 < 100) es <em>false</em> &rarr; entra en el <code>else</code>.<br>
+                    4) <code>bloqueado = false</code>.<br>
+                    5) <code>intentos === 1</code> es <strong>true</strong> &rarr; <code>saldo = 300 - 15 = 285</code>.<br>
+                    <strong>Resultado Final:</strong> <code>saldo = 285, intentos = 1, bloqueado = false</code>.
+                `
+            },
+            {
+                id: 3,
+                category: "condicionales",
+                categoryLabel: "Condicionales e If/Else",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Evaluación Compuesta y Reasignación de Estado",
+                code: `let a = 15;\nlet b = 8;\nlet estado = "inicial";\n\nif (a % 2 === 0) {\n    b = b * 2;\n    estado = "par";\n} else if (a > 10 && b < 10) {\n    a = a - 5;\n    b = b + 3;\n    if (a === b) {\n        estado = "iguales";\n    } else {\n        estado = "diferentes";\n    }\n} else {\n    b = 0;\n    estado = "final";\n}`,
+                question: "¿Cuáles son los valores finales de 'a', 'b' y 'estado' al concluir el código?",
+                options: [
+                    "a = 10, b = 11, estado = \"diferentes\"",
+                    "a = 10, b = 11, estado = \"iguales\"",
+                    "a = 15, b = 16, estado = \"par\"",
+                    "a = 15, b = 0, estado = \"final\""
+                ],
+                correctAnswer: 0,
+                explanation: `
+                    <strong>Traza de Ejecución:</strong><br>
+                    1) <code>15 % 2 === 0</code> es <em>false</em> (15 es impar).<br>
+                    2) <code>else if (a > 10 && b < 10)</code> &rarr; (15 > 10 && 8 < 10) es <strong>true && true &rarr; true</strong>.<br>
+                    3) <code>a = 15 - 5 = 10</code> y <code>b = 8 + 3 = 11</code>.<br>
+                    4) Condición anidada: <code>a === b</code> (10 === 11) es <em>false</em>.<br>
+                    5) Rama <code>else</code> anidada asigna: <code>estado = "diferentes"</code>.<br>
+                    <strong>Resultado Final:</strong> <code>a = 10, b = 11, estado = "diferentes"</code>.
+                `
+            },
+
+            // =========================================================================
+            // EJE 2: BUCLES WHILE
+            // =========================================================================
+            {
+                id: 4,
+                category: "while",
+                categoryLabel: "Bucle While",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Acumulador y Alternancia Par/Impar en Bucle While",
+                code: `let contador = 1;\nlet suma = 0;\nlet limite = 4;\n\nwhile (contador <= limite) {\n    if (contador % 2 === 0) {\n        suma = suma + (contador * 2);\n    } else {\n        suma = suma + contador;\n    }\n    contador = contador + 1;\n}`,
+                question: "¿Cuáles son los valores finales de 'contador', 'suma' y 'limite'?",
+                options: [
+                    "contador = 4, suma = 16, limite = 4",
+                    "contador = 5, suma = 10, limite = 4",
+                    "contador = 5, suma = 16, limite = 4",
+                    "contador = 4, suma = 8, limite = 4"
+                ],
+                correctAnswer: 2,
+                explanation: `
+                    <strong>Tabla de Seguimiento Iterativo:</strong>
+                    <table class="trace-table">
+                        <tr><th>Ciclo</th><th>contador</th><th>Condición</th><th>Suma</th><th>Nuevo contador</th></tr>
+                        <tr><td>1</td><td>1</td><td>1 <= 4 (V)</td><td>0 + 1 = 1</td><td>2</td></tr>
+                        <tr><td>2</td><td>2</td><td>2 <= 4 (V)</td><td>1 + (2*2) = 5</td><td>3</td></tr>
+                        <tr><td>3</td><td>3</td><td>3 <= 4 (V)</td><td>5 + 3 = 8</td><td>4</td></tr>
+                        <tr><td>4</td><td>4</td><td>4 <= 4 (V)</td><td>8 + (4*2) = 16</td><td>5</td></tr>
+                        <tr><td>Fin</td><td>5</td><td>5 <= 4 (F)</td><td>Sale</td><td><strong>5</strong></td></tr>
+                    </table>
+                    <strong>Resultado Final:</strong> <code>contador = 5, suma = 16, limite = 4</code>.
+                `
+            },
+            {
+                id: 5,
+                category: "while",
+                categoryLabel: "Bucle While",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Bucle While con Condición Compuesta (AND) y Pasos",
+                code: `let a = 3;\nlet b = 15;\nlet pasos = 0;\n\nwhile (a < 12 && b > 5) {\n    a = a + 3;\n    b = b - 4;\n    pasos = pasos + 1;\n}`,
+                question: "¿Cuáles son los valores finales de 'a', 'b' y 'pasos' al finalizar el bucle?",
+                options: [
+                    "a = 9, b = 7, pasos = 2",
+                    "a = 12, b = 3, pasos = 3",
+                    "a = 12, b = 7, pasos = 3",
+                    "a = 15, b = -1, pasos = 4"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Tabla de Seguimiento:</strong>
+                    <table class="trace-table">
+                        <tr><th>Ciclo</th><th>Condición (a < 12 && b > 5)</th><th>Nuevo a</th><th>Nuevo b</th><th>pasos</th></tr>
+                        <tr><td>1</td><td>3 < 12 && 15 > 5 (V && V &rarr; V)</td><td>6</td><td>11</td><td>1</td></tr>
+                        <tr><td>2</td><td>6 < 12 && 11 > 5 (V && V &rarr; V)</td><td>9</td><td>7</td><td>2</td></tr>
+                        <tr><td>3</td><td>9 < 12 && 7 > 5 (V && V &rarr; V)</td><td>12</td><td>3</td><td>3</td></tr>
+                        <tr><td>4</td><td>12 < 12 && 3 > 5 (F && F &rarr; F)</td><td>-</td><td>-</td><td><strong>3</strong></td></tr>
+                    </table>
+                    <strong>Resultado Final:</strong> <code>a = 12, b = 3, pasos = 3</code>.
+                `
+            },
+            {
+                id: 6,
+                category: "while",
+                categoryLabel: "Bucle While",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Secuencia Alternada con Límite de Operaciones",
+                code: `let n = 12;\nlet operaciones = 0;\nlet tipoFinal = "";\n\nwhile (n > 1 && operaciones < 5) {\n    if (n % 2 === 0) {\n        n = n / 2;\n        tipoFinal = "division";\n    } else {\n        n = (n * 3) + 1;\n        tipoFinal = "multiplicacion";\n    }\n    operaciones = operaciones + 1;\n}`,
+                question: "¿Cuáles son los valores finales de 'n', 'operaciones' y 'tipoFinal'?",
+                options: [
+                    "n = 1, operaciones = 5, tipoFinal = \"division\"",
+                    "n = 16, operaciones = 5, tipoFinal = \"multiplicacion\"",
+                    "n = 8, operaciones = 6, tipoFinal = \"division\"",
+                    "n = 5, operaciones = 4, tipoFinal = \"division\""
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Seguimiento de Operaciones:</strong><br>
+                    • Ciclo 1: n=12 (par) &rarr; n = 6, tipoFinal = "division", operaciones = 1.<br>
+                    • Ciclo 2: n=6 (par) &rarr; n = 3, tipoFinal = "division", operaciones = 2.<br>
+                    • Ciclo 3: n=3 (impar) &rarr; n = (3*3)+1 = 10, tipoFinal = "multiplicacion", operaciones = 3.<br>
+                    • Ciclo 4: n=10 (par) &rarr; n = 5, tipoFinal = "division", operaciones = 4.<br>
+                    • Ciclo 5: n=5 (impar) &rarr; n = (5*3)+1 = 16, tipoFinal = "multiplicacion", operaciones = 5.<br>
+                    • Al evaluar el ciclo 6: <code>operaciones < 5</code> (5 < 5) es <em>false</em> y el bucle termina.<br>
+                    <strong>Resultado Final:</strong> <code>n = 16, operaciones = 5, tipoFinal = "multiplicacion"</code>.
+                `
+            },
+
+            // =========================================================================
+            // EJE 3: BUCLES FOR Y SALTOS DE CONTROL
+            // =========================================================================
+            {
+                id: 7,
+                category: "for",
+                categoryLabel: "Bucle For",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Filtro Condicional y Valor Residual de Control en For",
+                code: `let total = 0;\nlet pares = 0;\nlet i;\n\nfor (i = 1; i <= 6; i++) {\n    if (i % 2 === 0) {\n        pares = pares + 1;\n        total = total + i;\n    } else {\n        total = total - 1;\n    }\n}`,
+                question: "¿Cuáles son los valores finales de las variables 'i', 'total' y 'pares'?",
+                options: [
+                    "i = 6, total = 9, pares = 3",
+                    "i = 7, total = 12, pares = 3",
+                    "i = 7, total = 9, pares = 3",
+                    "i = 6, total = 10, pares = 4"
+                ],
+                correctAnswer: 2,
+                explanation: `
+                    <strong>Tabla de Seguimiento Iterativo:</strong>
+                    <table class="trace-table">
+                        <tr><th>i</th><th>Condición (i <= 6)</th><th>¿Par?</th><th>total</th><th>pares</th></tr>
+                        <tr><td>1</td><td>true</td><td>No</td><td>0 - 1 = -1</td><td>0</td></tr>
+                        <tr><td>2</td><td>true</td><td>Sí</td><td>-1 + 2 = 1</td><td>1</td></tr>
+                        <tr><td>3</td><td>true</td><td>No</td><td>1 - 1 = 0</td><td>1</td></tr>
+                        <tr><td>4</td><td>true</td><td>Sí</td><td>0 + 4 = 4</td><td>2</td></tr>
+                        <tr><td>5</td><td>true</td><td>No</td><td>4 - 1 = 3</td><td>2</td></tr>
+                        <tr><td>6</td><td>true</td><td>Sí</td><td>3 + 6 = 9</td><td>3</td></tr>
+                        <tr><td><strong>7</strong></td><td><strong>false</strong> (sale)</td><td>-</td><td><strong>9</strong></td><td><strong>3</strong></td></tr>
+                    </table>
+                    <em>¡Ojo con 'i'!:</em> El bucle incrementa <code>i++</code> a 7 antes de comprobar que <code>7 <= 6</code> es falso.<br>
+                    <strong>Resultado Final:</strong> <code>i = 7, total = 9, pares = 3</code>.
+                `
+            },
+            {
+                id: 8,
+                category: "for",
+                categoryLabel: "Bucle For",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Paso Personalizado e Interrupción Anticipada con Break",
+                code: `let suma = 0;\nlet ultimoMultiplo = 0;\nlet k;\n\nfor (k = 5; k <= 30; k += 5) {\n    if (suma + k > 35) {\n        break;\n    }\n    suma = suma + k;\n    ultimoMultiplo = k;\n}`,
+                question: "¿Cuáles son los valores finales de 'k', 'suma' y 'ultimoMultiplo'?",
+                options: [
+                    "k = 20, suma = 30, ultimoMultiplo = 15",
+                    "k = 25, suma = 50, ultimoMultiplo = 20",
+                    "k = 15, suma = 30, ultimoMultiplo = 15",
+                    "k = 20, suma = 35, ultimoMultiplo = 20"
+                ],
+                correctAnswer: 0,
+                explanation: `
+                    <strong>Paso a paso con 'break':</strong><br>
+                    • k = 5: 0 + 5 > 35 (F) &rarr; suma = 5, ultimoMultiplo = 5.<br>
+                    • k = 10: 5 + 10 > 35 (F) &rarr; suma = 15, ultimoMultiplo = 10.<br>
+                    • k = 15: 15 + 15 > 35 (F) &rarr; suma = 30, ultimoMultiplo = 15.<br>
+                    • k = 20: 30 + 20 = 50 > 35 (<strong>true</strong>) &rarr; se ejecuta <code>break</code> de inmediato.<br>
+                    Al romperse el ciclo, <code>suma</code> y <code>ultimoMultiplo</code> no cambian, y <code>k</code> retiene 20.<br>
+                    <strong>Resultado Final:</strong> <code>k = 20, suma = 30, ultimoMultiplo = 15</code>.
+                `
+            },
+            {
+                id: 9,
+                category: "for",
+                categoryLabel: "Bucle For",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Salto de Iteración con Continue y Ramificación Dinámica",
+                code: `let balance = 20;\nlet positivos = 0;\nlet ignorados = 0;\nlet paso;\n\nfor (paso = 1; paso <= 5; paso++) {\n    if (paso === 3) {\n        ignorados = ignorados + 1;\n        continue;\n    }\n    \n    if (balance > 15) {\n        balance = balance - 4;\n        positivos = positivos + 1;\n    } else {\n        balance = balance + 2;\n    }\n}`,
+                question: "¿Cuáles son los valores finales de 'paso', 'balance', 'positivos' e 'ignorados'?",
+                options: [
+                    "paso = 5, balance = 16, positivos = 2, ignorados = 1",
+                    "paso = 6, balance = 16, positivos = 2, ignorados = 1",
+                    "paso = 6, balance = 12, positivos = 3, ignorados = 1",
+                    "paso = 5, balance = 14, positivos = 1, ignorados = 2"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Seguimiento de Iteraciones:</strong><br>
+                    • paso = 1: balance > 15 (20 > 15 V) &rarr; balance = 16, positivos = 1.<br>
+                    • paso = 2: balance > 15 (16 > 15 V) &rarr; balance = 12, positivos = 2.<br>
+                    • paso = 3: paso === 3 (V) &rarr; ignorados = 1, <code>continue</code> salta directo al siguiente incremento sin tocar balance.<br>
+                    • paso = 4: balance > 15 (12 > 15 F) &rarr; balance = 12 + 2 = 14.<br>
+                    • paso = 5: balance > 15 (14 > 15 F) &rarr; balance = 14 + 2 = 16.<br>
+                    • Termina el bucle tras <code>paso++</code> alcanzando <code>paso = 6</code>.<br>
+                    <strong>Resultado Final:</strong> <code>paso = 6, balance = 16, positivos = 2, ignorados = 1</code>.
+                `
+            },
+
+            // =========================================================================
+            // EJE 4: ANIDACIONES Y COMBINACIONES
+            // =========================================================================
+            {
+                id: 10,
+                category: "anidados",
+                categoryLabel: "Anidaciones y Combinaciones",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Bucles For Anidados con Comparación de Índices",
+                code: `let suma = 0;\nlet ciclosInternos = 0;\nlet i, j;\n\nfor (i = 1; i <= 3; i++) {\n    for (j = 1; j <= 2; j++) {\n        if (i === j) {\n            suma = suma + (i * 2);\n        } else {\n            suma = suma + 1;\n        }\n        ciclosInternos = ciclosInternos + 1;\n    }\n}`,
+                question: "¿Cuáles son los valores finales de 'i', 'j', 'suma' y 'ciclosInternos'?",
+                options: [
+                    "i = 3, j = 2, suma = 10, ciclosInternos = 6",
+                    "i = 4, j = 3, suma = 10, ciclosInternos = 6",
+                    "i = 4, j = 3, suma = 14, ciclosInternos = 6",
+                    "i = 3, j = 3, suma = 8, ciclosInternos = 5"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Tabla de Bucles Anidados:</strong>
+                    <table class="trace-table">
+                        <tr><th>i</th><th>j</th><th>¿i === j?</th><th>Suma</th><th>ciclosInternos</th></tr>
+                        <tr><td>1</td><td>1</td><td>Sí</td><td>0 + (1*2) = 2</td><td>1</td></tr>
+                        <tr><td>1</td><td>2</td><td>No</td><td>2 + 1 = 3</td><td>2</td></tr>
+                        <tr><td>2</td><td>1</td><td>No</td><td>3 + 1 = 4</td><td>3</td></tr>
+                        <tr><td>2</td><td>2</td><td>Sí</td><td>4 + (2*2) = 8</td><td>4</td></tr>
+                        <tr><td>3</td><td>1</td><td>No</td><td>8 + 1 = 9</td><td>5</td></tr>
+                        <tr><td>3</td><td>2</td><td>No</td><td>9 + 1 = 10</td><td>6</td></tr>
+                    </table>
+                    <em>Valores de salida:</em> 'j' incrementa a 3 para salir de cada bucle interno; 'i' incrementa a 4 para salir del bucle externo.<br>
+                    <strong>Resultado Final:</strong> <code>i = 4, j = 3, suma = 10, ciclosInternos = 6</code>.
+                `
+            },
+            {
+                id: 11,
+                category: "anidados",
+                categoryLabel: "Anidaciones y Combinaciones",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "While Externo con For Interno y Acumulador Condicional",
+                code: `let w = 1;\nlet total = 0;\nlet activaciones = 0;\n\nwhile (w <= 2) {\n    for (let f = 1; f <= 3; f++) {\n        if (w + f >= 4) {\n            total = total + (w * f);\n            activaciones = activaciones + 1;\n        } else {\n            total = total + 1;\n        }\n    }\n    w = w + 1;\n}`,
+                question: "¿Cuáles son los valores finales de 'w', 'total' y 'activaciones'?",
+                options: [
+                    "w = 2, total = 16, activaciones = 3",
+                    "w = 3, total = 16, activaciones = 3",
+                    "w = 3, total = 12, activaciones = 2",
+                    "w = 2, total = 14, activaciones = 4"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Traza de Ejecución:</strong><br>
+                    • Cuando w = 1:<br>
+                      - f=1: 1+1 >= 4 (F) &rarr; total = 0 + 1 = 1.<br>
+                      - f=2: 1+2 >= 4 (F) &rarr; total = 1 + 1 = 2.<br>
+                      - f=3: 1+3 >= 4 (V) &rarr; total = 2 + (1*3) = 5, activaciones = 1.<br>
+                      w se incrementa a 2.<br>
+                    • Cuando w = 2:<br>
+                      - f=1: 2+1 >= 4 (F) &rarr; total = 5 + 1 = 6.<br>
+                      - f=2: 2+2 >= 4 (V) &rarr; total = 6 + (2*2) = 10, activaciones = 2.<br>
+                      - f=3: 2+3 >= 4 (V) &rarr; total = 10 + (2*3) = 16, activaciones = 3.<br>
+                      w se incrementa a 3.<br>
+                    • w = 3 hace falso <code>w <= 2</code> y el ciclo while termina.<br>
+                    <strong>Resultado Final:</strong> <code>w = 3, total = 16, activaciones = 3</code>.
+                `
+            },
+            {
+                id: 12,
+                category: "anidados",
+                categoryLabel: "Anidaciones y Combinaciones",
+                type: "mc",
+                typeLabel: "Opción Múltiple",
+                title: "Simulación de Niveles y Rondas con Condicional Interno",
+                code: `let nivel = 1;\nlet energia = 25;\nlet puntos = 0;\n\nwhile (nivel <= 2 && energia > 10) {\n    energia = energia - 6;\n    for (let ronda = 1; ronda <= 2; ronda++) {\n        if (energia % 2 === 0) {\n            puntos = puntos + 10;\n        } else {\n            puntos = puntos + 5;\n        }\n    }\n    nivel = nivel + 1;\n}`,
+                question: "¿Cuáles son los valores finales de 'nivel', 'energia' y 'puntos'?",
+                options: [
+                    "nivel = 2, energia = 13, puntos = 20",
+                    "nivel = 3, energia = 13, puntos = 20",
+                    "nivel = 3, energia = 7, puntos = 30",
+                    "nivel = 2, energia = 19, puntos = 10"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Traza de Niveles y Rondas:</strong><br>
+                    • Vuelta 1 (nivel=1, energia=25):<br>
+                      - energia = 25 - 6 = 19 (impar).<br>
+                      - ronda=1 &rarr; suma 5 puntos.<br>
+                      - ronda=2 &rarr; suma 5 puntos (puntos = 10).<br>
+                      - nivel pasa a 2.<br>
+                    • Vuelta 2 (nivel=2, energia=19):<br>
+                      - energia = 19 - 6 = 13 (impar).<br>
+                      - ronda=1 &rarr; suma 5 puntos (puntos = 15).<br>
+                      - ronda=2 &rarr; suma 5 puntos (puntos = 20).<br>
+                      - nivel pasa a 3.<br>
+                    • Vuelta 3: <code>nivel <= 2</code> (3 <= 2) es <em>false</em> &rarr; Sale del bucle.<br>
+                    <strong>Resultado Final:</strong> <code>nivel = 3, energia = 13, puntos = 20</code>.
+                `
+            }
+        ];
+
+        // ESTADO DE LA APLICACIÓN
+        let userAnswers = {};
+        let activeFilter = 'all';
+
+        // CARGAR PROGRESO GUARDADO
+        function loadSavedState() {
+            const saved = localStorage.getItem('js_practica_anexo2_answers');
+            if (saved) {
+                try {
+                    userAnswers = JSON.parse(saved);
+                } catch (e) {
+                    userAnswers = {};
+                }
+            }
+        }
+
+        // GUARDAR ESTADO
+        function saveState() {
+            localStorage.setItem('js_practica_anexo2_answers', JSON.stringify(userAnswers));
+            updateHeaderStats();
+        }
+
+        // CALCULAR Y ACTUALIZAR MÉTRICAS
+        function updateHeaderStats() {
+            let correctCount = 0;
+            const total = exercisesData.length;
+
+            exercisesData.forEach(ex => {
+                const ans = userAnswers[ex.id];
+                if (ans && ans.isCorrect) {
+                    correctCount++;
+                }
+            });
+
+            const pct = Math.round((correctCount / total) * 100);
+            document.getElementById('score-counter').innerText = `${correctCount} / ${total}`;
+            document.getElementById('pct-counter').innerText = `${pct}%`;
+        }
+
+        // RENDERIZAR EJERCICIOS
+        function renderExercises() {
+            const container = document.getElementById('exercises-list');
+            container.innerHTML = '';
+
+            const filteredData = activeFilter === 'all' 
+                ? exercisesData 
+                : exercisesData.filter(ex => ex.category === activeFilter);
+
+            filteredData.forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                card.id = `ex-card-${ex.id}`;
+
+                const ansState = userAnswers[ex.id];
+                if (ansState) {
+                    card.classList.add(ansState.isCorrect ? 'status-correct' : 'status-incorrect');
+                }
+
+                // Encabezado de la Tarjeta
+                let html = `
+                    <div class="ex-header">
+                        <div class="ex-tags">
+                            <span class="tag-category">${ex.categoryLabel}</span>
+                            <span class="tag-type">${ex.typeLabel}</span>
+                        </div>
+                        <span class="ex-number">Desafío #${ex.id}</span>
+                    </div>
+                    <div class="ex-title-text">${ex.title}</div>
+                    <div class="code-box">${escapeHtml(ex.code)}</div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; margin-bottom: 15px;">${ex.question}</p>
+                `;
+
+                // Opciones Multiple Choice
+                html += `<div class="options-grid" id="options-group-${ex.id}">`;
+                ex.options.forEach((optText, optIdx) => {
+                    let optClass = 'option-item';
+                    let isChecked = false;
+
+                    if (ansState) {
+                        if (optIdx === ex.correctAnswer) {
+                            optClass += ' correct-ans';
+                        }
+                        if (ansState.selectedIndex === optIdx && !ansState.isCorrect) {
+                            optClass += ' incorrect-ans';
+                        }
+                        if (ansState.selectedIndex === optIdx) {
+                            isChecked = true;
+                            optClass += ' selected';
+                        }
+                    }
+
+                    html += `
+                        <label class="${optClass}" onclick="selectOption(${ex.id}, ${optIdx})">
+                            <input type="radio" name="mc-${ex.id}" class="option-radio" ${isChecked ? 'checked' : ''} ${ansState ? 'disabled' : ''}>
+                            <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(optText)}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+
+                // Bloque de Retroalimentación / Traza
+                let feedbackClass = 'feedback-box';
+                let feedbackContent = '';
+
+                if (ansState) {
+                    feedbackClass += ' show ' + (ansState.isCorrect ? 'correct' : 'incorrect');
+                    const icon = ansState.isCorrect ? '✓ ¡Correcto! Excelente análisis de memoria.' : '✗ Respuesta Incorrecta. Revisa el seguimiento de variables:';
+                    feedbackContent = `
+                        <div class="feedback-title">${icon}</div>
+                        <div>${ex.explanation}</div>
+                    `;
+                }
+
+                html += `<div class="${feedbackClass}" id="feedback-${ex.id}">${feedbackContent}</div>`;
+
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        // SELECCIONAR OPCIÓN EN MULTIPLE CHOICE
+        window.selectOption = function(exerciseId, optionIndex) {
+            if (userAnswers[exerciseId]) return; // Ya respondido
+
+            const ex = exercisesData.find(e => e.id === exerciseId);
+            const isCorrect = (optionIndex === ex.correctAnswer);
+
+            userAnswers[exerciseId] = {
+                isCorrect: isCorrect,
+                selectedIndex: optionIndex
+            };
+
+            saveState();
+            renderExercises();
+        };
+
+        // UTILIDAD ESCAPE HTML
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSavedState();
+            updateHeaderStats();
+            renderExercises();
+
+            // Filtros
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    activeFilter = e.target.dataset.filter;
+                    renderExercises();
+                });
+            });
+
+            // Reiniciar progreso
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (confirm('¿Estás seguro de reiniciar todos tus ejercicios del Anexo 2?')) {
+                    userAnswers = {};
+                    saveState();
+                    renderExercises();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
