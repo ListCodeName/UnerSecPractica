@@ -355,6 +355,31 @@
                     <a href="anexo-02-control-flujo-bucles.html" class="hub-card-btn" style="margin-top: 15px; background: linear-gradient(135deg, #ff2e93 0%, #9d4edd 100%);">Ingresar al Anexo 2</a>
                 </div>
             </div>
+
+            <!-- Anexo 3 Card -->
+            <div class="hub-card" style="--border-color: linear-gradient(135deg, #ffb703, #00f5ff)">
+                <div class="hub-card-number" style="font-size: 1.6rem; color: var(--neon-yellow);">A3</div>
+                <div>
+                    <h3 class="hub-card-title">Anexo 3: Arrays, Mutaciones y Strings</h3>
+                    <p class="hub-card-desc">Ejercicios de opción única y selección múltiple: modificaciones por índice, búsquedas, inmutabilidad de strings y monitoreo posicional.</p>
+                    <div class="hub-card-concepts">
+                        <span class="concept-tag">Arrays</span>
+                        <span class="concept-tag">Strings</span>
+                        <span class="concept-tag">Búsquedas</span>
+                        <span class="concept-tag">Multiselect</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="card-progress-bar-container">
+                        <div class="card-progress-fill" id="fill-anexo3"></div>
+                    </div>
+                    <div class="card-progress-text">
+                        <span id="text-anexo3">0/12 aciertos</span>
+                        <span id="pct-anexo3">0%</span>
+                    </div>
+                    <a href="anexo-03-arrays-strings.html" class="hub-card-btn" style="margin-top: 15px; background: linear-gradient(135deg, #ffb703 0%, #00f5ff 100%);">Ingresar al Anexo 3</a>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -449,6 +474,29 @@
                 fillA2.style.width = `${pct2}%`;
                 textA2.innerHTML = `<strong>${anexo2Count}</strong>/12 aciertos`;
                 pctA2.innerText = `${Math.round(pct2)}%`;
+            }
+
+            // Anexo 3 Stats
+            const savedAnexo3 = localStorage.getItem('js_practica_anexo3_answers');
+            let anexo3Count = 0;
+            if (savedAnexo3) {
+                try {
+                    const parsed3 = JSON.parse(savedAnexo3);
+                    Object.values(parsed3).forEach(item => {
+                        if (item.isCorrect) anexo3Count++;
+                    });
+                } catch (e) {
+                    anexo3Count = 0;
+                }
+            }
+            const fillA3 = document.getElementById('fill-anexo3');
+            const textA3 = document.getElementById('text-anexo3');
+            const pctA3 = document.getElementById('pct-anexo3');
+            if (fillA3 && textA3 && pctA3) {
+                const pct3 = (anexo3Count / 12) * 100;
+                fillA3.style.width = `${pct3}%`;
+                textA3.innerHTML = `<strong>${anexo3Count}</strong>/12 aciertos`;
+                pctA3.innerText = `${Math.round(pct3)}%`;
             }
 
             // Global stats

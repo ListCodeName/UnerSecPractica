@@ -463,12 +463,12 @@
                 code: `let a = 15;\nlet b = 8;\nlet estado = "inicial";\n\nif (a % 2 === 0) {\n    b = b * 2;\n    estado = "par";\n} else if (a > 10 && b < 10) {\n    a = a - 5;\n    b = b + 3;\n    if (a === b) {\n        estado = "iguales";\n    } else {\n        estado = "diferentes";\n    }\n} else {\n    b = 0;\n    estado = "final";\n}`,
                 question: "¿Cuáles son los valores finales de 'a', 'b' y 'estado' al concluir el código?",
                 options: [
-                    "a = 10, b = 11, estado = \"diferentes\"",
-                    "a = 10, b = 11, estado = \"iguales\"",
                     "a = 15, b = 16, estado = \"par\"",
-                    "a = 15, b = 0, estado = \"final\""
+                    "a = 15, b = 0, estado = \"final\"",
+                    "a = 10, b = 11, estado = \"iguales\"",
+                    "a = 10, b = 11, estado = \"diferentes\""
                 ],
-                correctAnswer: 0,
+                correctAnswer: 3,
                 explanation: `
                     <strong>Traza de Ejecución:</strong><br>
                     1) <code>15 % 2 === 0</code> es <em>false</em> (15 es impar).<br>
@@ -495,10 +495,10 @@
                 options: [
                     "contador = 4, suma = 16, limite = 4",
                     "contador = 5, suma = 10, limite = 4",
-                    "contador = 5, suma = 16, limite = 4",
-                    "contador = 4, suma = 8, limite = 4"
+                    "contador = 4, suma = 8, limite = 4",
+                    "contador = 5, suma = 16, limite = 4"
                 ],
-                correctAnswer: 2,
+                correctAnswer: 3,
                 explanation: `
                     <strong>Tabla de Seguimiento Iterativo:</strong>
                     <table class="trace-table">
@@ -523,11 +523,11 @@
                 question: "¿Cuáles son los valores finales de 'a', 'b' y 'pasos' al finalizar el bucle?",
                 options: [
                     "a = 9, b = 7, pasos = 2",
-                    "a = 12, b = 3, pasos = 3",
                     "a = 12, b = 7, pasos = 3",
+                    "a = 12, b = 3, pasos = 3",
                     "a = 15, b = -1, pasos = 4"
                 ],
-                correctAnswer: 1,
+                correctAnswer: 2,
                 explanation: `
                     <strong>Tabla de Seguimiento:</strong>
                     <table class="trace-table">
@@ -551,11 +551,11 @@
                 question: "¿Cuáles son los valores finales de 'n', 'operaciones' y 'tipoFinal'?",
                 options: [
                     "n = 1, operaciones = 5, tipoFinal = \"division\"",
-                    "n = 16, operaciones = 5, tipoFinal = \"multiplicacion\"",
                     "n = 8, operaciones = 6, tipoFinal = \"division\"",
-                    "n = 5, operaciones = 4, tipoFinal = \"division\""
+                    "n = 5, operaciones = 4, tipoFinal = \"division\"",
+                    "n = 16, operaciones = 5, tipoFinal = \"multiplicacion\""
                 ],
-                correctAnswer: 1,
+                correctAnswer: 3,
                 explanation: `
                     <strong>Seguimiento de Operaciones:</strong><br>
                     • Ciclo 1: n=12 (par) &rarr; n = 6, tipoFinal = "division", operaciones = 1.<br>
@@ -581,12 +581,12 @@
                 code: `let total = 0;\nlet pares = 0;\nlet i;\n\nfor (i = 1; i <= 6; i++) {\n    if (i % 2 === 0) {\n        pares = pares + 1;\n        total = total + i;\n    } else {\n        total = total - 1;\n    }\n}`,
                 question: "¿Cuáles son los valores finales de las variables 'i', 'total' y 'pares'?",
                 options: [
+                    "i = 7, total = 9, pares = 3",
                     "i = 6, total = 9, pares = 3",
                     "i = 7, total = 12, pares = 3",
-                    "i = 7, total = 9, pares = 3",
                     "i = 6, total = 10, pares = 4"
                 ],
-                correctAnswer: 2,
+                correctAnswer: 0,
                 explanation: `
                     <strong>Tabla de Seguimiento Iterativo:</strong>
                     <table class="trace-table">
@@ -613,12 +613,12 @@
                 code: `let suma = 0;\nlet ultimoMultiplo = 0;\nlet k;\n\nfor (k = 5; k <= 30; k += 5) {\n    if (suma + k > 35) {\n        break;\n    }\n    suma = suma + k;\n    ultimoMultiplo = k;\n}`,
                 question: "¿Cuáles son los valores finales de 'k', 'suma' y 'ultimoMultiplo'?",
                 options: [
-                    "k = 20, suma = 30, ultimoMultiplo = 15",
                     "k = 25, suma = 50, ultimoMultiplo = 20",
+                    "k = 20, suma = 30, ultimoMultiplo = 15",
                     "k = 15, suma = 30, ultimoMultiplo = 15",
                     "k = 20, suma = 35, ultimoMultiplo = 20"
                 ],
-                correctAnswer: 0,
+                correctAnswer: 1,
                 explanation: `
                     <strong>Paso a paso con 'break':</strong><br>
                     • k = 5: 0 + 5 > 35 (F) &rarr; suma = 5, ultimoMultiplo = 5.<br>
@@ -640,11 +640,11 @@
                 question: "¿Cuáles son los valores finales de 'paso', 'balance', 'positivos' e 'ignorados'?",
                 options: [
                     "paso = 5, balance = 16, positivos = 2, ignorados = 1",
-                    "paso = 6, balance = 16, positivos = 2, ignorados = 1",
                     "paso = 6, balance = 12, positivos = 3, ignorados = 1",
-                    "paso = 5, balance = 14, positivos = 1, ignorados = 2"
+                    "paso = 5, balance = 14, positivos = 1, ignorados = 2",
+                    "paso = 6, balance = 16, positivos = 2, ignorados = 1"
                 ],
-                correctAnswer: 1,
+                correctAnswer: 3,
                 explanation: `
                     <strong>Seguimiento de Iteraciones:</strong><br>
                     • paso = 1: balance > 15 (20 > 15 V) &rarr; balance = 16, positivos = 1.<br>
@@ -671,11 +671,11 @@
                 question: "¿Cuáles son los valores finales de 'i', 'j', 'suma' y 'ciclosInternos'?",
                 options: [
                     "i = 3, j = 2, suma = 10, ciclosInternos = 6",
-                    "i = 4, j = 3, suma = 10, ciclosInternos = 6",
                     "i = 4, j = 3, suma = 14, ciclosInternos = 6",
+                    "i = 4, j = 3, suma = 10, ciclosInternos = 6",
                     "i = 3, j = 3, suma = 8, ciclosInternos = 5"
                 ],
-                correctAnswer: 1,
+                correctAnswer: 2,
                 explanation: `
                     <strong>Tabla de Bucles Anidados:</strong>
                     <table class="trace-table">
@@ -701,12 +701,12 @@
                 code: `let w = 1;\nlet total = 0;\nlet activaciones = 0;\n\nwhile (w <= 2) {\n    for (let f = 1; f <= 3; f++) {\n        if (w + f >= 4) {\n            total = total + (w * f);\n            activaciones = activaciones + 1;\n        } else {\n            total = total + 1;\n        }\n    }\n    w = w + 1;\n}`,
                 question: "¿Cuáles son los valores finales de 'w', 'total' y 'activaciones'?",
                 options: [
-                    "w = 2, total = 16, activaciones = 3",
                     "w = 3, total = 16, activaciones = 3",
+                    "w = 2, total = 16, activaciones = 3",
                     "w = 3, total = 12, activaciones = 2",
                     "w = 2, total = 14, activaciones = 4"
                 ],
-                correctAnswer: 1,
+                correctAnswer: 0,
                 explanation: `
                     <strong>Traza de Ejecución:</strong><br>
                     • Cuando w = 1:<br>
@@ -734,11 +734,11 @@
                 question: "¿Cuáles son los valores finales de 'nivel', 'energia' y 'puntos'?",
                 options: [
                     "nivel = 2, energia = 13, puntos = 20",
-                    "nivel = 3, energia = 13, puntos = 20",
                     "nivel = 3, energia = 7, puntos = 30",
-                    "nivel = 2, energia = 19, puntos = 10"
+                    "nivel = 2, energia = 19, puntos = 10",
+                    "nivel = 3, energia = 13, puntos = 20"
                 ],
-                correctAnswer: 1,
+                correctAnswer: 3,
                 explanation: `
                     <strong>Traza de Niveles y Rondas:</strong><br>
                     • Vuelta 1 (nivel=1, energia=25):<br>
@@ -760,6 +760,27 @@
         // ESTADO DE LA APLICACIÓN
         let userAnswers = {};
         let activeFilter = 'all';
+
+        // FUNCIÓN ALEATORIZADORA (FISHER-YATES SHUFFLE)
+        function shuffleArray(array) {
+            const clone = [...array];
+            for (let i = clone.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [clone[i], clone[j]] = [clone[j], clone[i]];
+            }
+            return clone;
+        }
+
+        // INICIALIZACIÓN DE OPCIONES ALEATORIZADAS
+        function initDisplayOptions() {
+            exercisesData.forEach(ex => {
+                const items = ex.options.map((opt, idx) => ({
+                    text: opt,
+                    isCorrect: (idx === ex.correctAnswer)
+                }));
+                ex.displayOptions = shuffleArray(items);
+            });
+        }
 
         // CARGAR PROGRESO GUARDADO
         function loadSavedState() {
@@ -831,18 +852,21 @@
 
                 // Opciones Multiple Choice
                 html += `<div class="options-grid" id="options-group-${ex.id}">`;
-                ex.options.forEach((optText, optIdx) => {
+                const optionsList = ex.displayOptions || ex.options.map((opt, idx) => ({ text: opt, isCorrect: idx === ex.correctAnswer }));
+                optionsList.forEach((opt, optIdx) => {
                     let optClass = 'option-item';
                     let isChecked = false;
 
                     if (ansState) {
-                        if (optIdx === ex.correctAnswer) {
+                        if (opt.isCorrect) {
                             optClass += ' correct-ans';
                         }
-                        if (ansState.selectedIndex === optIdx && !ansState.isCorrect) {
+                        const isUserSelection = (ansState.selectedText === opt.text) || 
+                                                (ansState.selectedText === undefined && ansState.selectedIndex === optIdx);
+                        if (isUserSelection && !ansState.isCorrect) {
                             optClass += ' incorrect-ans';
                         }
-                        if (ansState.selectedIndex === optIdx) {
+                        if (isUserSelection) {
                             isChecked = true;
                             optClass += ' selected';
                         }
@@ -851,7 +875,7 @@
                     html += `
                         <label class="${optClass}" onclick="selectOption(${ex.id}, ${optIdx})">
                             <input type="radio" name="mc-${ex.id}" class="option-radio" ${isChecked ? 'checked' : ''} ${ansState ? 'disabled' : ''}>
-                            <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(optText)}</span>
+                            <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(opt.text)}</span>
                         </label>
                     `;
                 });
@@ -882,11 +906,13 @@
             if (userAnswers[exerciseId]) return; // Ya respondido
 
             const ex = exercisesData.find(e => e.id === exerciseId);
-            const isCorrect = (optionIndex === ex.correctAnswer);
+            const chosen = (ex.displayOptions && ex.displayOptions[optionIndex]) 
+                ? ex.displayOptions[optionIndex] 
+                : { text: ex.options[optionIndex], isCorrect: optionIndex === ex.correctAnswer };
 
             userAnswers[exerciseId] = {
-                isCorrect: isCorrect,
-                selectedIndex: optionIndex
+                isCorrect: chosen.isCorrect,
+                selectedText: chosen.text
             };
 
             saveState();
@@ -905,6 +931,7 @@
 
         // INICIALIZACIÓN
         document.addEventListener('DOMContentLoaded', () => {
+            initDisplayOptions();
             loadSavedState();
             updateHeaderStats();
             renderExercises();
@@ -924,6 +951,7 @@
                 if (confirm('¿Estás seguro de reiniciar todos tus ejercicios del Anexo 2?')) {
                     userAnswers = {};
                     saveState();
+                    initDisplayOptions();
                     renderExercises();
                 }
             });

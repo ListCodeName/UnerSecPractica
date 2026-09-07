@@ -464,12 +464,12 @@
                 code: `let a = 2;\na = a * 3;\na = a + 4;\na = a / 2;`,
                 question: "¿Cuál es el valor final almacenado en la variable 'a'?",
                 options: [
-                    "a = 5",
                     "a = 7",
                     "a = 10",
+                    "a = 5",
                     "a = 4"
                 ],
-                correctAnswer: 0,
+                correctAnswer: 2,
                 explanation: "Paso a paso: 1) a=2. 2) a=2*3=6. 3) a=6+4=10. 4) a=10/2=5."
             },
 
@@ -484,12 +484,12 @@
                 code: `let p = 2000; // Precio Base\nlet d = 15;   // Descuento %\nlet pf = ???;  // Precio Final`,
                 question: "¿Cuál es la fórmula en JavaScript para calcular 'pf' aplicando el descuento porcentual 'd' sobre 'p'?",
                 options: [
-                    "let pf = p - (p * d / 100);",
                     "let pf = p - d;",
                     "let pf = p * (100 - d);",
-                    "let pf = p / (d * 100);"
+                    "let pf = p / (d * 100);",
+                    "let pf = p - (p * d / 100);"
                 ],
-                correctAnswer: 0,
+                correctAnswer: 3,
                 explanation: "El valor a descontar se obtiene multiplicando el precio base (p) por el porcentaje (d) dividido entre 100: (2000 * 15 / 100 = 300). Restando 300 a 2000 obtenemos 1700."
             },
             {
@@ -546,12 +546,12 @@
                 code: `const producto = "Teclado Mechanical";\nconst stock = 8;`,
                 question: "¿Qué expresión en JS genera EXACTAMENTE la cadena 'Stock disponible: 8 unidades de Teclado Mechanical'?",
                 options: [
+                    "\"Stock disponible: \" + stock + \" unidades de \" + producto",
                     "`Stock disponible: \${stock} unidades de \${producto}`",
-                    "\"Stock disponible: \" + stock + \"unidades de\" + producto",
                     "\"Stock disponible: \${stock} unidades de \${producto}\"",
                     "`Stock disponible: $stock unidades de $producto`"
                 ],
-                correctAnswer: 0,
+                correctAnswer: 1,
                 explanation: "Los Template Literals delimitan con comillas invertidas (backticks `` ` ``) y permiten interpolar expresiones mediante el formato \${variable}."
             },
             {
@@ -596,12 +596,12 @@
                 code: `let edad = 20;\nlet tienePase = "SI";\nlet esVIP = false;\nlet resultado = (edad >= 18 && tienePase === "SI") || esVIP;`,
                 question: "¿Cuál es el valor booleano resultante almacenado en la variable 'resultado'?",
                 options: [
-                    "true",
                     "false",
                     "undefined",
+                    "true",
                     "null"
                 ],
-                correctAnswer: 0,
+                correctAnswer: 2,
                 explanation: "Evaluamos por partes: (20 >= 18) es true. ('SI' === 'SI') es true. true && true da true. Luego (true || false) resulta true."
             },
             {
@@ -634,12 +634,12 @@
                 code: `let exp1 = "5" + 3 === "53";\nlet exp2 = 5 + "3" === 8;`,
                 question: "¿Cuáles son los valores booleanos resultantes para exp1 y exp2 respectivamente?",
                 options: [
-                    "exp1 = true, exp2 = false",
                     "exp1 = false, exp2 = true",
                     "exp1 = true, exp2 = true",
-                    "exp1 = false, exp2 = false"
+                    "exp1 = false, exp2 = false",
+                    "exp1 = true, exp2 = false"
                 ],
-                correctAnswer: 0,
+                correctAnswer: 3,
                 explanation: "En exp1, '5' + 3 coerciona a la string '53', y '53' === '53' es true. En exp2, 5 + '3' también coerciona a '53', pero '53' === 8 es false."
             }
         ];
@@ -647,6 +647,29 @@
         // ESTADO DE LA APLICACIÓN
         let userAnswers = {};
         let activeFilter = 'all';
+
+        // FUNCIÓN ALEATORIZADORA (FISHER-YATES SHUFFLE)
+        function shuffleArray(array) {
+            const clone = [...array];
+            for (let i = clone.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [clone[i], clone[j]] = [clone[j], clone[i]];
+            }
+            return clone;
+        }
+
+        // INICIALIZACIÓN DE OPCIONES ALEATORIZADAS
+        function initDisplayOptions() {
+            exercisesData.forEach(ex => {
+                if (ex.type === 'mc') {
+                    const items = ex.options.map((opt, idx) => ({
+                        text: opt,
+                        isCorrect: (idx === ex.correctAnswer)
+                    }));
+                    ex.displayOptions = shuffleArray(items);
+                }
+            });
+        }
 
         // CARGAR PROGRESO GUARDADO
         function loadSavedState() {
@@ -719,18 +742,21 @@
                 // Render por tipo (MC vs Fill)
                 if (ex.type === 'mc') {
                     html += `<div class="options-grid" id="options-group-${ex.id}">`;
-                    ex.options.forEach((optText, optIdx) => {
+                    const optionsList = ex.displayOptions || ex.options.map((opt, idx) => ({ text: opt, isCorrect: idx === ex.correctAnswer }));
+                    optionsList.forEach((opt, optIdx) => {
                         let optClass = 'option-item';
                         let isChecked = false;
 
                         if (ansState) {
-                            if (optIdx === ex.correctAnswer) {
+                            if (opt.isCorrect) {
                                 optClass += ' correct-ans';
                             }
-                            if (ansState.selectedIndex === optIdx && !ansState.isCorrect) {
+                            const isUserSelection = (ansState.selectedText === opt.text) || 
+                                                    (ansState.selectedText === undefined && ansState.selectedIndex === optIdx);
+                            if (isUserSelection && !ansState.isCorrect) {
                                 optClass += ' incorrect-ans';
                             }
-                            if (ansState.selectedIndex === optIdx) {
+                            if (isUserSelection) {
                                 isChecked = true;
                                 optClass += ' selected';
                             }
@@ -739,7 +765,7 @@
                         html += `
                             <label class="${optClass}" onclick="selectOption(${ex.id}, ${optIdx})">
                                 <input type="radio" name="mc-${ex.id}" class="option-radio" ${isChecked ? 'checked' : ''} ${ansState ? 'disabled' : ''}>
-                                <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(optText)}</span>
+                                <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(opt.text)}</span>
                             </label>
                         `;
                     });
@@ -784,11 +810,13 @@
             if (userAnswers[exerciseId]) return; // Ya respondido
 
             const ex = exercisesData.find(e => e.id === exerciseId);
-            const isCorrect = (optionIndex === ex.correctAnswer);
+            const chosen = (ex.displayOptions && ex.displayOptions[optionIndex]) 
+                ? ex.displayOptions[optionIndex] 
+                : { text: ex.options[optionIndex], isCorrect: optionIndex === ex.correctAnswer };
 
             userAnswers[exerciseId] = {
-                isCorrect: isCorrect,
-                selectedIndex: optionIndex
+                isCorrect: chosen.isCorrect,
+                selectedText: chosen.text
             };
 
             saveState();
@@ -839,6 +867,7 @@
 
         // EVENT LISTENERS DE FILTROS Y REINICIO
         document.addEventListener('DOMContentLoaded', () => {
+            initDisplayOptions();
             loadSavedState();
             updateHeaderStats();
             renderExercises();
@@ -858,6 +887,7 @@
                 if (confirm('¿Estás seguro de reiniciar todos tus ejercicios del Anexo 1?')) {
                     userAnswers = {};
                     saveState();
+                    initDisplayOptions();
                     renderExercises();
                 }
             });

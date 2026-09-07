@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anexo 3: Arrays, Búsquedas, Mutaciones y Strings | Programación II</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <style>
+        .anexo-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            width: 100%;
+        }
+
+        /* Banner de Progreso */
+        .anexo-stats-card {
+            background-color: var(--surface);
+            background-image: linear-gradient(135deg, var(--surface-card) 0%, rgba(22, 17, 43, 0.6) 100%);
+            border: var(--border-neon);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--glow-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .anexo-stats-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--grad-sunset);
+        }
+
+        .anexo-info h2 {
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .anexo-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stats-badge-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 12px;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .stat-pill-val {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
+        }
+
+        .stat-pill-lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* Filtros por Categoría */
+        .filter-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .filter-btn {
+            background: rgba(22, 17, 43, 0.8);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 99px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        .filter-btn.active {
+            background: var(--grad-sunset);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: var(--glow-pink);
+        }
+
+        /* Tarjeta de Ejercicio */
+        .exercise-card {
+            background: var(--surface-card);
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .exercise-card.status-correct {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+        }
+
+        .exercise-card.status-incorrect {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px rgba(255, 46, 147, 0.2);
+        }
+
+        .ex-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ex-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-category {
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid var(--neon-purple);
+            color: #d8b4fe;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tag-type {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+        }
+
+        .tag-type.multi {
+            background: rgba(255, 183, 3, 0.12);
+            border-color: var(--neon-yellow);
+            color: var(--neon-yellow);
+        }
+
+        .ex-number {
+            font-family: var(--font-title);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .ex-title-text {
+            font-family: var(--font-title);
+            font-size: 1.15rem;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        /* Bloque de Código de Consigna */
+        .code-box {
+            background: #060410;
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            color: #f1ecfc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Opciones Multiple Choice */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            background: rgba(10, 8, 22, 0.7);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        .option-item:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .option-item.selected {
+            border-color: var(--neon-pink);
+            background: rgba(255, 46, 147, 0.12);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.2);
+        }
+
+        .option-item.correct-ans {
+            border-color: var(--neon-green) !important;
+            background: rgba(57, 255, 20, 0.15) !important;
+            color: #fff !important;
+            box-shadow: 0 0 12px rgba(57, 255, 20, 0.3) !important;
+        }
+
+        .option-item.incorrect-ans {
+            border-color: var(--neon-pink) !important;
+            background: rgba(255, 46, 147, 0.15) !important;
+            color: #ff99c8 !important;
+        }
+
+        /* Radio Buttons */
+        .option-radio {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .option-radio:checked {
+            border-color: var(--neon-pink);
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* Checkboxes para Multiselect */
+        .option-checkbox {
+            appearance: none;
+            width: 19px;
+            height: 19px;
+            border: 2px solid var(--text-muted);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .option-checkbox:checked {
+            border-color: var(--neon-cyan);
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .option-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #060410;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        /* Botón de Confirmación Multiselect */
+        .btn-confirm-multi {
+            background: var(--grad-sunset);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 12px 26px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: var(--glow-pink);
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-confirm-multi:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Caja de Retroalimentación / Explicación */
+        .feedback-box {
+            display: none;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-box.correct {
+            background: rgba(57, 255, 20, 0.08);
+            border: 1px solid var(--neon-green);
+            color: #c2ffb3;
+        }
+
+        .feedback-box.incorrect {
+            background: rgba(255, 46, 147, 0.08);
+            border: 1px solid var(--neon-pink);
+            color: #ffd1e8;
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Tablas de traza en retroalimentación */
+        .trace-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.82rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .trace-table th, .trace-table td {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .trace-table th {
+            background: rgba(157, 78, 221, 0.2);
+            color: var(--neon-cyan);
+            font-family: var(--font-title);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body data-workshop-id="anexo3">
+
+    <!-- ENCABEZADO -->
+    <header>
+        <div class="badge-topic">Anexo 03 - Arrays y Cadenas</div>
+        <h1>Pruebas de Escritorio: Arrays, Mutaciones y Strings</h1>
+        <p>Aprende y valida el manejo de estructuras indexadas en memoria: modificaciones directas por índice, búsquedas secuenciales, mutabilidad de arrays frente a inmutabilidad de strings, y rastreo posicional.</p>
+        <div class="header-meta">
+            <span>Modalidad: <strong>Práctica Autónoma con Tracing</strong></span>
+            <span>Ejercicios: <strong>12 Desafíos (Simple y Múltiple Selección)</strong></span>
+            <span>Navegación: <a href="index.html" style="color: var(--neon-pink); text-decoration: none; font-weight: 600;">&larr; Volver al Portal de Práctica</a></span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="anexo-container">
+
+        <!-- BANNER DE PROGRESO -->
+        <div class="anexo-stats-card">
+            <div class="anexo-info">
+                <h2>Panel de Avance del Anexo 3</h2>
+                <p>Analiza el código y determina las posiciones o el contenido final de los arrays y strings. Tus respuestas se guardan automáticamente.</p>
+            </div>
+            <div class="stats-badge-group">
+                <div class="stat-pill">
+                    <div class="stat-pill-val" id="score-counter">0 / 12</div>
+                    <div class="stat-pill-lbl">Aciertos</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-pill-val" id="pct-counter" style="color: var(--neon-pink); text-shadow: var(--glow-pink);">0%</div>
+                    <div class="stat-pill-lbl">Completado</div>
+                </div>
+                <button class="filter-btn" id="reset-btn" style="border-color: rgba(255, 70, 70, 0.5); color: #ff8585;">↺ Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- FILTROS POR CATEGORÍA -->
+        <div class="filter-nav">
+            <button class="filter-btn active" data-filter="all">Todos (12)</button>
+            <button class="filter-btn" data-filter="modificaciones">1. Modificaciones por Índice</button>
+            <button class="filter-btn" data-filter="busquedas">2. Búsquedas y Recorridos</button>
+            <button class="filter-btn" data-filter="strings">3. Strings como Arrays</button>
+            <button class="filter-btn" data-filter="posiciones">4. Monitoreo de Posiciones</button>
+        </div>
+
+        <!-- CONTENEDOR DE EJERCICIOS RENDERIZADOS DINÁMICAMENTE -->
+        <div id="exercises-list"></div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <p>JavaScript Arcade Playground &middot; Cátedra de Programación II &middot; UNER</p>
+    </footer>
+
+    <!-- LÓGICA INTERACTIVA DE EJERCICIOS -->
+    <script>
+        const exercisesData = [
+            // =========================================================================
+            // EJE 1: MODIFICACIONES POR ÍNDICE
+            // =========================================================================
+            {
+                id: 1,
+                category: "modificaciones",
+                categoryLabel: "Modificaciones por Índice",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Reasignación Directa por Índice y Desplazamiento de Valores",
+                code: `let numeros = [10, 20, 30, 40, 50];\nnumeros[1] = numeros[0] + numeros[2];\nnumeros[3] = numeros[3] * 2;\nnumeros[4] = numeros[1] - numeros[3];`,
+                question: "¿Cuál es el contenido final del array 'numeros' al terminar la ejecución?",
+                options: [
+                    "[10, 50, 30, 80, -30]",
+                    "[40, 40, 30, 80, 50]",
+                    "[10, 40, 30, 80, -40]",
+                    "[10, 40, 30, 40, -40]"
+                ],
+                correctAnswer: 2,
+                explanation: `
+                    <strong>Traza de Memoria de 'numeros':</strong><br>
+                    • Estado inicial: <code>[10, 20, 30, 40, 50]</code>.<br>
+                    • <code>numeros[1] = numeros[0] + numeros[2]</code> &rarr; <code>10 + 30 = 40</code> &rarr; array: <code>[10, 40, 30, 40, 50]</code>.<br>
+                    • <code>numeros[3] = numeros[3] * 2</code> &rarr; <code>40 * 2 = 80</code> &rarr; array: <code>[10, 40, 30, 80, 50]</code>.<br>
+                    • <code>numeros[4] = numeros[1] - numeros[3]</code> &rarr; <code>40 - 80 = -40</code> &rarr; array: <code>[10, 40, 30, 80, -40]</code>.<br>
+                    <strong>Resultado Final:</strong> <code>[10, 40, 30, 80, -40]</code>.
+                `
+            },
+            {
+                id: 2,
+                category: "modificaciones",
+                categoryLabel: "Modificaciones por Índice",
+                type: "multi",
+                typeLabel: "Selección Múltiple",
+                title: "Intercambio Espejado de Elementos (Swap con Auxiliar)",
+                code: `let datos = ["a", "b", "c", "d", "e"];\n\nfor (let i = 0; i < 2; i++) {\n    let temp = datos[i];\n    datos[i] = datos[4 - i];\n    datos[4 - i] = temp;\n}`,
+                question: "Selecciona TODAS las afirmaciones que sean VERDADERAS sobre el array 'datos' al finalizar el bucle:",
+                options: [
+                    "En el índice 1 se encuentra el valor 'b'.",
+                    "En el índice 0 se encuentra el valor 'e'.",
+                    "En el índice 4 se encuentra el valor 'e'.",
+                    "En el índice 3 se encuentra el valor 'b'."
+                ],
+                correctAnswers: [1, 3],
+                explanation: `
+                    <strong>Seguimiento de la Inversión (Swap):</strong><br>
+                    • Estado inicial: <code>['a', 'b', 'c', 'd', 'e']</code>.<br>
+                    • Ciclo i = 0: intercambia índices 0 y 4 (4 - 0). Array resultante: <code>['e', 'b', 'c', 'd', 'a']</code>.<br>
+                    • Ciclo i = 1: intercambia índices 1 y 3 (4 - 1). Array resultante: <code>['e', 'd', 'c', 'b', 'a']</code>.<br>
+                    • Ciclo i = 2: no entra (2 < 2 es false). El centro 'c' queda intacto.<br>
+                    <strong>Verificación de opciones:</strong><br>
+                    ✓ <code>datos[0] === 'e'</code> (Verdadero).<br>
+                    ✗ <code>datos[1] === 'b'</code> (Falso, contiene 'd').<br>
+                    ✓ <code>datos[3] === 'b'</code> (Verdadero).<br>
+                    ✗ <code>datos[4] === 'e'</code> (Falso, contiene 'a').
+                `
+            },
+            {
+                id: 3,
+                category: "modificaciones",
+                categoryLabel: "Modificaciones por Índice",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Modificación Condicional de Elementos según Paridad",
+                code: `let valores = [3, 8, 5, 2, 7];\n\nfor (let i = 0; i < valores.length; i++) {\n    if (valores[i] % 2 !== 0) {\n        valores[i] = valores[i] * 2;\n    } else {\n        valores[i] = 0;\n    }\n}`,
+                question: "¿Cuál es el contenido final del array 'valores'?",
+                options: [
+                    "[6, 8, 10, 2, 14]",
+                    "[6, 0, 10, 0, 14]",
+                    "[0, 16, 0, 4, 0]",
+                    "[3, 0, 5, 0, 7]"
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Evaluación de cada elemento:</strong><br>
+                    • i=0 &rarr; <code>valores[0] = 3</code> (impar) &rarr; <code>3 * 2 = 6</code>.<br>
+                    • i=1 &rarr; <code>valores[1] = 8</code> (par) &rarr; se asigna <code>0</code>.<br>
+                    • i=2 &rarr; <code>valores[2] = 5</code> (impar) &rarr; <code>5 * 2 = 10</code>.<br>
+                    • i=3 &rarr; <code>valores[3] = 2</code> (par) &rarr; se asigna <code>0</code>.<br>
+                    • i=4 &rarr; <code>valores[4] = 7</code> (impar) &rarr; <code>7 * 2 = 14</code>.<br>
+                    <strong>Resultado Final:</strong> <code>[6, 0, 10, 0, 14]</code>.
+                `
+            },
+
+            // =========================================================================
+            // EJE 2: BÚSQUEDAS Y RECORRIDOS
+            // =========================================================================
+            {
+                id: 4,
+                category: "busquedas",
+                categoryLabel: "Búsquedas y Recorridos",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Búsqueda Lineal con Parada Temprana",
+                code: `let nombres = ["Ana", "Marcos", "Lucía", "Pedro", "Sofía"];\nlet buscado = "Pedro";\nlet indiceEncontrado = -1;\nlet i;\n\nfor (i = 0; i < nombres.length; i++) {\n    if (nombres[i] === buscado) {\n        indiceEncontrado = i;\n        break;\n    }\n}`,
+                question: "¿Cuáles son los valores finales de 'indiceEncontrado' y de 'i' al terminar el bucle?",
+                options: [
+                    "indiceEncontrado = 3, i = 4",
+                    "indiceEncontrado = 4, i = 5",
+                    "indiceEncontrado = 3, i = 3",
+                    "indiceEncontrado = -1, i = 5"
+                ],
+                correctAnswer: 2,
+                explanation: `
+                    <strong>Paso a paso de la búsqueda lineal:</strong><br>
+                    • i = 0: "Ana" !== "Pedro".<br>
+                    • i = 1: "Marcos" !== "Pedro".<br>
+                    • i = 2: "Lucía" !== "Pedro".<br>
+                    • i = 3: "Pedro" === "Pedro" &rarr; coincide, asigna <code>indiceEncontrado = 3</code> y ejecuta <code>break</code>.<br>
+                    Al ejecutarse el <code>break</code>, el bucle se interrumpe de inmediato sin ejecutar el <code>i++</code> posterior.<br>
+                    <strong>Resultado Final:</strong> <code>indiceEncontrado = 3, i = 3</code>.
+                `
+            },
+            {
+                id: 5,
+                category: "busquedas",
+                categoryLabel: "Búsquedas y Recorridos",
+                type: "multi",
+                typeLabel: "Selección Múltiple",
+                title: "Registro de Ocurrencias y Filtrado de Índices",
+                code: `let notas = [4, 7, 9, 7, 2, 7, 8];\nlet posicionesSiete = [];\nlet totalSietes = 0;\n\nfor (let i = 0; i < notas.length; i++) {\n    if (notas[i] === 7) {\n        posicionesSiete.push(i);\n        totalSietes = totalSietes + 1;\n    }\n}`,
+                question: "Selecciona TODAS las afirmaciones correctas sobre el estado final de las variables:",
+                options: [
+                    "El array 'posicionesSiete' contiene los valores [7, 7, 7].",
+                    "La variable 'totalSietes' tiene un valor final de 3.",
+                    "En la posición posicionesSiete[0] se encuentra almacenado el valor 0.",
+                    "El array 'posicionesSiete' contiene exactamente los índices [1, 3, 5]."
+                ],
+                correctAnswers: [1, 3],
+                explanation: `
+                    <strong>Traza del Filtro de Posiciones:</strong><br>
+                    • notas[1] === 7 &rarr; almacena índice 1 en posicionesSiete.<br>
+                    • notas[3] === 7 &rarr; almacena índice 3 en posicionesSiete.<br>
+                    • notas[5] === 7 &rarr; almacena índice 5 en posicionesSiete.<br>
+                    • <code>totalSietes</code> se incrementa 3 veces &rarr; valor final: <code>3</code>.<br>
+                    • <code>posicionesSiete</code> almacena las posiciones donde estuvo el 7: <code>[1, 3, 5]</code>.<br>
+                    ✓ Opción 2 es Verdadera (totalSietes es 3).<br>
+                    ✓ Opción 4 es Verdadera (posicionesSiete es [1, 3, 5]).<br>
+                    ✗ Opción 1 es Falsa (guarda los índices, no el número 7).<br>
+                    ✗ Opción 3 es Falsa (posicionesSiete[0] es 1).
+                `
+            },
+            {
+                id: 6,
+                category: "busquedas",
+                categoryLabel: "Búsquedas y Recorridos",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Acumulación y Conteo bajo Filtro Numérico",
+                code: `let precios = [150, 320, 80, 500, 210];\nlet suma = 0;\nlet cantidadContada = 0;\n\nfor (let i = 0; i < precios.length; i++) {\n    if (precios[i] >= 200) {\n        suma = suma + precios[i];\n        cantidadContada = cantidadContada + 1;\n    }\n}`,
+                question: "¿Cuáles son los valores finales de 'suma' y 'cantidadContada'?",
+                options: [
+                    "suma = 820, cantidadContada = 2",
+                    "suma = 1260, cantidadContada = 5",
+                    "suma = 710, cantidadContada = 2",
+                    "suma = 1030, cantidadContada = 3"
+                ],
+                correctAnswer: 3,
+                explanation: `
+                    <strong>Filtrado de elementos >= 200:</strong><br>
+                    • precios[0] = 150 &rarr; no cumple.<br>
+                    • precios[1] = 320 &rarr; cumple: suma = 320, cantidad = 1.<br>
+                    • precios[2] = 80 &rarr; no cumple.<br>
+                    • precios[3] = 500 &rarr; cumple: suma = 320 + 500 = 820, cantidad = 2.<br>
+                    • precios[4] = 210 &rarr; cumple: suma = 820 + 210 = 1030, cantidad = 3.<br>
+                    <strong>Resultado Final:</strong> <code>suma = 1030, cantidadContada = 3</code>.
+                `
+            },
+
+            // =========================================================================
+            // EJE 3: STRINGS COMO ARRAYS
+            // =========================================================================
+            {
+                id: 7,
+                category: "strings",
+                categoryLabel: "Strings como Arrays",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Indexación de Cadenas e Inmutabilidad en JavaScript",
+                code: `let palabra = "CODIGO";\nlet primera = palabra[0];\nlet ultima = palabra[palabra.length - 1];\npalabra[0] = "X"; // Intento de mutación directa\nlet caracterMedio = palabra[2];`,
+                question: "¿Cuáles son los valores finales de 'primera', 'ultima', 'caracterMedio' y 'palabra'?",
+                options: [
+                    "primera = \"X\", ultima = \"O\", caracterMedio = \"D\", palabra = \"XODIGO\"",
+                    "primera = \"C\", ultima = \"O\", caracterMedio = \"D\", palabra = \"CODIGO\"",
+                    "primera = \"C\", ultima = \"G\", caracterMedio = \"D\", palabra = \"CODIGO\"",
+                    "primera = \"C\", ultima = \"O\", caracterMedio = \"I\", palabra = \"XODIGO\""
+                ],
+                correctAnswer: 1,
+                explanation: `
+                    <strong>Concepto Clave - Inmutabilidad de los Strings:</strong><br>
+                    • En JavaScript los strings se pueden leer por índice como si fueran arrays (<code>palabra[0]</code> da 'C', <code>palabra[5]</code> da 'O', <code>palabra[2]</code> da 'D').<br>
+                    • Sin embargo, los strings son <strong>primitivos inmutables</strong>: la instrucción <code>palabra[0] = "X"</code> se ignora silenciosamente y <strong>no modifica la cadena original</strong>.<br>
+                    <strong>Resultado Final:</strong> <code>primera = "C", ultima = "O", caracterMedio = "D", palabra = "CODIGO"</code>.
+                `
+            },
+            {
+                id: 8,
+                category: "strings",
+                categoryLabel: "Strings como Arrays",
+                type: "multi",
+                typeLabel: "Selección Múltiple",
+                title: "Separación de Caracteres y Clasificación de Vocales",
+                code: `let texto = "ALGORITMO";\nlet vocalesEncontradas = [];\nlet consonantes = 0;\n\nfor (let i = 0; i < texto.length; i++) {\n    let c = texto[i];\n    if (c === "A" || c === "E" || c === "I" || c === "O" || c === "U") {\n        vocalesEncontradas.push(c);\n    } else {\n        consonantes = consonantes + 1;\n    }\n}`,
+                question: "Selecciona TODAS las opciones VERDADERAS respecto a las variables resultantes:",
+                options: [
+                    "En 'vocalesEncontradas[1]' se encuentra almacenada la letra 'I'.",
+                    "La variable 'consonantes' termina con un valor de 5.",
+                    "El array 'vocalesEncontradas' contiene exactamente 4 elementos: ['A', 'O', 'I', 'O'].",
+                    "En la posición 'vocalesEncontradas[3]' se encuentra la letra 'O'."
+                ],
+                correctAnswers: [1, 2, 3],
+                explanation: `
+                    <strong>Recorrido letra por letra de 'ALGORITMO':</strong><br>
+                    • i=0: 'A' &rarr; vocal 1 (vocales: ['A']).<br>
+                    • i=1: 'L' &rarr; consonante (1).<br>
+                    • i=2: 'G' &rarr; consonante (2).<br>
+                    • i=3: 'O' &rarr; vocal 2 (vocales: ['A', 'O']).<br>
+                    • i=4: 'R' &rarr; consonante (3).<br>
+                    • i=5: 'I' &rarr; vocal 3 (vocales: ['A', 'O', 'I']).<br>
+                    • i=6: 'T' &rarr; consonante (4).<br>
+                    • i=7: 'M' &rarr; consonante (5).<br>
+                    • i=8: 'O' &rarr; vocal 4 (vocales: ['A', 'O', 'I', 'O']).<br>
+                    ✓ Opción 2 es Verdadera (5 consonantes).<br>
+                    ✓ Opción 3 es Verdadera (vocalesEncontradas tiene 4 elementos).<br>
+                    ✗ Opción 1 es Falsa (vocalesEncontradas[1] es 'O', no 'I').<br>
+                    ✓ Opción 4 es Verdadera (vocalesEncontradas[3] es 'O').
+                `
+            },
+            {
+                id: 9,
+                category: "strings",
+                categoryLabel: "Strings como Arrays",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Inversión de Cadena mediante Recorrido Descendente",
+                code: `let frase = "NODO";\nlet invertida = "";\nlet i;\n\nfor (i = frase.length - 1; i >= 0; i--) {\n    invertida = invertida + frase[i];\n}`,
+                question: "¿Cuál es el valor final de la variable 'invertida' y el valor de 'i' al terminar?",
+                options: [
+                    "invertida = \"NODO\", i = 0",
+                    "invertida = \"ODON\", i = 0",
+                    "invertida = \"ODON\", i = -1",
+                    "invertida = \"ODO\", i = -1"
+                ],
+                correctAnswer: 2,
+                explanation: `
+                    <strong>Traza del bucle regresivo (frase.length = 4):</strong><br>
+                    • i = 3: frase[3] = 'O' &rarr; invertida = "O".<br>
+                    • i = 2: frase[2] = 'D' &rarr; invertida = "OD".<br>
+                    • i = 1: frase[1] = 'O' &rarr; invertida = "ODO".<br>
+                    • i = 0: frase[0] = 'N' &rarr; invertida = "ODON".<br>
+                    • i se decrementa con <code>i--</code> alcanzando <code>-1</code>, lo que hace falsa la condición <code>i >= 0</code> y rompe el bucle.<br>
+                    <strong>Resultado Final:</strong> <code>invertida = "ODON", i = -1</code>.
+                `
+            },
+
+            // =========================================================================
+            // EJE 4: MONITOREO DE POSICIONES E ÍNDICES
+            // =========================================================================
+            {
+                id: 10,
+                category: "posiciones",
+                categoryLabel: "Monitoreo de Posiciones",
+                type: "multi",
+                typeLabel: "Selección Múltiple",
+                title: "Monitoreo Puntual de Contenido por Posición en Memoria",
+                code: `let chars = ["m", "p", "a", "x", "e", "a", "k", "t", "o", "x"];\nchars[1] = "z";\nchars[6] = chars[0];\nchars[8] = "u";`,
+                question: "Selecciona TODAS las opciones que sean VERDADERAS sobre los elementos y sus posiciones en el array 'chars':",
+                options: [
+                    "En la posición 1 el array contiene una 'p'.",
+                    "En la posición 5 el array contiene una 'a'.",
+                    "En la posición 8 el array contiene una 'o'.",
+                    "En la posición 9 el array contiene una 'x'.",
+                    "En la posición 6 el array contiene una 'm'."
+                ],
+                correctAnswers: [1, 3, 4],
+                explanation: `
+                    <strong>Mapeo índice por índice de 'chars':</strong><br>
+                    • [0]: 'm'<br>
+                    • [1]: 'z' (era 'p', fue reemplazado)<br>
+                    • [2]: 'a'<br>
+                    • [3]: 'x'<br>
+                    • [4]: 'e'<br>
+                    • [5]: 'a'<br>
+                    • [6]: 'm' (tomó el valor de chars[0])<br>
+                    • [7]: 't'<br>
+                    • [8]: 'u' (era 'o', fue reemplazado)<br>
+                    • [9]: 'x'<br>
+                    ✓ Posición 5 tiene 'a' (Verdadero).<br>
+                    ✓ Posición 9 tiene 'x' (Verdadero).<br>
+                    ✗ Posición 1 tiene 'p' (Falso, ahora tiene 'z').<br>
+                    ✓ Posición 6 tiene 'm' (Verdadero).<br>
+                    ✗ Posición 8 tiene 'o' (Falso, ahora tiene 'u').
+                `
+            },
+            {
+                id: 11,
+                category: "posiciones",
+                categoryLabel: "Monitoreo de Posiciones",
+                type: "mc",
+                typeLabel: "Opción Única",
+                title: "Búsqueda del Primer Elemento Duplicado con Índices Cruzados",
+                code: `let lista = [5, 12, 8, 12, 3];\nlet duplicado = -1;\nlet posOriginal = -1;\nlet posCopia = -1;\n\nfor (let i = 0; i < lista.length; i++) {\n    for (let j = i + 1; j < lista.length; j++) {\n        if (lista[i] === lista[j]) {\n            duplicado = lista[i];\n            posOriginal = i;\n            posCopia = j;\n            break;\n        }\n    }\n    if (duplicado !== -1) break;\n}`,
+                question: "¿Cuáles son los valores finales de 'duplicado', 'posOriginal' y 'posCopia'?",
+                options: [
+                    "duplicado = 12, posOriginal = 3, posCopia = 1",
+                    "duplicado = 8, posOriginal = 2, posCopia = 2",
+                    "duplicado = -1, posOriginal = -1, posCopia = -1",
+                    "duplicado = 12, posOriginal = 1, posCopia = 3"
+                ],
+                correctAnswer: 3,
+                explanation: `
+                    <strong>Seguimiento de Doble Recorrido:</strong><br>
+                    • i = 0 (valor 5): compara con j = 1, 2, 3, 4 &rarr; no hay coincidencias.<br>
+                    • i = 1 (valor 12):<br>
+                      - j = 2 (valor 8) &rarr; no coincide.<br>
+                      - j = 3 (valor 12) &rarr; ¡Coincide! <code>lista[1] === lista[3]</code>.<br>
+                      - Se registra: <code>duplicado = 12</code>, <code>posOriginal = 1</code>, <code>posCopia = 3</code>.<br>
+                      - Ejecuta <code>break</code> interno y luego rompe el externo con <code>if (duplicado !== -1) break</code>.<br>
+                    <strong>Resultado Final:</strong> <code>duplicado = 12, posOriginal = 1, posCopia = 3</code>.
+                `
+            },
+            {
+                id: 12,
+                category: "posiciones",
+                categoryLabel: "Monitoreo de Posiciones",
+                type: "multi",
+                typeLabel: "Selección Múltiple",
+                title: "Desglose de String en Arrays de Letras y Dígitos",
+                code: `let codigo = "r2a7p9i1d0";\nlet letras = [];\nlet digitos = [];\n\nfor (let i = 0; i < codigo.length; i++) {\n    let car = codigo[i];\n    if (car >= "0" && car <= "9") {\n        digitos.push(Number(car));\n    } else {\n        letras.push(car);\n    }\n}`,
+                question: "Selecciona TODAS las afirmaciones correctas sobre los arrays resultantes:",
+                options: [
+                    "En la posición digitos[4] se encuentra el número 1.",
+                    "En el índice 2 de 'letras' se encuentra el caracter 'p'.",
+                    "En el índice 0 de 'digitos' se encuentra el número 2.",
+                    "El tamaño de ambos arrays es igual (letras.length === 5 y digitos.length === 5)."
+                ],
+                correctAnswers: [1, 2, 3],
+                explanation: `
+                    <strong>Clasificación caracter a caracter de "r2a7p9i1d0":</strong><br>
+                    • 'r' &rarr; letras[0]<br>
+                    • '2' &rarr; digitos[0]<br>
+                    • 'a' &rarr; letras[1]<br>
+                    • '7' &rarr; digitos[1]<br>
+                    • 'p' &rarr; letras[2]<br>
+                    • '9' &rarr; digitos[2]<br>
+                    • 'i' &rarr; letras[3]<br>
+                    • '1' &rarr; digitos[3]<br>
+                    • 'd' &rarr; letras[4]<br>
+                    • '0' &rarr; digitos[4]<br>
+                    <strong>Contenidos finales:</strong><br>
+                    <code>letras = ['r', 'a', 'p', 'i', 'd']</code> (longitud 5).<br>
+                    <code>digitos = [2, 7, 9, 1, 0]</code> (longitud 5).<br>
+                    ✓ Opción 2 es Verdadera (letras[2] es 'p').<br>
+                    ✓ Opción 3 es Verdadera (digitos[0] es 2).<br>
+                    ✓ Opción 4 es Verdadera (ambos tienen tamaño 5).<br>
+                    ✗ Opción 1 es Falsa (digitos[4] es 0, no 1).
+                `
+            }
+        ];
+
+        // ESTADO DE LA APLICACIÓN
+        let userAnswers = {};
+        let activeFilter = 'all';
+
+        // FUNCIÓN ALEATORIZADORA (FISHER-YATES SHUFFLE)
+        function shuffleArray(array) {
+            const clone = [...array];
+            for (let i = clone.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [clone[i], clone[j]] = [clone[j], clone[i]];
+            }
+            return clone;
+        }
+
+        // INICIALIZACIÓN DE OPCIONES ALEATORIZADAS
+        function initDisplayOptions() {
+            exercisesData.forEach(ex => {
+                if (ex.type === 'mc') {
+                    const items = ex.options.map((opt, idx) => ({
+                        text: opt,
+                        isCorrect: (idx === ex.correctAnswer)
+                    }));
+                    ex.displayOptions = shuffleArray(items);
+                } else if (ex.type === 'multi') {
+                    const items = ex.options.map((opt, idx) => ({
+                        text: opt,
+                        isCorrect: ex.correctAnswers.includes(idx)
+                    }));
+                    ex.displayOptions = shuffleArray(items);
+                }
+            });
+        }
+
+        // CARGAR PROGRESO GUARDADO
+        function loadSavedState() {
+            const saved = localStorage.getItem('js_practica_anexo3_answers');
+            if (saved) {
+                try {
+                    userAnswers = JSON.parse(saved);
+                } catch (e) {
+                    userAnswers = {};
+                }
+            }
+        }
+
+        // GUARDAR ESTADO
+        function saveState() {
+            localStorage.setItem('js_practica_anexo3_answers', JSON.stringify(userAnswers));
+            updateHeaderStats();
+        }
+
+        // CALCULAR Y ACTUALIZAR MÉTRICAS
+        function updateHeaderStats() {
+            let correctCount = 0;
+            const total = exercisesData.length;
+
+            exercisesData.forEach(ex => {
+                const ans = userAnswers[ex.id];
+                if (ans && ans.isCorrect) {
+                    correctCount++;
+                }
+            });
+
+            const pct = Math.round((correctCount / total) * 100);
+            document.getElementById('score-counter').innerText = `${correctCount} / ${total}`;
+            document.getElementById('pct-counter').innerText = `${pct}%`;
+        }
+
+        // RENDERIZAR EJERCICIOS
+        function renderExercises() {
+            const container = document.getElementById('exercises-list');
+            container.innerHTML = '';
+
+            const filteredData = activeFilter === 'all' 
+                ? exercisesData 
+                : exercisesData.filter(ex => ex.category === activeFilter);
+
+            filteredData.forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                card.id = `ex-card-${ex.id}`;
+
+                const ansState = userAnswers[ex.id];
+                if (ansState) {
+                    card.classList.add(ansState.isCorrect ? 'status-correct' : 'status-incorrect');
+                }
+
+                // Encabezado de la Tarjeta
+                let html = `
+                    <div class="ex-header">
+                        <div class="ex-tags">
+                            <span class="tag-category">${ex.categoryLabel}</span>
+                            <span class="tag-type ${ex.type === 'multi' ? 'multi' : ''}">${ex.typeLabel}</span>
+                        </div>
+                        <span class="ex-number">Desafío #${ex.id}</span>
+                    </div>
+                    <div class="ex-title-text">${ex.title}</div>
+                    <div class="code-box">${escapeHtml(ex.code)}</div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; margin-bottom: 15px;">${ex.question}</p>
+                `;
+
+                // Opciones de Selección
+                if (ex.type === 'mc') {
+                    // Opción Única (Radio)
+                    html += `<div class="options-grid" id="options-group-${ex.id}">`;
+                    const optionsList = ex.displayOptions || ex.options.map((opt, idx) => ({ text: opt, isCorrect: idx === ex.correctAnswer }));
+                    optionsList.forEach((opt, optIdx) => {
+                        let optClass = 'option-item';
+                        let isChecked = false;
+
+                        if (ansState) {
+                            if (opt.isCorrect) {
+                                optClass += ' correct-ans';
+                            }
+                            const isUserSelection = (ansState.selectedText === opt.text) || 
+                                                    (ansState.selectedText === undefined && ansState.selectedIndex === optIdx);
+                            if (isUserSelection && !ansState.isCorrect) {
+                                optClass += ' incorrect-ans';
+                            }
+                            if (isUserSelection) {
+                                isChecked = true;
+                                optClass += ' selected';
+                            }
+                        }
+
+                        html += `
+                            <label class="${optClass}" onclick="selectSingleOption(${ex.id}, ${optIdx})">
+                                <input type="radio" name="mc-${ex.id}" class="option-radio" ${isChecked ? 'checked' : ''} ${ansState ? 'disabled' : ''}>
+                                <span><strong>${String.fromCharCode(65 + optIdx)})</strong> ${escapeHtml(opt.text)}</span>
+                            </label>
+                        `;
+                    });
+                    html += `</div>`;
+                } else if (ex.type === 'multi') {
+                    // Selección Múltiple (Checkboxes)
+                    html += `<div class="options-grid" id="options-group-${ex.id}">`;
+                    const optionsList = ex.displayOptions || ex.options.map((opt, idx) => ({ text: opt, isCorrect: ex.correctAnswers.includes(idx) }));
+                    optionsList.forEach((opt, optIdx) => {
+                        let optClass = 'option-item';
+                        let isChecked = false;
+
+                        if (ansState) {
+                            const isCorrectOpt = opt.isCorrect;
+                            const userChecked = ansState.selectedTexts && ansState.selectedTexts.includes(opt.text);
+
+                            if (isCorrectOpt) {
+                                optClass += ' correct-ans';
+                            }
+                            if (userChecked && !isCorrectOpt) {
+                                optClass += ' incorrect-ans';
+                            }
+                            if (userChecked) {
+                                isChecked = true;
+                                optClass += ' selected';
+                            }
+                        }
+
+                        html += `
+                            <label class="${optClass}" id="label-multi-${ex.id}-${optIdx}">
+                                <input type="checkbox" class="option-checkbox" data-ex="${ex.id}" data-idx="${optIdx}" data-text="${escapeHtml(opt.text)}" ${isChecked ? 'checked' : ''} ${ansState ? 'disabled' : ''}>
+                                <span><strong>${optIdx + 1})</strong> ${escapeHtml(opt.text)}</span>
+                            </label>
+                        `;
+                    });
+                    html += `</div>`;
+
+                    if (!ansState) {
+                        html += `
+                            <div style="margin-bottom: 15px;">
+                                <button class="btn-confirm-multi" onclick="submitMultiAnswer(${ex.id})">
+                                    <span>✓ Confirmar Selección Múltiple</span>
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Bloque de Retroalimentación / Traza
+                let feedbackClass = 'feedback-box';
+                let feedbackContent = '';
+
+                if (ansState) {
+                    feedbackClass += ' show ' + (ansState.isCorrect ? 'correct' : 'incorrect');
+                    const icon = ansState.isCorrect ? '✓ ¡Correcto! Excelente análisis de memoria.' : '✗ Respuesta Incorrecta. Revisa el seguimiento de posiciones:';
+                    feedbackContent = `
+                        <div class="feedback-title">${icon}</div>
+                        <div>${ex.explanation}</div>
+                    `;
+                }
+
+                html += `<div class="${feedbackClass}" id="feedback-${ex.id}">${feedbackContent}</div>`;
+
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        // RESPONDER OPCIÓN ÚNICA (MC)
+        window.selectSingleOption = function(exerciseId, optionIndex) {
+            if (userAnswers[exerciseId]) return;
+
+            const ex = exercisesData.find(e => e.id === exerciseId);
+            const chosen = (ex.displayOptions && ex.displayOptions[optionIndex]) 
+                ? ex.displayOptions[optionIndex] 
+                : { text: ex.options[optionIndex], isCorrect: optionIndex === ex.correctAnswer };
+
+            userAnswers[exerciseId] = {
+                isCorrect: chosen.isCorrect,
+                selectedText: chosen.text
+            };
+
+            saveState();
+            renderExercises();
+        };
+
+        // RESPONDER SELECCIÓN MÚLTIPLE (CHECKBOXES)
+        window.submitMultiAnswer = function(exerciseId) {
+            if (userAnswers[exerciseId]) return;
+
+            const checkboxes = document.querySelectorAll(`input.option-checkbox[data-ex="${exerciseId}"]`);
+            const selectedTexts = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedTexts.push(cb.dataset.text);
+                }
+            });
+
+            if (selectedTexts.length === 0) {
+                alert('Por favor selecciona al menos una opción antes de confirmar.');
+                return;
+            }
+
+            const ex = exercisesData.find(e => e.id === exerciseId);
+            const correctTexts = ex.displayOptions.filter(o => o.isCorrect).map(o => o.text);
+            
+            // Comparar si todas las correctas fueron seleccionadas y ninguna incorrecta
+            const isCorrect = (selectedTexts.length === correctTexts.length) &&
+                              selectedTexts.every(t => correctTexts.includes(t));
+
+            userAnswers[exerciseId] = {
+                isCorrect: isCorrect,
+                selectedTexts: selectedTexts
+            };
+
+            saveState();
+            renderExercises();
+        };
+
+        // UTILIDAD ESCAPE HTML
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', () => {
+            initDisplayOptions();
+            loadSavedState();
+            updateHeaderStats();
+            renderExercises();
+
+            // Filtros
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    activeFilter = e.target.dataset.filter;
+                    renderExercises();
+                });
+            });
+
+            // Reiniciar progreso
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if (confirm('¿Estás seguro de reiniciar todos tus ejercicios del Anexo 3?')) {
+                    userAnswers = {};
+                    saveState();
+                    initDisplayOptions();
+                    renderExercises();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
