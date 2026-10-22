@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Práctica 3: DQL — SELECT, WHERE, AND, OR, LIKE, BETWEEN, NOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --bg-grad: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #f0f9ff 100%);
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --surface-code: #f1f5f9;
+            --border: #dbe3ef;
+            --border-strong: #cbd5e1;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #e0e7ff;
+            --accent: #0284c7;
+            --accent-light: #e0f2fe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 8px 24px rgba(79, 70, 229, 0.08);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .top-nav-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(3deg); }
+        }
+
+        .module-tabs {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .module-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.42rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-muted);
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .module-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .module-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+        }
+
+        /* HUD */
+        .hud-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hud-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .level-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .level-pill.current {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: scale(1.06);
+        }
+
+        .level-pill.done {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-chip.timer-chip {
+            background: var(--primary-light);
+            border-color: #c7d2fe;
+            color: var(--primary-dark);
+            min-width: 106px;
+        }
+
+        .stat-chip.timer-chip.warning {
+            background: var(--warning-light);
+            border-color: #fde68a;
+            color: #b45309;
+            animation: pulseUrgent 0.8s infinite alternate;
+        }
+
+        .stat-chip.timer-chip.danger {
+            background: var(--danger-light);
+            border-color: #fecaca;
+            color: #b91c1c;
+            animation: pulseUrgent 0.45s infinite alternate;
+        }
+
+        @keyframes pulseUrgent {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.35s linear, background 0.3s;
+        }
+
+        .workspace {
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.1rem;
+            flex: 1;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.15rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .objective-title {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+
+        .objective-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+
+        .spec-box {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .spec-box-title {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            color: var(--primary-dark);
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+
+        .spec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.1rem 0.42rem;
+            border-radius: 5px;
+        }
+
+        /* Editor SQL */
+        .sql-editor-box {
+            background: var(--surface-code);
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            line-height: 2.15;
+            overflow-x: auto;
+        }
+
+        .sql-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed var(--border-strong);
+            font-family: var(--font-sans);
+            font-size: 0.76rem;
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        .sql-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .sql-indent {
+            padding-left: 1.2rem;
+        }
+
+        .sql-punct {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sql-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 86px;
+            height: 34px;
+            padding: 0 0.65rem;
+            border-radius: 7px;
+            border: 2px dashed #94a3b8;
+            background: #ffffff;
+            color: #64748b;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .sql-slot::before {
+            content: attr(data-slot-index);
+            font-size: 0.66rem;
+            opacity: 0.55;
+            margin-right: 4px;
+        }
+
+        .sql-slot.active-target {
+            border-style: solid;
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .sql-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: #0369a1;
+        }
+
+        .sql-slot.slot-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-slot.slot-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #991b1b !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        .sql-input {
+            height: 34px;
+            padding: 0 0.55rem;
+            border-radius: 7px;
+            border: 2px solid #94a3b8;
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .sql-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+        }
+
+        .sql-input.input-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-input.input-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        @keyframes shakeElem {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .keyword-bank-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .keyword-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .kw-chip {
+            padding: 0.42rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+            transition: all 0.16s ease;
+            user-select: none;
+        }
+
+        .kw-chip:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .kw-chip.used {
+            opacity: 0.35;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1.15rem;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: #fff;
+            display: none;
+        }
+
+        .btn-next.visible {
+            display: inline-flex;
+        }
+
+        .feedback-banner {
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback-banner.show {
+            display: block;
+            animation: resultPopup 0.3s ease;
+        }
+
+        .feedback-banner.ok {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback-banner.err {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        /* VISOR DQL: TABLA ORIGEN + RESULTADO POPUP */
+        .visor-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 430px;
+        }
+
+        .visor-stage {
+            flex: 1;
+            background:
+                radial-gradient(#cbd5e1 1px, transparent 1px) 0 0 / 18px 18px,
+                #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-x: auto;
+        }
+
+        .visor-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: var(--text-muted);
+        }
+
+        .visor-status-pill.executed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .table-box {
+            background: #ffffff;
+            border: 2px solid var(--border-strong);
+            border-radius: 11px;
+            overflow: hidden;
+        }
+
+        .table-box.result-box {
+            border-color: var(--success);
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.14);
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .table-banner {
+            background: #334155;
+            color: #fff;
+            padding: 0.5rem 0.85rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .table-banner.result-banner {
+            background: linear-gradient(135deg, var(--success), #0284c7);
+        }
+
+        table.dql-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+        }
+
+        table.dql-grid th {
+            background: #f1f5f9;
+            color: var(--text);
+            text-align: left;
+            padding: 0.5rem 0.65rem;
+            border-bottom: 2px solid var(--border);
+            transition: all 0.25s;
+        }
+
+        table.dql-grid td {
+            padding: 0.48rem 0.65rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.25s;
+        }
+
+        th.col-selected {
+            background: var(--primary-light) !important;
+            color: var(--primary-dark) !important;
+            border-bottom-color: var(--primary) !important;
+        }
+
+        tr.row-matched {
+            background: #ecfdf5 !important;
+        }
+
+        tr.row-matched td {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        tr.row-dimmed {
+            opacity: 0.42;
+        }
+
+        tr.result-row-pop {
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes resultPopup {
+            0% {
+                opacity: 0;
+                transform: scale(0.86) translateY(14px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.02) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .top-nav-inner {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1.12fr 0.88fr;
+                align-items: start;
+                padding: 1.5rem;
+            }
+            .visor-card {
+                position: sticky;
+                top: 84px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-wrapper">
+        <nav class="top-nav">
+            <div class="top-nav-inner">
+                <div class="brand-row">
+                    <a href="1-DDL-Tablas-y-Campos.html" class="brand">
+                        <span class="brand-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                            </svg>
+                        </span>
+                        <span>SQL Práctica · Base de Datos II</span>
+                    </a>
+                </div>
+                <div class="module-tabs">
+                    <a href="1-DDL-Tablas-y-Campos.html" class="module-tab">1. DDL · Tablas y Campos</a>
+                    <a href="2-DML-Manipulacion-Datos.html" class="module-tab">2. DML · Registros (INSERT/UPDATE/DELETE)</a>
+                    <a href="3-DQL-Consultas-y-Filtros.html" class="module-tab active">3. DQL · SELECT y Filtros</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hud-bar">
+            <div class="hud-inner">
+                <div class="level-pills" id="levelPills"></div>
+                <div class="stats-group">
+                    <div class="stat-chip timer-chip" id="timerChip">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <circle cx="12" cy="13" r="8"></circle>
+                            <path d="M12 9v4l2.5 2.5"></path>
+                            <path d="M9 2h6"></path>
+                        </svg>
+                        <span id="timerDisplay">01:10</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>⚡ Racha:</span>
+                        <span id="streakDisplay">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>🏆 Puntos:</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+
+        <main class="workspace">
+            <!-- COLUMNA IZQUIERDA -->
+            <section class="card">
+                <div class="card-header">
+                    <span class="badge-tag" id="levelBadge">Nivel 1 de 10 · DQL</span>
+                    <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.32rem 0.65rem;font-size:0.76rem;">
+                        ↺ Reiniciar Nivel
+                    </button>
+                </div>
+
+                <h1 class="objective-title" id="objTitle"></h1>
+                <p class="objective-desc" id="objDesc"></p>
+
+                <div class="spec-box">
+                    <div class="spec-box-title">📋 Especificación Estricta de Consulta</div>
+                    <ul class="spec-list" id="specList"></ul>
+                </div>
+
+                <div class="sql-editor-box">
+                    <div class="sql-editor-header">
+                        <span>CONSTRUCTOR SQL (MySQL) — Sin ayudas de autocompletado</span>
+                        <span id="slotIndicator">Slot activo: #1</span>
+                    </div>
+                    <div id="sqlBuilderContainer"></div>
+                </div>
+
+                <div class="keyword-bank-title">
+                    <span>🧩 Banco de Palabras Clave SQL</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para cambiar su palabra</span>
+                </div>
+                <div class="keyword-bank" id="keywordBank"></div>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-primary" id="runQueryBtn">
+                        ▶ Ejecutar Consulta SELECT
+                    </button>
+                    <button type="button" class="btn btn-next" id="nextLevelBtn">
+                        Siguiente Ejercicio ➔
+                    </button>
+                </div>
+
+                <div class="feedback-banner" id="feedbackBanner"></div>
+            </section>
+
+            <!-- COLUMNA DERECHA: VISOR ANIMADO DQL -->
+            <section class="card visor-card">
+                <div class="card-header">
+                    <span class="badge-tag" style="background:#e0f2fe;color:#0369a1;">🔎 Visor de Proyección y Filtrado</span>
+                    <span class="visor-status-pill" id="visorStatus">Esperando consulta...</span>
+                </div>
+                <div class="visor-stage" id="visorStage"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           DATOS DE LA TABLA EMPLEADOS Y 10 NIVELES DQL
+           (SELECT, FROM, WHERE, AND, OR, LIKE, BETWEEN, NOT)
+           ========================================================= */
+        const EMPLEADOS_DATA = [
+            { id_empleado: 1, nombre: "Sofia", apellido: "Martinez", sector: "Sistemas", salario: 950000, email: "sofia@empresa.com" },
+            { id_empleado: 2, nombre: "Mateo", apellido: "Gomez", sector: "Ventas", salario: 620000, email: "mateo@gmail.com" },
+            { id_empleado: 3, nombre: "Valentina", apellido: "Lopez", sector: "Sistemas", salario: 1100000, email: "valen@empresa.com" },
+            { id_empleado: 4, nombre: "Martin", apellido: "Diaz", sector: "Contable", salario: 780000, email: "martin@empresa.com" },
+            { id_empleado: 5, nombre: "Camila", apellido: "Perez", sector: "Soporte", salario: 580000, email: "camila@gmail.com" }
+        ];
+
+        const COLS_EMPLEADOS = ["id_empleado", "nombre", "apellido", "sector", "salario", "email"];
+
+        const LEVELS = [
+            {
+                id: 1,
+                title: "Selección de campos específicos (SELECT + FROM)",
+                timeLimit: 60,
+                desc: "Extrae únicamente el nombre, apellido y sector de todos los registros de la tabla empleados.",
+                specs: [
+                    "Tabla a consultar: <span class='code-pill'>empleados</span>",
+                    "Campos a proyectar en orden: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>sector</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "100px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "sector", width: "90px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "120px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "apellido", "sector"],
+                matchedIds: [1, 2, 3, 4, 5]
+            },
+            {
+                id: 2,
+                title: "Filtro simple con WHERE",
+                timeLimit: 60,
+                desc: "Obtén el nombre y salario de los empleados que trabajan en el sector 'Sistemas'.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos a seleccionar: <span class='code-pill'>nombre</span>, <span class='code-pill'>salario</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>sector</span> = <span class='code-pill'>'Sistemas'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "salario", width: "95px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "120px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Sistemas", width: "105px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "SET"],
+                selectedCols: ["nombre", "salario"],
+                matchedIds: [1, 3]
+            },
+            {
+                id: 3,
+                title: "Condición doble obligatoria con AND",
+                timeLimit: 70,
+                desc: "Selecciona el nombre, apellido y salario de los empleados del sector 'Sistemas' cuyo salario supere 1000000.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>salario</span>",
+                    "Filtro: <span class='code-pill'>sector</span> = <span class='code-pill'>'Sistemas'</span> <span class='code-pill'>AND</span> <span class='code-pill'>salario</span> &gt; <span class='code-pill'>1000000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "salario", width: "95px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "punct", text: "= 'Sistemas'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "salario", width: "90px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "1000000", width: "100px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "NOT", "BETWEEN"],
+                selectedCols: ["nombre", "apellido", "salario"],
+                matchedIds: [3]
+            },
+            {
+                id: 4,
+                title: "Alternativa lógica con operador OR",
+                timeLimit: 70,
+                desc: "Lista el nombre y sector de los empleados que pertenezcan a 'Ventas' o a 'Soporte'.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>sector</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>sector</span> = <span class='code-pill'>'Ventas'</span> <span class='code-pill'>OR</span> <span class='code-pill'>sector</span> = <span class='code-pill'>'Soporte'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "punct", text: "= 'Ventas'" },
+                            { type: "slot", answer: "OR" },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Soporte", width: "95px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "OR", "AND", "NOT", "LIKE"],
+                selectedCols: ["nombre", "sector"],
+                matchedIds: [2, 5]
+            },
+            {
+                id: 5,
+                title: "Filtro por rango usando BETWEEN y AND",
+                timeLimit: 70,
+                desc: "Obtén el nombre, sector y salario de los empleados cuyo salario esté entre 600000 y 950000 inclusive.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>sector</span>, <span class='code-pill'>salario</span>",
+                    "Condición: <span class='code-pill'>salario</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>600000</span> <span class='code-pill'>AND</span> <span class='code-pill'>950000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "sector", width: "85px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "salario", width: "90px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "salario", width: "90px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "600000", width: "90px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "950000", width: "90px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "sector", "salario"],
+                matchedIds: [1, 2, 4]
+            },
+            {
+                id: 6,
+                title: "Búsqueda por patrón de texto con LIKE (prefijo)",
+                timeLimit: 65,
+                desc: "Busca el id_empleado, nombre y apellido de todos los empleados cuyo nombre empiece con 'Ma'.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>id_empleado</span>, <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>",
+                    "Condición: <span class='code-pill'>nombre</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'Ma%'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "id_empleado", width: "120px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "nombre", width: "90px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "Ma%", width: "75px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "LIKE", "BETWEEN", "AND", "NOT"],
+                selectedCols: ["id_empleado", "nombre", "apellido"],
+                matchedIds: [2, 4]
+            },
+            {
+                id: 7,
+                title: "Negación de condición con NOT",
+                timeLimit: 65,
+                desc: "Obtén el nombre y sector de todos los empleados que NO pertenezcan al sector 'Sistemas'.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>sector</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>NOT</span> <span class='code-pill'>sector</span> = <span class='code-pill'>'Sistemas'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Sistemas", width: "100px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "NOT", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "sector"],
+                matchedIds: [2, 4, 5]
+            },
+            {
+                id: 8,
+                title: "Excluir correos con NOT y LIKE",
+                timeLimit: 70,
+                desc: "Selecciona el nombre y email de los empleados que no utilicen correo terminado en '@gmail.com'.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>email</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>email</span> <span class='code-pill'>NOT</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'%@gmail.com'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "email", width: "85px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "email", width: "85px" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "%@gmail.com", width: "130px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "NOT", "LIKE", "BETWEEN", "OR"],
+                selectedCols: ["nombre", "email"],
+                matchedIds: [1, 3, 4]
+            },
+            {
+                id: 9,
+                title: "Exclusión de rango con NOT BETWEEN",
+                timeLimit: 75,
+                desc: "Extrae nombre y salario de los empleados cuyo salario NO se encuentre entre 600000 y 1000000.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>salario</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>salario</span> <span class='code-pill'>NOT</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>600000</span> <span class='code-pill'>AND</span> <span class='code-pill'>1000000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "salario", width: "95px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "salario", width: "90px" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "600000", width: "88px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "1000000", width: "95px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "NOT", "BETWEEN", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "salario"],
+                matchedIds: [3, 5]
+            },
+            {
+                id: 10,
+                title: "Desafío Final: Combinación de LIKE, AND y BETWEEN",
+                timeLimit: 85,
+                desc: "Selecciona nombre, apellido, sector y salario de los empleados con email corporativo ('%@empresa.com') y salario entre 700000 y 1000000.",
+                specs: [
+                    "Tabla: <span class='code-pill'>empleados</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>sector</span>, <span class='code-pill'>salario</span>",
+                    "Filtro 1: <span class='code-pill'>email</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'%@empresa.com'</span>",
+                    "Conector: <span class='code-pill'>AND</span>",
+                    "Filtro 2: <span class='code-pill'>salario</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>700000</span> <span class='code-pill'>AND</span> <span class='code-pill'>1000000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "88px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "90px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "sector", width: "82px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "salario", width: "88px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "email", width: "80px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "%@empresa.com", width: "135px" },
+                            { type: "punct", text: "'" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "salario", width: "88px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "700000", width: "88px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "1000000", width: "95px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "LIKE", "AND", "BETWEEN", "AND", "OR", "NOT"],
+                selectedCols: ["nombre", "apellido", "sector", "salario"],
+                matchedIds: [1, 4]
+            }
+        ];
+
+        /* =========================================================
+           LÓGICA DE JUEGO Y VISOR DQL
+           ========================================================= */
+        let currentLevelIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let completedLevels = new Set();
+        let activeSlotIndex = 0;
+        let slotAssignments = [];
+        let timerSeconds = 0;
+        let timerMax = 70;
+        let timerInterval = null;
+        let levelSolved = false;
+
+        const levelPillsEl = document.getElementById("levelPills");
+        const timerDisplayEl = document.getElementById("timerDisplay");
+        const timerChipEl = document.getElementById("timerChip");
+        const timerBarFillEl = document.getElementById("timerBarFill");
+        const streakDisplayEl = document.getElementById("streakDisplay");
+        const scoreDisplayEl = document.getElementById("scoreDisplay");
+        const levelBadgeEl = document.getElementById("levelBadge");
+        const objTitleEl = document.getElementById("objTitle");
+        const objDescEl = document.getElementById("objDesc");
+        const specListEl = document.getElementById("specList");
+        const sqlBuilderContainerEl = document.getElementById("sqlBuilderContainer");
+        const keywordBankEl = document.getElementById("keywordBank");
+        const slotIndicatorEl = document.getElementById("slotIndicator");
+        const feedbackBannerEl = document.getElementById("feedbackBanner");
+        const visorStageEl = document.getElementById("visorStage");
+        const visorStatusEl = document.getElementById("visorStatus");
+        const nextLevelBtn = document.getElementById("nextLevelBtn");
+        const runQueryBtn = document.getElementById("runQueryBtn");
+        const resetLevelBtn = document.getElementById("resetLevelBtn");
+
+        function renderLevelPills() {
+            levelPillsEl.innerHTML = "";
+            LEVELS.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "level-pill" +
+                    (idx === currentLevelIdx ? " current" : "") +
+                    (completedLevels.has(lvl.id) ? " done" : "");
+                btn.textContent = lvl.id;
+                btn.addEventListener("click", () => loadLevel(idx));
+                levelPillsEl.appendChild(btn);
+            });
+        }
+
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, "0");
+            const s = String(sec % 60).padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timerMax = seconds;
+            timerSeconds = seconds;
+            updateTimerUI();
+
+            timerInterval = setInterval(() => {
+                if (levelSolved) return;
+                timerSeconds--;
+                updateTimerUI();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    streak = 0;
+                    streakDisplayEl.textContent = streak;
+                    showFeedback(false, "⏰ ¡Se acabó el tiempo! Reinicia el nivel o completa la consulta para continuar.");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            timerDisplayEl.textContent = formatTime(Math.max(0, timerSeconds));
+            const pct = Math.max(0, (timerSeconds / timerMax) * 100);
+            timerBarFillEl.style.width = pct + "%";
+
+            timerChipEl.classList.remove("warning", "danger");
+            if (timerSeconds <= 15) {
+                timerChipEl.classList.add("danger");
+                timerBarFillEl.style.background = "var(--danger)";
+            } else if (timerSeconds <= 28) {
+                timerChipEl.classList.add("warning");
+                timerBarFillEl.style.background = "var(--warning)";
+            } else {
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--primary), var(--accent))";
+            }
+        }
+
+        function loadLevel(idx) {
+            currentLevelIdx = idx;
+            levelSolved = false;
+            const lvl = LEVELS[idx];
+
+            renderLevelPills();
+            levelBadgeEl.textContent = `Nivel ${lvl.id} de ${LEVELS.length} · DQL`;
+            objTitleEl.textContent = lvl.title;
+            objDescEl.textContent = lvl.desc;
+            specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
+
+            feedbackBannerEl.className = "feedback-banner";
+            nextLevelBtn.classList.remove("visible");
+            visorStatusEl.textContent = "Tabla origen: empleados (5 filas)";
+            visorStatusEl.className = "visor-status-pill";
+
+            sqlBuilderContainerEl.innerHTML = "";
+            slotAssignments = [];
+            let slotCount = 0;
+
+            lvl.lines.forEach(line => {
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "sql-line" + (line.indent ? " sql-indent" : "");
+
+                line.tokens.forEach(tok => {
+                    if (tok.type === "punct") {
+                        const span = document.createElement("span");
+                        span.className = "sql-punct";
+                        span.textContent = tok.text;
+                        lineDiv.appendChild(span);
+                    } else if (tok.type === "slot") {
+                        const sIdx = slotCount++;
+                        slotAssignments.push(null);
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sql-slot";
+                        btn.dataset.slotIndex = `#${sIdx + 1}`;
+                        btn.dataset.idx = sIdx;
+                        btn.dataset.answer = tok.answer;
+                        btn.textContent = "___";
+                        btn.addEventListener("click", () => onSlotClicked(sIdx));
+                        lineDiv.appendChild(btn);
+                    } else if (tok.type === "input") {
+                        const inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.className = "sql-input";
+                        inp.autocomplete = "off";
+                        inp.spellcheck = false;
+                        inp.style.width = tok.width || "105px";
+                        inp.dataset.answer = tok.answer;
+                        inp.addEventListener("input", () => {
+                            inp.classList.remove("input-error", "input-correct");
+                        });
+                        lineDiv.appendChild(inp);
+                    }
+                });
+
+                sqlBuilderContainerEl.appendChild(lineDiv);
+            });
+
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+
+            keywordBankEl.innerHTML = "";
+            lvl.bank.forEach((word, bIdx) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "kw-chip";
+                chip.dataset.bankIdx = bIdx;
+                chip.textContent = word;
+                chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
+                keywordBankEl.appendChild(chip);
+            });
+
+            renderSourceTableVisor();
+            startTimer(lvl.timeLimit);
+        }
+
+        function onSlotClicked(sIdx) {
+            if (levelSolved) return;
+            const current = slotAssignments[sIdx];
+            if (current) {
+                const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
+                if (chip) chip.classList.remove("used");
+                slotAssignments[sIdx] = null;
+            }
+            activeSlotIndex = sIdx;
+            updateSlotHighlights();
+        }
+
+        function onBankChipClicked(bankIdx, word, evt) {
+            if (levelSolved) return;
+            if (activeSlotIndex === null || activeSlotIndex >= slotAssignments.length) {
+                const firstEmpty = slotAssignments.findIndex(x => x === null);
+                if (firstEmpty === -1) return;
+                activeSlotIndex = firstEmpty;
+            }
+
+            const existing = slotAssignments[activeSlotIndex];
+            if (existing) {
+                const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
+                if (oldChip) oldChip.classList.remove("used");
+            }
+
+            slotAssignments[activeSlotIndex] = { bankIdx, value: word };
+            const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
+            if (chip) chip.classList.add("used");
+
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#4f46e5", 10);
+
+            const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
+            if (nextEmpty !== -1) {
+                activeSlotIndex = nextEmpty;
+            } else {
+                const anyEmpty = slotAssignments.findIndex(x => x === null);
+                activeSlotIndex = anyEmpty !== -1 ? anyEmpty : activeSlotIndex;
+            }
+
+            updateSlotHighlights();
+        }
+
+        function updateSlotHighlights() {
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            slots.forEach((el, idx) => {
+                el.classList.remove("active-target", "filled", "slot-error", "slot-correct");
+                const assigned = slotAssignments[idx];
+                if (assigned) {
+                    el.textContent = assigned.value;
+                    el.classList.add("filled");
+                } else {
+                    el.textContent = "___";
+                }
+                if (idx === activeSlotIndex && !levelSolved) {
+                    el.classList.add("active-target");
+                }
+            });
+            slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
+        }
+
+        function renderSourceTableVisor() {
+            const headers = COLS_EMPLEADOS.map(c => `<th data-col="${c}">${c}</th>`).join("");
+            const rows = EMPLEADOS_DATA.map(r => {
+                const cells = COLS_EMPLEADOS.map(c => `<td data-col="${c}">${r[c]}</td>`).join("");
+                return `<tr data-rowid="${r.id_empleado}">${cells}</tr>`;
+            }).join("");
+
+            visorStageEl.innerHTML = `
+                <div class="table-box">
+                    <div class="table-banner">
+                        <span>🗄️ TABLA ORIGEN: empleados</span>
+                        <span>5 registros totales</span>
+                    </div>
+                    <table class="dql-grid" id="sourceGrid">
+                        <thead><tr>${headers}</tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                <div id="resultContainer"></div>
+            `;
+        }
+
+        function validateAndRun() {
+            if (levelSolved) return;
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+
+            let allSlotsOk = true;
+            let allInputsOk = true;
+
+            slots.forEach((slotEl, idx) => {
+                const expected = slotEl.dataset.answer.trim().toUpperCase();
+                const current = slotAssignments[idx] ? slotAssignments[idx].value.trim().toUpperCase() : "";
+                slotEl.classList.remove("slot-error", "slot-correct");
+                if (current === expected) {
+                    slotEl.classList.add("slot-correct");
+                } else {
+                    slotEl.classList.add("slot-error");
+                    allSlotsOk = false;
+                }
+            });
+
+            inputs.forEach(inpEl => {
+                const expected = inpEl.dataset.answer.trim();
+                const current = inpEl.value.trim();
+                inpEl.classList.remove("input-error", "input-correct");
+                if (current === expected) {
+                    inpEl.classList.add("input-correct");
+                } else {
+                    inpEl.classList.add("input-error");
+                    allInputsOk = false;
+                }
+            });
+
+            if (!allSlotsOk || !allInputsOk) {
+                streak = 0;
+                streakDisplayEl.textContent = streak;
+                showFeedback(false, "❌ Revisa los campos marcados en rojo: verifica tanto las palabras clave SQL como los nombres escritos manualmente.");
+                return;
+            }
+
+            levelSolved = true;
+            clearInterval(timerInterval);
+
+            const lvl = LEVELS[currentLevelIdx];
+            const timeBonus = Math.max(10, timerSeconds * 3);
+            streak++;
+            const gained = 100 + timeBonus + (streak * 15);
+            score += gained;
+            completedLevels.add(lvl.id);
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+
+            showFeedback(true, `✅ ¡Consulta ejecutada! Se extrajeron ${lvl.matchedIds.length} registros. +${gained} pts`);
+            visorStatusEl.textContent = `${lvl.matchedIds.length} fila(s) devuelta(s)`;
+            visorStatusEl.className = "visor-status-pill executed";
+
+            const rect = visorStageEl.getBoundingClientRect();
+            spawnBurst(rect.left + rect.width / 2, rect.top + 140, "#10b981", 28);
+
+            animateDqlResult(lvl);
+
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextLevelBtn.classList.add("visible");
+            }
+        }
+
+        function animateDqlResult(lvl) {
+            const sourceGrid = document.getElementById("sourceGrid");
+            // 1. Iluminar columnas seleccionadas en la tabla origen
+            lvl.selectedCols.forEach(col => {
+                const th = sourceGrid.querySelector(`th[data-col="${col}"]`);
+                if (th) th.classList.add("col-selected");
+            });
+
+            // 2. Resaltar filas que cumplen el WHERE y atenuar el resto
+            const trs = sourceGrid.querySelectorAll("tbody tr");
+            trs.forEach(tr => {
+                const id = Number(tr.dataset.rowid);
+                if (lvl.matchedIds.includes(id)) {
+                    tr.classList.add("row-matched");
+                } else {
+                    tr.classList.add("row-dimmed");
+                }
+            });
+
+            // 3. Crear tabla de resultado con efecto popup por cada registro
+            const resultContainer = document.getElementById("resultContainer");
+            const resHeaders = lvl.selectedCols.map(c => `<th>${c}</th>`).join("");
+            resultContainer.innerHTML = `
+                <div class="table-box result-box">
+                    <div class="table-banner result-banner">
+                        <span>✨ RESULTADO DEL SELECT (Proyección + Filtro)</span>
+                        <span>${lvl.matchedIds.length} coincidencia(s)</span>
+                    </div>
+                    <table class="dql-grid">
+                        <thead><tr>${resHeaders}</tr></thead>
+                        <tbody id="resultBody"></tbody>
+                    </table>
+                </div>
+            `;
+
+            const resultBody = document.getElementById("resultBody");
+            const matchedRows = EMPLEADOS_DATA.filter(r => lvl.matchedIds.includes(r.id_empleado));
+            matchedRows.forEach((row, idx) => {
+                setTimeout(() => {
+                    const tr = document.createElement("tr");
+                    tr.className = "result-row-pop";
+                    tr.innerHTML = lvl.selectedCols.map(c => `<td><strong>${row[c]}</strong></td>`).join("");
+                    resultBody.appendChild(tr);
+                }, idx * 140);
+            });
+        }
+
+        function showFeedback(isOk, msg) {
+            feedbackBannerEl.className = "feedback-banner show " + (isOk ? "ok" : "err");
+            feedbackBannerEl.textContent = msg;
+        }
+
+        /* Partículas */
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let ambientParticles = [];
+        let burstParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 24; i++) {
+            ambientParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: 1.5 + Math.random() * 2.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                color: i % 2 === 0 ? "rgba(79, 70, 229, 0.15)" : "rgba(2, 132, 199, 0.14)"
+            });
+        }
+
+        function spawnBurst(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4.2;
+                burstParticles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,
+                    r: 2.5 + Math.random() * 3,
+                    alpha: 1,
+                    color
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ambientParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const b = burstParticles[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.08;
+                b.alpha -= 0.024;
+                if (b.alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        runQueryBtn.addEventListener("click", validateAndRun);
+        resetLevelBtn.addEventListener("click", () => loadLevel(currentLevelIdx));
+        nextLevelBtn.addEventListener("click", () => {
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+            }
+        });
+
+        loadLevel(0);
+    </script>
+</body>
+</html>
