@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ejercicio 1-1: DDL — Creación y Estructura de Tablas (Terna 1)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --bg-grad: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 50%, #eefdf6 100%);
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --surface-code: #f1f5f9;
+            --border: #dbe3ef;
+            --border-strong: #cbd5e1;
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-light: #e0f2fe;
+            --accent: #6366f1;
+            --accent-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 8px 24px rgba(2, 132, 199, 0.08);
+            --shadow-lg: 0 14px 34px rgba(15, 23, 42, 0.1);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Canvas de partículas */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navegación superior */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .top-nav-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(3deg); }
+        }
+
+        .module-tabs {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .module-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.42rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-muted);
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .module-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .module-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.25);
+        }
+
+        /* HUD de Juego (Tiempo, Puntos, Racha) */
+        .hud-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hud-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .level-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .level-pill.current {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: scale(1.06);
+        }
+
+        .level-pill.done {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-chip.timer-chip {
+            background: var(--primary-light);
+            border-color: #bae6fd;
+            color: var(--primary-dark);
+            min-width: 106px;
+        }
+
+        .stat-chip.timer-chip.warning {
+            background: var(--warning-light);
+            border-color: #fde68a;
+            color: #b45309;
+            animation: pulseUrgent 0.8s infinite alternate;
+        }
+
+        .stat-chip.timer-chip.danger {
+            background: var(--danger-light);
+            border-color: #fecaca;
+            color: #b91c1c;
+            animation: pulseUrgent 0.45s infinite alternate;
+        }
+
+        @keyframes pulseUrgent {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            transition: width 0.35s linear, background 0.3s;
+        }
+
+        /* Layout Mobile-First */
+        .workspace {
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.1rem;
+            flex: 1;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.15rem;
+            position: relative;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .objective-title {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+
+        .objective-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+
+        .spec-box {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .spec-box-title {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            color: var(--primary-dark);
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+
+        .spec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .spec-list li {
+            display: flex;
+            align-items: baseline;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.1rem 0.42rem;
+            border-radius: 5px;
+        }
+
+        /* Editor de Sentencia SQL */
+        .sql-editor-box {
+            background: var(--surface-code);
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            line-height: 2.15;
+            overflow-x: auto;
+        }
+
+        .sql-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed var(--border-strong);
+            font-family: var(--font-sans);
+            font-size: 0.76rem;
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        .sql-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .sql-indent {
+            padding-left: 1.25rem;
+        }
+
+        .sql-punct {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* Slot para Palabra Clave */
+        .sql-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            height: 34px;
+            padding: 0 0.65rem;
+            border-radius: 7px;
+            border: 2px dashed #94a3b8;
+            background: #ffffff;
+            color: #64748b;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .sql-slot::before {
+            content: attr(data-slot-index);
+            font-size: 0.66rem;
+            opacity: 0.55;
+            margin-right: 4px;
+        }
+
+        .sql-slot.active-target {
+            border-style: solid;
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .sql-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: #3730a3;
+        }
+
+        .sql-slot.slot-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-slot.slot-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #991b1b !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        /* Input manual estricto (SIN PLACEHOLDER) */
+        .sql-input {
+            height: 34px;
+            padding: 0 0.55rem;
+            border-radius: 7px;
+            border: 2px solid #94a3b8;
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .sql-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+            background: #fff;
+        }
+
+        .sql-input.input-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-input.input-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        @keyframes shakeElem {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Banco de Palabras Clave */
+        .keyword-bank-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .keyword-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .kw-chip {
+            padding: 0.42rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+            transition: all 0.16s ease;
+            user-select: none;
+        }
+
+        .kw-chip:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .kw-chip:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .kw-chip.used {
+            opacity: 0.35;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        /* Botones de Acción */
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1.15rem;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text);
+            border-color: var(--text-muted);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+            display: none;
+        }
+
+        .btn-next.visible {
+            display: inline-flex;
+        }
+
+        .feedback-banner {
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feedback-banner.show {
+            display: flex;
+            animation: popIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .feedback-banner.ok {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback-banner.err {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        /* VISOR ANIMADO DE BASE DE DATOS */
+        .visor-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 380px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .visor-stage {
+            flex: 1;
+            background:
+                radial-gradient(#cbd5e1 1px, transparent 1px) 0 0 / 18px 18px,
+                #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visor-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: var(--text-muted);
+        }
+
+        .visor-status-pill.executed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        /* Tarjeta visual de Tabla en el Visor */
+        .db-table-visual {
+            background: #ffffff;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12);
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .db-table-visual.pop-create {
+            animation: tableCreatePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .db-table-visual.drop-explode {
+            animation: tableDropAnim 0.65s ease forwards;
+        }
+
+        @keyframes tableCreatePop {
+            0% { opacity: 0; transform: scale(0.75) translateY(24px); }
+            65% { opacity: 1; transform: scale(1.03) translateY(-4px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes tableDropAnim {
+            0% { transform: scale(1); opacity: 1; border-color: var(--danger); }
+            25% { transform: translateX(-8px) rotate(-1.5deg); background: var(--danger-light); }
+            50% { transform: translateX(8px) rotate(1.5deg); }
+            100% { transform: scale(0.55) translateY(30px); opacity: 0; }
+        }
+
+        .db-table-head {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            padding: 0.65rem 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .db-cols-list {
+            padding: 0.65rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .db-col-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            transition: all 0.3s ease;
+        }
+
+        .db-col-row.col-popup {
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .db-col-row.col-modified {
+            animation: modifyGlow 0.85s ease;
+            border-color: var(--warning);
+            background: var(--warning-light);
+        }
+
+        .db-col-row.col-dropped {
+            animation: dropRowOut 0.55s ease forwards;
+            border-color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.84) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes modifyGlow {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.04); box-shadow: 0 0 18px rgba(245, 158, 11, 0.45); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes dropRowOut {
+            0% { opacity: 1; transform: translateX(0); }
+            30% { transform: translateX(-8px); }
+            100% { opacity: 0; transform: translateX(45px) scale(0.85); }
+        }
+
+        .col-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            align-items: center;
+        }
+
+        .c-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.12rem 0.45rem;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+
+        .c-badge.type { background: #e0f2fe; color: #0369a1; }
+        .c-badge.pk { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .c-badge.nn { background: #ede9fe; color: #5b21b6; }
+        .c-badge.uq { background: #dcfce7; color: #166534; }
+        .c-badge.new { background: var(--success); color: #fff; }
+
+        .empty-visor-msg {
+            margin: auto;
+            text-align: center;
+            color: var(--text-soft);
+            padding: 2rem 1rem;
+            font-size: 0.88rem;
+        }
+
+        /* Responsive Desktop */
+        @media (min-width: 768px) {
+            .top-nav-inner {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1.15fr 0.85fr;
+                align-items: start;
+                padding: 1.5rem;
+            }
+            .visor-card {
+                position: sticky;
+                top: 84px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-wrapper">
+        <!-- BARRA SUPERIOR DE NAVEGACIÓN -->
+        <nav class="top-nav">
+            <div class="top-nav-inner">
+                <div class="brand-row">
+                    <a href="Ejercicio 1-1.html" class="brand">
+                        <span class="brand-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                            </svg>
+                        </span>
+                        <span>SQL Práctica · Base de Datos I</span>
+                    </a>
+                </div>
+                <div class="module-tabs">
+                    <a href="Ejercicio 1-1.html" class="module-tab active">1-1 · DDL Tablas</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML Registros</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL Consultas</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL (Terna 2)</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML (Terna 2)</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL (Terna 2)</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- BARRA HUD: NIVELES, RELOJ Y PUNTAJE -->
+        <section class="hud-bar">
+            <div class="hud-inner">
+                <div class="level-pills" id="levelPills"></div>
+                <div class="stats-group">
+                    <div class="stat-chip timer-chip" id="timerChip">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <circle cx="12" cy="13" r="8"></circle>
+                            <path d="M12 9v4l2.5 2.5"></path>
+                            <path d="M9 2h6"></path>
+                        </svg>
+                        <span id="timerDisplay">05:00</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>⚡ Racha:</span>
+                        <span id="streakDisplay">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>🏆 Puntos:</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+
+        <!-- ÁREA PRINCIPAL -->
+        <main class="workspace">
+            <!-- COLUMNA IZQUIERDA: OBJETIVO + CONSTRUCTOR SQL -->
+            <section class="card">
+                <div class="card-header">
+                    <span class="badge-tag" id="levelBadge">Ejercicio 1 · Nivel 1 de 8</span>
+                    <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.32rem 0.65rem;font-size:0.76rem;">
+                        🧹 Limpiar Respuesta
+                    </button>
+                </div>
+
+                <h1 class="objective-title" id="objTitle"></h1>
+                <p class="objective-desc" id="objDesc"></p>
+
+                <div class="spec-box">
+                    <div class="spec-box-title">📋 Especificación Estricta de Nombres</div>
+                    <ul class="spec-list" id="specList"></ul>
+                </div>
+
+                <!-- CONSTRUCTOR DE SENTENCIA SQL -->
+                <div class="sql-editor-box">
+                    <div class="sql-editor-header">
+                        <span>CONSTRUCTOR SQL (MySQL) — Escribe manualmente tablas/campos y selecciona palabras clave</span>
+                        <span id="slotIndicator">Slot activo: #1</span>
+                    </div>
+                    <div id="sqlBuilderContainer"></div>
+                </div>
+
+                <!-- BANCO DE PALABRAS CLAVE -->
+                <div class="keyword-bank-title">
+                    <span>🧩 Banco de Palabras Clave SQL (Haz clic para colocar en el slot activo)</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Clic en un slot lleno para quitar</span>
+                </div>
+                <div class="keyword-bank" id="keywordBank"></div>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-primary" id="runQueryBtn">
+                        ▶ Ejecutar Sentencia SQL
+                    </button>
+                    <button type="button" class="btn btn-next" id="nextLevelBtn">
+                        Siguiente Ejercicio ➔
+                    </button>
+                </div>
+
+                <div class="feedback-banner" id="feedbackBanner"></div>
+            </section>
+
+            <!-- COLUMNA DERECHA: VISOR ANIMADO DE ESQUEMA -->
+            <section class="card visor-card">
+                <div class="card-header">
+                    <span class="badge-tag" style="background:#ede9fe;color:#5b21b6;">✨ Visor Gráfico de Esquema MySQL</span>
+                    <span class="visor-status-pill" id="visorStatus">Esperando sentencia...</span>
+                </div>
+                <div class="visor-stage" id="visorStage"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           DEFINICIÓN DE LOS 8 EJERCICIOS DDL (SIN PLACEHOLDERS)
+           ========================================================= */
+        const LEVELS = [
+            {
+                id: 1,
+                title: "Crear tabla de Categorías",
+                timeLimit: 300,
+                desc: "Construye la sentencia para crear una nueva tabla que almacenará las categorías del catálogo.",
+                specs: [
+                    "Nombre exacto de la tabla: <span class='code-pill'>categorias</span>",
+                    "Campo 1: <span class='code-pill'>id_categoria</span> — Entero (<span class='code-pill'>INT</span>), clave primaria (<span class='code-pill'>PRIMARY KEY</span>) y autoincremental (<span class='code-pill'>AUTO_INCREMENT</span>).",
+                    "Campo 2: <span class='code-pill'>nombre</span> — Cadena variable (<span class='code-pill'>VARCHAR</span>) de longitud <span class='code-pill'>50</span>, obligatorio (<span class='code-pill'>NOT NULL</span>)."
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "CREATE TABLE" },
+                            { type: "input", answer: "categorias", width: "135px" },
+                            { type: "punct", text: "(" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "id_categoria", width: "135px" },
+                            { type: "slot", answer: "INT" },
+                            { type: "slot", answer: "PRIMARY KEY" },
+                            { type: "slot", answer: "AUTO_INCREMENT" },
+                            { type: "punct", text: "," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "nombre", width: "110px" },
+                            { type: "slot", answer: "VARCHAR" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "50", width: "54px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "NOT NULL" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "punct", text: ");" }
+                        ]
+                    }
+                ],
+                bank: ["CREATE TABLE", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "DROP TABLE", "DATE", "UNIQUE"],
+                initialTable: null,
+                afterEffect: {
+                    mode: "create_table",
+                    tableName: "categorias",
+                    columns: [
+                        { name: "id_categoria", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "nombre", type: "VARCHAR(50)", pk: false, nn: true }
+                    ]
+                }
+            },
+            {
+                id: 2,
+                title: "Crear tabla Clientes con restricción UNIQUE",
+                timeLimit: 360,
+                desc: "Crea la tabla de clientes verificando primero que no exista en la base de datos.",
+                specs: [
+                    "Nombre exacto de la tabla: <span class='code-pill'>clientes</span> (usando <span class='code-pill'>IF NOT EXISTS</span>)",
+                    "Campo 1: <span class='code-pill'>id_cliente</span> — <span class='code-pill'>INT</span>, <span class='code-pill'>PRIMARY KEY</span>, <span class='code-pill'>AUTO_INCREMENT</span>",
+                    "Campo 2: <span class='code-pill'>email</span> — <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>100</span>, obligatorio (<span class='code-pill'>NOT NULL</span>) y sin repetidos (<span class='code-pill'>UNIQUE</span>)",
+                    "Campo 3: <span class='code-pill'>fecha_alta</span> — Tipo fecha (<span class='code-pill'>DATE</span>), obligatorio (<span class='code-pill'>NOT NULL</span>)"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "CREATE TABLE" },
+                            { type: "slot", answer: "IF NOT EXISTS" },
+                            { type: "input", answer: "clientes", width: "120px" },
+                            { type: "punct", text: "(" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "id_cliente", width: "120px" },
+                            { type: "slot", answer: "INT" },
+                            { type: "slot", answer: "PRIMARY KEY" },
+                            { type: "slot", answer: "AUTO_INCREMENT" },
+                            { type: "punct", text: "," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "email", width: "95px" },
+                            { type: "slot", answer: "VARCHAR" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "100", width: "60px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "NOT NULL" },
+                            { type: "slot", answer: "UNIQUE" },
+                            { type: "punct", text: "," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "fecha_alta", width: "120px" },
+                            { type: "slot", answer: "DATE" },
+                            { type: "slot", answer: "NOT NULL" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [{ type: "punct", text: ");" }]
+                    }
+                ],
+                bank: ["CREATE TABLE", "IF NOT EXISTS", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "UNIQUE", "DATE", "NOT NULL", "ALTER TABLE", "TEXT"],
+                initialTable: null,
+                afterEffect: {
+                    mode: "create_table",
+                    tableName: "clientes",
+                    columns: [
+                        { name: "id_cliente", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "email", type: "VARCHAR(100)", pk: false, nn: true, uq: true },
+                        { name: "fecha_alta", type: "DATE", pk: false, nn: true }
+                    ]
+                }
+            },
+            {
+                id: 3,
+                title: "Crear tabla Productos con decimales",
+                timeLimit: 360,
+                desc: "Define la estructura de la tabla de productos incluyendo precio con precisión decimal.",
+                specs: [
+                    "Nombre exacto de la tabla: <span class='code-pill'>productos</span>",
+                    "Campo 1: <span class='code-pill'>id_producto</span> — <span class='code-pill'>INT</span>, <span class='code-pill'>PRIMARY KEY</span>, <span class='code-pill'>AUTO_INCREMENT</span>",
+                    "Campo 2: <span class='code-pill'>nombre_producto</span> — <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>80</span>, obligatorio (<span class='code-pill'>NOT NULL</span>)",
+                    "Campo 3: <span class='code-pill'>precio</span> — Tipo <span class='code-pill'>DECIMAL</span> con precisión <span class='code-pill'>10,2</span>, obligatorio (<span class='code-pill'>NOT NULL</span>)"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "CREATE TABLE" },
+                            { type: "input", answer: "productos", width: "125px" },
+                            { type: "punct", text: "(" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "id_producto", width: "130px" },
+                            { type: "slot", answer: "INT" },
+                            { type: "slot", answer: "PRIMARY KEY" },
+                            { type: "slot", answer: "AUTO_INCREMENT" },
+                            { type: "punct", text: "," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "nombre_producto", width: "155px" },
+                            { type: "slot", answer: "VARCHAR" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "80", width: "54px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "NOT NULL" },
+                            { type: "punct", text: "," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "input", answer: "precio", width: "95px" },
+                            { type: "slot", answer: "DECIMAL" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "10,2", width: "68px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "NOT NULL" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [{ type: "punct", text: ");" }]
+                    }
+                ],
+                bank: ["CREATE TABLE", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "DECIMAL", "NOT NULL", "ADD COLUMN", "DATE"],
+                initialTable: null,
+                afterEffect: {
+                    mode: "create_table",
+                    tableName: "productos",
+                    columns: [
+                        { name: "id_producto", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "nombre_producto", type: "VARCHAR(80)", pk: false, nn: true },
+                        { name: "precio", type: "DECIMAL(10,2)", pk: false, nn: true }
+                    ]
+                }
+            },
+            {
+                id: 4,
+                title: "Agregar columna a la tabla Clientes",
+                timeLimit: 300,
+                desc: "Altera la estructura de la tabla clientes para añadir un campo de teléfono obligatorio.",
+                specs: [
+                    "Tabla a modificar: <span class='code-pill'>clientes</span>",
+                    "Nueva columna a agregar (<span class='code-pill'>ADD COLUMN</span>): <span class='code-pill'>telefono</span>",
+                    "Tipo y restricción: <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>20</span> y <span class='code-pill'>NOT NULL</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ALTER TABLE" },
+                            { type: "input", answer: "clientes", width: "120px" },
+                            { type: "slot", answer: "ADD COLUMN" },
+                            { type: "input", answer: "telefono", width: "120px" },
+                            { type: "slot", answer: "VARCHAR" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "20", width: "54px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "NOT NULL" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["ALTER TABLE", "ADD COLUMN", "VARCHAR", "NOT NULL", "CREATE TABLE", "MODIFY COLUMN", "DROP COLUMN", "INT"],
+                initialTable: {
+                    tableName: "clientes",
+                    columns: [
+                        { name: "id_cliente", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "email", type: "VARCHAR(100)", pk: false, nn: true, uq: true },
+                        { name: "fecha_alta", type: "DATE", pk: false, nn: true }
+                    ]
+                },
+                afterEffect: {
+                    mode: "add_column",
+                    tableName: "clientes",
+                    newCol: { name: "telefono", type: "VARCHAR(20)", pk: false, nn: true, isNew: true }
+                }
+            },
+            {
+                id: 5,
+                title: "Agregar columna de Stock a Productos",
+                timeLimit: 300,
+                desc: "Añade un nuevo campo numérico entero obligatorio para controlar las existencias en la tabla productos.",
+                specs: [
+                    "Tabla a modificar: <span class='code-pill'>productos</span>",
+                    "Nueva columna (<span class='code-pill'>ADD COLUMN</span>): <span class='code-pill'>stock</span>",
+                    "Tipo y restricción: <span class='code-pill'>INT</span> y <span class='code-pill'>NOT NULL</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ALTER TABLE" },
+                            { type: "input", answer: "productos", width: "125px" },
+                            { type: "slot", answer: "ADD COLUMN" },
+                            { type: "input", answer: "stock", width: "100px" },
+                            { type: "slot", answer: "INT" },
+                            { type: "slot", answer: "NOT NULL" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["ALTER TABLE", "ADD COLUMN", "INT", "NOT NULL", "MODIFY COLUMN", "VARCHAR", "UNIQUE", "DROP TABLE"],
+                initialTable: {
+                    tableName: "productos",
+                    columns: [
+                        { name: "id_producto", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "nombre_producto", type: "VARCHAR(80)", pk: false, nn: true },
+                        { name: "precio", type: "DECIMAL(10,2)", pk: false, nn: true }
+                    ]
+                },
+                afterEffect: {
+                    mode: "add_column",
+                    tableName: "productos",
+                    newCol: { name: "stock", type: "INT", pk: false, nn: true, isNew: true }
+                }
+            },
+            {
+                id: 6,
+                title: "Modificar longitud de una columna existente",
+                timeLimit: 330,
+                desc: "Amplía la capacidad del campo nombre_producto en la tabla productos sin perder sus datos.",
+                specs: [
+                    "Tabla a modificar: <span class='code-pill'>productos</span>",
+                    "Operación: <span class='code-pill'>MODIFY COLUMN</span> sobre el campo <span class='code-pill'>nombre_producto</span>",
+                    "Nuevo tipo y restricción: <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>150</span>, manteniendo <span class='code-pill'>NOT NULL</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ALTER TABLE" },
+                            { type: "input", answer: "productos", width: "125px" },
+                            { type: "slot", answer: "MODIFY COLUMN" },
+                            { type: "input", answer: "nombre_producto", width: "155px" },
+                            { type: "slot", answer: "VARCHAR" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "150", width: "60px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "NOT NULL" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["ALTER TABLE", "MODIFY COLUMN", "VARCHAR", "NOT NULL", "ADD COLUMN", "DROP COLUMN", "INT", "UNIQUE"],
+                initialTable: {
+                    tableName: "productos",
+                    columns: [
+                        { name: "id_producto", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "nombre_producto", type: "VARCHAR(80)", pk: false, nn: true },
+                        { name: "precio", type: "DECIMAL(10,2)", pk: false, nn: true },
+                        { name: "stock", type: "INT", pk: false, nn: true }
+                    ]
+                },
+                afterEffect: {
+                    mode: "modify_column",
+                    tableName: "productos",
+                    targetCol: "nombre_producto",
+                    newType: "VARCHAR(150) ← antes VARCHAR(80)"
+                }
+            },
+            {
+                id: 7,
+                title: "Eliminar una columna de una tabla",
+                timeLimit: 300,
+                desc: "Elimina la columna fecha_alta de la estructura de la tabla clientes.",
+                specs: [
+                    "Tabla a alterar: <span class='code-pill'>clientes</span>",
+                    "Operación: <span class='code-pill'>DROP COLUMN</span>",
+                    "Columna a eliminar: <span class='code-pill'>fecha_alta</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ALTER TABLE" },
+                            { type: "input", answer: "clientes", width: "120px" },
+                            { type: "slot", answer: "DROP COLUMN" },
+                            { type: "input", answer: "fecha_alta", width: "125px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["ALTER TABLE", "DROP COLUMN", "DROP TABLE", "ADD COLUMN", "MODIFY COLUMN", "DELETE"],
+                initialTable: {
+                    tableName: "clientes",
+                    columns: [
+                        { name: "id_cliente", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
+                        { name: "email", type: "VARCHAR(100)", pk: false, nn: true, uq: true },
+                        { name: "fecha_alta", type: "DATE", pk: false, nn: true },
+                        { name: "telefono", type: "VARCHAR(20)", pk: false, nn: true }
+                    ]
+                },
+                afterEffect: {
+                    mode: "drop_column",
+                    tableName: "clientes",
+                    targetCol: "fecha_alta"
+                }
+            },
+            {
+                id: 8,
+                title: "Eliminar una tabla por completo",
+                timeLimit: 300,
+                desc: "Destruye del esquema físico la tabla auxiliar de pruebas verificando primero que exista.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>DROP TABLE</span> con cláusula <span class='code-pill'>IF EXISTS</span>",
+                    "Nombre exacto de la tabla a eliminar: <span class='code-pill'>logs_temporales</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DROP TABLE" },
+                            { type: "slot", answer: "IF EXISTS" },
+                            { type: "input", answer: "logs_temporales", width: "160px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["DROP TABLE", "IF EXISTS", "ALTER TABLE", "DROP COLUMN", "IF NOT EXISTS", "CREATE TABLE"],
+                initialTable: {
+                    tableName: "logs_temporales",
+                    columns: [
+                        { name: "id_log", type: "INT", pk: true, nn: true },
+                        { name: "mensaje", type: "VARCHAR(200)", pk: false, nn: false }
+                    ]
+                },
+                afterEffect: {
+                    mode: "drop_table",
+                    tableName: "logs_temporales"
+                }
+            }
+        ];
+
+        /* =========================================================
+           ESTADO DEL JUEGO Y TEMPORIZADOR PERSISTENTE (SIN RESET)
+           ========================================================= */
+        const STORAGE_KEY = "sql_practica_ejercicio_1_state_v1";
+        let currentLevelIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let completedLevels = new Set();
+        let activeSlotIndex = 0;
+        let slotAssignments = [];
+        let timerSeconds = 300;
+        let timerMax = 300;
+        let timerInterval = null;
+        let levelSolved = false;
+        let hasLoadedOnce = false;
+
+        // Estado persistente por cada ejercicio/nivel para no resetear nunca el reloj al cambiar
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+
+        const levelPillsEl = document.getElementById("levelPills");
+        const timerDisplayEl = document.getElementById("timerDisplay");
+        const timerChipEl = document.getElementById("timerChip");
+        const timerBarFillEl = document.getElementById("timerBarFill");
+        const streakDisplayEl = document.getElementById("streakDisplay");
+        const scoreDisplayEl = document.getElementById("scoreDisplay");
+        const levelBadgeEl = document.getElementById("levelBadge");
+        const objTitleEl = document.getElementById("objTitle");
+        const objDescEl = document.getElementById("objDesc");
+        const specListEl = document.getElementById("specList");
+        const sqlBuilderContainerEl = document.getElementById("sqlBuilderContainer");
+        const keywordBankEl = document.getElementById("keywordBank");
+        const slotIndicatorEl = document.getElementById("slotIndicator");
+        const feedbackBannerEl = document.getElementById("feedbackBanner");
+        const visorStageEl = document.getElementById("visorStage");
+        const visorStatusEl = document.getElementById("visorStatus");
+        const nextLevelBtn = document.getElementById("nextLevelBtn");
+        const runQueryBtn = document.getElementById("runQueryBtn");
+        const resetLevelBtn = document.getElementById("resetLevelBtn");
+
+        function renderLevelPills() {
+            levelPillsEl.innerHTML = "";
+            LEVELS.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "level-pill" +
+                    (idx === currentLevelIdx ? " current" : "") +
+                    (completedLevels.has(lvl.id) ? " done" : "");
+                btn.textContent = lvl.id;
+                btn.title = lvl.title;
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
+                levelPillsEl.appendChild(btn);
+            });
+        }
+
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, "0");
+            const s = String(sec % 60).padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function resumeTimer() {
+            clearInterval(timerInterval);
+            updateTimerUI();
+
+            if (levelSolved || timerSeconds <= 0) {
+                if (!levelSolved && timerSeconds <= 0) {
+                    showFeedback(false, "⏰ El tiempo de este ejercicio se agotó. Aún puedes resolverlo sin bono por tiempo.");
+                }
+                return;
+            }
+
+            timerInterval = setInterval(() => {
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
+                updateTimerUI();
+                saveCurrentLevelProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    streak = 0;
+                    streakDisplayEl.textContent = streak;
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la sentencia para continuar (sin bono de tiempo).");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            timerDisplayEl.textContent = formatTime(Math.max(0, timerSeconds));
+            const pct = Math.max(0, (timerSeconds / timerMax) * 100);
+            timerBarFillEl.style.width = pct + "%";
+
+            timerChipEl.classList.remove("warning", "danger");
+            if (timerSeconds <= 30) {
+                timerChipEl.classList.add("danger");
+                timerBarFillEl.style.background = "var(--danger)";
+            } else if (timerSeconds <= 60) {
+                timerChipEl.classList.add("warning");
+                timerBarFillEl.style.background = "var(--warning)";
+            } else {
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--success), var(--primary))";
+            }
+        }
+
+        function loadLevel(idx) {
+            // Frenar y guardar el estado y tiempo del ejercicio actual antes de cambiar
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
+            currentLevelIdx = idx;
+
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+            levelBadgeEl.textContent = `Ejercicio 1-1 · Nivel ${lvl.id} de ${LEVELS.length}`;
+            objTitleEl.textContent = lvl.title;
+            objDescEl.textContent = lvl.desc;
+            specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
+
+            feedbackBannerEl.className = "feedback-banner";
+            nextLevelBtn.classList.remove("visible");
+            visorStatusEl.textContent = levelSolved ? "Query OK · Esquema actualizado" : "Esperando sentencia...";
+            visorStatusEl.className = "visor-status-pill" + (levelSolved ? " executed" : "");
+
+            // Construir líneas de SQL
+            sqlBuilderContainerEl.innerHTML = "";
+            slotAssignments = [];
+            let slotCount = 0;
+            let inputCount = 0;
+
+            lvl.lines.forEach(line => {
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "sql-line" + (line.indent ? " sql-indent" : "");
+
+                line.tokens.forEach(tok => {
+                    if (tok.type === "punct") {
+                        const span = document.createElement("span");
+                        span.className = "sql-punct";
+                        span.textContent = tok.text;
+                        lineDiv.appendChild(span);
+                    } else if (tok.type === "slot") {
+                        const sIdx = slotCount++;
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sql-slot";
+                        btn.dataset.slotIndex = `#${sIdx + 1}`;
+                        btn.dataset.idx = sIdx;
+                        btn.dataset.answer = tok.answer;
+                        btn.textContent = "___";
+                        btn.addEventListener("click", () => onSlotClicked(sIdx));
+                        lineDiv.appendChild(btn);
+                    } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
+                        const inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.className = "sql-input";
+                        inp.autocomplete = "off";
+                        inp.spellcheck = false;
+                        inp.style.width = tok.width || "120px";
+                        inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
+                        inp.addEventListener("input", () => {
+                            inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
+                        });
+                        lineDiv.appendChild(inp);
+                    }
+                });
+
+                sqlBuilderContainerEl.appendChild(lineDiv);
+            });
+
+            // Renderizar banco de palabras clave
+            keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
+            lvl.bank.forEach((word, bIdx) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
+                chip.dataset.bankIdx = bIdx;
+                chip.textContent = word;
+                chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
+                keywordBankEl.appendChild(chip);
+            });
+
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderInitialVisor(lvl);
+            if (levelSolved) {
+                animateVisorEffect(lvl.afterEffect);
+                showFeedback(true, "✅ Este nivel ya fue completado correctamente.");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                }
+            }
+
+            // Continuar el reloj de este nivel desde donde quedó (sin resetearlo)
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onSlotClicked(sIdx) {
+            if (levelSolved) return;
+            const current = slotAssignments[sIdx];
+            if (current) {
+                // Liberar palabra clave de este slot
+                const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
+                if (chip) chip.classList.remove("used");
+                slotAssignments[sIdx] = null;
+            }
+            activeSlotIndex = sIdx;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onBankChipClicked(bankIdx, word, evt) {
+            if (levelSolved) return;
+            if (activeSlotIndex === null || activeSlotIndex >= slotAssignments.length) {
+                const firstEmpty = slotAssignments.findIndex(x => x === null);
+                if (firstEmpty === -1) return;
+                activeSlotIndex = firstEmpty;
+            }
+
+            // Si el slot activo ya tenía una palabra, devolverla al banco
+            const existing = slotAssignments[activeSlotIndex];
+            if (existing) {
+                const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
+                if (oldChip) oldChip.classList.remove("used");
+            }
+
+            slotAssignments[activeSlotIndex] = { bankIdx, value: word };
+            const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
+            if (chip) chip.classList.add("used");
+
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#6366f1", 10);
+
+            // Avanzar al siguiente slot vacío
+            const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
+            if (nextEmpty !== -1) {
+                activeSlotIndex = nextEmpty;
+            } else {
+                const anyEmpty = slotAssignments.findIndex(x => x === null);
+                activeSlotIndex = anyEmpty !== -1 ? anyEmpty : activeSlotIndex;
+            }
+
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function updateSlotHighlights() {
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            slots.forEach((el, idx) => {
+                el.classList.remove("active-target", "filled", "slot-error", "slot-correct");
+                const assigned = slotAssignments[idx];
+                if (assigned) {
+                    el.textContent = assigned.value;
+                    el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
+                } else {
+                    el.textContent = "___";
+                }
+                if (idx === activeSlotIndex && !levelSolved) {
+                    el.classList.add("active-target");
+                }
+            });
+            slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
+        }
+
+        /* =========================================================
+           VALIDACIÓN ESTRICTA Y EJECUCIÓN DEL VISOR ANIMADO
+           ========================================================= */
+        function validateAndRun() {
+            if (levelSolved) return;
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+
+            let allSlotsOk = true;
+            let allInputsOk = true;
+
+            slots.forEach((slotEl, idx) => {
+                const expected = slotEl.dataset.answer.trim().toUpperCase();
+                const current = slotAssignments[idx] ? slotAssignments[idx].value.trim().toUpperCase() : "";
+                slotEl.classList.remove("slot-error", "slot-correct");
+                if (current === expected) {
+                    slotEl.classList.add("slot-correct");
+                } else {
+                    slotEl.classList.add("slot-error");
+                    allSlotsOk = false;
+                }
+            });
+
+            inputs.forEach(inpEl => {
+                const expected = inpEl.dataset.answer.trim().replace(/\s+/g, "");
+                const current = inpEl.value.trim().replace(/\s+/g, "");
+                inpEl.classList.remove("input-error", "input-correct");
+                if (current === expected) {
+                    inpEl.classList.add("input-correct");
+                } else {
+                    inpEl.classList.add("input-error");
+                    allInputsOk = false;
+                }
+            });
+
+            if (!allSlotsOk || !allInputsOk) {
+                streak = 0;
+                streakDisplayEl.textContent = streak;
+                saveCurrentLevelProgress();
+                if (!allSlotsOk && !allInputsOk) {
+                    showFeedback(false, "❌ Hay palabras clave incorrectas y nombres escritos manualmente que no coinciden con la especificación.");
+                } else if (!allSlotsOk) {
+                    showFeedback(false, "❌ Revisa las palabras clave SQL seleccionadas en los slots marcados en rojo.");
+                } else {
+                    showFeedback(false, "❌ Revisa los nombres de tablas, campos o longitudes escritos manualmente (deben coincidir exactamente).");
+                }
+                return;
+            }
+
+            // ¡Sentencia correcta!
+            levelSolved = true;
+            clearInterval(timerInterval);
+
+            const lvl = LEVELS[currentLevelIdx];
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
+            streak++;
+            const gained = 100 + timeBonus + (streak * 15);
+            score += gained;
+            completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+
+            showFeedback(true, `✅ ¡Sentencia DDL ejecutada con éxito! +${gained} pts (Bono de tiempo: +${timeBonus} pts)`);
+            visorStatusEl.textContent = "Query OK · Esquema actualizado";
+            visorStatusEl.className = "visor-status-pill executed";
+
+            const rect = visorStageEl.getBoundingClientRect();
+            spawnBurst(rect.left + rect.width / 2, rect.top + 80, "#10b981", 28);
+
+            animateVisorEffect(lvl.afterEffect);
+
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextLevelBtn.classList.add("visible");
+            }
+        }
+
+        function showFeedback(isOk, msg) {
+            feedbackBannerEl.className = "feedback-banner show " + (isOk ? "ok" : "err");
+            feedbackBannerEl.textContent = msg;
+        }
+
+        /* =========================================================
+           RENDERIZADO Y ANIMACIÓN DEL VISOR GRÁFICO
+           ========================================================= */
+        function buildColumnHTML(col, extraClass = "") {
+            return `
+                <div class="db-col-row ${extraClass}" data-col="${col.name}">
+                    <div>
+                        <strong>${col.name}</strong>
+                    </div>
+                    <div class="col-badges">
+                        <span class="c-badge type" data-role="type">${col.type}</span>
+                        ${col.pk ? `<span class="c-badge pk">🔑 PK</span>` : ""}
+                        ${col.nn ? `<span class="c-badge nn">NOT NULL</span>` : ""}
+                        ${col.uq ? `<span class="c-badge uq">UNIQUE</span>` : ""}
+                        ${col.extra ? `<span class="c-badge type">${col.extra}</span>` : ""}
+                        ${col.isNew ? `<span class="c-badge new">✨ NUEVO</span>` : ""}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInitialVisor(lvl) {
+            if (!lvl.initialTable) {
+                visorStageEl.innerHTML = `
+                    <div class="empty-visor-msg">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.7" style="margin-bottom:0.5rem;">
+                            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                        <div>El esquema espera la ejecución de tu sentencia <strong>CREATE TABLE</strong> para materializar la tabla aquí.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const t = lvl.initialTable;
+            visorStageEl.innerHTML = `
+                <div class="db-table-visual" id="activeVisualTable">
+                    <div class="db-table-head">
+                        <span>📦 TABLA: ${t.tableName}</span>
+                        <span style="font-size:0.75rem;opacity:0.85;">InnoDB · utf8mb4</span>
+                    </div>
+                    <div class="db-cols-list" id="visualColsList">
+                        ${t.columns.map(c => buildColumnHTML(c)).join("")}
+                    </div>
+                </div>
+            `;
+        }
+
+        function animateVisorEffect(effect) {
+            if (effect.mode === "create_table") {
+                visorStageEl.innerHTML = `
+                    <div class="db-table-visual pop-create" id="activeVisualTable">
+                        <div class="db-table-head">
+                            <span>📦 TABLA CREADA: ${effect.tableName}</span>
+                            <span style="font-size:0.75rem;">✨ NUEVA</span>
+                        </div>
+                        <div class="db-cols-list" id="visualColsList"></div>
+                    </div>
+                `;
+                const listEl = document.getElementById("visualColsList");
+                effect.columns.forEach((col, i) => {
+                    setTimeout(() => {
+                        listEl.insertAdjacentHTML("beforeend", buildColumnHTML(col, "col-popup"));
+                    }, i * 160);
+                });
+            } else if (effect.mode === "add_column") {
+                const listEl = document.getElementById("visualColsList");
+                if (listEl) {
+                    listEl.insertAdjacentHTML("beforeend", buildColumnHTML(effect.newCol, "col-popup"));
+                }
+            } else if (effect.mode === "modify_column") {
+                const rowEl = visorStageEl.querySelector(`.db-col-row[data-col="${effect.targetCol}"]`);
+                if (rowEl) {
+                    rowEl.classList.add("col-modified");
+                    const typeBadge = rowEl.querySelector(`[data-role="type"]`);
+                    if (typeBadge) typeBadge.textContent = effect.newType;
+                }
+            } else if (effect.mode === "drop_column") {
+                const rowEl = visorStageEl.querySelector(`.db-col-row[data-col="${effect.targetCol}"]`);
+                if (rowEl) {
+                    rowEl.classList.add("col-dropped");
+                    setTimeout(() => rowEl.remove(), 550);
+                }
+            } else if (effect.mode === "drop_table") {
+                const tblEl = document.getElementById("activeVisualTable");
+                if (tblEl) {
+                    tblEl.classList.add("drop-explode");
+                    setTimeout(() => {
+                        visorStageEl.innerHTML = `
+                            <div class="empty-visor-msg" style="color:#065f46;font-weight:700;">
+                                🗑️ La tabla <code>${effect.tableName}</code> fue eliminada definitivamente del esquema físico.
+                            </div>
+                        `;
+                    }, 650);
+                }
+            }
+        }
+
+        /* =========================================================
+           SISTEMA DE PARTÍCULAS EN CANVAS (AMBIENTE + EXPLOSIONES)
+           ========================================================= */
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let ambientParticles = [];
+        let burstParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 26; i++) {
+            ambientParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: 1.5 + Math.random() * 2.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                color: i % 2 === 0 ? "rgba(2, 132, 199, 0.16)" : "rgba(99, 102, 241, 0.14)"
+            });
+        }
+
+        function spawnBurst(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4.2;
+                burstParticles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,
+                    r: 2.5 + Math.random() * 3,
+                    alpha: 1,
+                    color
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ambientParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const b = burstParticles[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.08;
+                b.alpha -= 0.024;
+                if (b.alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* =========================================================
+           EVENTOS DE BOTONES
+           ========================================================= */
+        runQueryBtn.addEventListener("click", validateAndRun);
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
+        nextLevelBtn.addEventListener("click", () => {
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+            }
+        });
+
+        // Cargar estado guardado y comenzar en Nivel 1
+        loadPersistedState();
+        loadLevel(0);
+    </script>
+</body>
+</html>

@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL Práctica 1: DDL — Creación y Estructura de Tablas</title>
+    <title>Ejercicio 2-3: DQL — SELECT, WHERE, AND, OR, LIKE, BETWEEN, NOT (Terna 2)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
         :root {
-            --bg: #f4f7fb;
-            --bg-grad: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 50%, #eefdf6 100%);
+            --bg: #f0fdfa;
+            --bg-grad: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 50%, #ecfeff 100%);
             --surface: #ffffff;
-            --surface-alt: #f8fafc;
-            --surface-code: #f1f5f9;
-            --border: #dbe3ef;
-            --border-strong: #cbd5e1;
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-            --primary-light: #e0f2fe;
-            --accent: #6366f1;
-            --accent-light: #e0e7ff;
+            --surface-alt: #f3faf9;
+            --surface-code: #ecfeff;
+            --border: #ccebe7;
+            --border-strong: #99f6e4;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --primary-light: #ccfbf1;
+            --accent: #0891b2;
+            --accent-light: #cffafe;
             --success: #10b981;
             --success-light: #d1fae5;
             --warning: #f59e0b;
@@ -26,13 +26,12 @@
             --danger: #ef4444;
             --danger-light: #fee2e2;
             --text: #0f172a;
-            --text-muted: #475569;
+            --text-muted: #334155;
             --text-soft: #64748b;
             --radius: 14px;
             --radius-sm: 8px;
             --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
-            --shadow-md: 0 8px 24px rgba(2, 132, 199, 0.08);
-            --shadow-lg: 0 14px 34px rgba(15, 23, 42, 0.1);
+            --shadow-md: 0 8px 24px rgba(13, 148, 136, 0.09);
             --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -53,7 +52,6 @@
             overflow-x: hidden;
         }
 
-        /* Canvas de partículas */
         #particleCanvas {
             position: fixed;
             inset: 0;
@@ -71,9 +69,8 @@
             min-height: 100vh;
         }
 
-        /* Navegación superior */
         .top-nav {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
             padding: 0.65rem 1rem;
@@ -116,7 +113,7 @@
             align-items: center;
             justify-content: center;
             color: #fff;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.28);
             animation: floatIcon 3s ease-in-out infinite;
         }
 
@@ -157,10 +154,10 @@
             background: var(--primary);
             color: #fff;
             border-color: var(--primary);
-            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.25);
+            box-shadow: 0 3px 10px rgba(13, 148, 136, 0.28);
         }
 
-        /* HUD de Juego (Tiempo, Puntos, Racha) */
+        /* HUD */
         .hud-bar {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -240,7 +237,7 @@
 
         .stat-chip.timer-chip {
             background: var(--primary-light);
-            border-color: #bae6fd;
+            border-color: #5eead4;
             color: var(--primary-dark);
             min-width: 106px;
         }
@@ -274,11 +271,10 @@
         .timer-bar-fill {
             height: 100%;
             width: 100%;
-            background: linear-gradient(90deg, var(--success), var(--primary));
+            background: linear-gradient(90deg, var(--primary), var(--accent));
             transition: width 0.35s linear, background 0.3s;
         }
 
-        /* Layout Mobile-First */
         .workspace {
             max-width: 1360px;
             width: 100%;
@@ -296,7 +292,6 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow-md);
             padding: 1.15rem;
-            position: relative;
         }
 
         .card-header {
@@ -360,24 +355,17 @@
             gap: 0.35rem;
         }
 
-        .spec-list li {
-            display: flex;
-            align-items: baseline;
-            gap: 0.45rem;
-            flex-wrap: wrap;
-        }
-
         .code-pill {
             font-family: var(--font-mono);
             font-size: 0.8rem;
             font-weight: 700;
-            background: #e2e8f0;
-            color: #0f172a;
+            background: #ccfbf1;
+            color: #115e59;
             padding: 0.1rem 0.42rem;
             border-radius: 5px;
         }
 
-        /* Editor de Sentencia SQL */
+        /* Editor SQL */
         .sql-editor-box {
             background: var(--surface-code);
             border: 2px solid var(--border-strong);
@@ -412,7 +400,7 @@
         }
 
         .sql-indent {
-            padding-left: 1.25rem;
+            padding-left: 1.2rem;
         }
 
         .sql-punct {
@@ -420,18 +408,17 @@
             color: var(--text-muted);
         }
 
-        /* Slot para Palabra Clave */
         .sql-slot {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 92px;
+            min-width: 86px;
             height: 34px;
             padding: 0 0.65rem;
             border-radius: 7px;
-            border: 2px dashed #94a3b8;
+            border: 2px dashed #5eead4;
             background: #ffffff;
-            color: #64748b;
+            color: #0f766e;
             font-family: var(--font-mono);
             font-size: 0.82rem;
             font-weight: 700;
@@ -452,7 +439,7 @@
             border-color: var(--primary);
             background: var(--primary-light);
             color: var(--primary-dark);
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
             transform: translateY(-1px);
         }
 
@@ -460,7 +447,7 @@
             border-style: solid;
             border-color: var(--accent);
             background: var(--accent-light);
-            color: #3730a3;
+            color: #155e75;
         }
 
         .sql-slot.slot-correct {
@@ -476,7 +463,6 @@
             animation: shakeElem 0.35s ease;
         }
 
-        /* Input manual estricto (SIN PLACEHOLDER) */
         .sql-input {
             height: 34px;
             padding: 0 0.55rem;
@@ -493,8 +479,7 @@
 
         .sql-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
-            background: #fff;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
         }
 
         .sql-input.input-correct {
@@ -515,7 +500,6 @@
             75% { transform: translateX(5px); }
         }
 
-        /* Banco de Palabras Clave */
         .keyword-bank-title {
             font-size: 0.78rem;
             font-weight: 700;
@@ -561,17 +545,12 @@
             transform: translateY(-2px);
         }
 
-        .kw-chip:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
         .kw-chip.used {
             opacity: 0.35;
             transform: scale(0.95);
             pointer-events: none;
         }
 
-        /* Botones de Acción */
         .actions-row {
             display: flex;
             flex-wrap: wrap;
@@ -597,13 +576,12 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+            box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);
             flex: 1;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
         }
 
         .btn-secondary {
@@ -612,15 +590,9 @@
             border: 1px solid var(--border-strong);
         }
 
-        .btn-secondary:hover {
-            color: var(--text);
-            border-color: var(--text-muted);
-        }
-
         .btn-next {
             background: linear-gradient(135deg, var(--success), #059669);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
             display: none;
         }
 
@@ -635,13 +607,11 @@
             font-size: 0.85rem;
             font-weight: 600;
             display: none;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         .feedback-banner.show {
-            display: flex;
-            animation: popIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: block;
+            animation: resultPopup 0.3s ease;
         }
 
         .feedback-banner.ok {
@@ -656,27 +626,25 @@
             color: #991b1b;
         }
 
-        /* VISOR ANIMADO DE BASE DE DATOS */
+        /* VISOR DQL: TABLA ORIGEN + RESULTADO POPUP */
         .visor-card {
             display: flex;
             flex-direction: column;
-            min-height: 380px;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            min-height: 430px;
         }
 
         .visor-stage {
             flex: 1;
             background:
-                radial-gradient(#cbd5e1 1px, transparent 1px) 0 0 / 18px 18px,
-                #f8fafc;
+                radial-gradient(#99f6e4 1px, transparent 1px) 0 0 / 18px 18px,
+                #f3faf9;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.1rem;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            position: relative;
-            overflow: hidden;
+            overflow-x: auto;
         }
 
         .visor-status-pill {
@@ -685,8 +653,8 @@
             font-weight: 700;
             padding: 0.22rem 0.65rem;
             border-radius: 999px;
-            background: #e2e8f0;
-            color: var(--text-muted);
+            background: #ccfbf1;
+            color: var(--primary-dark);
         }
 
         .visor-status-pill.executed {
@@ -694,135 +662,95 @@
             color: #065f46;
         }
 
-        /* Tarjeta visual de Tabla en el Visor */
-        .db-table-visual {
+        .table-box {
             background: #ffffff;
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12);
+            border: 2px solid var(--border-strong);
+            border-radius: 11px;
             overflow: hidden;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .db-table-visual.pop-create {
-            animation: tableCreatePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .db-table-visual.drop-explode {
-            animation: tableDropAnim 0.65s ease forwards;
-        }
-
-        @keyframes tableCreatePop {
-            0% { opacity: 0; transform: scale(0.75) translateY(24px); }
-            65% { opacity: 1; transform: scale(1.03) translateY(-4px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        @keyframes tableDropAnim {
-            0% { transform: scale(1); opacity: 1; border-color: var(--danger); }
-            25% { transform: translateX(-8px) rotate(-1.5deg); background: var(--danger-light); }
-            50% { transform: translateX(8px) rotate(1.5deg); }
-            100% { transform: scale(0.55) translateY(30px); opacity: 0; }
-        }
-
-        .db-table-head {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: #fff;
-            padding: 0.65rem 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .db-cols-list {
-            padding: 0.65rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.45rem;
-        }
-
-        .db-col-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            border-radius: 8px;
-            background: var(--surface-alt);
-            border: 1px solid var(--border);
-            font-family: var(--font-mono);
-            font-size: 0.82rem;
-            transition: all 0.3s ease;
-        }
-
-        .db-col-row.col-popup {
-            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        .table-box.result-box {
             border-color: var(--success);
-            background: var(--success-light);
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.14);
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .db-col-row.col-modified {
-            animation: modifyGlow 0.85s ease;
-            border-color: var(--warning);
-            background: var(--warning-light);
-        }
-
-        .db-col-row.col-dropped {
-            animation: dropRowOut 0.55s ease forwards;
-            border-color: var(--danger);
-            background: var(--danger-light);
-        }
-
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.84) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        @keyframes modifyGlow {
-            0% { transform: scale(1); }
-            45% { transform: scale(1.04); box-shadow: 0 0 18px rgba(245, 158, 11, 0.45); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes dropRowOut {
-            0% { opacity: 1; transform: translateX(0); }
-            30% { transform: translateX(-8px); }
-            100% { opacity: 0; transform: translateX(45px) scale(0.85); }
-        }
-
-        .col-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.3rem;
-            align-items: center;
-        }
-
-        .c-badge {
-            font-size: 0.68rem;
+        .table-banner {
+            background: linear-gradient(135deg, #115e59, #155e75);
+            color: #fff;
+            padding: 0.5rem 0.85rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
             font-weight: 700;
-            padding: 0.12rem 0.45rem;
-            border-radius: 5px;
-            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .c-badge.type { background: #e0f2fe; color: #0369a1; }
-        .c-badge.pk { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-        .c-badge.nn { background: #ede9fe; color: #5b21b6; }
-        .c-badge.uq { background: #dcfce7; color: #166534; }
-        .c-badge.new { background: var(--success); color: #fff; }
-
-        .empty-visor-msg {
-            margin: auto;
-            text-align: center;
-            color: var(--text-soft);
-            padding: 2rem 1rem;
-            font-size: 0.88rem;
+        .table-banner.result-banner {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
         }
 
-        /* Responsive Desktop */
+        table.dql-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+        }
+
+        table.dql-grid th {
+            background: #f0fdfa;
+            color: var(--text);
+            text-align: left;
+            padding: 0.5rem 0.65rem;
+            border-bottom: 2px solid var(--border);
+            transition: all 0.25s;
+        }
+
+        table.dql-grid td {
+            padding: 0.48rem 0.65rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.25s;
+        }
+
+        th.col-selected {
+            background: var(--primary-light) !important;
+            color: var(--primary-dark) !important;
+            border-bottom-color: var(--primary) !important;
+        }
+
+        tr.row-matched {
+            background: #ecfdf5 !important;
+        }
+
+        tr.row-matched td {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        tr.row-dimmed {
+            opacity: 0.42;
+        }
+
+        tr.result-row-pop {
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes resultPopup {
+            0% {
+                opacity: 0;
+                transform: scale(0.86) translateY(14px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.02) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
         @media (min-width: 768px) {
             .top-nav-inner {
                 flex-direction: row;
@@ -833,7 +761,7 @@
 
         @media (min-width: 1024px) {
             .workspace {
-                grid-template-columns: 1.15fr 0.85fr;
+                grid-template-columns: 1.12fr 0.88fr;
                 align-items: start;
                 padding: 1.5rem;
             }
@@ -848,11 +776,10 @@
     <canvas id="particleCanvas"></canvas>
 
     <div class="app-wrapper">
-        <!-- BARRA SUPERIOR DE NAVEGACIÓN -->
         <nav class="top-nav">
             <div class="top-nav-inner">
                 <div class="brand-row">
-                    <a href="1-DDL-Tablas-y-Campos.html" class="brand">
+                    <a href="Ejercicio 1-1.html" class="brand">
                         <span class="brand-icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
                                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
@@ -860,18 +787,20 @@
                                 <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                             </svg>
                         </span>
-                        <span>SQL Práctica · Base de Datos II</span>
+                        <span>SQL Práctica · Base de Datos I (Terna 2)</span>
                     </a>
                 </div>
                 <div class="module-tabs">
-                    <a href="1-DDL-Tablas-y-Campos.html" class="module-tab active">1. DDL · Tablas y Campos</a>
-                    <a href="2-DML-Manipulacion-Datos.html" class="module-tab">2. DML · Registros (INSERT/UPDATE/DELETE)</a>
-                    <a href="3-DQL-Consultas-y-Filtros.html" class="module-tab">3. DQL · SELECT y Filtros</a>
+                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL Tablas</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML Registros</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL Consultas</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL (Terna 2)</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML (Terna 2)</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab active">2-3 · DQL (Terna 2)</a>
                 </div>
             </div>
         </nav>
 
-        <!-- BARRA HUD: NIVELES, RELOJ Y PUNTAJE -->
         <section class="hud-bar">
             <div class="hud-inner">
                 <div class="level-pills" id="levelPills"></div>
@@ -882,7 +811,7 @@
                             <path d="M12 9v4l2.5 2.5"></path>
                             <path d="M9 2h6"></path>
                         </svg>
-                        <span id="timerDisplay">01:15</span>
+                        <span id="timerDisplay">05:00</span>
                     </div>
                     <div class="stat-chip">
                         <span>⚡ Racha:</span>
@@ -899,14 +828,13 @@
             <div class="timer-bar-fill" id="timerBarFill"></div>
         </div>
 
-        <!-- ÁREA PRINCIPAL -->
         <main class="workspace">
-            <!-- COLUMNA IZQUIERDA: OBJETIVO + CONSTRUCTOR SQL -->
+            <!-- COLUMNA IZQUIERDA -->
             <section class="card">
                 <div class="card-header">
-                    <span class="badge-tag" id="levelBadge">Nivel 1 de 8 · DDL</span>
+                    <span class="badge-tag" id="levelBadge">Ejercicio 2-3 · Nivel 1 de 10</span>
                     <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.32rem 0.65rem;font-size:0.76rem;">
-                        ↺ Reiniciar Nivel
+                        🧹 Limpiar Respuesta
                     </button>
                 </div>
 
@@ -914,29 +842,27 @@
                 <p class="objective-desc" id="objDesc"></p>
 
                 <div class="spec-box">
-                    <div class="spec-box-title">📋 Especificación Estricta de Nombres</div>
+                    <div class="spec-box-title">📋 Especificación Estricta de Consulta (Clínica Médica)</div>
                     <ul class="spec-list" id="specList"></ul>
                 </div>
 
-                <!-- CONSTRUCTOR DE SENTENCIA SQL -->
                 <div class="sql-editor-box">
                     <div class="sql-editor-header">
-                        <span>CONSTRUCTOR SQL (MySQL) — Escribe manualmente tablas/campos y selecciona palabras clave</span>
+                        <span>CONSTRUCTOR SQL (MySQL) — Sin ayudas de autocompletado</span>
                         <span id="slotIndicator">Slot activo: #1</span>
                     </div>
                     <div id="sqlBuilderContainer"></div>
                 </div>
 
-                <!-- BANCO DE PALABRAS CLAVE -->
                 <div class="keyword-bank-title">
-                    <span>🧩 Banco de Palabras Clave SQL (Haz clic para colocar en el slot activo)</span>
-                    <span style="font-size:0.72rem;text-transform:none;">Clic en un slot lleno para quitar</span>
+                    <span>🧩 Banco de Palabras Clave SQL</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para cambiar su palabra</span>
                 </div>
                 <div class="keyword-bank" id="keywordBank"></div>
 
                 <div class="actions-row">
                     <button type="button" class="btn btn-primary" id="runQueryBtn">
-                        ▶ Ejecutar Sentencia SQL
+                        ▶ Ejecutar Consulta SELECT
                     </button>
                     <button type="button" class="btn btn-next" id="nextLevelBtn">
                         Siguiente Ejercicio ➔
@@ -946,11 +872,11 @@
                 <div class="feedback-banner" id="feedbackBanner"></div>
             </section>
 
-            <!-- COLUMNA DERECHA: VISOR ANIMADO DE ESQUEMA -->
+            <!-- COLUMNA DERECHA: VISOR ANIMADO DQL -->
             <section class="card visor-card">
                 <div class="card-header">
-                    <span class="badge-tag" style="background:#ede9fe;color:#5b21b6;">✨ Visor Gráfico de Esquema MySQL</span>
-                    <span class="visor-status-pill" id="visorStatus">Esperando sentencia...</span>
+                    <span class="badge-tag" style="background:#cffafe;color:#155e75;">🔎 Visor de Proyección y Filtrado</span>
+                    <span class="visor-status-pill" id="visorStatus">Esperando consulta...</span>
                 </div>
                 <div class="visor-stage" id="visorStage"></div>
             </section>
@@ -959,417 +885,501 @@
 
     <script>
         /* =========================================================
-           DEFINICIÓN DE LOS 8 EJERCICIOS DDL (SIN PLACEHOLDERS)
+           DATOS DE LA TABLA PACIENTES Y 10 NIVELES DQL (TERNA 2)
+           (SELECT, FROM, WHERE, AND, OR, LIKE, BETWEEN, NOT)
            ========================================================= */
+        const PACIENTES_DATA = [
+            { id_paciente: 1, nombre: "Lucia", apellido: "Gomez", obra_social: "OSDE", edad: 34, correo: "lucia@clinica.com" },
+            { id_paciente: 2, nombre: "Ramiro", apellido: "Paz", obra_social: "IOMA", edad: 62, correo: "ramiro@yahoo.com" },
+            { id_paciente: 3, nombre: "Luciano", apellido: "Vera", obra_social: "OSDE", edad: 45, correo: "luciano@clinica.com" },
+            { id_paciente: 4, nombre: "Elena", apellido: "Rios", obra_social: "Swiss", edad: 28, correo: "elena@clinica.com" },
+            { id_paciente: 5, nombre: "Paula", apellido: "Sosa", obra_social: "PAMI", edad: 71, correo: "paula@yahoo.com" }
+        ];
+
+        const COLS_PACIENTES = ["id_paciente", "nombre", "apellido", "obra_social", "edad", "correo"];
+
         const LEVELS = [
             {
                 id: 1,
-                title: "Crear tabla de Categorías",
-                timeLimit: 75,
-                desc: "Construye la sentencia para crear una nueva tabla que almacenará las categorías del catálogo.",
+                title: "Selección de columnas específicas (SELECT + FROM)",
+                timeLimit: 300,
+                desc: "Extrae únicamente el nombre, apellido y obra_social de todos los registros de la tabla pacientes.",
                 specs: [
-                    "Nombre exacto de la tabla: <span class='code-pill'>categorias</span>",
-                    "Campo 1: <span class='code-pill'>id_categoria</span> — Entero (<span class='code-pill'>INT</span>), clave primaria (<span class='code-pill'>PRIMARY KEY</span>) y autoincremental (<span class='code-pill'>AUTO_INCREMENT</span>).",
-                    "Campo 2: <span class='code-pill'>nombre</span> — Cadena variable (<span class='code-pill'>VARCHAR</span>) de longitud <span class='code-pill'>50</span>, obligatorio (<span class='code-pill'>NOT NULL</span>)."
+                    "Tabla a consultar: <span class='code-pill'>pacientes</span>",
+                    "Campos a proyectar en orden: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>obra_social</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "CREATE TABLE" },
-                            { type: "input", answer: "categorias", width: "135px" },
-                            { type: "punct", text: "(" }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "id_categoria", width: "135px" },
-                            { type: "slot", answer: "INT" },
-                            { type: "slot", answer: "PRIMARY KEY" },
-                            { type: "slot", answer: "AUTO_INCREMENT" },
-                            { type: "punct", text: "," }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "nombre", width: "110px" },
-                            { type: "slot", answer: "VARCHAR" },
-                            { type: "punct", text: "(" },
-                            { type: "input", answer: "50", width: "54px" },
-                            { type: "punct", text: ")" },
-                            { type: "slot", answer: "NOT NULL" }
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "100px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "obra_social", width: "120px" }
                         ]
                     },
                     {
                         indent: false,
                         tokens: [
-                            { type: "punct", text: ");" }
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" },
+                            { type: "punct", text: ";" }
                         ]
                     }
                 ],
-                bank: ["CREATE TABLE", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "DROP TABLE", "DATE", "UNIQUE"],
-                initialTable: null,
-                afterEffect: {
-                    mode: "create_table",
-                    tableName: "categorias",
-                    columns: [
-                        { name: "id_categoria", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "nombre", type: "VARCHAR(50)", pk: false, nn: true }
-                    ]
-                }
+                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "apellido", "obra_social"],
+                matchedIds: [1, 2, 3, 4, 5]
             },
             {
                 id: 2,
-                title: "Crear tabla Clientes con restricción UNIQUE",
-                timeLimit: 85,
-                desc: "Crea la tabla de clientes verificando primero que no exista en la base de datos.",
+                title: "Filtro simple con WHERE",
+                timeLimit: 300,
+                desc: "Obtén el nombre y edad de los pacientes cuya obra_social sea 'OSDE'.",
                 specs: [
-                    "Nombre exacto de la tabla: <span class='code-pill'>clientes</span> (usando <span class='code-pill'>IF NOT EXISTS</span>)",
-                    "Campo 1: <span class='code-pill'>id_cliente</span> — <span class='code-pill'>INT</span>, <span class='code-pill'>PRIMARY KEY</span>, <span class='code-pill'>AUTO_INCREMENT</span>",
-                    "Campo 2: <span class='code-pill'>email</span> — <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>100</span>, obligatorio (<span class='code-pill'>NOT NULL</span>) y sin repetidos (<span class='code-pill'>UNIQUE</span>)",
-                    "Campo 3: <span class='code-pill'>fecha_alta</span> — Tipo fecha (<span class='code-pill'>DATE</span>), obligatorio (<span class='code-pill'>NOT NULL</span>)"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos a seleccionar: <span class='code-pill'>nombre</span>, <span class='code-pill'>edad</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>obra_social</span> = <span class='code-pill'>'OSDE'</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "CREATE TABLE" },
-                            { type: "slot", answer: "IF NOT EXISTS" },
-                            { type: "input", answer: "clientes", width: "120px" },
-                            { type: "punct", text: "(" }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "id_cliente", width: "120px" },
-                            { type: "slot", answer: "INT" },
-                            { type: "slot", answer: "PRIMARY KEY" },
-                            { type: "slot", answer: "AUTO_INCREMENT" },
-                            { type: "punct", text: "," }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "email", width: "95px" },
-                            { type: "slot", answer: "VARCHAR" },
-                            { type: "punct", text: "(" },
-                            { type: "input", answer: "100", width: "60px" },
-                            { type: "punct", text: ")" },
-                            { type: "slot", answer: "NOT NULL" },
-                            { type: "slot", answer: "UNIQUE" },
-                            { type: "punct", text: "," }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "fecha_alta", width: "120px" },
-                            { type: "slot", answer: "DATE" },
-                            { type: "slot", answer: "NOT NULL" }
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
                         ]
                     },
                     {
                         indent: false,
-                        tokens: [{ type: "punct", text: ");" }]
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "OSDE", width: "85px" },
+                            { type: "punct", text: "';" }
+                        ]
                     }
                 ],
-                bank: ["CREATE TABLE", "IF NOT EXISTS", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "UNIQUE", "DATE", "NOT NULL", "ALTER TABLE", "TEXT"],
-                initialTable: null,
-                afterEffect: {
-                    mode: "create_table",
-                    tableName: "clientes",
-                    columns: [
-                        { name: "id_cliente", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "email", type: "VARCHAR(100)", pk: false, nn: true, uq: true },
-                        { name: "fecha_alta", type: "DATE", pk: false, nn: true }
-                    ]
-                }
+                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "SET"],
+                selectedCols: ["nombre", "edad"],
+                matchedIds: [1, 3]
             },
             {
                 id: 3,
-                title: "Crear tabla Productos con decimales",
-                timeLimit: 85,
-                desc: "Define la estructura de la tabla de productos incluyendo precio con precisión decimal.",
+                title: "Condición doble obligatoria con AND",
+                timeLimit: 330,
+                desc: "Selecciona el nombre, apellido y edad de los pacientes con obra_social 'OSDE' cuya edad sea mayor a 40.",
                 specs: [
-                    "Nombre exacto de la tabla: <span class='code-pill'>productos</span>",
-                    "Campo 1: <span class='code-pill'>id_producto</span> — <span class='code-pill'>INT</span>, <span class='code-pill'>PRIMARY KEY</span>, <span class='code-pill'>AUTO_INCREMENT</span>",
-                    "Campo 2: <span class='code-pill'>nombre_producto</span> — <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>80</span>, obligatorio (<span class='code-pill'>NOT NULL</span>)",
-                    "Campo 3: <span class='code-pill'>precio</span> — Tipo <span class='code-pill'>DECIMAL</span> con precisión <span class='code-pill'>10,2</span>, obligatorio (<span class='code-pill'>NOT NULL</span>)"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>edad</span>",
+                    "Filtro: <span class='code-pill'>obra_social</span> = <span class='code-pill'>'OSDE'</span> <span class='code-pill'>AND</span> <span class='code-pill'>edad</span> &gt; <span class='code-pill'>40</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "CREATE TABLE" },
-                            { type: "input", answer: "productos", width: "125px" },
-                            { type: "punct", text: "(" }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "id_producto", width: "130px" },
-                            { type: "slot", answer: "INT" },
-                            { type: "slot", answer: "PRIMARY KEY" },
-                            { type: "slot", answer: "AUTO_INCREMENT" },
-                            { type: "punct", text: "," }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "nombre_producto", width: "155px" },
-                            { type: "slot", answer: "VARCHAR" },
-                            { type: "punct", text: "(" },
-                            { type: "input", answer: "80", width: "54px" },
-                            { type: "punct", text: ")" },
-                            { type: "slot", answer: "NOT NULL" },
-                            { type: "punct", text: "," }
-                        ]
-                    },
-                    {
-                        indent: true,
-                        tokens: [
-                            { type: "input", answer: "precio", width: "95px" },
-                            { type: "slot", answer: "DECIMAL" },
-                            { type: "punct", text: "(" },
-                            { type: "input", answer: "10,2", width: "68px" },
-                            { type: "punct", text: ")" },
-                            { type: "slot", answer: "NOT NULL" }
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
                         ]
                     },
                     {
                         indent: false,
-                        tokens: [{ type: "punct", text: ");" }]
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "punct", text: "= 'OSDE'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "40", width: "70px" },
+                            { type: "punct", text: ";" }
+                        ]
                     }
                 ],
-                bank: ["CREATE TABLE", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "DECIMAL", "NOT NULL", "ADD COLUMN", "DATE"],
-                initialTable: null,
-                afterEffect: {
-                    mode: "create_table",
-                    tableName: "productos",
-                    columns: [
-                        { name: "id_producto", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "nombre_producto", type: "VARCHAR(80)", pk: false, nn: true },
-                        { name: "precio", type: "DECIMAL(10,2)", pk: false, nn: true }
-                    ]
-                }
+                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "NOT", "BETWEEN"],
+                selectedCols: ["nombre", "apellido", "edad"],
+                matchedIds: [3]
             },
             {
                 id: 4,
-                title: "Agregar columna a la tabla Clientes",
-                timeLimit: 65,
-                desc: "Altera la estructura de la tabla clientes para añadir un campo de teléfono obligatorio.",
+                title: "Alternativa lógica con operador OR",
+                timeLimit: 330,
+                desc: "Lista el nombre y obra_social de los pacientes que tengan 'IOMA' o 'PAMI'.",
                 specs: [
-                    "Tabla a modificar: <span class='code-pill'>clientes</span>",
-                    "Nueva columna a agregar (<span class='code-pill'>ADD COLUMN</span>): <span class='code-pill'>telefono</span>",
-                    "Tipo y restricción: <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>20</span> y <span class='code-pill'>NOT NULL</span>"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>obra_social</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>obra_social</span> = <span class='code-pill'>'IOMA'</span> <span class='code-pill'>OR</span> <span class='code-pill'>obra_social</span> = <span class='code-pill'>'PAMI'</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "ALTER TABLE" },
-                            { type: "input", answer: "clientes", width: "120px" },
-                            { type: "slot", answer: "ADD COLUMN" },
-                            { type: "input", answer: "telefono", width: "120px" },
-                            { type: "slot", answer: "VARCHAR" },
-                            { type: "punct", text: "(" },
-                            { type: "input", answer: "20", width: "54px" },
-                            { type: "punct", text: ")" },
-                            { type: "slot", answer: "NOT NULL" },
-                            { type: "punct", text: ";" }
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "punct", text: "= 'IOMA'" },
+                            { type: "slot", answer: "OR" },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "PAMI", width: "80px" },
+                            { type: "punct", text: "';" }
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "ADD COLUMN", "VARCHAR", "NOT NULL", "CREATE TABLE", "MODIFY COLUMN", "DROP COLUMN", "INT"],
-                initialTable: {
-                    tableName: "clientes",
-                    columns: [
-                        { name: "id_cliente", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "email", type: "VARCHAR(100)", pk: false, nn: true, uq: true },
-                        { name: "fecha_alta", type: "DATE", pk: false, nn: true }
-                    ]
-                },
-                afterEffect: {
-                    mode: "add_column",
-                    tableName: "clientes",
-                    newCol: { name: "telefono", type: "VARCHAR(20)", pk: false, nn: true, isNew: true }
-                }
+                bank: ["SELECT", "FROM", "WHERE", "OR", "AND", "NOT", "LIKE"],
+                selectedCols: ["nombre", "obra_social"],
+                matchedIds: [2, 5]
             },
             {
                 id: 5,
-                title: "Agregar columna de Stock a Productos",
-                timeLimit: 65,
-                desc: "Añade un nuevo campo numérico entero obligatorio para controlar las existencias en la tabla productos.",
+                title: "Filtro por rango usando BETWEEN y AND",
+                timeLimit: 330,
+                desc: "Obtén el nombre, obra_social y edad de los pacientes cuya edad esté entre 30 y 65 años inclusive.",
                 specs: [
-                    "Tabla a modificar: <span class='code-pill'>productos</span>",
-                    "Nueva columna (<span class='code-pill'>ADD COLUMN</span>): <span class='code-pill'>stock</span>",
-                    "Tipo y restricción: <span class='code-pill'>INT</span> y <span class='code-pill'>NOT NULL</span>"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>obra_social</span>, <span class='code-pill'>edad</span>",
+                    "Condición: <span class='code-pill'>edad</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>30</span> <span class='code-pill'>AND</span> <span class='code-pill'>65</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "ALTER TABLE" },
-                            { type: "input", answer: "productos", width: "125px" },
-                            { type: "slot", answer: "ADD COLUMN" },
-                            { type: "input", answer: "stock", width: "100px" },
-                            { type: "slot", answer: "INT" },
-                            { type: "slot", answer: "NOT NULL" },
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "30", width: "70px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "65", width: "70px" },
                             { type: "punct", text: ";" }
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "ADD COLUMN", "INT", "NOT NULL", "MODIFY COLUMN", "VARCHAR", "UNIQUE", "DROP TABLE"],
-                initialTable: {
-                    tableName: "productos",
-                    columns: [
-                        { name: "id_producto", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "nombre_producto", type: "VARCHAR(80)", pk: false, nn: true },
-                        { name: "precio", type: "DECIMAL(10,2)", pk: false, nn: true }
-                    ]
-                },
-                afterEffect: {
-                    mode: "add_column",
-                    tableName: "productos",
-                    newCol: { name: "stock", type: "INT", pk: false, nn: true, isNew: true }
-                }
+                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "obra_social", "edad"],
+                matchedIds: [1, 2, 3]
             },
             {
                 id: 6,
-                title: "Modificar longitud de una columna existente",
-                timeLimit: 70,
-                desc: "Amplía la capacidad del campo nombre_producto en la tabla productos sin perder sus datos.",
+                title: "Búsqueda por patrón de texto con LIKE (prefijo)",
+                timeLimit: 300,
+                desc: "Busca el id_paciente, nombre y apellido de todos los pacientes cuyo nombre comience con 'Luc'.",
                 specs: [
-                    "Tabla a modificar: <span class='code-pill'>productos</span>",
-                    "Operación: <span class='code-pill'>MODIFY COLUMN</span> sobre el campo <span class='code-pill'>nombre_producto</span>",
-                    "Nuevo tipo y restricción: <span class='code-pill'>VARCHAR</span> de longitud <span class='code-pill'>150</span>, manteniendo <span class='code-pill'>NOT NULL</span>"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>id_paciente</span>, <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>",
+                    "Condición: <span class='code-pill'>nombre</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'Luc%'</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "ALTER TABLE" },
-                            { type: "input", answer: "productos", width: "125px" },
-                            { type: "slot", answer: "MODIFY COLUMN" },
-                            { type: "input", answer: "nombre_producto", width: "155px" },
-                            { type: "slot", answer: "VARCHAR" },
-                            { type: "punct", text: "(" },
-                            { type: "input", answer: "150", width: "60px" },
-                            { type: "punct", text: ")" },
-                            { type: "slot", answer: "NOT NULL" },
-                            { type: "punct", text: ";" }
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "id_paciente", width: "120px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "nombre", width: "90px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "Luc%", width: "80px" },
+                            { type: "punct", text: "';" }
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "MODIFY COLUMN", "VARCHAR", "NOT NULL", "ADD COLUMN", "DROP COLUMN", "INT", "UNIQUE"],
-                initialTable: {
-                    tableName: "productos",
-                    columns: [
-                        { name: "id_producto", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "nombre_producto", type: "VARCHAR(80)", pk: false, nn: true },
-                        { name: "precio", type: "DECIMAL(10,2)", pk: false, nn: true },
-                        { name: "stock", type: "INT", pk: false, nn: true }
-                    ]
-                },
-                afterEffect: {
-                    mode: "modify_column",
-                    tableName: "productos",
-                    targetCol: "nombre_producto",
-                    newType: "VARCHAR(150) ← antes VARCHAR(80)"
-                }
+                bank: ["SELECT", "FROM", "WHERE", "LIKE", "BETWEEN", "AND", "NOT"],
+                selectedCols: ["id_paciente", "nombre", "apellido"],
+                matchedIds: [1, 3]
             },
             {
                 id: 7,
-                title: "Eliminar una columna de una tabla",
-                timeLimit: 60,
-                desc: "Elimina la columna fecha_alta de la estructura de la tabla clientes.",
+                title: "Negación de condición con NOT",
+                timeLimit: 300,
+                desc: "Obtén el nombre y obra_social de todos los pacientes que NO tengan la obra social 'OSDE'.",
                 specs: [
-                    "Tabla a alterar: <span class='code-pill'>clientes</span>",
-                    "Operación: <span class='code-pill'>DROP COLUMN</span>",
-                    "Columna a eliminar: <span class='code-pill'>fecha_alta</span>"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>obra_social</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>NOT</span> <span class='code-pill'>obra_social</span> = <span class='code-pill'>'OSDE'</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "ALTER TABLE" },
-                            { type: "input", answer: "clientes", width: "120px" },
-                            { type: "slot", answer: "DROP COLUMN" },
-                            { type: "input", answer: "fecha_alta", width: "125px" },
-                            { type: "punct", text: ";" }
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "input", answer: "obra_social", width: "120px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "OSDE", width: "85px" },
+                            { type: "punct", text: "';" }
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "DROP COLUMN", "DROP TABLE", "ADD COLUMN", "MODIFY COLUMN", "DELETE"],
-                initialTable: {
-                    tableName: "clientes",
-                    columns: [
-                        { name: "id_cliente", type: "INT", pk: true, nn: true, extra: "AUTO_INCREMENT" },
-                        { name: "email", type: "VARCHAR(100)", pk: false, nn: true, uq: true },
-                        { name: "fecha_alta", type: "DATE", pk: false, nn: true },
-                        { name: "telefono", type: "VARCHAR(20)", pk: false, nn: true }
-                    ]
-                },
-                afterEffect: {
-                    mode: "drop_column",
-                    tableName: "clientes",
-                    targetCol: "fecha_alta"
-                }
+                bank: ["SELECT", "FROM", "WHERE", "NOT", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "obra_social"],
+                matchedIds: [2, 4, 5]
             },
             {
                 id: 8,
-                title: "Eliminar una tabla por completo",
-                timeLimit: 55,
-                desc: "Destruye del esquema físico la tabla auxiliar de pruebas verificando primero que exista.",
+                title: "Excluir correos con NOT y LIKE",
+                timeLimit: 330,
+                desc: "Selecciona el nombre y correo de los pacientes que no utilicen una cuenta terminada en '@yahoo.com'.",
                 specs: [
-                    "Sentencia: <span class='code-pill'>DROP TABLE</span> con cláusula <span class='code-pill'>IF EXISTS</span>",
-                    "Nombre exacto de la tabla a eliminar: <span class='code-pill'>logs_temporales</span>"
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>correo</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>correo</span> <span class='code-pill'>NOT</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'%@yahoo.com'</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "DROP TABLE" },
-                            { type: "slot", answer: "IF EXISTS" },
-                            { type: "input", answer: "logs_temporales", width: "160px" },
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "correo", width: "90px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "correo", width: "90px" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "%@yahoo.com", width: "130px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "NOT", "LIKE", "BETWEEN", "OR"],
+                selectedCols: ["nombre", "correo"],
+                matchedIds: [1, 3, 4]
+            },
+            {
+                id: 9,
+                title: "Exclusión de rango con NOT BETWEEN",
+                timeLimit: 360,
+                desc: "Extrae nombre y edad de los pacientes cuya edad NO se encuentre entre 30 y 65 años.",
+                specs: [
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>edad</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>edad</span> <span class='code-pill'>NOT</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>30</span> <span class='code-pill'>AND</span> <span class='code-pill'>65</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "30", width: "70px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "65", width: "70px" },
                             { type: "punct", text: ";" }
                         ]
                     }
                 ],
-                bank: ["DROP TABLE", "IF EXISTS", "ALTER TABLE", "DROP COLUMN", "IF NOT EXISTS", "CREATE TABLE"],
-                initialTable: {
-                    tableName: "logs_temporales",
-                    columns: [
-                        { name: "id_log", type: "INT", pk: true, nn: true },
-                        { name: "mensaje", type: "VARCHAR(200)", pk: false, nn: false }
-                    ]
-                },
-                afterEffect: {
-                    mode: "drop_table",
-                    tableName: "logs_temporales"
-                }
+                bank: ["SELECT", "FROM", "WHERE", "NOT", "BETWEEN", "AND", "OR", "LIKE"],
+                selectedCols: ["nombre", "edad"],
+                matchedIds: [4, 5]
+            },
+            {
+                id: 10,
+                title: "Desafío Final: Combinación de LIKE, AND y BETWEEN",
+                timeLimit: 420,
+                desc: "Selecciona nombre, apellido, obra_social y edad de los pacientes con correo terminado en '@clinica.com' y edad entre 25 y 40 años.",
+                specs: [
+                    "Tabla: <span class='code-pill'>pacientes</span>",
+                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>obra_social</span>, <span class='code-pill'>edad</span>",
+                    "Filtro 1: <span class='code-pill'>correo</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'%@clinica.com'</span>",
+                    "Conector: <span class='code-pill'>AND</span>",
+                    "Filtro 2: <span class='code-pill'>edad</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>25</span> <span class='code-pill'>AND</span> <span class='code-pill'>40</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "88px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "90px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "obra_social", width: "115px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "edad", width: "75px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pacientes", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "correo", width: "85px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "%@clinica.com", width: "135px" },
+                            { type: "punct", text: "'" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "edad", width: "80px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "25", width: "70px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "40", width: "70px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "FROM", "WHERE", "LIKE", "AND", "BETWEEN", "AND", "OR", "NOT"],
+                selectedCols: ["nombre", "apellido", "obra_social", "edad"],
+                matchedIds: [1, 4]
             }
         ];
 
         /* =========================================================
-           ESTADO DEL JUEGO Y TEMPORIZADOR
+           LÓGICA DE JUEGO Y VISOR DQL (TEMPORIZADOR SIN RESET)
            ========================================================= */
+        const STORAGE_KEY = "sql_practica_ejercicio_2_3_state_v1";
         let currentLevelIdx = 0;
         let score = 0;
         let streak = 0;
         let completedLevels = new Set();
         let activeSlotIndex = 0;
-        let slotAssignments = []; // [{ bankIndex, value }]
-        let timerSeconds = 0;
-        let timerMax = 75;
+        let slotAssignments = [];
+        let timerSeconds = 300;
+        let timerMax = 300;
         let timerInterval = null;
         let levelSolved = false;
+        let hasLoadedOnce = false;
+
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
 
         const levelPillsEl = document.getElementById("levelPills");
         const timerDisplayEl = document.getElementById("timerDisplay");
@@ -1400,8 +1410,9 @@
                     (idx === currentLevelIdx ? " current" : "") +
                     (completedLevels.has(lvl.id) ? " done" : "");
                 btn.textContent = lvl.id;
-                btn.title = lvl.title;
-                btn.addEventListener("click", () => loadLevel(idx));
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
                 levelPillsEl.appendChild(btn);
             });
         }
@@ -1412,21 +1423,32 @@
             return `${m}:${s}`;
         }
 
-        function startTimer(seconds) {
+        function resumeTimer() {
             clearInterval(timerInterval);
-            timerMax = seconds;
-            timerSeconds = seconds;
             updateTimerUI();
 
+            if (levelSolved || timerSeconds <= 0) {
+                if (!levelSolved && timerSeconds <= 0) {
+                    showFeedback(false, "⏰ El tiempo de este ejercicio se agotó. Aún puedes resolverlo sin bono por tiempo.");
+                }
+                return;
+            }
+
             timerInterval = setInterval(() => {
-                if (levelSolved) return;
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
                 timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
                 updateTimerUI();
+                saveCurrentLevelProgress();
                 if (timerSeconds <= 0) {
                     clearInterval(timerInterval);
                     streak = 0;
                     streakDisplayEl.textContent = streak;
-                    showFeedback(false, "⏰ ¡Se agotó el tiempo! Haz clic en 'Reiniciar Nivel' o corrige la sentencia para continuar.");
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la consulta para continuar (sin bono de tiempo).");
                 }
             }, 1000);
         }
@@ -1437,37 +1459,51 @@
             timerBarFillEl.style.width = pct + "%";
 
             timerChipEl.classList.remove("warning", "danger");
-            if (timerSeconds <= 15) {
+            if (timerSeconds <= 30) {
                 timerChipEl.classList.add("danger");
                 timerBarFillEl.style.background = "var(--danger)";
-            } else if (timerSeconds <= 30) {
+            } else if (timerSeconds <= 60) {
                 timerChipEl.classList.add("warning");
                 timerBarFillEl.style.background = "var(--warning)";
             } else {
-                timerBarFillEl.style.background = "linear-gradient(90deg, var(--success), var(--primary))";
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--primary), var(--accent))";
             }
         }
 
         function loadLevel(idx) {
+            // Frenar el reloj del ejercicio actual y guardar su estado antes de pasar al nuevo
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
             currentLevelIdx = idx;
-            levelSolved = false;
-            const lvl = LEVELS[idx];
 
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
             renderLevelPills();
-            levelBadgeEl.textContent = `Nivel ${lvl.id} de ${LEVELS.length} · DDL`;
+            levelBadgeEl.textContent = `Ejercicio 2-3 · Nivel ${lvl.id} de ${LEVELS.length}`;
             objTitleEl.textContent = lvl.title;
             objDescEl.textContent = lvl.desc;
             specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
 
             feedbackBannerEl.className = "feedback-banner";
             nextLevelBtn.classList.remove("visible");
-            visorStatusEl.textContent = "Esperando sentencia...";
-            visorStatusEl.className = "visor-status-pill";
+            visorStatusEl.textContent = levelSolved
+                ? `${lvl.matchedIds.length} fila(s) devuelta(s)`
+                : "Tabla origen: pacientes (5 filas)";
+            visorStatusEl.className = "visor-status-pill" + (levelSolved ? " executed" : "");
 
-            // Construir líneas de SQL
             sqlBuilderContainerEl.innerHTML = "";
             slotAssignments = [];
             let slotCount = 0;
+            let inputCount = 0;
 
             lvl.lines.forEach(line => {
                 const lineDiv = document.createElement("div");
@@ -1481,7 +1517,8 @@
                         lineDiv.appendChild(span);
                     } else if (tok.type === "slot") {
                         const sIdx = slotCount++;
-                        slotAssignments.push(null);
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
                         const btn = document.createElement("button");
                         btn.type = "button";
                         btn.className = "sql-slot";
@@ -1492,15 +1529,25 @@
                         btn.addEventListener("click", () => onSlotClicked(sIdx));
                         lineDiv.appendChild(btn);
                     } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
                         const inp = document.createElement("input");
                         inp.type = "text";
                         inp.className = "sql-input";
                         inp.autocomplete = "off";
                         inp.spellcheck = false;
-                        inp.style.width = tok.width || "120px";
+                        inp.style.width = tok.width || "105px";
                         inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
                         inp.addEventListener("input", () => {
                             inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
                         });
                         lineDiv.appendChild(inp);
                     }
@@ -1509,36 +1556,59 @@
                 sqlBuilderContainerEl.appendChild(lineDiv);
             });
 
-            activeSlotIndex = 0;
-            updateSlotHighlights();
-
-            // Renderizar banco de palabras clave
             keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
             lvl.bank.forEach((word, bIdx) => {
                 const chip = document.createElement("button");
                 chip.type = "button";
-                chip.className = "kw-chip";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
                 chip.dataset.bankIdx = bIdx;
                 chip.textContent = word;
                 chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
                 keywordBankEl.appendChild(chip);
             });
 
-            renderInitialVisor(lvl);
-            startTimer(lvl.timeLimit);
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderSourceTableVisor();
+            if (levelSolved) {
+                animateDqlResult(lvl);
+                showFeedback(true, "✅ Este nivel ya fue completado correctamente.");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                }
+            }
+
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
         }
 
         function onSlotClicked(sIdx) {
             if (levelSolved) return;
             const current = slotAssignments[sIdx];
             if (current) {
-                // Liberar palabra clave de este slot
                 const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
                 if (chip) chip.classList.remove("used");
                 slotAssignments[sIdx] = null;
             }
             activeSlotIndex = sIdx;
             updateSlotHighlights();
+            saveCurrentLevelProgress();
         }
 
         function onBankChipClicked(bankIdx, word, evt) {
@@ -1549,7 +1619,6 @@
                 activeSlotIndex = firstEmpty;
             }
 
-            // Si el slot activo ya tenía una palabra, devolverla al banco
             const existing = slotAssignments[activeSlotIndex];
             if (existing) {
                 const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
@@ -1560,9 +1629,8 @@
             const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
             if (chip) chip.classList.add("used");
 
-            if (evt) spawnBurst(evt.clientX, evt.clientY, "#6366f1", 10);
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#0d9488", 10);
 
-            // Avanzar al siguiente slot vacío
             const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
             if (nextEmpty !== -1) {
                 activeSlotIndex = nextEmpty;
@@ -1572,6 +1640,7 @@
             }
 
             updateSlotHighlights();
+            saveCurrentLevelProgress();
         }
 
         function updateSlotHighlights() {
@@ -1582,6 +1651,7 @@
                 if (assigned) {
                     el.textContent = assigned.value;
                     el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
                 } else {
                     el.textContent = "___";
                 }
@@ -1592,9 +1662,28 @@
             slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
         }
 
-        /* =========================================================
-           VALIDACIÓN ESTRICTA Y EJECUCIÓN DEL VISOR ANIMADO
-           ========================================================= */
+        function renderSourceTableVisor() {
+            const headers = COLS_PACIENTES.map(c => `<th data-col="${c}">${c}</th>`).join("");
+            const rows = PACIENTES_DATA.map(r => {
+                const cells = COLS_PACIENTES.map(c => `<td data-col="${c}">${r[c]}</td>`).join("");
+                return `<tr data-rowid="${r.id_paciente}">${cells}</tr>`;
+            }).join("");
+
+            visorStageEl.innerHTML = `
+                <div class="table-box">
+                    <div class="table-banner">
+                        <span>🗄️ TABLA ORIGEN: pacientes</span>
+                        <span>5 registros totales</span>
+                    </div>
+                    <table class="dql-grid" id="sourceGrid">
+                        <thead><tr>${headers}</tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                <div id="resultContainer"></div>
+            `;
+        }
+
         function validateAndRun() {
             if (levelSolved) return;
             const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
@@ -1616,8 +1705,8 @@
             });
 
             inputs.forEach(inpEl => {
-                const expected = inpEl.dataset.answer.trim().replace(/\s+/g, "");
-                const current = inpEl.value.trim().replace(/\s+/g, "");
+                const expected = inpEl.dataset.answer.trim();
+                const current = inpEl.value.trim();
                 inpEl.classList.remove("input-error", "input-correct");
                 if (current === expected) {
                     inpEl.classList.add("input-correct");
@@ -1630,43 +1719,86 @@
             if (!allSlotsOk || !allInputsOk) {
                 streak = 0;
                 streakDisplayEl.textContent = streak;
-                if (!allSlotsOk && !allInputsOk) {
-                    showFeedback(false, "❌ Hay palabras clave incorrectas y nombres escritos manualmente que no coinciden con la especificación.");
-                } else if (!allSlotsOk) {
-                    showFeedback(false, "❌ Revisa las palabras clave SQL seleccionadas en los slots marcados en rojo.");
-                } else {
-                    showFeedback(false, "❌ Revisa los nombres de tablas, campos o longitudes escritos manualmente (deben coincidir exactamente).");
-                }
+                saveCurrentLevelProgress();
+                showFeedback(false, "❌ Revisa los campos marcados en rojo: verifica tanto las palabras clave SQL como los nombres escritos manualmente.");
                 return;
             }
 
-            // ¡Sentencia correcta!
             levelSolved = true;
             clearInterval(timerInterval);
 
             const lvl = LEVELS[currentLevelIdx];
-            const timeBonus = Math.max(10, timerSeconds * 3);
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
             streak++;
             const gained = 100 + timeBonus + (streak * 15);
             score += gained;
             completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
 
             streakDisplayEl.textContent = streak;
             scoreDisplayEl.textContent = score;
             renderLevelPills();
 
-            showFeedback(true, `✅ ¡Sentencia DDL ejecutada con éxito! +${gained} pts (Bono de tiempo: +${timeBonus} pts)`);
-            visorStatusEl.textContent = "Query OK · Esquema actualizado";
+            showFeedback(true, `✅ ¡Consulta ejecutada! Se extrajeron ${lvl.matchedIds.length} registros. +${gained} pts`);
+            visorStatusEl.textContent = `${lvl.matchedIds.length} fila(s) devuelta(s)`;
             visorStatusEl.className = "visor-status-pill executed";
 
             const rect = visorStageEl.getBoundingClientRect();
-            spawnBurst(rect.left + rect.width / 2, rect.top + 80, "#10b981", 28);
+            spawnBurst(rect.left + rect.width / 2, rect.top + 140, "#0d9488", 28);
 
-            animateVisorEffect(lvl.afterEffect);
+            animateDqlResult(lvl);
 
             if (currentLevelIdx < LEVELS.length - 1) {
                 nextLevelBtn.classList.add("visible");
             }
+        }
+
+        function animateDqlResult(lvl) {
+            const sourceGrid = document.getElementById("sourceGrid");
+            // 1. Iluminar columnas seleccionadas en la tabla origen
+            lvl.selectedCols.forEach(col => {
+                const th = sourceGrid.querySelector(`th[data-col="${col}"]`);
+                if (th) th.classList.add("col-selected");
+            });
+
+            // 2. Resaltar filas que cumplen el WHERE y atenuar el resto
+            const trs = sourceGrid.querySelectorAll("tbody tr");
+            trs.forEach(tr => {
+                const id = Number(tr.dataset.rowid);
+                if (lvl.matchedIds.includes(id)) {
+                    tr.classList.add("row-matched");
+                } else {
+                    tr.classList.add("row-dimmed");
+                }
+            });
+
+            // 3. Crear tabla de resultado con efecto popup por cada registro
+            const resultContainer = document.getElementById("resultContainer");
+            const resHeaders = lvl.selectedCols.map(c => `<th>${c}</th>`).join("");
+            resultContainer.innerHTML = `
+                <div class="table-box result-box">
+                    <div class="table-banner result-banner">
+                        <span>✨ RESULTADO DEL SELECT (Proyección + Filtro)</span>
+                        <span>${lvl.matchedIds.length} coincidencia(s)</span>
+                    </div>
+                    <table class="dql-grid">
+                        <thead><tr>${resHeaders}</tr></thead>
+                        <tbody id="resultBody"></tbody>
+                    </table>
+                </div>
+            `;
+
+            const resultBody = document.getElementById("resultBody");
+            const matchedRows = PACIENTES_DATA.filter(r => lvl.matchedIds.includes(r.id_paciente));
+            matchedRows.forEach((row, idx) => {
+                setTimeout(() => {
+                    const tr = document.createElement("tr");
+                    tr.className = "result-row-pop";
+                    tr.innerHTML = lvl.selectedCols.map(c => `<td><strong>${row[c]}</strong></td>`).join("");
+                    resultBody.appendChild(tr);
+                }, idx * 140);
+            });
         }
 
         function showFeedback(isOk, msg) {
@@ -1674,109 +1806,7 @@
             feedbackBannerEl.textContent = msg;
         }
 
-        /* =========================================================
-           RENDERIZADO Y ANIMACIÓN DEL VISOR GRÁFICO
-           ========================================================= */
-        function buildColumnHTML(col, extraClass = "") {
-            return `
-                <div class="db-col-row ${extraClass}" data-col="${col.name}">
-                    <div>
-                        <strong>${col.name}</strong>
-                    </div>
-                    <div class="col-badges">
-                        <span class="c-badge type" data-role="type">${col.type}</span>
-                        ${col.pk ? `<span class="c-badge pk">🔑 PK</span>` : ""}
-                        ${col.nn ? `<span class="c-badge nn">NOT NULL</span>` : ""}
-                        ${col.uq ? `<span class="c-badge uq">UNIQUE</span>` : ""}
-                        ${col.extra ? `<span class="c-badge type">${col.extra}</span>` : ""}
-                        ${col.isNew ? `<span class="c-badge new">✨ NUEVO</span>` : ""}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderInitialVisor(lvl) {
-            if (!lvl.initialTable) {
-                visorStageEl.innerHTML = `
-                    <div class="empty-visor-msg">
-                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.7" style="margin-bottom:0.5rem;">
-                            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-                            <line x1="3" y1="9" x2="21" y2="9"></line>
-                            <line x1="9" y1="21" x2="9" y2="9"></line>
-                        </svg>
-                        <div>El esquema espera la ejecución de tu sentencia <strong>CREATE TABLE</strong> para materializar la tabla aquí.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            const t = lvl.initialTable;
-            visorStageEl.innerHTML = `
-                <div class="db-table-visual" id="activeVisualTable">
-                    <div class="db-table-head">
-                        <span>📦 TABLA: ${t.tableName}</span>
-                        <span style="font-size:0.75rem;opacity:0.85;">InnoDB · utf8mb4</span>
-                    </div>
-                    <div class="db-cols-list" id="visualColsList">
-                        ${t.columns.map(c => buildColumnHTML(c)).join("")}
-                    </div>
-                </div>
-            `;
-        }
-
-        function animateVisorEffect(effect) {
-            if (effect.mode === "create_table") {
-                visorStageEl.innerHTML = `
-                    <div class="db-table-visual pop-create" id="activeVisualTable">
-                        <div class="db-table-head">
-                            <span>📦 TABLA CREADA: ${effect.tableName}</span>
-                            <span style="font-size:0.75rem;">✨ NUEVA</span>
-                        </div>
-                        <div class="db-cols-list" id="visualColsList"></div>
-                    </div>
-                `;
-                const listEl = document.getElementById("visualColsList");
-                effect.columns.forEach((col, i) => {
-                    setTimeout(() => {
-                        listEl.insertAdjacentHTML("beforeend", buildColumnHTML(col, "col-popup"));
-                    }, i * 160);
-                });
-            } else if (effect.mode === "add_column") {
-                const listEl = document.getElementById("visualColsList");
-                if (listEl) {
-                    listEl.insertAdjacentHTML("beforeend", buildColumnHTML(effect.newCol, "col-popup"));
-                }
-            } else if (effect.mode === "modify_column") {
-                const rowEl = visorStageEl.querySelector(`.db-col-row[data-col="${effect.targetCol}"]`);
-                if (rowEl) {
-                    rowEl.classList.add("col-modified");
-                    const typeBadge = rowEl.querySelector(`[data-role="type"]`);
-                    if (typeBadge) typeBadge.textContent = effect.newType;
-                }
-            } else if (effect.mode === "drop_column") {
-                const rowEl = visorStageEl.querySelector(`.db-col-row[data-col="${effect.targetCol}"]`);
-                if (rowEl) {
-                    rowEl.classList.add("col-dropped");
-                    setTimeout(() => rowEl.remove(), 550);
-                }
-            } else if (effect.mode === "drop_table") {
-                const tblEl = document.getElementById("activeVisualTable");
-                if (tblEl) {
-                    tblEl.classList.add("drop-explode");
-                    setTimeout(() => {
-                        visorStageEl.innerHTML = `
-                            <div class="empty-visor-msg" style="color:#065f46;font-weight:700;">
-                                🗑️ La tabla <code>${effect.tableName}</code> fue eliminada definitivamente del esquema físico.
-                            </div>
-                        `;
-                    }, 650);
-                }
-            }
-        }
-
-        /* =========================================================
-           SISTEMA DE PARTÍCULAS EN CANVAS (AMBIENTE + EXPLOSIONES)
-           ========================================================= */
+        /* Partículas */
         const canvas = document.getElementById("particleCanvas");
         const ctx = canvas.getContext("2d");
         let ambientParticles = [];
@@ -1789,14 +1819,14 @@
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
 
-        for (let i = 0; i < 26; i++) {
+        for (let i = 0; i < 24; i++) {
             ambientParticles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
                 r: 1.5 + Math.random() * 2.5,
                 vx: (Math.random() - 0.5) * 0.35,
                 vy: (Math.random() - 0.5) * 0.35,
-                color: i % 2 === 0 ? "rgba(2, 132, 199, 0.16)" : "rgba(99, 102, 241, 0.14)"
+                color: i % 2 === 0 ? "rgba(13, 148, 136, 0.16)" : "rgba(8, 145, 178, 0.15)"
             });
         }
 
@@ -1805,8 +1835,7 @@
                 const angle = Math.random() * Math.PI * 2;
                 const speed = 1.5 + Math.random() * 4.2;
                 burstParticles.push({
-                    x,
-                    y,
+                    x, y,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed - 1,
                     r: 2.5 + Math.random() * 3,
@@ -1818,7 +1847,6 @@
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             ambientParticles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
@@ -1826,7 +1854,6 @@
                 if (p.x > canvas.width) p.x = 0;
                 if (p.y < 0) p.y = canvas.height;
                 if (p.y > canvas.height) p.y = 0;
-
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
@@ -1851,23 +1878,19 @@
                 ctx.fill();
                 ctx.restore();
             }
-
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
 
-        /* =========================================================
-           EVENTOS DE BOTONES
-           ========================================================= */
         runQueryBtn.addEventListener("click", validateAndRun);
-        resetLevelBtn.addEventListener("click", () => loadLevel(currentLevelIdx));
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
         nextLevelBtn.addEventListener("click", () => {
             if (currentLevelIdx < LEVELS.length - 1) {
                 loadLevel(currentLevelIdx + 1);
             }
         });
 
-        // Iniciar en Nivel 1
+        loadPersistedState();
         loadLevel(0);
     </script>
 </body>

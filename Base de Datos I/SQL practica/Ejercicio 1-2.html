@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL Práctica 3: DQL — SELECT, WHERE, AND, OR, LIKE, BETWEEN, NOT</title>
+    <title>Ejercicio 1-2: DML — Inserción, Modificación y Eliminación (Terna 1)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
         :root {
             --bg: #f4f7fb;
-            --bg-grad: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #f0f9ff 100%);
+            --bg-grad: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 50%, #eff6ff 100%);
             --surface: #ffffff;
             --surface-alt: #f8fafc;
             --surface-code: #f1f5f9;
             --border: #dbe3ef;
             --border-strong: #cbd5e1;
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --primary-light: #e0e7ff;
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #d1fae5;
             --accent: #0284c7;
             --accent-light: #e0f2fe;
             --success: #10b981;
@@ -31,7 +31,7 @@
             --radius: 14px;
             --radius-sm: 8px;
             --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
-            --shadow-md: 0 8px 24px rgba(79, 70, 229, 0.08);
+            --shadow-md: 0 8px 24px rgba(5, 150, 105, 0.08);
             --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -113,13 +113,13 @@
             align-items: center;
             justify-content: center;
             color: #fff;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
             animation: floatIcon 3s ease-in-out infinite;
         }
 
         @keyframes floatIcon {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-3px) rotate(3deg); }
+            50% { transform: translateY(-3px) rotate(-3deg); }
         }
 
         .module-tabs {
@@ -154,7 +154,7 @@
             background: var(--primary);
             color: #fff;
             border-color: var(--primary);
-            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+            box-shadow: 0 3px 10px rgba(5, 150, 105, 0.25);
         }
 
         /* HUD */
@@ -237,7 +237,7 @@
 
         .stat-chip.timer-chip {
             background: var(--primary-light);
-            border-color: #c7d2fe;
+            border-color: #a7f3d0;
             color: var(--primary-dark);
             min-width: 106px;
         }
@@ -412,7 +412,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 86px;
+            min-width: 90px;
             height: 34px;
             padding: 0 0.65rem;
             border-radius: 7px;
@@ -439,7 +439,7 @@
             border-color: var(--primary);
             background: var(--primary-light);
             color: var(--primary-dark);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
             transform: translateY(-1px);
         }
 
@@ -479,7 +479,7 @@
 
         .sql-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
         }
 
         .sql-input.input-correct {
@@ -576,7 +576,7 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28);
             flex: 1;
         }
 
@@ -591,7 +591,7 @@
         }
 
         .btn-next {
-            background: linear-gradient(135deg, var(--success), #059669);
+            background: linear-gradient(135deg, #0284c7, #4f46e5);
             color: #fff;
             display: none;
         }
@@ -611,7 +611,7 @@
 
         .feedback-banner.show {
             display: block;
-            animation: resultPopup 0.3s ease;
+            animation: rowPopup 0.3s ease;
         }
 
         .feedback-banner.ok {
@@ -626,11 +626,11 @@
             color: #991b1b;
         }
 
-        /* VISOR DQL: TABLA ORIGEN + RESULTADO POPUP */
+        /* VISOR DE REGISTROS (TABLA ANIMADA) */
         .visor-card {
             display: flex;
             flex-direction: column;
-            min-height: 430px;
+            min-height: 390px;
         }
 
         .visor-stage {
@@ -641,9 +641,6 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
             overflow-x: auto;
         }
 
@@ -662,93 +659,119 @@
             color: #065f46;
         }
 
-        .table-box {
+        .data-table-wrap {
             background: #ffffff;
-            border: 2px solid var(--border-strong);
-            border-radius: 11px;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
         }
 
-        .table-box.result-box {
-            border-color: var(--success);
-            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.14);
-            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .table-banner {
-            background: #334155;
-            color: #fff;
-            padding: 0.5rem 0.85rem;
+        .data-table-banner {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #ffffff;
+            padding: 0.6rem 0.95rem;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.86rem;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
-        .table-banner.result-banner {
-            background: linear-gradient(135deg, var(--success), #0284c7);
-        }
-
-        table.dql-grid {
+        table.visual-grid {
             width: 100%;
             border-collapse: collapse;
             font-family: var(--font-mono);
-            font-size: 0.78rem;
+            font-size: 0.8rem;
         }
 
-        table.dql-grid th {
+        table.visual-grid th {
             background: #f1f5f9;
             color: var(--text);
             text-align: left;
-            padding: 0.5rem 0.65rem;
+            padding: 0.55rem 0.7rem;
             border-bottom: 2px solid var(--border);
-            transition: all 0.25s;
-        }
-
-        table.dql-grid td {
-            padding: 0.48rem 0.65rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-muted);
-            transition: all 0.25s;
-        }
-
-        th.col-selected {
-            background: var(--primary-light) !important;
-            color: var(--primary-dark) !important;
-            border-bottom-color: var(--primary) !important;
-        }
-
-        tr.row-matched {
-            background: #ecfdf5 !important;
-        }
-
-        tr.row-matched td {
-            color: #065f46;
             font-weight: 700;
         }
 
-        tr.row-dimmed {
-            opacity: 0.42;
+        table.visual-grid td {
+            padding: 0.55rem 0.7rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.3s ease;
         }
 
-        tr.result-row-pop {
-            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        /* Efectos Popup en Registros */
+        tr.row-popup-insert {
+            animation: rowPopup 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            background: #ecfdf5 !important;
         }
 
-        @keyframes resultPopup {
+        tr.row-popup-insert td {
+            color: #065f46;
+            font-weight: 700;
+            border-bottom-color: #6ee7b7;
+        }
+
+        tr.row-updated-anim {
+            animation: rowUpdatePulse 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: #fffbeb !important;
+        }
+
+        td.cell-changed {
+            color: #b45309 !important;
+            font-weight: 700;
+            background: #fef3c7;
+            border-radius: 6px;
+        }
+
+        tr.row-delete-out {
+            animation: rowDeleteOut 0.65s ease forwards;
+            background: #fef2f2 !important;
+        }
+
+        tr.row-delete-out td {
+            color: #b91c1c !important;
+            text-decoration: line-through;
+        }
+
+        @keyframes rowPopup {
             0% {
                 opacity: 0;
-                transform: scale(0.86) translateY(14px);
+                transform: scale(0.82) translateY(18px);
             }
-            70% {
+            65% {
                 opacity: 1;
-                transform: scale(1.02) translateY(-2px);
+                transform: scale(1.03) translateY(-3px);
             }
             100% {
                 opacity: 1;
                 transform: scale(1) translateY(0);
             }
+        }
+
+        @keyframes rowUpdatePulse {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.025); box-shadow: 0 0 18px rgba(245, 158, 11, 0.35); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes rowDeleteOut {
+            0% { opacity: 1; transform: translateX(0) scale(1); }
+            30% { transform: translateX(-8px) scale(1.01); }
+            100% { opacity: 0; transform: translateX(60px) scale(0.85); }
+        }
+
+        .row-badge-new {
+            display: inline-block;
+            background: var(--success);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 999px;
+            margin-left: 0.35rem;
+            vertical-align: middle;
         }
 
         @media (min-width: 768px) {
@@ -761,7 +784,7 @@
 
         @media (min-width: 1024px) {
             .workspace {
-                grid-template-columns: 1.12fr 0.88fr;
+                grid-template-columns: 1.15fr 0.85fr;
                 align-items: start;
                 padding: 1.5rem;
             }
@@ -779,7 +802,7 @@
         <nav class="top-nav">
             <div class="top-nav-inner">
                 <div class="brand-row">
-                    <a href="1-DDL-Tablas-y-Campos.html" class="brand">
+                    <a href="Ejercicio 1-1.html" class="brand">
                         <span class="brand-icon" aria-hidden="true">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
                                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
@@ -787,13 +810,16 @@
                                 <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                             </svg>
                         </span>
-                        <span>SQL Práctica · Base de Datos II</span>
+                        <span>SQL Práctica · Base de Datos I</span>
                     </a>
                 </div>
                 <div class="module-tabs">
-                    <a href="1-DDL-Tablas-y-Campos.html" class="module-tab">1. DDL · Tablas y Campos</a>
-                    <a href="2-DML-Manipulacion-Datos.html" class="module-tab">2. DML · Registros (INSERT/UPDATE/DELETE)</a>
-                    <a href="3-DQL-Consultas-y-Filtros.html" class="module-tab active">3. DQL · SELECT y Filtros</a>
+                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL Tablas</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab active">1-2 · DML Registros</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL Consultas</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL (Terna 2)</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML (Terna 2)</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL (Terna 2)</a>
                 </div>
             </div>
         </nav>
@@ -808,7 +834,7 @@
                             <path d="M12 9v4l2.5 2.5"></path>
                             <path d="M9 2h6"></path>
                         </svg>
-                        <span id="timerDisplay">01:10</span>
+                        <span id="timerDisplay">05:30</span>
                     </div>
                     <div class="stat-chip">
                         <span>⚡ Racha:</span>
@@ -829,9 +855,9 @@
             <!-- COLUMNA IZQUIERDA -->
             <section class="card">
                 <div class="card-header">
-                    <span class="badge-tag" id="levelBadge">Nivel 1 de 10 · DQL</span>
+                    <span class="badge-tag" id="levelBadge">Ejercicio 2 · Nivel 1 de 8</span>
                     <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.32rem 0.65rem;font-size:0.76rem;">
-                        ↺ Reiniciar Nivel
+                        🧹 Limpiar Respuesta
                     </button>
                 </div>
 
@@ -839,13 +865,13 @@
                 <p class="objective-desc" id="objDesc"></p>
 
                 <div class="spec-box">
-                    <div class="spec-box-title">📋 Especificación Estricta de Consulta</div>
+                    <div class="spec-box-title">📋 Especificación Estricta de Nombres y Datos</div>
                     <ul class="spec-list" id="specList"></ul>
                 </div>
 
                 <div class="sql-editor-box">
                     <div class="sql-editor-header">
-                        <span>CONSTRUCTOR SQL (MySQL) — Sin ayudas de autocompletado</span>
+                        <span>CONSTRUCTOR SQL (MySQL) — Completa nombres manualmente y elige palabras clave</span>
                         <span id="slotIndicator">Slot activo: #1</span>
                     </div>
                     <div id="sqlBuilderContainer"></div>
@@ -853,13 +879,13 @@
 
                 <div class="keyword-bank-title">
                     <span>🧩 Banco de Palabras Clave SQL</span>
-                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para cambiar su palabra</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para vaciarlo</span>
                 </div>
                 <div class="keyword-bank" id="keywordBank"></div>
 
                 <div class="actions-row">
                     <button type="button" class="btn btn-primary" id="runQueryBtn">
-                        ▶ Ejecutar Consulta SELECT
+                        ▶ Ejecutar Sentencia SQL
                     </button>
                     <button type="button" class="btn btn-next" id="nextLevelBtn">
                         Siguiente Ejercicio ➔
@@ -869,11 +895,11 @@
                 <div class="feedback-banner" id="feedbackBanner"></div>
             </section>
 
-            <!-- COLUMNA DERECHA: VISOR ANIMADO DQL -->
+            <!-- COLUMNA DERECHA: VISOR ANIMADO DE REGISTROS -->
             <section class="card visor-card">
                 <div class="card-header">
-                    <span class="badge-tag" style="background:#e0f2fe;color:#0369a1;">🔎 Visor de Proyección y Filtrado</span>
-                    <span class="visor-status-pill" id="visorStatus">Esperando consulta...</span>
+                    <span class="badge-tag" style="background:#e0f2fe;color:#0369a1;">📊 Visor Animado de Registros</span>
+                    <span class="visor-status-pill" id="visorStatus">Esperando ejecución...</span>
                 </div>
                 <div class="visor-stage" id="visorStage"></div>
             </section>
@@ -882,442 +908,448 @@
 
     <script>
         /* =========================================================
-           DATOS DE LA TABLA EMPLEADOS Y 10 NIVELES DQL
-           (SELECT, FROM, WHERE, AND, OR, LIKE, BETWEEN, NOT)
+           8 NIVELES DE DML: INSERT, UPDATE, DELETE (SIN PLACEHOLDERS)
            ========================================================= */
-        const EMPLEADOS_DATA = [
-            { id_empleado: 1, nombre: "Sofia", apellido: "Martinez", sector: "Sistemas", salario: 950000, email: "sofia@empresa.com" },
-            { id_empleado: 2, nombre: "Mateo", apellido: "Gomez", sector: "Ventas", salario: 620000, email: "mateo@gmail.com" },
-            { id_empleado: 3, nombre: "Valentina", apellido: "Lopez", sector: "Sistemas", salario: 1100000, email: "valen@empresa.com" },
-            { id_empleado: 4, nombre: "Martin", apellido: "Diaz", sector: "Contable", salario: 780000, email: "martin@empresa.com" },
-            { id_empleado: 5, nombre: "Camila", apellido: "Perez", sector: "Soporte", salario: 580000, email: "camila@gmail.com" }
+        const BASE_PRODUCTOS = [
+            { id_producto: 1, nombre: "Teclado Mecanico", categoria: "Perifericos", precio: 45000, stock: 12 },
+            { id_producto: 2, nombre: "Mouse Gamer", categoria: "Perifericos", precio: 22000, stock: 25 },
+            { id_producto: 3, nombre: "Monitor 24", categoria: "Pantallas", precio: 185000, stock: 4 },
+            { id_producto: 4, nombre: "Cable HDMI", categoria: "Accesorios", precio: 6500, stock: 0 }
         ];
-
-        const COLS_EMPLEADOS = ["id_empleado", "nombre", "apellido", "sector", "salario", "email"];
 
         const LEVELS = [
             {
                 id: 1,
-                title: "Selección de campos específicos (SELECT + FROM)",
-                timeLimit: 60,
-                desc: "Extrae únicamente el nombre, apellido y sector de todos los registros de la tabla empleados.",
+                title: "Insertar un nuevo registro en Productos",
+                timeLimit: 330,
+                desc: "Agrega un nuevo producto especificando las columnas y sus respectivos valores.",
                 specs: [
-                    "Tabla a consultar: <span class='code-pill'>empleados</span>",
-                    "Campos a proyectar en orden: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>sector</span>"
+                    "Tabla destino: <span class='code-pill'>productos</span>",
+                    "Columnas en orden: <span class='code-pill'>nombre</span>, <span class='code-pill'>categoria</span>, <span class='code-pill'>precio</span>, <span class='code-pill'>stock</span>",
+                    "Valores a insertar: <span class='code-pill'>'Auriculares USB'</span>, <span class='code-pill'>'Audio'</span>, <span class='code-pill'>32000</span>, <span class='code-pill'>15</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "SELECT" },
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "productos", width: "120px" },
+                            { type: "punct", text: "(" },
                             { type: "input", answer: "nombre", width: "95px" },
                             { type: "punct", text: "," },
-                            { type: "input", answer: "apellido", width: "100px" },
+                            { type: "input", answer: "categoria", width: "105px" },
                             { type: "punct", text: "," },
-                            { type: "input", answer: "sector", width: "90px" }
+                            { type: "input", answer: "precio", width: "85px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "stock", width: "80px" },
+                            { type: "punct", text: ")" }
                         ]
                     },
                     {
-                        indent: false,
+                        indent: true,
                         tokens: [
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "120px" },
-                            { type: "punct", text: ";" }
+                            { type: "slot", answer: "VALUES" },
+                            { type: "punct", text: "('Auriculares USB', 'Audio'," },
+                            { type: "input", answer: "32000", width: "80px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "15", width: "58px" },
+                            { type: "punct", text: ");" }
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "LIKE"],
-                selectedCols: ["nombre", "apellido", "sector"],
-                matchedIds: [1, 2, 3, 4, 5]
+                bank: ["INSERT INTO", "VALUES", "UPDATE", "SET", "SELECT", "FROM", "WHERE"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "insert",
+                    newRow: { id_producto: 5, nombre: "Auriculares USB", categoria: "Audio", precio: 32000, stock: 15 }
+                }
             },
             {
                 id: 2,
-                title: "Filtro simple con WHERE",
-                timeLimit: 60,
-                desc: "Obtén el nombre y salario de los empleados que trabajan en el sector 'Sistemas'.",
+                title: "Insertar un cliente en la tabla Clientes",
+                timeLimit: 330,
+                desc: "Registra un nuevo cliente completando manualmente el nombre de la tabla y sus campos.",
                 specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos a seleccionar: <span class='code-pill'>nombre</span>, <span class='code-pill'>salario</span>",
-                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>sector</span> = <span class='code-pill'>'Sistemas'</span>"
+                    "Tabla destino: <span class='code-pill'>clientes</span>",
+                    "Columnas en orden: <span class='code-pill'>nombre</span>, <span class='code-pill'>ciudad</span>, <span class='code-pill'>activo</span>",
+                    "Valores: <span class='code-pill'>'Lucia Gomez'</span>, <span class='code-pill'>'Parana'</span>, <span class='code-pill'>1</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "SELECT" },
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "clientes", width: "115px" },
+                            { type: "punct", text: "(" },
                             { type: "input", answer: "nombre", width: "95px" },
                             { type: "punct", text: "," },
-                            { type: "input", answer: "salario", width: "95px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "120px" }
+                            { type: "input", answer: "ciudad", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "activo", width: "85px" },
+                            { type: "punct", text: ")" }
                         ]
                     },
                     {
-                        indent: false,
+                        indent: true,
                         tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "sector", width: "90px" },
-                            { type: "punct", text: "= '" },
-                            { type: "input", answer: "Sistemas", width: "105px" },
-                            { type: "punct", text: "';" }
+                            { type: "slot", answer: "VALUES" },
+                            { type: "punct", text: "('Lucia Gomez', '" },
+                            { type: "input", answer: "Parana", width: "95px" },
+                            { type: "punct", text: "'," },
+                            { type: "input", answer: "1", width: "50px" },
+                            { type: "punct", text: ");" }
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "SET"],
-                selectedCols: ["nombre", "salario"],
-                matchedIds: [1, 3]
+                bank: ["INSERT INTO", "VALUES", "INTO", "ADD COLUMN", "UPDATE", "SET"],
+                tableName: "clientes",
+                columns: ["id_cliente", "nombre", "ciudad", "activo"],
+                initialRows: [
+                    { id_cliente: 1, nombre: "Carlos Ruiz", ciudad: "Concordia", activo: 1 },
+                    { id_cliente: 2, nombre: "Ana Torres", ciudad: "Colon", activo: 1 }
+                ],
+                effect: {
+                    type: "insert",
+                    newRow: { id_cliente: 3, nombre: "Lucia Gomez", ciudad: "Parana", activo: 1 }
+                }
             },
             {
                 id: 3,
-                title: "Condición doble obligatoria con AND",
-                timeLimit: 70,
-                desc: "Selecciona el nombre, apellido y salario de los empleados del sector 'Sistemas' cuyo salario supere 1000000.",
+                title: "Actualizar el precio de un producto específico",
+                timeLimit: 300,
+                desc: "Actualiza el precio del producto cuyo identificador es 3 utilizando UPDATE, SET y WHERE.",
                 specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>salario</span>",
-                    "Filtro: <span class='code-pill'>sector</span> = <span class='code-pill'>'Sistemas'</span> <span class='code-pill'>AND</span> <span class='code-pill'>salario</span> &gt; <span class='code-pill'>1000000</span>"
+                    "Tabla a actualizar: <span class='code-pill'>productos</span>",
+                    "Campo a modificar (<span class='code-pill'>SET</span>): <span class='code-pill'>precio</span> con nuevo valor <span class='code-pill'>195000</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>id_producto</span> igual a <span class='code-pill'>3</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "apellido", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "salario", width: "95px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "productos", width: "120px" }
                         ]
                     },
                     {
-                        indent: false,
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "precio", width: "95px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "195000", width: "95px" }
+                        ]
+                    },
+                    {
+                        indent: true,
                         tokens: [
                             { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "sector", width: "90px" },
-                            { type: "punct", text: "= 'Sistemas'" },
-                            { type: "slot", answer: "AND" },
-                            { type: "input", answer: "salario", width: "90px" },
-                            { type: "punct", text: ">" },
-                            { type: "input", answer: "1000000", width: "100px" },
+                            { type: "input", answer: "id_producto", width: "125px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "3", width: "55px" },
                             { type: "punct", text: ";" }
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "NOT", "BETWEEN"],
-                selectedCols: ["nombre", "apellido", "salario"],
-                matchedIds: [3]
+                bank: ["UPDATE", "SET", "WHERE", "INSERT INTO", "VALUES", "FROM", "SELECT"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "update",
+                    matchIds: [3],
+                    idCol: "id_producto",
+                    changes: { precio: "195000 (antes 185000)" }
+                }
             },
             {
                 id: 4,
-                title: "Alternativa lógica con operador OR",
-                timeLimit: 70,
-                desc: "Lista el nombre y sector de los empleados que pertenezcan a 'Ventas' o a 'Soporte'.",
+                title: "Actualizar stock con condición compuesta (AND)",
+                timeLimit: 360,
+                desc: "Actualiza a 30 el stock de los productos de la categoría 'Perifericos' que tengan precio menor a 30000.",
                 specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>sector</span>",
-                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>sector</span> = <span class='code-pill'>'Ventas'</span> <span class='code-pill'>OR</span> <span class='code-pill'>sector</span> = <span class='code-pill'>'Soporte'</span>"
+                    "Tabla: <span class='code-pill'>productos</span>",
+                    "Asignación (<span class='code-pill'>SET</span>): <span class='code-pill'>stock</span> = <span class='code-pill'>30</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>categoria</span> = <span class='code-pill'>'Perifericos'</span> <span class='code-pill'>AND</span> <span class='code-pill'>precio</span> &lt; <span class='code-pill'>30000</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "sector", width: "90px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "productos", width: "120px" },
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "stock", width: "85px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "30", width: "60px" }
                         ]
                     },
                     {
-                        indent: false,
+                        indent: true,
                         tokens: [
                             { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "sector", width: "90px" },
-                            { type: "punct", text: "= 'Ventas'" },
-                            { type: "slot", answer: "OR" },
-                            { type: "input", answer: "sector", width: "90px" },
-                            { type: "punct", text: "= '" },
-                            { type: "input", answer: "Soporte", width: "95px" },
-                            { type: "punct", text: "';" }
+                            { type: "input", answer: "categoria", width: "105px" },
+                            { type: "punct", text: "= 'Perifericos'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "precio", width: "85px" },
+                            { type: "punct", text: "<" },
+                            { type: "input", answer: "30000", width: "85px" },
+                            { type: "punct", text: ";" }
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "OR", "AND", "NOT", "LIKE"],
-                selectedCols: ["nombre", "sector"],
-                matchedIds: [2, 5]
+                bank: ["UPDATE", "SET", "WHERE", "AND", "OR", "NOT", "BETWEEN", "FROM"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "update",
+                    matchIds: [2],
+                    idCol: "id_producto",
+                    changes: { stock: "30 (antes 25)" }
+                }
             },
             {
                 id: 5,
-                title: "Filtro por rango usando BETWEEN y AND",
-                timeLimit: 70,
-                desc: "Obtén el nombre, sector y salario de los empleados cuyo salario esté entre 600000 y 950000 inclusive.",
+                title: "Actualizar categoría usando operador LIKE",
+                timeLimit: 330,
+                desc: "Cambia la categoría a 'Cables' para todos los productos cuyo nombre comience con 'Cable'.",
                 specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>sector</span>, <span class='code-pill'>salario</span>",
-                    "Condición: <span class='code-pill'>salario</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>600000</span> <span class='code-pill'>AND</span> <span class='code-pill'>950000</span>"
+                    "Tabla: <span class='code-pill'>productos</span>",
+                    "Asignación (<span class='code-pill'>SET</span>): <span class='code-pill'>categoria</span> = <span class='code-pill'>'Cables'</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>nombre</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'Cable%'</span>"
                 ],
                 lines: [
                     {
                         indent: false,
                         tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "sector", width: "85px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "salario", width: "90px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
-                        ]
-                    },
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "salario", width: "90px" },
-                            { type: "slot", answer: "BETWEEN" },
-                            { type: "input", answer: "600000", width: "90px" },
-                            { type: "slot", answer: "AND" },
-                            { type: "input", answer: "950000", width: "90px" },
-                            { type: "punct", text: ";" }
-                        ]
-                    }
-                ],
-                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "OR", "LIKE"],
-                selectedCols: ["nombre", "sector", "salario"],
-                matchedIds: [1, 2, 4]
-            },
-            {
-                id: 6,
-                title: "Búsqueda por patrón de texto con LIKE (prefijo)",
-                timeLimit: 65,
-                desc: "Busca el id_empleado, nombre y apellido de todos los empleados cuyo nombre empiece con 'Ma'.",
-                specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>id_empleado</span>, <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>",
-                    "Condición: <span class='code-pill'>nombre</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'Ma%'</span>"
-                ],
-                lines: [
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "id_empleado", width: "120px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "nombre", width: "90px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "apellido", width: "95px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
-                        ]
-                    },
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "slot", answer: "LIKE" },
-                            { type: "punct", text: "'" },
-                            { type: "input", answer: "Ma%", width: "75px" },
-                            { type: "punct", text: "';" }
-                        ]
-                    }
-                ],
-                bank: ["SELECT", "FROM", "WHERE", "LIKE", "BETWEEN", "AND", "NOT"],
-                selectedCols: ["id_empleado", "nombre", "apellido"],
-                matchedIds: [2, 4]
-            },
-            {
-                id: 7,
-                title: "Negación de condición con NOT",
-                timeLimit: 65,
-                desc: "Obtén el nombre y sector de todos los empleados que NO pertenezcan al sector 'Sistemas'.",
-                specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>sector</span>",
-                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>NOT</span> <span class='code-pill'>sector</span> = <span class='code-pill'>'Sistemas'</span>"
-                ],
-                lines: [
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "sector", width: "90px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
-                        ]
-                    },
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "slot", answer: "NOT" },
-                            { type: "input", answer: "sector", width: "90px" },
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "productos", width: "120px" },
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "categoria", width: "105px" },
                             { type: "punct", text: "= '" },
-                            { type: "input", answer: "Sistemas", width: "100px" },
-                            { type: "punct", text: "';" }
-                        ]
-                    }
-                ],
-                bank: ["SELECT", "FROM", "WHERE", "NOT", "AND", "OR", "LIKE"],
-                selectedCols: ["nombre", "sector"],
-                matchedIds: [2, 4, 5]
-            },
-            {
-                id: 8,
-                title: "Excluir correos con NOT y LIKE",
-                timeLimit: 70,
-                desc: "Selecciona el nombre y email de los empleados que no utilicen correo terminado en '@gmail.com'.",
-                specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>email</span>",
-                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>email</span> <span class='code-pill'>NOT</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'%@gmail.com'</span>"
-                ],
-                lines: [
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "email", width: "85px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
-                        ]
-                    },
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "email", width: "85px" },
-                            { type: "slot", answer: "NOT" },
-                            { type: "slot", answer: "LIKE" },
-                            { type: "punct", text: "'" },
-                            { type: "input", answer: "%@gmail.com", width: "130px" },
-                            { type: "punct", text: "';" }
-                        ]
-                    }
-                ],
-                bank: ["SELECT", "FROM", "WHERE", "NOT", "LIKE", "BETWEEN", "OR"],
-                selectedCols: ["nombre", "email"],
-                matchedIds: [1, 3, 4]
-            },
-            {
-                id: 9,
-                title: "Exclusión de rango con NOT BETWEEN",
-                timeLimit: 75,
-                desc: "Extrae nombre y salario de los empleados cuyo salario NO se encuentre entre 600000 y 1000000.",
-                specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>salario</span>",
-                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>salario</span> <span class='code-pill'>NOT</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>600000</span> <span class='code-pill'>AND</span> <span class='code-pill'>1000000</span>"
-                ],
-                lines: [
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "95px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "salario", width: "95px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "115px" }
-                        ]
-                    },
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "salario", width: "90px" },
-                            { type: "slot", answer: "NOT" },
-                            { type: "slot", answer: "BETWEEN" },
-                            { type: "input", answer: "600000", width: "88px" },
-                            { type: "slot", answer: "AND" },
-                            { type: "input", answer: "1000000", width: "95px" },
-                            { type: "punct", text: ";" }
-                        ]
-                    }
-                ],
-                bank: ["SELECT", "FROM", "WHERE", "NOT", "BETWEEN", "AND", "OR", "LIKE"],
-                selectedCols: ["nombre", "salario"],
-                matchedIds: [3, 5]
-            },
-            {
-                id: 10,
-                title: "Desafío Final: Combinación de LIKE, AND y BETWEEN",
-                timeLimit: 85,
-                desc: "Selecciona nombre, apellido, sector y salario de los empleados con email corporativo ('%@empresa.com') y salario entre 700000 y 1000000.",
-                specs: [
-                    "Tabla: <span class='code-pill'>empleados</span>",
-                    "Campos: <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>sector</span>, <span class='code-pill'>salario</span>",
-                    "Filtro 1: <span class='code-pill'>email</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'%@empresa.com'</span>",
-                    "Conector: <span class='code-pill'>AND</span>",
-                    "Filtro 2: <span class='code-pill'>salario</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>700000</span> <span class='code-pill'>AND</span> <span class='code-pill'>1000000</span>"
-                ],
-                lines: [
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "SELECT" },
-                            { type: "input", answer: "nombre", width: "88px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "apellido", width: "90px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "sector", width: "82px" },
-                            { type: "punct", text: "," },
-                            { type: "input", answer: "salario", width: "88px" },
-                            { type: "slot", answer: "FROM" },
-                            { type: "input", answer: "empleados", width: "110px" }
-                        ]
-                    },
-                    {
-                        indent: false,
-                        tokens: [
-                            { type: "slot", answer: "WHERE" },
-                            { type: "input", answer: "email", width: "80px" },
-                            { type: "slot", answer: "LIKE" },
-                            { type: "punct", text: "'" },
-                            { type: "input", answer: "%@empresa.com", width: "135px" },
+                            { type: "input", answer: "Cables", width: "85px" },
                             { type: "punct", text: "'" }
                         ]
                     },
                     {
                         indent: true,
                         tokens: [
-                            { type: "slot", answer: "AND" },
-                            { type: "input", answer: "salario", width: "88px" },
-                            { type: "slot", answer: "BETWEEN" },
-                            { type: "input", answer: "700000", width: "88px" },
-                            { type: "slot", answer: "AND" },
-                            { type: "input", answer: "1000000", width: "95px" },
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "Cable%", width: "85px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["UPDATE", "SET", "WHERE", "LIKE", "BETWEEN", "AND", "SELECT"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "update",
+                    matchIds: [4],
+                    idCol: "id_producto",
+                    changes: { categoria: "Cables (antes Accesorios)" }
+                }
+            },
+            {
+                id: 6,
+                title: "Eliminar registros sin stock (DELETE + WHERE)",
+                timeLimit: 300,
+                desc: "Elimina de la tabla productos aquellos artículos cuyo stock sea exactamente 0.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>DELETE</span> <span class='code-pill'>FROM</span> sobre la tabla <span class='code-pill'>productos</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>stock</span> = <span class='code-pill'>0</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "120px" },
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "stock", width: "85px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "0", width: "50px" },
                             { type: "punct", text: ";" }
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "LIKE", "AND", "BETWEEN", "AND", "OR", "NOT"],
-                selectedCols: ["nombre", "apellido", "sector", "salario"],
-                matchedIds: [1, 4]
+                bank: ["DELETE", "FROM", "WHERE", "DROP TABLE", "UPDATE", "SET"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "delete",
+                    matchIds: [4],
+                    idCol: "id_producto"
+                }
+            },
+            {
+                id: 7,
+                title: "Eliminar registros en un rango (BETWEEN)",
+                timeLimit: 330,
+                desc: "Elimina los productos cuyo precio se encuentre entre 20000 y 50000 inclusive.",
+                specs: [
+                    "Tabla: <span class='code-pill'>productos</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): campo <span class='code-pill'>precio</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>20000</span> <span class='code-pill'>AND</span> <span class='code-pill'>50000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "120px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "precio", width: "90px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "20000", width: "80px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "50000", width: "80px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["DELETE", "FROM", "WHERE", "BETWEEN", "AND", "OR", "LIKE", "UPDATE"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "delete",
+                    matchIds: [1, 2],
+                    idCol: "id_producto"
+                }
+            },
+            {
+                id: 8,
+                title: "Eliminar registros con condición OR",
+                timeLimit: 360,
+                desc: "Elimina los productos cuya categoría sea 'Accesorios' o cuyo stock sea menor a 5.",
+                specs: [
+                    "Tabla: <span class='code-pill'>productos</span>",
+                    "Condición 1: <span class='code-pill'>categoria</span> = <span class='code-pill'>'Accesorios'</span>",
+                    "Operador lógico: <span class='code-pill'>OR</span>",
+                    "Condición 2: <span class='code-pill'>stock</span> &lt; <span class='code-pill'>5</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "120px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "categoria", width: "105px" },
+                            { type: "punct", text: "= 'Accesorios'" },
+                            { type: "slot", answer: "OR" },
+                            { type: "input", answer: "stock", width: "80px" },
+                            { type: "punct", text: "<" },
+                            { type: "input", answer: "5", width: "50px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["DELETE", "FROM", "WHERE", "OR", "AND", "NOT", "BETWEEN", "SET"],
+                tableName: "productos",
+                columns: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                initialRows: BASE_PRODUCTOS,
+                effect: {
+                    type: "delete",
+                    matchIds: [3, 4],
+                    idCol: "id_producto"
+                }
             }
         ];
 
         /* =========================================================
-           LÓGICA DE JUEGO Y VISOR DQL
+           CONTROL DEL JUEGO Y DEL VISOR DE DATOS (RELOJ SIN RESET)
            ========================================================= */
+        const STORAGE_KEY = "sql_practica_ejercicio_2_state_v1";
         let currentLevelIdx = 0;
         let score = 0;
         let streak = 0;
         let completedLevels = new Set();
         let activeSlotIndex = 0;
         let slotAssignments = [];
-        let timerSeconds = 0;
-        let timerMax = 70;
+        let timerSeconds = 330;
+        let timerMax = 330;
         let timerInterval = null;
         let levelSolved = false;
+        let hasLoadedOnce = false;
+
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
 
         const levelPillsEl = document.getElementById("levelPills");
         const timerDisplayEl = document.getElementById("timerDisplay");
@@ -1348,7 +1380,9 @@
                     (idx === currentLevelIdx ? " current" : "") +
                     (completedLevels.has(lvl.id) ? " done" : "");
                 btn.textContent = lvl.id;
-                btn.addEventListener("click", () => loadLevel(idx));
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
                 levelPillsEl.appendChild(btn);
             });
         }
@@ -1359,21 +1393,32 @@
             return `${m}:${s}`;
         }
 
-        function startTimer(seconds) {
+        function resumeTimer() {
             clearInterval(timerInterval);
-            timerMax = seconds;
-            timerSeconds = seconds;
             updateTimerUI();
 
+            if (levelSolved || timerSeconds <= 0) {
+                if (!levelSolved && timerSeconds <= 0) {
+                    showFeedback(false, "⏰ El tiempo de este ejercicio se agotó. Aún puedes resolverlo sin bono por tiempo.");
+                }
+                return;
+            }
+
             timerInterval = setInterval(() => {
-                if (levelSolved) return;
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
                 timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
                 updateTimerUI();
+                saveCurrentLevelProgress();
                 if (timerSeconds <= 0) {
                     clearInterval(timerInterval);
                     streak = 0;
                     streakDisplayEl.textContent = streak;
-                    showFeedback(false, "⏰ ¡Se acabó el tiempo! Reinicia el nivel o completa la consulta para continuar.");
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la sentencia para continuar (sin bono de tiempo).");
                 }
             }, 1000);
         }
@@ -1384,10 +1429,10 @@
             timerBarFillEl.style.width = pct + "%";
 
             timerChipEl.classList.remove("warning", "danger");
-            if (timerSeconds <= 15) {
+            if (timerSeconds <= 30) {
                 timerChipEl.classList.add("danger");
                 timerBarFillEl.style.background = "var(--danger)";
-            } else if (timerSeconds <= 28) {
+            } else if (timerSeconds <= 60) {
                 timerChipEl.classList.add("warning");
                 timerBarFillEl.style.background = "var(--warning)";
             } else {
@@ -1396,24 +1441,37 @@
         }
 
         function loadLevel(idx) {
+            // Frenar y guardar el tiempo y estado del ejercicio actual antes de cambiar
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
             currentLevelIdx = idx;
-            levelSolved = false;
-            const lvl = LEVELS[idx];
 
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
             renderLevelPills();
-            levelBadgeEl.textContent = `Nivel ${lvl.id} de ${LEVELS.length} · DQL`;
+            levelBadgeEl.textContent = `Ejercicio 1-2 · Nivel ${lvl.id} de ${LEVELS.length}`;
             objTitleEl.textContent = lvl.title;
             objDescEl.textContent = lvl.desc;
             specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
 
             feedbackBannerEl.className = "feedback-banner";
             nextLevelBtn.classList.remove("visible");
-            visorStatusEl.textContent = "Tabla origen: empleados (5 filas)";
-            visorStatusEl.className = "visor-status-pill";
+            visorStatusEl.textContent = levelSolved ? "Query OK · Filas afectadas" : `Tabla activa: ${lvl.tableName}`;
+            visorStatusEl.className = "visor-status-pill" + (levelSolved ? " executed" : "");
 
             sqlBuilderContainerEl.innerHTML = "";
             slotAssignments = [];
             let slotCount = 0;
+            let inputCount = 0;
 
             lvl.lines.forEach(line => {
                 const lineDiv = document.createElement("div");
@@ -1427,7 +1485,8 @@
                         lineDiv.appendChild(span);
                     } else if (tok.type === "slot") {
                         const sIdx = slotCount++;
-                        slotAssignments.push(null);
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
                         const btn = document.createElement("button");
                         btn.type = "button";
                         btn.className = "sql-slot";
@@ -1438,15 +1497,25 @@
                         btn.addEventListener("click", () => onSlotClicked(sIdx));
                         lineDiv.appendChild(btn);
                     } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
                         const inp = document.createElement("input");
                         inp.type = "text";
                         inp.className = "sql-input";
                         inp.autocomplete = "off";
                         inp.spellcheck = false;
-                        inp.style.width = tok.width || "105px";
+                        inp.style.width = tok.width || "110px";
                         inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
                         inp.addEventListener("input", () => {
                             inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
                         });
                         lineDiv.appendChild(inp);
                     }
@@ -1455,22 +1524,46 @@
                 sqlBuilderContainerEl.appendChild(lineDiv);
             });
 
-            activeSlotIndex = 0;
-            updateSlotHighlights();
-
             keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
             lvl.bank.forEach((word, bIdx) => {
                 const chip = document.createElement("button");
                 chip.type = "button";
-                chip.className = "kw-chip";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
                 chip.dataset.bankIdx = bIdx;
                 chip.textContent = word;
                 chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
                 keywordBankEl.appendChild(chip);
             });
 
-            renderSourceTableVisor();
-            startTimer(lvl.timeLimit);
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderTableVisor(lvl);
+            if (levelSolved) {
+                applyDmlAnimation(lvl);
+                showFeedback(true, "✅ Este nivel ya fue completado correctamente.");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                }
+            }
+
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
         }
 
         function onSlotClicked(sIdx) {
@@ -1483,6 +1576,7 @@
             }
             activeSlotIndex = sIdx;
             updateSlotHighlights();
+            saveCurrentLevelProgress();
         }
 
         function onBankChipClicked(bankIdx, word, evt) {
@@ -1503,7 +1597,7 @@
             const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
             if (chip) chip.classList.add("used");
 
-            if (evt) spawnBurst(evt.clientX, evt.clientY, "#4f46e5", 10);
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#059669", 10);
 
             const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
             if (nextEmpty !== -1) {
@@ -1514,6 +1608,7 @@
             }
 
             updateSlotHighlights();
+            saveCurrentLevelProgress();
         }
 
         function updateSlotHighlights() {
@@ -1524,6 +1619,7 @@
                 if (assigned) {
                     el.textContent = assigned.value;
                     el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
                 } else {
                     el.textContent = "___";
                 }
@@ -1534,25 +1630,25 @@
             slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
         }
 
-        function renderSourceTableVisor() {
-            const headers = COLS_EMPLEADOS.map(c => `<th data-col="${c}">${c}</th>`).join("");
-            const rows = EMPLEADOS_DATA.map(r => {
-                const cells = COLS_EMPLEADOS.map(c => `<td data-col="${c}">${r[c]}</td>`).join("");
-                return `<tr data-rowid="${r.id_empleado}">${cells}</tr>`;
+        function renderTableVisor(lvl) {
+            const headersHTML = lvl.columns.map(c => `<th>${c}</th>`).join("");
+            const rowsHTML = lvl.initialRows.map(r => {
+                const rowId = r[lvl.columns[0]];
+                const cells = lvl.columns.map(col => `<td data-col="${col}">${r[col]}</td>`).join("");
+                return `<tr data-rowid="${rowId}">${cells}</tr>`;
             }).join("");
 
             visorStageEl.innerHTML = `
-                <div class="table-box">
-                    <div class="table-banner">
-                        <span>🗄️ TABLA ORIGEN: empleados</span>
-                        <span>5 registros totales</span>
+                <div class="data-table-wrap">
+                    <div class="data-table-banner">
+                        <span>📋 TABLA: ${lvl.tableName}</span>
+                        <span id="rowCountBadge">${lvl.initialRows.length} registros</span>
                     </div>
-                    <table class="dql-grid" id="sourceGrid">
-                        <thead><tr>${headers}</tr></thead>
-                        <tbody>${rows}</tbody>
+                    <table class="visual-grid">
+                        <thead><tr>${headersHTML}</tr></thead>
+                        <tbody id="visorTableBody">${rowsHTML}</tbody>
                     </table>
                 </div>
-                <div id="resultContainer"></div>
             `;
         }
 
@@ -1591,7 +1687,8 @@
             if (!allSlotsOk || !allInputsOk) {
                 streak = 0;
                 streakDisplayEl.textContent = streak;
-                showFeedback(false, "❌ Revisa los campos marcados en rojo: verifica tanto las palabras clave SQL como los nombres escritos manualmente.");
+                saveCurrentLevelProgress();
+                showFeedback(false, "❌ Revisa los elementos en rojo: verifica tanto las palabras clave como los nombres de campos/valores escritos manualmente.");
                 return;
             }
 
@@ -1599,75 +1696,73 @@
             clearInterval(timerInterval);
 
             const lvl = LEVELS[currentLevelIdx];
-            const timeBonus = Math.max(10, timerSeconds * 3);
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
             streak++;
             const gained = 100 + timeBonus + (streak * 15);
             score += gained;
             completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
 
             streakDisplayEl.textContent = streak;
             scoreDisplayEl.textContent = score;
             renderLevelPills();
 
-            showFeedback(true, `✅ ¡Consulta ejecutada! Se extrajeron ${lvl.matchedIds.length} registros. +${gained} pts`);
-            visorStatusEl.textContent = `${lvl.matchedIds.length} fila(s) devuelta(s)`;
+            showFeedback(true, `✅ ¡Sentencia DML ejecutada! +${gained} pts (Bono rapidez: +${timeBonus} pts)`);
+            visorStatusEl.textContent = "Query OK · Filas afectadas";
             visorStatusEl.className = "visor-status-pill executed";
 
             const rect = visorStageEl.getBoundingClientRect();
-            spawnBurst(rect.left + rect.width / 2, rect.top + 140, "#10b981", 28);
+            spawnBurst(rect.left + rect.width / 2, rect.top + 120, "#10b981", 28);
 
-            animateDqlResult(lvl);
+            applyDmlAnimation(lvl);
 
             if (currentLevelIdx < LEVELS.length - 1) {
                 nextLevelBtn.classList.add("visible");
             }
         }
 
-        function animateDqlResult(lvl) {
-            const sourceGrid = document.getElementById("sourceGrid");
-            // 1. Iluminar columnas seleccionadas en la tabla origen
-            lvl.selectedCols.forEach(col => {
-                const th = sourceGrid.querySelector(`th[data-col="${col}"]`);
-                if (th) th.classList.add("col-selected");
-            });
+        function applyDmlAnimation(lvl) {
+            const tbody = document.getElementById("visorTableBody");
+            const countBadge = document.getElementById("rowCountBadge");
+            const eff = lvl.effect;
 
-            // 2. Resaltar filas que cumplen el WHERE y atenuar el resto
-            const trs = sourceGrid.querySelectorAll("tbody tr");
-            trs.forEach(tr => {
-                const id = Number(tr.dataset.rowid);
-                if (lvl.matchedIds.includes(id)) {
-                    tr.classList.add("row-matched");
-                } else {
-                    tr.classList.add("row-dimmed");
+            if (eff.type === "insert") {
+                const cells = lvl.columns.map((col, idx) => {
+                    const extra = idx === 0 ? `<span class="row-badge-new">POPUP NUEVO</span>` : "";
+                    return `<td data-col="${col}">${eff.newRow[col]} ${extra}</td>`;
+                }).join("");
+                const tr = document.createElement("tr");
+                tr.className = "row-popup-insert";
+                tr.innerHTML = cells;
+                tbody.appendChild(tr);
+                if (countBadge) countBadge.textContent = `${lvl.initialRows.length + 1} registros`;
+            } else if (eff.type === "update") {
+                eff.matchIds.forEach(id => {
+                    const tr = tbody.querySelector(`tr[data-rowid="${id}"]`);
+                    if (tr) {
+                        tr.classList.add("row-updated-anim");
+                        Object.keys(eff.changes).forEach(colName => {
+                            const td = tr.querySelector(`td[data-col="${colName}"]`);
+                            if (td) {
+                                td.classList.add("cell-changed");
+                                td.textContent = "✨ " + eff.changes[colName];
+                            }
+                        });
+                    }
+                });
+            } else if (eff.type === "delete") {
+                eff.matchIds.forEach(id => {
+                    const tr = tbody.querySelector(`tr[data-rowid="${id}"]`);
+                    if (tr) {
+                        tr.classList.add("row-delete-out");
+                        setTimeout(() => tr.remove(), 650);
+                    }
+                });
+                if (countBadge) {
+                    countBadge.textContent = `${lvl.initialRows.length - eff.matchIds.length} registros`;
                 }
-            });
-
-            // 3. Crear tabla de resultado con efecto popup por cada registro
-            const resultContainer = document.getElementById("resultContainer");
-            const resHeaders = lvl.selectedCols.map(c => `<th>${c}</th>`).join("");
-            resultContainer.innerHTML = `
-                <div class="table-box result-box">
-                    <div class="table-banner result-banner">
-                        <span>✨ RESULTADO DEL SELECT (Proyección + Filtro)</span>
-                        <span>${lvl.matchedIds.length} coincidencia(s)</span>
-                    </div>
-                    <table class="dql-grid">
-                        <thead><tr>${resHeaders}</tr></thead>
-                        <tbody id="resultBody"></tbody>
-                    </table>
-                </div>
-            `;
-
-            const resultBody = document.getElementById("resultBody");
-            const matchedRows = EMPLEADOS_DATA.filter(r => lvl.matchedIds.includes(r.id_empleado));
-            matchedRows.forEach((row, idx) => {
-                setTimeout(() => {
-                    const tr = document.createElement("tr");
-                    tr.className = "result-row-pop";
-                    tr.innerHTML = lvl.selectedCols.map(c => `<td><strong>${row[c]}</strong></td>`).join("");
-                    resultBody.appendChild(tr);
-                }, idx * 140);
-            });
+            }
         }
 
         function showFeedback(isOk, msg) {
@@ -1695,7 +1790,7 @@
                 r: 1.5 + Math.random() * 2.5,
                 vx: (Math.random() - 0.5) * 0.35,
                 vy: (Math.random() - 0.5) * 0.35,
-                color: i % 2 === 0 ? "rgba(79, 70, 229, 0.15)" : "rgba(2, 132, 199, 0.14)"
+                color: i % 2 === 0 ? "rgba(5, 150, 105, 0.15)" : "rgba(2, 132, 199, 0.14)"
             });
         }
 
@@ -1752,13 +1847,14 @@
         animateParticles();
 
         runQueryBtn.addEventListener("click", validateAndRun);
-        resetLevelBtn.addEventListener("click", () => loadLevel(currentLevelIdx));
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
         nextLevelBtn.addEventListener("click", () => {
             if (currentLevelIdx < LEVELS.length - 1) {
                 loadLevel(currentLevelIdx + 1);
             }
         });
 
+        loadPersistedState();
         loadLevel(0);
     </script>
 </body>
