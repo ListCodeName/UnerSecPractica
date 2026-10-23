@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Base de Datos II — Ejercicio 2: Lenguaje de Manipulación de Datos (DML)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --bg-grad: linear-gradient(135deg, #ecfdf5 0%, #f8fafc 50%, #eff6ff 100%);
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --surface-code: #f1f5f9;
+            --border: #dbe3ef;
+            --border-strong: #cbd5e1;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --primary-light: #ccfbf1;
+            --accent: #2563eb;
+            --accent-dark: #1d4ed8;
+            --accent-light: #dbeafe;
+            --dml-key: #059669;
+            --dml-key-light: #d1fae5;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 8px 24px rgba(13, 148, 136, 0.09);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .top-nav-inner {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.28);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(3deg); }
+        }
+
+        .context-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .context-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.36rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .context-pill.active-db {
+            background: var(--primary-light);
+            border-color: #5eead4;
+            color: var(--primary-dark);
+        }
+
+        .hud-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hud-inner {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .level-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .level-pill.current {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: scale(1.06);
+        }
+
+        .level-pill.done {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-chip.timer-chip {
+            background: var(--primary-light);
+            border-color: #5eead4;
+            color: var(--primary-dark);
+            min-width: 106px;
+        }
+
+        .stat-chip.timer-chip.warning {
+            background: var(--warning-light);
+            border-color: #fde68a;
+            color: #b45309;
+            animation: pulseUrgent 0.8s infinite alternate;
+        }
+
+        .stat-chip.timer-chip.danger {
+            background: var(--danger-light);
+            border-color: #fecaca;
+            color: #b91c1c;
+            animation: pulseUrgent 0.45s infinite alternate;
+        }
+
+        @keyframes pulseUrgent {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.35s linear, background 0.3s;
+        }
+
+        .workspace {
+            max-width: 1480px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.35rem 1.5rem 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            flex: 1;
+        }
+
+        .card {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 1.75rem;
+            scroll-margin-top: 84px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .objective-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+
+        .objective-desc {
+            font-size: 0.94rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* TABLAS DE MUESTRA EN FORMATO SIMPLIFICADO */
+        .sample-schema-wrapper {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.9rem 1.05rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .sample-schema-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.7rem;
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+        }
+
+        .sample-tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .sample-table-card {
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
+            border-radius: 9px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+        }
+
+        .sample-table-title {
+            background: #f1f5f9;
+            padding: 0.4rem 0.7rem;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .sample-table-scroll {
+            overflow-x: auto;
+        }
+
+        table.sample-mini-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+        }
+
+        table.sample-mini-grid th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.35rem 0.55rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        table.sample-mini-grid th.sample-pk {
+            color: #0f766e;
+            background: #f0fdfa;
+        }
+
+        table.sample-mini-grid td {
+            padding: 0.32rem 0.55rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* BOTÓN DE FOCO "PISTA" Y ESPECIFICACIÓN OCULTA POR DEFECTO */
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.36rem 0.8rem;
+            border-radius: 999px;
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.14);
+        }
+
+        .btn-hint:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.22);
+        }
+
+        .btn-hint.active {
+            background: #f59e0b;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+
+        .btn-hint svg {
+            transition: transform 0.25s ease;
+        }
+
+        .btn-hint:hover svg,
+        .btn-hint.active svg {
+            transform: scale(1.15) rotate(-6deg);
+        }
+
+        .spec-box {
+            display: none;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.05rem;
+            font-size: 0.84rem;
+        }
+
+        .spec-box.visible {
+            display: block;
+            animation: resultPopup 0.28s ease;
+        }
+
+        .spec-box-title {
+            font-weight: 700;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            color: #b45309;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+
+        .spec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            font-size: 0.79rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.1rem 0.42rem;
+            border-radius: 5px;
+        }
+
+        .code-pill.pk-pill {
+            background: #ccfbf1;
+            color: #0f766e;
+            border: 1px solid #99f6e4;
+        }
+
+        /* SQL BUILDER */
+        .sql-editor-box {
+            background: var(--surface-code);
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.86rem;
+            line-height: 2.15;
+            overflow-x: auto;
+        }
+
+        .sql-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed var(--border-strong);
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        .sql-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.38rem;
+            margin-bottom: 0.38rem;
+        }
+
+        .sql-indent {
+            padding-left: 1.35rem;
+        }
+
+        .sql-punct {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sql-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 88px;
+            height: 34px;
+            padding: 0 0.65rem;
+            border-radius: 7px;
+            border: 2px dashed #94a3b8;
+            background: #ffffff;
+            color: #475569;
+            font-family: var(--font-mono);
+            font-size: 0.81rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .sql-slot::before {
+            content: attr(data-slot-index);
+            font-size: 0.65rem;
+            opacity: 0.55;
+            margin-right: 4px;
+        }
+
+        .sql-slot.active-target {
+            border-style: solid;
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .sql-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent-dark);
+        }
+
+        .sql-slot.slot-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-slot.slot-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #991b1b !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        .sql-input {
+            height: 34px;
+            padding: 0 0.52rem;
+            border-radius: 7px;
+            border: 2px solid #94a3b8;
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.83rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .sql-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
+        }
+
+        .sql-input.input-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-input.input-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        @keyframes shakeElem {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .keyword-bank-title {
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .keyword-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .kw-chip {
+            padding: 0.42rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+            transition: all 0.16s ease;
+            user-select: none;
+        }
+
+        .kw-chip:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .kw-chip.used {
+            opacity: 0.35;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1.1rem;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-replay {
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            border: 1px solid #93c5fd;
+            display: none;
+        }
+
+        .btn-replay.visible {
+            display: inline-flex;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: #fff;
+            display: none;
+        }
+
+        .btn-next.visible {
+            display: inline-flex;
+        }
+
+        .feedback-banner {
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback-banner.show {
+            display: block;
+            animation: resultPopup 0.3s ease;
+        }
+
+        .feedback-banner.ok {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback-banner.err {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        /* =========================================================
+           VISOR ANIMADO DML (100% WIDTH + ALTO DINÁMICO)
+           ========================================================= */
+        .visor-card {
+            width: 100%;
+            height: auto;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+            padding: 1.65rem 1.85rem;
+            border: 2px solid #cbd5e1;
+        }
+
+        .visor-card.visor-highlight-active {
+            border-color: var(--primary);
+            box-shadow: 0 14px 36px rgba(13, 148, 136, 0.14);
+        }
+
+        .visor-stage {
+            flex: 1;
+            width: 100%;
+            height: auto;
+            min-height: 460px;
+            background:
+                radial-gradient(#cbd5e1 1px, transparent 1px) 0 0 / 20px 20px,
+                #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.65rem 1.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.65rem;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .visor-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.34rem 0.85rem;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            transition: all 0.25s;
+        }
+
+        .visor-status-pill.phase-key {
+            background: var(--accent-light);
+            color: var(--accent-dark);
+        }
+
+        .visor-status-pill.phase-where {
+            background: var(--warning-light);
+            color: #b45309;
+        }
+
+        .visor-status-pill.executed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .dml-steps-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            padding: 0.7rem 1rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .dml-step-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.36rem 0.85rem;
+            border-radius: 999px;
+            background: var(--surface-alt);
+            color: var(--text-soft);
+            border: 1px solid var(--border);
+            transition: all 0.28s ease;
+        }
+
+        .dml-step-chip.active-step {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-color: #2dd4bf;
+            transform: scale(1.04);
+        }
+
+        .dml-step-chip.done-step {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .table-box {
+            background: #ffffff;
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .table-banner {
+            padding: 0.72rem 1.05rem;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+        }
+
+        table.dml-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        table.dml-grid th {
+            background: #f1f5f9;
+            color: var(--text);
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        table.dml-grid td {
+            padding: 0.62rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        tr.dml-row-inserted {
+            background: #ecfdf5 !important;
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        tr.dml-row-inserted td {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        tr.dml-row-updated {
+            background: #fef3c7 !important;
+            animation: resultPopup 0.4s ease both;
+        }
+
+        tr.dml-row-updated td {
+            color: #92400e;
+            font-weight: 700;
+        }
+
+        tr.dml-row-deleted {
+            background: #fee2e2 !important;
+            text-decoration: line-through;
+            opacity: 0.42;
+        }
+
+        th.dml-col-renamed {
+            background: #dbeafe !important;
+            color: #1d4ed8 !important;
+            border-bottom-color: #2563eb !important;
+        }
+
+        .old-val-strike {
+            text-decoration: line-through;
+            color: #ef4444;
+            margin-right: 6px;
+            font-weight: 500;
+        }
+
+        .new-val-badge {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 0.1rem 0.45rem;
+            border-radius: 5px;
+            font-weight: 800;
+        }
+
+        .visor-footer-actions {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-strong);
+        }
+
+        .visor-footer-actions.visible {
+            display: flex;
+        }
+
+        @keyframes resultPopup {
+            0% {
+                opacity: 0;
+                transform: scale(0.88) translateY(14px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.02) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-wrapper">
+        <nav class="top-nav">
+            <div class="top-nav-inner">
+                <a href="Ejercicio 2 - DML.html" class="brand">
+                    <span class="brand-icon" aria-hidden="true">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                        </svg>
+                    </span>
+                    <span>Base de Datos II · Ejercicio 2: Manipulación de Datos (DML) y Alteraciones</span>
+                </a>
+                <div class="context-badges">
+                    <span class="context-pill active-db">🗄️ Esquema: universidad_practica</span>
+                    <span class="context-pill">✏️ INSERT · UPDATE · DELETE · RENAME</span>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hud-bar">
+            <div class="hud-inner">
+                <div class="level-pills" id="levelPills"></div>
+                <div class="stats-group">
+                    <div class="stat-chip timer-chip" id="timerChip">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <circle cx="12" cy="13" r="8"></circle>
+                            <path d="M12 9v4l2.5 2.5"></path>
+                            <path d="M9 2h6"></path>
+                        </svg>
+                        <span id="timerDisplay">05:30</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>⚡ Racha:</span>
+                        <span id="streakDisplay">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>🏆 Puntos:</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+
+        <main class="workspace">
+            <!-- SECCIÓN SUPERIOR (100% WIDTH): CONSIGNA + TABLAS SIMPLIFICADAS + CONSTRUCTOR SQL -->
+            <section class="card" id="builderCard">
+                <div class="card-header">
+                    <span class="badge-tag" id="levelBadge">Ejercicio 2 (DML) · Nivel 1 de 8</span>
+                    <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+                        <button type="button" class="btn-hint" id="hintToggleBtn" title="Mostrar u ocultar Especificación Estricta (Pista)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18h6"></path>
+                                <path d="M10 22h4"></path>
+                                <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"></path>
+                            </svg>
+                            <span id="hintBtnText">Pista</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.34rem 0.7rem;font-size:0.76rem;">
+                            🧹 Limpiar Respuesta
+                        </button>
+                    </div>
+                </div>
+
+                <h1 class="objective-title" id="objTitle"></h1>
+                <p class="objective-desc" id="objDesc"></p>
+
+                <!-- TABLAS DE MUESTRA EN FORMATO SIMPLIFICADO (SIEMPRE VISIBLES) -->
+                <div class="sample-schema-wrapper" id="sampleSchemaWrapper">
+                    <div class="sample-schema-header">
+                        <span id="sampleSchemaTitle">🗂️ Tablas de Muestra Simplificadas — Esquema: universidad_practica</span>
+                        <span style="text-transform:none;font-weight:600;">🔑 Clave Primaria (PK) · Estructura y datos de referencia para confeccionar la sentencia</span>
+                    </div>
+                    <div class="sample-tables-grid" id="sampleTablesGrid"></div>
+                </div>
+
+                <!-- ESPECIFICACIÓN ESTRICTA OCULTA POR DEFECTO (SOLO SE MUESTRA AL PULSAR "PISTA") -->
+                <div class="spec-box" id="specBox">
+                    <div class="spec-box-title">
+                        <span>💡 Pista — Especificación Estricta DML (MySQL / MariaDB)</span>
+                    </div>
+                    <ul class="spec-list" id="specList"></ul>
+                </div>
+
+                <div class="sql-editor-box">
+                    <div class="sql-editor-header">
+                        <span>CONSTRUCTOR SQL DML (MySQL) — Sin ayudas de autocompletado</span>
+                        <span id="slotIndicator">Slot activo: #1</span>
+                    </div>
+                    <div id="sqlBuilderContainer"></div>
+                </div>
+
+                <div class="keyword-bank-title">
+                    <span>🧩 Banco de Palabras Clave SQL (Orden Alternado + Distractores)</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para cambiar su palabra</span>
+                </div>
+                <div class="keyword-bank" id="keywordBank"></div>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-primary" id="runQueryBtn">
+                        ▶ Ejecutar Sentencia DML
+                    </button>
+                    <button type="button" class="btn btn-replay" id="replayAnimBtn">
+                        🔄 Repetir Animación DML
+                    </button>
+                    <button type="button" class="btn btn-next" id="nextLevelBtn">
+                        Siguiente Ejercicio ➔
+                    </button>
+                </div>
+
+                <div class="feedback-banner" id="feedbackBanner"></div>
+            </section>
+
+            <!-- SECCIÓN INFERIOR (100% WIDTH + ALTO DINÁMICO): VISOR ANIMADO DML -->
+            <section class="card visor-card" id="visorCard">
+                <div class="card-header">
+                    <span class="badge-tag" style="background:#ccfbf1;color:#0f766e;">✏️ Visor Animado de Registros y Alteraciones (DML)</span>
+                    <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-replay" id="replayVisorBtn" style="padding:0.34rem 0.8rem;font-size:0.78rem;">
+                            🔄 Repetir Animación DML
+                        </button>
+                        <button type="button" class="btn btn-next" id="nextVisorHeaderBtn" style="padding:0.34rem 0.8rem;font-size:0.78rem;">
+                            Siguiente Ejercicio ➔
+                        </button>
+                        <span class="visor-status-pill" id="visorStatus">Esperando sentencia DML...</span>
+                    </div>
+                </div>
+
+                <div class="dml-steps-bar">
+                    <span class="dml-step-chip" id="stepChip1">1️⃣ Selección de Tabla / Filtro WHERE</span>
+                    <span class="dml-step-chip" id="stepChip2">2️⃣ Mutación de Filas / Columnas</span>
+                    <span class="dml-step-chip" id="stepChip3">3️⃣ Tabla Confirmada en Motor</span>
+                </div>
+
+                <div class="visor-stage" id="visorStage"></div>
+
+                <div class="visor-footer-actions" id="visorFooterActions">
+                    <button type="button" class="btn btn-secondary" id="backToBuilderBtn">
+                        ⬆️ Subir a la Consigna
+                    </button>
+                    <div style="display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-replay visible" id="replayVisorFooterBtn">
+                            🔄 Repetir Animación DML
+                        </button>
+                        <button type="button" class="btn btn-next" id="nextVisorFooterBtn">
+                            Siguiente Ejercicio ➔
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           TABLAS DE REFERENCIA TOMADAS DE EJERCICIO 2 / README.md
+           ========================================================= */
+        const SAMPLE_TABLES_DML = {
+            cursos: {
+                name: "cursos",
+                pk: "id_curso",
+                cols: ["id_curso", "nombre_curso", "creditos"],
+                rows: [
+                    { id_curso: 1, nombre_curso: "Introducción a Bases de Datos", creditos: 4 },
+                    { id_curso: 2, nombre_curso: "Programación Web", creditos: 4 },
+                    { id_curso: 3, nombre_curso: "Arquitectura de Computadoras", creditos: 5 },
+                    { id_curso: 4, nombre_curso: "Inglés Técnico", creditos: 2 }
+                ]
+            },
+            alumnos: {
+                name: "alumnos",
+                pk: "id_alumno",
+                cols: ["id_alumno", "legajo", "nombre", "apellido", "email", "fecha_ingreso", "telefono"],
+                rows: [
+                    { id_alumno: 1, legajo: "UNER000101", nombre: "Ana", apellido: "Gomez", email: "ana.gomez@email.com", fecha_ingreso: "2025-03-01", telefono: "3434112233" },
+                    { id_alumno: 2, legajo: "UNER000102", nombre: "Lucas", apellido: "Pérez", email: "lucas.perez@email.com", fecha_ingreso: "2025-03-01", telefono: "3434223344" },
+                    { id_alumno: 3, legajo: "UNER000103", nombre: "Sofía", apellido: "Díaz", email: "sofia.diaz@email.com", fecha_ingreso: "2025-03-02", telefono: "3434334455" },
+                    { id_alumno: 4, legajo: "1234567890", nombre: "Mateo", apellido: "Ruiz", email: "mateo.ruiz@email.com", fecha_ingreso: "2025-03-03", telefono: "3434445566" }
+                ]
+            }
+        };
+
+        const LEVELS = [
+            {
+                id: 1,
+                title: "1. Inserción Unitaria en Cursos (INSERT INTO)",
+                timeLimit: 300,
+                desc: "Agrega un nuevo registro individual a la tabla cursos especificando las columnas nombre_curso y creditos (en ese orden). El curso debe llamarse 'Introducción a Bases de Datos' y otorgar 4 créditos.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>INSERT INTO</span> <span class='code-pill'>cursos</span> (<span class='code-pill'>nombre_curso</span>, <span class='code-pill'>creditos</span>)",
+                    "Valores: <span class='code-pill'>VALUES</span> (<span class='code-pill'>'Introducción a Bases de Datos'</span>, <span class='code-pill'>4</span>);"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "cursos", width: "95px" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "nombre_curso", width: "135px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "creditos", width: "100px" },
+                            { type: "punct", text: ")" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "VALUES" },
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "Introducción a Bases de Datos", width: "255px" },
+                            { type: "punct", text: "'," },
+                            { type: "input", answer: "4", width: "55px" },
+                            { type: "punct", text: ");" }
+                        ]
+                    }
+                ],
+                bank: ["VALUES", "UPDATE", "INSERT INTO", "SET", "INTO", "SELECT", "WHERE", "ADD COLUMN"],
+                dmlType: "insert_unit_curso"
+            },
+            {
+                id: 2,
+                title: "2. Inserción Masiva de Alumnos (Multi-Row INSERT INTO)",
+                timeLimit: 360,
+                desc: "Registra los 4 alumnos de referencia en un solo golpe utilizando una única sentencia INSERT INTO sobre la tabla alumnos para las columnas legajo, nombre, apellido, email y fecha_ingreso (observa los valores exactos en la tabla de muestra de alumnos).",
+                specs: [
+                    "Cabecera: <span class='code-pill'>INSERT INTO</span> <span class='code-pill'>alumnos</span> (<span class='code-pill'>legajo</span>, <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>email</span>, <span class='code-pill'>fecha_ingreso</span>) <span class='code-pill'>VALUES</span>",
+                    "Fila 1: <span class='code-pill'>'UNER000101'</span>, <span class='code-pill'>'Ana'</span>, <span class='code-pill'>'Gomez'</span> · Fila 4: legajo <span class='code-pill'>'1234567890'</span>, nombre <span class='code-pill'>'Mateo'</span>, apellido <span class='code-pill'>'Ruiz'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "alumnos", width: "100px" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "legajo", width: "85px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "nombre", width: "85px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "90px" },
+                            { type: "punct", text: ", email, fecha_ingreso)" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "VALUES" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "UNER000101", width: "115px" },
+                            { type: "punct", text: "', 'Ana', 'Gomez', 'ana.gomez@email.com', '2025-03-01')," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('UNER000102', 'Lucas', 'Pérez', 'lucas.perez@email.com', '2025-03-01')," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('UNER000103', 'Sofía', 'Díaz', 'sofia.diaz@email.com', '2025-03-02')," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "1234567890", width: "115px" },
+                            { type: "punct", text: "', '" },
+                            { type: "input", answer: "Mateo", width: "80px" },
+                            { type: "punct", text: "', '" },
+                            { type: "input", answer: "Ruiz", width: "75px" },
+                            { type: "punct", text: "', 'mateo.ruiz@email.com', '2025-03-03');" }
+                        ]
+                    }
+                ],
+                bank: ["VALUES", "SET", "INSERT INTO", "UPDATE", "FROM", "WHERE", "SELECT", "DELETE FROM"],
+                dmlType: "insert_bulk_alumnos"
+            },
+            {
+                id: 3,
+                title: "3. Inserción Masiva de Cursos (3 Materias en 1 Sentencia)",
+                timeLimit: 330,
+                desc: "Registra en una sola sentencia INSERT INTO las 3 materias adicionales en la tabla cursos (columnas nombre_curso y creditos): 'Programación Web' (4 créditos), 'Arquitectura de Computadoras' (5 créditos) e 'Inglés Técnico' (2 créditos).",
+                specs: [
+                    "Cabecera: <span class='code-pill'>INSERT INTO</span> <span class='code-pill'>cursos</span> (<span class='code-pill'>nombre_curso</span>, <span class='code-pill'>creditos</span>) <span class='code-pill'>VALUES</span>",
+                    "Tuplas: (<span class='code-pill'>'Programación Web'</span>, <span class='code-pill'>4</span>), (<span class='code-pill'>'Arquitectura de Computadoras'</span>, <span class='code-pill'>5</span>), (<span class='code-pill'>'Inglés Técnico'</span>, <span class='code-pill'>2</span>);"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "cursos", width: "95px" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "nombre_curso", width: "135px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "creditos", width: "95px" },
+                            { type: "punct", text: ")" },
+                            { type: "slot", answer: "VALUES" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "Programación Web", width: "165px" },
+                            { type: "punct", text: "'," },
+                            { type: "input", answer: "4", width: "50px" },
+                            { type: "punct", text: ")," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "Arquitectura de Computadoras", width: "245px" },
+                            { type: "punct", text: "'," },
+                            { type: "input", answer: "5", width: "50px" },
+                            { type: "punct", text: ")," }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "Inglés Técnico", width: "145px" },
+                            { type: "punct", text: "'," },
+                            { type: "input", answer: "2", width: "50px" },
+                            { type: "punct", text: ");" }
+                        ]
+                    }
+                ],
+                bank: ["VALUES", "INSERT INTO", "UPDATE", "SET", "WHERE", "INTO", "ALTER TABLE", "ADD COLUMN"],
+                dmlType: "insert_bulk_cursos"
+            },
+            {
+                id: 4,
+                title: "4. Actualización Selectiva de Correo (UPDATE + WHERE)",
+                timeLimit: 300,
+                desc: "Actualiza el correo electrónico (email) de la alumna Ana Gomez (cuyo id_alumno es 1 en la tabla alumnos) asignándole el nuevo correo 'ana.gomez@uner.edu.ar' mediante una cláusula WHERE específica.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>UPDATE</span> <span class='code-pill'>alumnos</span> <span class='code-pill'>SET</span> <span class='code-pill'>email</span> = <span class='code-pill'>'ana.gomez@uner.edu.ar'</span>",
+                    "Filtro obligatorio: <span class='code-pill'>WHERE</span> <span class='code-pill pk-pill'>id_alumno = 1</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "alumnos", width: "105px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "email", width: "85px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "ana.gomez@uner.edu.ar", width: "205px" },
+                            { type: "punct", text: "'" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "id_alumno", width: "110px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "1", width: "55px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SET", "WHERE", "UPDATE", "MODIFY COLUMN", "INSERT INTO", "FROM", "VALUES", "SELECT"],
+                dmlType: "update_alumno_email"
+            },
+            {
+                id: 5,
+                title: "5. Actualización Masiva de Créditos (UPDATE por Condición)",
+                timeLimit: 300,
+                desc: "Incrementa a 5 el valor de la columna creditos en todos los registros de la tabla cursos que actualmente tengan exactamente 4 créditos.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>UPDATE</span> <span class='code-pill'>cursos</span> <span class='code-pill'>SET</span> <span class='code-pill'>creditos</span> = <span class='code-pill'>5</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>creditos</span> = <span class='code-pill'>4</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "cursos", width: "95px" },
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "creditos", width: "100px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "5", width: "55px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "creditos", width: "100px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "4", width: "55px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["WHERE", "UPDATE", "SET", "ALTER TABLE", "VALUES", "FROM", "HAVING", "DELETE FROM"],
+                dmlType: "update_cursos_creditos"
+            },
+            {
+                id: 6,
+                title: "6. Eliminación Selectiva de Alumno por Legajo (DELETE FROM)",
+                timeLimit: 300,
+                desc: "El alumno Mateo Ruiz con legajo '1234567890' se ha dado de baja de la universidad. Confecciona la sentencia DELETE para remover únicamente ese registro de la tabla alumnos filtrando por su legajo.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>DELETE FROM</span> <span class='code-pill'>alumnos</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>legajo</span> = <span class='code-pill'>'1234567890'</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE FROM" },
+                            { type: "input", answer: "alumnos", width: "105px" },
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "legajo", width: "90px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "1234567890", width: "120px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["WHERE", "DROP TABLE", "DELETE FROM", "TRUNCATE TABLE", "DROP COLUMN", "FROM", "SET", "UPDATE"],
+                dmlType: "delete_alumno_legajo"
+            },
+            {
+                id: 7,
+                title: "7. Renombrar Columna con Datos (ALTER TABLE RENAME COLUMN)",
+                timeLimit: 300,
+                desc: "Se decidió que el campo telefono de la tabla alumnos almacenará exclusivamente teléfonos móviles. Utiliza la sintaxis moderna de MySQL 8+ / MariaDB 10.5+ (RENAME COLUMN ... TO ...) para renombrar la columna telefono por el nuevo nombre celular.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>ALTER TABLE</span> <span class='code-pill'>alumnos</span> <span class='code-pill'>RENAME COLUMN</span> <span class='code-pill'>telefono</span> <span class='code-pill'>TO</span> <span class='code-pill'>celular</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ALTER TABLE" },
+                            { type: "input", answer: "alumnos", width: "105px" },
+                            { type: "slot", answer: "RENAME COLUMN" },
+                            { type: "input", answer: "telefono", width: "105px" },
+                            { type: "slot", answer: "TO" },
+                            { type: "input", answer: "celular", width: "105px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["TO", "RENAME COLUMN", "MODIFY COLUMN", "ALTER TABLE", "UPDATE", "SET", "ADD COLUMN", "AS"],
+                dmlType: "rename_telefono_celular"
+            },
+            {
+                id: 8,
+                title: "8. Modificación de Tipo con Tabla Poblada (MODIFY COLUMN)",
+                timeLimit: 300,
+                desc: "Para estandarizar el almacenamiento de números móviles a un formato nacional reducido sin perder los teléfonos ya cargados, modifica la columna celular de la tabla alumnos para que su tipo de dato sea VARCHAR(15).",
+                specs: [
+                    "Sentencia: <span class='code-pill'>ALTER TABLE</span> <span class='code-pill'>alumnos</span> <span class='code-pill'>MODIFY COLUMN</span> <span class='code-pill'>celular</span> <span class='code-pill'>VARCHAR(15)</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ALTER TABLE" },
+                            { type: "input", answer: "alumnos", width: "105px" },
+                            { type: "slot", answer: "MODIFY COLUMN" },
+                            { type: "input", answer: "celular", width: "100px" },
+                            { type: "input", answer: "VARCHAR(15)", width: "125px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["MODIFY COLUMN", "RENAME COLUMN", "ALTER TABLE", "UPDATE", "SET", "DROP COLUMN", "ADD COLUMN", "VALUES"],
+                dmlType: "modify_celular_varchar15"
+            }
+        ];
+
+        const STORAGE_KEY = "bd2_ej2_dml_state_v1";
+        let currentLevelIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let completedLevels = new Set();
+        let activeSlotIndex = 0;
+        let slotAssignments = [];
+        let timerSeconds = 300;
+        let timerMax = 300;
+        let timerInterval = null;
+        let levelSolved = false;
+        let hasLoadedOnce = false;
+        let animTimeouts = [];
+
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function clearAnimTimeouts() {
+            animTimeouts.forEach(t => clearTimeout(t));
+            animTimeouts = [];
+        }
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+
+        const builderCardEl = document.getElementById("builderCard");
+        const visorCardEl = document.getElementById("visorCard");
+        const levelPillsEl = document.getElementById("levelPills");
+        const timerDisplayEl = document.getElementById("timerDisplay");
+        const timerChipEl = document.getElementById("timerChip");
+        const timerBarFillEl = document.getElementById("timerBarFill");
+        const streakDisplayEl = document.getElementById("streakDisplay");
+        const scoreDisplayEl = document.getElementById("scoreDisplay");
+        const levelBadgeEl = document.getElementById("levelBadge");
+        const objTitleEl = document.getElementById("objTitle");
+        const objDescEl = document.getElementById("objDesc");
+        const specBoxEl = document.getElementById("specBox");
+        const specListEl = document.getElementById("specList");
+        const hintToggleBtn = document.getElementById("hintToggleBtn");
+        const hintBtnTextEl = document.getElementById("hintBtnText");
+        const sampleTablesGridEl = document.getElementById("sampleTablesGrid");
+        const sqlBuilderContainerEl = document.getElementById("sqlBuilderContainer");
+        const keywordBankEl = document.getElementById("keywordBank");
+        const slotIndicatorEl = document.getElementById("slotIndicator");
+        const feedbackBannerEl = document.getElementById("feedbackBanner");
+        const visorStageEl = document.getElementById("visorStage");
+        const visorStatusEl = document.getElementById("visorStatus");
+        const nextLevelBtn = document.getElementById("nextLevelBtn");
+        const replayAnimBtn = document.getElementById("replayAnimBtn");
+        const replayVisorBtn = document.getElementById("replayVisorBtn");
+        const nextVisorHeaderBtn = document.getElementById("nextVisorHeaderBtn");
+        const visorFooterActionsEl = document.getElementById("visorFooterActions");
+        const backToBuilderBtn = document.getElementById("backToBuilderBtn");
+        const replayVisorFooterBtn = document.getElementById("replayVisorFooterBtn");
+        const nextVisorFooterBtn = document.getElementById("nextVisorFooterBtn");
+        const runQueryBtn = document.getElementById("runQueryBtn");
+        const resetLevelBtn = document.getElementById("resetLevelBtn");
+        const stepChip1El = document.getElementById("stepChip1");
+        const stepChip2El = document.getElementById("stepChip2");
+        const stepChip3El = document.getElementById("stepChip3");
+
+        function scrollToVisor() {
+            if (visorCardEl) visorCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function scrollToBuilder() {
+            if (builderCardEl) builderCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function hideHint() {
+            if (specBoxEl) specBoxEl.classList.remove("visible");
+            if (hintToggleBtn) hintToggleBtn.classList.remove("active");
+            if (hintBtnTextEl) hintBtnTextEl.textContent = "Pista";
+        }
+
+        function toggleHint() {
+            if (!specBoxEl) return;
+            const isNowVisible = specBoxEl.classList.toggle("visible");
+            if (hintToggleBtn) hintToggleBtn.classList.toggle("active", isNowVisible);
+            if (hintBtnTextEl) hintBtnTextEl.textContent = isNowVisible ? "Ocultar Pista" : "Pista";
+        }
+
+        function renderSimplifiedSampleTables() {
+            if (!sampleTablesGridEl) return;
+            sampleTablesGridEl.innerHTML = Object.values(SAMPLE_TABLES_DML).map(tObj => {
+                const ths = tObj.cols.map(c => `<th class="${c === tObj.pk ? 'sample-pk' : ''}">${c}${c === tObj.pk ? ' 🔑' : ''}</th>`).join("");
+                const trs = tObj.rows.map(r => `<tr>${tObj.cols.map(c => `<td>${r[c]}</td>`).join("")}</tr>`).join("");
+                return `
+                    <div class="sample-table-card">
+                        <div class="sample-table-title">
+                            <span>📋 Tabla: ${tObj.name}</span>
+                            <span style="font-size:0.68rem;color:#64748b;">${tObj.cols.length} columnas · ${tObj.rows.length} registros</span>
+                        </div>
+                        <div class="sample-table-scroll">
+                            <table class="sample-mini-grid">
+                                <thead><tr>${ths}</tr></thead>
+                                <tbody>${trs}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function setStepIndicator(activePhase) {
+            [stepChip1El, stepChip2El, stepChip3El].forEach((el, idx) => {
+                el.classList.remove("active-step", "done-step");
+                const stepNum = idx + 1;
+                if (activePhase > stepNum) {
+                    el.classList.add("done-step");
+                } else if (activePhase === stepNum) {
+                    el.classList.add("active-step");
+                }
+            });
+        }
+
+        function renderLevelPills() {
+            levelPillsEl.innerHTML = "";
+            LEVELS.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "level-pill" +
+                    (idx === currentLevelIdx ? " current" : "") +
+                    (completedLevels.has(lvl.id) ? " done" : "");
+                btn.textContent = lvl.id;
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
+                levelPillsEl.appendChild(btn);
+            });
+        }
+
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, "0");
+            const s = String(sec % 60).padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function resumeTimer() {
+            clearInterval(timerInterval);
+            updateTimerUI();
+            if (levelSolved || timerSeconds <= 0) return;
+
+            timerInterval = setInterval(() => {
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
+                updateTimerUI();
+                saveCurrentLevelProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    streak = 0;
+                    streakDisplayEl.textContent = streak;
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la sentencia DML para continuar.");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            timerDisplayEl.textContent = formatTime(Math.max(0, timerSeconds));
+            const pct = Math.max(0, (timerSeconds / timerMax) * 100);
+            timerBarFillEl.style.width = pct + "%";
+            timerChipEl.classList.remove("warning", "danger");
+            if (timerSeconds <= 30) {
+                timerChipEl.classList.add("danger");
+                timerBarFillEl.style.background = "var(--danger)";
+            } else if (timerSeconds <= 60) {
+                timerChipEl.classList.add("warning");
+                timerBarFillEl.style.background = "var(--warning)";
+            } else {
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--primary), var(--accent))";
+            }
+        }
+
+        function loadLevel(idx) {
+            clearAnimTimeouts();
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
+            currentLevelIdx = idx;
+
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+            levelBadgeEl.textContent = `Ejercicio 2 (DML) · Nivel ${lvl.id} de ${LEVELS.length}`;
+            objTitleEl.textContent = lvl.title;
+            objDescEl.textContent = lvl.desc;
+            specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
+            hideHint();
+            renderSimplifiedSampleTables();
+
+            feedbackBannerEl.className = "feedback-banner";
+            visorCardEl.classList.remove("visor-highlight-active");
+            nextLevelBtn.classList.remove("visible");
+            nextVisorHeaderBtn.classList.remove("visible");
+            nextVisorFooterBtn.classList.remove("visible");
+            visorFooterActionsEl.classList.remove("visible");
+            replayAnimBtn.classList.remove("visible");
+            replayVisorBtn.classList.remove("visible");
+            setStepIndicator(0);
+            visorStatusEl.textContent = "Estado inicial cargado · Esperando sentencia DML...";
+            visorStatusEl.className = "visor-status-pill";
+
+            sqlBuilderContainerEl.innerHTML = "";
+            slotAssignments = [];
+            let slotCount = 0;
+            let inputCount = 0;
+
+            lvl.lines.forEach(line => {
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "sql-line" + (line.indent ? " sql-indent" : "");
+
+                line.tokens.forEach(tok => {
+                    if (tok.type === "punct") {
+                        const span = document.createElement("span");
+                        span.className = "sql-punct";
+                        span.textContent = tok.text;
+                        lineDiv.appendChild(span);
+                    } else if (tok.type === "slot") {
+                        const sIdx = slotCount++;
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sql-slot";
+                        btn.dataset.slotIndex = `#${sIdx + 1}`;
+                        btn.dataset.idx = sIdx;
+                        btn.dataset.answer = tok.answer;
+                        btn.textContent = "___";
+                        btn.addEventListener("click", () => onSlotClicked(sIdx));
+                        lineDiv.appendChild(btn);
+                    } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
+                        const inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.className = "sql-input";
+                        inp.autocomplete = "off";
+                        inp.spellcheck = false;
+                        inp.style.width = tok.width || "110px";
+                        inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
+                        inp.addEventListener("input", () => {
+                            inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
+                        });
+                        lineDiv.appendChild(inp);
+                    }
+                });
+                sqlBuilderContainerEl.appendChild(lineDiv);
+            });
+
+            keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
+            lvl.bank.forEach((word, bIdx) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
+                chip.dataset.bankIdx = bIdx;
+                chip.textContent = word;
+                chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
+                keywordBankEl.appendChild(chip);
+            });
+
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderInitialDMLVisor(lvl);
+
+            if (levelSolved) {
+                visorCardEl.classList.add("visor-highlight-active");
+                replayAnimBtn.classList.add("visible");
+                replayVisorBtn.classList.add("visible");
+                visorFooterActionsEl.classList.add("visible");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                    nextVisorHeaderBtn.classList.add("visible");
+                    nextVisorFooterBtn.classList.add("visible");
+                }
+                showFeedback(true, "✅ Nivel completado. Puedes pulsar «🔄 Repetir Animación DML» cuando quieras.");
+                playDMLAnimation(lvl);
+            }
+
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onSlotClicked(sIdx) {
+            if (levelSolved) return;
+            const current = slotAssignments[sIdx];
+            if (current) {
+                const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
+                if (chip) chip.classList.remove("used");
+                slotAssignments[sIdx] = null;
+            }
+            activeSlotIndex = sIdx;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onBankChipClicked(bankIdx, word, evt) {
+            if (levelSolved) return;
+            if (activeSlotIndex === null || activeSlotIndex >= slotAssignments.length) {
+                const firstEmpty = slotAssignments.findIndex(x => x === null);
+                if (firstEmpty === -1) return;
+                activeSlotIndex = firstEmpty;
+            }
+            const existing = slotAssignments[activeSlotIndex];
+            if (existing) {
+                const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
+                if (oldChip) oldChip.classList.remove("used");
+            }
+            slotAssignments[activeSlotIndex] = { bankIdx, value: word };
+            const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
+            if (chip) chip.classList.add("used");
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#0d9488", 10);
+
+            const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
+            if (nextEmpty !== -1) {
+                activeSlotIndex = nextEmpty;
+            } else {
+                const anyEmpty = slotAssignments.findIndex(x => x === null);
+                activeSlotIndex = anyEmpty !== -1 ? anyEmpty : activeSlotIndex;
+            }
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function updateSlotHighlights() {
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            slots.forEach((el, idx) => {
+                el.classList.remove("active-target", "filled", "slot-error", "slot-correct");
+                const assigned = slotAssignments[idx];
+                if (assigned) {
+                    el.textContent = assigned.value;
+                    el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
+                } else {
+                    el.textContent = "___";
+                }
+                if (idx === activeSlotIndex && !levelSolved) {
+                    el.classList.add("active-target");
+                }
+            });
+            slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
+        }
+
+        /* =========================================================
+           RENDERIZADO Y ANIMACIÓN DEL VISOR DML
+           ========================================================= */
+        function renderInitialDMLVisor(lvl) {
+            const isCursos = ["insert_unit_curso", "insert_bulk_cursos", "update_cursos_creditos"].includes(lvl.dmlType);
+            const tObj = isCursos ? SAMPLE_TABLES_DML.cursos : SAMPLE_TABLES_DML.alumnos;
+            const ths = tObj.cols.map(c => `<th>${c}${c === tObj.pk ? ' 🔑' : ''}</th>`).join("");
+            let initialRows = tObj.rows;
+            if (lvl.dmlType === "insert_unit_curso") initialRows = [];
+            if (lvl.dmlType === "insert_bulk_alumnos") initialRows = [];
+            if (lvl.dmlType === "insert_bulk_cursos") initialRows = [SAMPLE_TABLES_DML.cursos.rows[0]];
+
+            const trs = initialRows.length
+                ? initialRows.map(r => `<tr>${tObj.cols.map(c => `<td>${r[c]}</td>`).join("")}</tr>`).join("")
+                : `<tr><td colspan="${tObj.cols.length}" style="text-align:center;padding:1.25rem;color:#94a3b8;">Tabla vacía (0 registros) — Esperando INSERT INTO...</td></tr>`;
+
+            visorStageEl.innerHTML = `
+                <div class="table-box">
+                    <div class="table-banner">
+                        <span>🗄️ Tabla Objetivo: universidad_practica.${tObj.name}</span>
+                        <span>Estado previo a la ejecución</span>
+                    </div>
+                    <table class="dml-grid">
+                        <thead><tr>${ths}</tr></thead>
+                        <tbody id="dmlVisorBody">${trs}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function playDMLAnimation(lvl) {
+            clearAnimTimeouts();
+            renderInitialDMLVisor(lvl);
+
+            setStepIndicator(1);
+            visorStatusEl.textContent = "Fase 1: Analizando tabla objetivo y condición...";
+            visorStatusEl.className = "visor-status-pill phase-key";
+
+            const tPhase2 = setTimeout(() => {
+                setStepIndicator(2);
+                visorStatusEl.textContent = "Fase 2: Aplicando operación sobre los registros...";
+                visorStatusEl.className = "visor-status-pill phase-where";
+
+                const tbody = document.getElementById("dmlVisorBody");
+                if (!tbody) return;
+
+                if (lvl.dmlType === "insert_unit_curso") {
+                    tbody.innerHTML = `
+                        <tr class="dml-row-inserted">
+                            <td>1 (AUTO_INCREMENT)</td>
+                            <td>Introducción a Bases de Datos</td>
+                            <td>4</td>
+                        </tr>
+                    `;
+                } else if (lvl.dmlType === "insert_bulk_alumnos") {
+                    tbody.innerHTML = "";
+                    SAMPLE_TABLES_DML.alumnos.rows.forEach((r, idx) => {
+                        animTimeouts.push(setTimeout(() => {
+                            tbody.insertAdjacentHTML("beforeend", `
+                                <tr class="dml-row-inserted">
+                                    <td>${r.id_alumno}</td>
+                                    <td>${r.legajo}</td>
+                                    <td>${r.nombre}</td>
+                                    <td>${r.apellido}</td>
+                                    <td>${r.email}</td>
+                                    <td>${r.fecha_ingreso}</td>
+                                    <td>${r.telefono}</td>
+                                </tr>
+                            `);
+                        }, idx * 170));
+                    });
+                } else if (lvl.dmlType === "insert_bulk_cursos") {
+                    SAMPLE_TABLES_DML.cursos.rows.slice(1).forEach((r, idx) => {
+                        animTimeouts.push(setTimeout(() => {
+                            tbody.insertAdjacentHTML("beforeend", `
+                                <tr class="dml-row-inserted">
+                                    <td>${r.id_curso}</td>
+                                    <td>${r.nombre_curso}</td>
+                                    <td>${r.creditos}</td>
+                                </tr>
+                            `);
+                        }, idx * 180));
+                    });
+                } else if (lvl.dmlType === "update_alumno_email") {
+                    tbody.innerHTML = SAMPLE_TABLES_DML.alumnos.rows.map(r => {
+                        if (r.id_alumno === 1) {
+                            return `
+                                <tr class="dml-row-updated">
+                                    <td>${r.id_alumno}</td>
+                                    <td>${r.legajo}</td>
+                                    <td>${r.nombre}</td>
+                                    <td>${r.apellido}</td>
+                                    <td><span class="old-val-strike">${r.email}</span><span class="new-val-badge">ana.gomez@uner.edu.ar</span></td>
+                                    <td>${r.fecha_ingreso}</td>
+                                    <td>${r.telefono}</td>
+                                </tr>
+                            `;
+                        }
+                        return `<tr>${SAMPLE_TABLES_DML.alumnos.cols.map(c => `<td>${r[c]}</td>`).join("")}</tr>`;
+                    }).join("");
+                } else if (lvl.dmlType === "update_cursos_creditos") {
+                    tbody.innerHTML = SAMPLE_TABLES_DML.cursos.rows.map(r => {
+                        if (r.creditos === 4) {
+                            return `
+                                <tr class="dml-row-updated">
+                                    <td>${r.id_curso}</td>
+                                    <td>${r.nombre_curso}</td>
+                                    <td><span class="old-val-strike">4</span><span class="new-val-badge">5 (+1 crédito)</span></td>
+                                </tr>
+                            `;
+                        }
+                        return `<tr><td>${r.id_curso}</td><td>${r.nombre_curso}</td><td>${r.creditos}</td></tr>`;
+                    }).join("");
+                } else if (lvl.dmlType === "delete_alumno_legajo") {
+                    tbody.innerHTML = SAMPLE_TABLES_DML.alumnos.rows.map(r => {
+                        const cls = r.legajo === "1234567890" ? "dml-row-deleted" : "";
+                        return `<tr class="${cls}">${SAMPLE_TABLES_DML.alumnos.cols.map(c => `<td>${r[c]}</td>`).join("")}</tr>`;
+                    }).join("");
+                } else if (lvl.dmlType === "rename_telefono_celular" || lvl.dmlType === "modify_celular_varchar15") {
+                    const colLabel = lvl.dmlType === "rename_telefono_celular"
+                        ? "🔄 telefono ➔ celular (VARCHAR(20))"
+                        : "📐 celular (VARCHAR(20) ➔ VARCHAR(15))";
+                    const headers = ["id_alumno 🔑", "legajo", "nombre", "apellido", "email", "fecha_ingreso", colLabel];
+                    visorStageEl.innerHTML = `
+                        <div class="table-box">
+                            <div class="table-banner">
+                                <span>🗄️ ALTER TABLE: universidad_practica.alumnos</span>
+                                <span>Registros preservados intactos</span>
+                            </div>
+                            <table class="dml-grid">
+                                <thead>
+                                    <tr>${headers.map((h, i) => `<th class="${i === 6 ? 'dml-col-renamed' : ''}">${h}</th>`).join("")}</tr>
+                                </thead>
+                                <tbody>
+                                    ${SAMPLE_TABLES_DML.alumnos.rows.slice(0, 3).map(r => `
+                                        <tr class="dml-row-updated">
+                                            <td>${r.id_alumno}</td>
+                                            <td>${r.legajo}</td>
+                                            <td>${r.nombre}</td>
+                                            <td>${r.apellido}</td>
+                                            <td>${r.email}</td>
+                                            <td>${r.fecha_ingreso}</td>
+                                            <td><span class="new-val-badge">${r.telefono}</span></td>
+                                        </tr>
+                                    `).join("")}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            }, 320);
+            animTimeouts.push(tPhase2);
+
+            const tPhase3 = setTimeout(() => {
+                setStepIndicator(3);
+                visorStatusEl.textContent = "DML completado: Cambios confirmados en la tabla";
+                visorStatusEl.className = "visor-status-pill executed";
+            }, 1150);
+            animTimeouts.push(tPhase3);
+        }
+
+        function validateAndRun() {
+            if (levelSolved) {
+                scrollToVisor();
+                playDMLAnimation(LEVELS[currentLevelIdx]);
+                return;
+            }
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+
+            let allSlotsOk = true;
+            let allInputsOk = true;
+
+            slots.forEach((slotEl, idx) => {
+                const expected = slotEl.dataset.answer.trim().toUpperCase();
+                const current = slotAssignments[idx] ? slotAssignments[idx].value.trim().toUpperCase() : "";
+                slotEl.classList.remove("slot-error", "slot-correct");
+                if (current === expected) {
+                    slotEl.classList.add("slot-correct");
+                } else {
+                    slotEl.classList.add("slot-error");
+                    allSlotsOk = false;
+                }
+            });
+
+            inputs.forEach(inpEl => {
+                const expected = inpEl.dataset.answer.trim();
+                const current = inpEl.value.trim();
+                inpEl.classList.remove("input-error", "input-correct");
+                if (current === expected) {
+                    inpEl.classList.add("input-correct");
+                } else {
+                    inpEl.classList.add("input-error");
+                    allInputsOk = false;
+                }
+            });
+
+            if (!allSlotsOk || !allInputsOk) {
+                streak = 0;
+                streakDisplayEl.textContent = streak;
+                saveCurrentLevelProgress();
+                showFeedback(false, "❌ Revisa los elementos en rojo: verifica las palabras clave DML y los nombres de tablas, columnas o valores escritos manualmente.");
+                return;
+            }
+
+            levelSolved = true;
+            clearInterval(timerInterval);
+            inputs.forEach(inp => { inp.readOnly = true; });
+
+            const lvl = LEVELS[currentLevelIdx];
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
+            streak++;
+            const gained = 120 + timeBonus + (streak * 15);
+            score += gained;
+            completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+
+            showFeedback(true, `✅ ¡Sentencia DML ejecutada correctamente! Desplazando al visor (+${gained} pts).`);
+
+            visorCardEl.classList.add("visor-highlight-active");
+            replayAnimBtn.classList.add("visible");
+            replayVisorBtn.classList.add("visible");
+            visorFooterActionsEl.classList.add("visible");
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextLevelBtn.classList.add("visible");
+                nextVisorHeaderBtn.classList.add("visible");
+                nextVisorFooterBtn.classList.add("visible");
+            }
+
+            scrollToVisor();
+
+            const startAnimTimeout = setTimeout(() => {
+                const rect = visorStageEl.getBoundingClientRect();
+                spawnBurst(rect.left + rect.width / 2, Math.max(120, rect.top + 120), "#0d9488", 28);
+                playDMLAnimation(lvl);
+            }, 320);
+            animTimeouts.push(startAnimTimeout);
+        }
+
+        function showFeedback(isOk, msg) {
+            feedbackBannerEl.className = "feedback-banner show " + (isOk ? "ok" : "err");
+            feedbackBannerEl.textContent = msg;
+        }
+
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let ambientParticles = [];
+        let burstParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        for (let i = 0; i < 24; i++) {
+            ambientParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: 1.5 + Math.random() * 2.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                color: i % 2 === 0 ? "rgba(13, 148, 136, 0.14)" : "rgba(37, 99, 235, 0.14)"
+            });
+        }
+
+        function spawnBurst(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4.2;
+                burstParticles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,
+                    r: 2.5 + Math.random() * 3,
+                    alpha: 1,
+                    color
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ambientParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const b = burstParticles[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.08;
+                b.alpha -= 0.024;
+                if (b.alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function goToNextLevel() {
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+                scrollToBuilder();
+            }
+        }
+
+        runQueryBtn.addEventListener("click", validateAndRun);
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
+        hintToggleBtn.addEventListener("click", toggleHint);
+        replayAnimBtn.addEventListener("click", () => {
+            if (levelSolved) {
+                scrollToVisor();
+                playDMLAnimation(LEVELS[currentLevelIdx]);
+            }
+        });
+        replayVisorBtn.addEventListener("click", () => {
+            if (levelSolved) playDMLAnimation(LEVELS[currentLevelIdx]);
+        });
+        replayVisorFooterBtn.addEventListener("click", () => {
+            if (levelSolved) playDMLAnimation(LEVELS[currentLevelIdx]);
+        });
+        backToBuilderBtn.addEventListener("click", scrollToBuilder);
+        nextLevelBtn.addEventListener("click", goToNextLevel);
+        nextVisorHeaderBtn.addEventListener("click", goToNextLevel);
+        nextVisorFooterBtn.addEventListener("click", goToNextLevel);
+
+        loadPersistedState();
+        loadLevel(0);
+    </script>
+</body>
+</html>

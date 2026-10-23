@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ejercicio 3-2: DML — INSERT, UPDATE y DELETE (Terna 3)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f7fee7;
+            --bg-grad: linear-gradient(135deg, #f7fee7 0%, #f8fafc 50%, #ecfdf5 100%);
+            --surface: #ffffff;
+            --surface-alt: #f8faf2;
+            --surface-code: #ecfccb;
+            --border: #d9f99d;
+            --border-strong: #bef264;
+            --primary: #65a30d;
+            --primary-dark: #4d7c0f;
+            --primary-light: #ecfccb;
+            --accent: #059669;
+            --accent-light: #d1fae5;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text: #1a2e05;
+            --text-muted: #365314;
+            --text-soft: #64748b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(101, 163, 13, 0.06);
+            --shadow-md: 0 8px 24px rgba(101, 163, 13, 0.1);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .top-nav-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(101, 163, 13, 0.28);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(3deg); }
+        }
+
+        .module-tabs {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .module-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.42rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-muted);
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .module-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .module-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 3px 10px rgba(101, 163, 13, 0.28);
+        }
+
+        .hud-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hud-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .level-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .level-pill.current {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: scale(1.06);
+        }
+
+        .level-pill.done {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-chip.timer-chip {
+            background: var(--primary-light);
+            border-color: #bef264;
+            color: var(--primary-dark);
+            min-width: 106px;
+        }
+
+        .stat-chip.timer-chip.warning {
+            background: var(--warning-light);
+            border-color: #fde68a;
+            color: #b45309;
+            animation: pulseUrgent 0.8s infinite alternate;
+        }
+
+        .stat-chip.timer-chip.danger {
+            background: var(--danger-light);
+            border-color: #fecaca;
+            color: #b91c1c;
+            animation: pulseUrgent 0.45s infinite alternate;
+        }
+
+        @keyframes pulseUrgent {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.35s linear, background 0.3s;
+        }
+
+        .workspace {
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.1rem;
+            flex: 1;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.15rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .objective-title {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+
+        .objective-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+        }
+
+        .spec-box {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .spec-box-title {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            color: var(--primary-dark);
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+
+        .spec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #ecfccb;
+            color: #365314;
+            padding: 0.1rem 0.42rem;
+            border-radius: 5px;
+        }
+
+        .sql-editor-box {
+            background: var(--surface-code);
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            line-height: 2.15;
+            overflow-x: auto;
+        }
+
+        .sql-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed var(--border-strong);
+            font-family: var(--font-sans);
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .sql-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .sql-indent {
+            padding-left: 1.2rem;
+        }
+
+        .sql-punct {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sql-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            height: 34px;
+            padding: 0 0.65rem;
+            border-radius: 7px;
+            border: 2px dashed #84cc16;
+            background: #ffffff;
+            color: #4d7c0f;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .sql-slot::before {
+            content: attr(data-slot-index);
+            font-size: 0.66rem;
+            opacity: 0.55;
+            margin-right: 4px;
+        }
+
+        .sql-slot.active-target {
+            border-style: solid;
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(101, 163, 13, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .sql-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: #065f46;
+        }
+
+        .sql-slot.slot-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-slot.slot-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #991b1b !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        .sql-input {
+            height: 34px;
+            padding: 0 0.55rem;
+            border-radius: 7px;
+            border: 2px solid #a3e635;
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .sql-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(101, 163, 13, 0.18);
+        }
+
+        .sql-input.input-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-input.input-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        @keyframes shakeElem {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .keyword-bank-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .keyword-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .kw-chip {
+            padding: 0.42rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(101, 163, 13, 0.05);
+            transition: all 0.16s ease;
+            user-select: none;
+        }
+
+        .kw-chip:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .kw-chip.used {
+            opacity: 0.35;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1.15rem;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(101, 163, 13, 0.28);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: #fff;
+            display: none;
+        }
+
+        .btn-next.visible {
+            display: inline-flex;
+        }
+
+        .feedback-banner {
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback-banner.show {
+            display: block;
+            animation: popRow 0.3s ease;
+        }
+
+        .feedback-banner.ok {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback-banner.err {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        /* VISOR DE REGISTROS (TABLA DE DATOS) */
+        .visor-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 410px;
+        }
+
+        .visor-stage {
+            flex: 1;
+            background:
+                radial-gradient(#d9f99d 1px, transparent 1px) 0 0 / 18px 18px,
+                #f8faf2;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            overflow-x: auto;
+        }
+
+        .visor-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            background: #ecfccb;
+            color: var(--primary-dark);
+        }
+
+        .visor-status-pill.executed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .data-table-wrap {
+            background: #ffffff;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(101, 163, 13, 0.1);
+            overflow: hidden;
+        }
+
+        .data-table-banner {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            padding: 0.6rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        table.visual-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        table.visual-grid th {
+            background: #f7fee7;
+            color: var(--text);
+            text-align: left;
+            padding: 0.55rem 0.7rem;
+            border-bottom: 2px solid var(--border);
+            font-weight: 700;
+        }
+
+        table.visual-grid td {
+            padding: 0.55rem 0.7rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.35s ease;
+        }
+
+        tr.row-popup-insert {
+            animation: popRow 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: #ecfdf5 !important;
+        }
+
+        tr.row-popup-insert td {
+            color: #065f46;
+            font-weight: 700;
+            border-bottom-color: #6ee7b7;
+        }
+
+        tr.row-updated-anim {
+            animation: updateFlash 0.9s ease;
+            background: #fef3c7 !important;
+        }
+
+        td.cell-changed {
+            background: #fde68a;
+            color: #92400e !important;
+            font-weight: 800;
+            border-radius: 4px;
+        }
+
+        tr.row-delete-out {
+            animation: deleteSlideOut 0.65s ease forwards;
+            background: #fee2e2 !important;
+        }
+
+        @keyframes popRow {
+            0% {
+                opacity: 0;
+                transform: scale(0.82) translateY(16px);
+            }
+            65% {
+                opacity: 1;
+                transform: scale(1.03) translateY(-3px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes updateFlash {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.02); box-shadow: 0 0 18px rgba(245, 158, 11, 0.45); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes deleteSlideOut {
+            0% { opacity: 1; transform: translateX(0); }
+            30% { transform: translateX(-10px); }
+            100% { opacity: 0; transform: translateX(65px) scale(0.85); }
+        }
+
+        .row-badge-new {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 0.08rem 0.4rem;
+            border-radius: 999px;
+            margin-left: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .top-nav-inner {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1.15fr 0.85fr;
+                align-items: start;
+                padding: 1.5rem;
+            }
+            .visor-card {
+                position: sticky;
+                top: 84px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-wrapper">
+        <nav class="top-nav">
+            <div class="top-nav-inner">
+                <div class="brand-row">
+                    <a href="Ejercicio 3-1.html" class="brand">
+                        <span class="brand-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                            </svg>
+                        </span>
+                        <span>SQL Práctica · Base de Datos I (Terna 3)</span>
+                    </a>
+                </div>
+                <div class="module-tabs">
+                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL</a>
+                    <a href="Ejercicio 3-1.html" class="module-tab">3-1 · DDL (Terna 3)</a>
+                    <a href="Ejercicio 3-2.html" class="module-tab active">3-2 · DML (Terna 3)</a>
+                    <a href="Ejercicio 3-3.html" class="module-tab">3-3 · DQL (Terna 3)</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hud-bar">
+            <div class="hud-inner">
+                <div class="level-pills" id="levelPills"></div>
+                <div class="stats-group">
+                    <div class="stat-chip timer-chip" id="timerChip">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <circle cx="12" cy="13" r="8"></circle>
+                            <path d="M12 9v4l2.5 2.5"></path>
+                            <path d="M9 2h6"></path>
+                        </svg>
+                        <span id="timerDisplay">05:30</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>⚡ Racha:</span>
+                        <span id="streakDisplay">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>🏆 Puntos:</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+
+        <main class="workspace">
+            <section class="card">
+                <div class="card-header">
+                    <span class="badge-tag" id="levelBadge">Ejercicio 3-2 · Nivel 1 de 8</span>
+                    <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.32rem 0.65rem;font-size:0.76rem;">
+                        🧹 Limpiar Respuesta
+                    </button>
+                </div>
+
+                <h1 class="objective-title" id="objTitle"></h1>
+                <p class="objective-desc" id="objDesc"></p>
+
+                <div class="spec-box">
+                    <div class="spec-box-title">📋 Especificación Estricta de Nombres y Datos (Universidad)</div>
+                    <ul class="spec-list" id="specList"></ul>
+                </div>
+
+                <div class="sql-editor-box">
+                    <div class="sql-editor-header">
+                        <span>CONSTRUCTOR SQL (MySQL) — Completa nombres manualmente y elige palabras clave</span>
+                        <span id="slotIndicator">Slot activo: #1</span>
+                    </div>
+                    <div id="sqlBuilderContainer"></div>
+                </div>
+
+                <div class="keyword-bank-title">
+                    <span>🧩 Banco de Palabras Clave SQL</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para vaciarlo</span>
+                </div>
+                <div class="keyword-bank" id="keywordBank"></div>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-primary" id="runQueryBtn">
+                        ▶ Ejecutar Sentencia SQL
+                    </button>
+                    <button type="button" class="btn btn-next" id="nextLevelBtn">
+                        Siguiente Ejercicio ➔
+                    </button>
+                </div>
+
+                <div class="feedback-banner" id="feedbackBanner"></div>
+            </section>
+
+            <section class="card visor-card">
+                <div class="card-header">
+                    <span class="badge-tag">🎓 Visor Animado de Registros (Universidad)</span>
+                    <span class="visor-status-pill" id="visorStatus">Esperando ejecución...</span>
+                </div>
+                <div class="visor-stage" id="visorStage"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           TERNA 3 - EJERCICIO 3-2: 8 NIVELES DML (SIN PLACEHOLDERS)
+           ========================================================= */
+        const BASE_MATERIAS = [
+            { id_materia: 1, asignatura: "Base de Datos I", area: "Datos", carga_horaria: 64, cupo: 40 },
+            { id_materia: 2, asignatura: "Programacion Web", area: "Software", carga_horaria: 96, cupo: 25 },
+            { id_materia: 3, asignatura: "Calculo Numerico", area: "Exactas", carga_horaria: 48, cupo: 30 },
+            { id_materia: 4, asignatura: "Taller de Robotica", area: "Optativa", carga_horaria: 32, cupo: 0 }
+        ];
+
+        const LEVELS = [
+            {
+                id: 1,
+                title: "Insertar una nueva materia en el plan de estudios",
+                timeLimit: 330,
+                desc: "Agrega la asignatura 'Redes de Datos' en la tabla materias indicando sus columnas y valores.",
+                specs: [
+                    "Tabla destino: <span class='code-pill'>materias</span>",
+                    "Columnas en orden: <span class='code-pill'>asignatura</span>, <span class='code-pill'>area</span>, <span class='code-pill'>carga_horaria</span>, <span class='code-pill'>cupo</span>",
+                    "Valores a insertar: <span class='code-pill'>'Redes de Datos'</span>, <span class='code-pill'>'Infraestructura'</span>, <span class='code-pill'>64</span>, <span class='code-pill'>35</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "materias", width: "110px" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "asignatura", width: "115px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "area", width: "75px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "carga_horaria", width: "135px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "cupo", width: "75px" },
+                            { type: "punct", text: ")" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "VALUES" },
+                            { type: "punct", text: "('Redes de Datos', 'Infraestructura'," },
+                            { type: "input", answer: "64", width: "65px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "35", width: "65px" },
+                            { type: "punct", text: ");" }
+                        ]
+                    }
+                ],
+                bank: ["WHERE", "VALUES", "SET", "SELECT", "INSERT INTO", "UPDATE", "FROM", "DELETE", "ALTER TABLE"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "insert",
+                    newRow: { id_materia: 5, asignatura: "Redes de Datos", area: "Infraestructura", carga_horaria: 64, cupo: 35 }
+                }
+            },
+            {
+                id: 2,
+                title: "Registrar un nuevo docente en la tabla Docentes",
+                timeLimit: 330,
+                desc: "Inserta un nuevo profesor en la tabla docentes escribiendo manualmente los campos y valores.",
+                specs: [
+                    "Tabla destino: <span class='code-pill'>docentes</span>",
+                    "Columnas en orden: <span class='code-pill'>nombre_docente</span>, <span class='code-pill'>sede</span>, <span class='code-pill'>dedicacion</span>",
+                    "Valores: <span class='code-pill'>'Laura Benitez'</span>, <span class='code-pill'>'Concordia'</span>, <span class='code-pill'>'Exclusiva'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "INSERT INTO" },
+                            { type: "input", answer: "docentes", width: "110px" },
+                            { type: "punct", text: "(" },
+                            { type: "input", answer: "nombre_docente", width: "145px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "sede", width: "80px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "dedicacion", width: "115px" },
+                            { type: "punct", text: ")" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "VALUES" },
+                            { type: "punct", text: "('Laura Benitez', '" },
+                            { type: "input", answer: "Concordia", width: "115px" },
+                            { type: "punct", text: "', '" },
+                            { type: "input", answer: "Exclusiva", width: "110px" },
+                            { type: "punct", text: "');" }
+                        ]
+                    }
+                ],
+                bank: ["UPDATE", "VALUES", "ADD COLUMN", "INTO", "SET", "INSERT INTO", "WHERE", "DELETE", "FROM"],
+                tableName: "docentes",
+                columns: ["id_docente", "nombre_docente", "sede", "dedicacion"],
+                initialRows: [
+                    { id_docente: 1, nombre_docente: "Carlos Quiroga", sede: "Parana", dedicacion: "Simple" },
+                    { id_docente: 2, nombre_docente: "Ana Navarro", sede: "Oro Verde", dedicacion: "Semiexclusiva" }
+                ],
+                effect: {
+                    type: "insert",
+                    newRow: { id_docente: 3, nombre_docente: "Laura Benitez", sede: "Concordia", dedicacion: "Exclusiva" }
+                }
+            },
+            {
+                id: 3,
+                title: "Actualizar el cupo de una materia por ID",
+                timeLimit: 300,
+                desc: "Amplía a 50 el cupo disponible de la materia con identificador 2.",
+                specs: [
+                    "Tabla a actualizar: <span class='code-pill'>materias</span>",
+                    "Campo a modificar (<span class='code-pill'>SET</span>): <span class='code-pill'>cupo</span> = <span class='code-pill'>50</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>id_materia</span> = <span class='code-pill'>2</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "materias", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "cupo", width: "80px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "50", width: "60px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "id_materia", width: "115px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "2", width: "55px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "SET", "VALUES", "WHERE", "INSERT INTO", "UPDATE", "FROM", "DELETE", "BETWEEN", "AND"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "update",
+                    matchIds: [2],
+                    idCol: "id_materia",
+                    changes: { cupo: "50 (antes 25)" }
+                }
+            },
+            {
+                id: 4,
+                title: "Actualizar cupo con condición compuesta (AND)",
+                timeLimit: 360,
+                desc: "Actualiza a 45 el cupo de las materias del área 'Software' cuya carga_horaria supere las 80 horas.",
+                specs: [
+                    "Tabla: <span class='code-pill'>materias</span>",
+                    "Asignación (<span class='code-pill'>SET</span>): <span class='code-pill'>cupo</span> = <span class='code-pill'>45</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>area</span> = <span class='code-pill'>'Software'</span> <span class='code-pill'>AND</span> <span class='code-pill'>carga_horaria</span> &gt; <span class='code-pill'>80</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "materias", width: "110px" },
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "cupo", width: "80px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "45", width: "60px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "area", width: "80px" },
+                            { type: "punct", text: "= 'Software'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "carga_horaria", width: "135px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "80", width: "65px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["NOT", "WHERE", "BETWEEN", "AND", "FROM", "SET", "OR", "UPDATE", "DELETE", "LIKE", "VALUES"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "update",
+                    matchIds: [2],
+                    idCol: "id_materia",
+                    changes: { cupo: "45 (antes 25)" }
+                }
+            },
+            {
+                id: 5,
+                title: "Actualizar área académica con LIKE",
+                timeLimit: 330,
+                desc: "Cambia el área a 'Sistemas' para todas las materias cuya asignatura empiece con 'Base'.",
+                specs: [
+                    "Tabla: <span class='code-pill'>materias</span>",
+                    "Asignación (<span class='code-pill'>SET</span>): <span class='code-pill'>area</span> = <span class='code-pill'>'Sistemas'</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>asignatura</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'Base%'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "UPDATE" },
+                            { type: "input", answer: "materias", width: "110px" },
+                            { type: "slot", answer: "SET" },
+                            { type: "input", answer: "area", width: "80px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Sistemas", width: "105px" },
+                            { type: "punct", text: "'" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "asignatura", width: "115px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "Base%", width: "85px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["SELECT", "LIKE", "AND", "SET", "BETWEEN", "WHERE", "UPDATE", "OR", "NOT", "FROM", "DELETE"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "update",
+                    matchIds: [1],
+                    idCol: "id_materia",
+                    changes: { area: "Sistemas (antes Datos)" }
+                }
+            },
+            {
+                id: 6,
+                title: "Eliminar materias sin cupo habilitado (DELETE + WHERE)",
+                timeLimit: 300,
+                desc: "Elimina de la tabla materias aquellas asignaturas cuyo cupo sea igual a 0.",
+                specs: [
+                    "Sentencia: <span class='code-pill'>DELETE</span> <span class='code-pill'>FROM</span> sobre la tabla <span class='code-pill'>materias</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>cupo</span> = <span class='code-pill'>0</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "materias", width: "110px" },
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "cupo", width: "80px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "0", width: "50px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["SET", "WHERE", "DROP TABLE", "FROM", "UPDATE", "DELETE", "SELECT", "DROP COLUMN", "AND"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "delete",
+                    matchIds: [4],
+                    idCol: "id_materia"
+                }
+            },
+            {
+                id: 7,
+                title: "Eliminar materias en un rango horario (BETWEEN)",
+                timeLimit: 330,
+                desc: "Elimina las materias cuya carga_horaria se encuentre entre 40 y 65 horas inclusive.",
+                specs: [
+                    "Tabla: <span class='code-pill'>materias</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): campo <span class='code-pill'>carga_horaria</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>40</span> <span class='code-pill'>AND</span> <span class='code-pill'>65</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "materias", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "carga_horaria", width: "135px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "40", width: "65px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "65", width: "65px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["UPDATE", "BETWEEN", "OR", "FROM", "LIKE", "AND", "WHERE", "DELETE", "SET", "NOT", "DROP TABLE"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "delete",
+                    matchIds: [1, 3],
+                    idCol: "id_materia"
+                }
+            },
+            {
+                id: 8,
+                title: "Eliminar registros con condición OR",
+                timeLimit: 360,
+                desc: "Elimina las materias cuya área sea 'Optativa' o cuyo cupo sea menor a 28.",
+                specs: [
+                    "Tabla: <span class='code-pill'>materias</span>",
+                    "Condición 1: <span class='code-pill'>area</span> = <span class='code-pill'>'Optativa'</span>",
+                    "Operador lógico: <span class='code-pill'>OR</span>",
+                    "Condición 2: <span class='code-pill'>cupo</span> &lt; <span class='code-pill'>28</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "DELETE" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "materias", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "area", width: "80px" },
+                            { type: "punct", text: "= 'Optativa'" },
+                            { type: "slot", answer: "OR" },
+                            { type: "input", answer: "cupo", width: "80px" },
+                            { type: "punct", text: "<" },
+                            { type: "input", answer: "28", width: "60px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["BETWEEN", "FROM", "AND", "OR", "SET", "WHERE", "NOT", "DELETE", "LIKE", "UPDATE"],
+                tableName: "materias",
+                columns: ["id_materia", "asignatura", "area", "carga_horaria", "cupo"],
+                initialRows: BASE_MATERIAS,
+                effect: {
+                    type: "delete",
+                    matchIds: [2, 4],
+                    idCol: "id_materia"
+                }
+            }
+        ];
+
+        /* =========================================================
+           CONTROL DEL JUEGO Y DEL VISOR DE DATOS (RELOJ SIN RESET)
+           ========================================================= */
+        const STORAGE_KEY = "sql_practica_ejercicio_3_2_state_v1";
+        let currentLevelIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let completedLevels = new Set();
+        let activeSlotIndex = 0;
+        let slotAssignments = [];
+        let timerSeconds = 330;
+        let timerMax = 330;
+        let timerInterval = null;
+        let levelSolved = false;
+        let hasLoadedOnce = false;
+
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+
+        const levelPillsEl = document.getElementById("levelPills");
+        const timerDisplayEl = document.getElementById("timerDisplay");
+        const timerChipEl = document.getElementById("timerChip");
+        const timerBarFillEl = document.getElementById("timerBarFill");
+        const streakDisplayEl = document.getElementById("streakDisplay");
+        const scoreDisplayEl = document.getElementById("scoreDisplay");
+        const levelBadgeEl = document.getElementById("levelBadge");
+        const objTitleEl = document.getElementById("objTitle");
+        const objDescEl = document.getElementById("objDesc");
+        const specListEl = document.getElementById("specList");
+        const sqlBuilderContainerEl = document.getElementById("sqlBuilderContainer");
+        const keywordBankEl = document.getElementById("keywordBank");
+        const slotIndicatorEl = document.getElementById("slotIndicator");
+        const feedbackBannerEl = document.getElementById("feedbackBanner");
+        const visorStageEl = document.getElementById("visorStage");
+        const visorStatusEl = document.getElementById("visorStatus");
+        const nextLevelBtn = document.getElementById("nextLevelBtn");
+        const runQueryBtn = document.getElementById("runQueryBtn");
+        const resetLevelBtn = document.getElementById("resetLevelBtn");
+
+        function renderLevelPills() {
+            levelPillsEl.innerHTML = "";
+            LEVELS.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "level-pill" +
+                    (idx === currentLevelIdx ? " current" : "") +
+                    (completedLevels.has(lvl.id) ? " done" : "");
+                btn.textContent = lvl.id;
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
+                levelPillsEl.appendChild(btn);
+            });
+        }
+
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, "0");
+            const s = String(sec % 60).padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function resumeTimer() {
+            clearInterval(timerInterval);
+            updateTimerUI();
+
+            if (levelSolved || timerSeconds <= 0) {
+                if (!levelSolved && timerSeconds <= 0) {
+                    showFeedback(false, "⏰ El tiempo de este ejercicio se agotó. Aún puedes resolverlo sin bono por tiempo.");
+                }
+                return;
+            }
+
+            timerInterval = setInterval(() => {
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
+                updateTimerUI();
+                saveCurrentLevelProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    streak = 0;
+                    streakDisplayEl.textContent = streak;
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la sentencia para continuar (sin bono de tiempo).");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            timerDisplayEl.textContent = formatTime(Math.max(0, timerSeconds));
+            const pct = Math.max(0, (timerSeconds / timerMax) * 100);
+            timerBarFillEl.style.width = pct + "%";
+
+            timerChipEl.classList.remove("warning", "danger");
+            if (timerSeconds <= 30) {
+                timerChipEl.classList.add("danger");
+                timerBarFillEl.style.background = "var(--danger)";
+            } else if (timerSeconds <= 60) {
+                timerChipEl.classList.add("warning");
+                timerBarFillEl.style.background = "var(--warning)";
+            } else {
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--primary), var(--accent))";
+            }
+        }
+
+        function loadLevel(idx) {
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
+            currentLevelIdx = idx;
+
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+            levelBadgeEl.textContent = `Ejercicio 3-2 · Nivel ${lvl.id} de ${LEVELS.length}`;
+            objTitleEl.textContent = lvl.title;
+            objDescEl.textContent = lvl.desc;
+            specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
+
+            feedbackBannerEl.className = "feedback-banner";
+            nextLevelBtn.classList.remove("visible");
+            visorStatusEl.textContent = levelSolved ? "Query OK · Filas afectadas" : `Tabla activa: ${lvl.tableName}`;
+            visorStatusEl.className = "visor-status-pill" + (levelSolved ? " executed" : "");
+
+            sqlBuilderContainerEl.innerHTML = "";
+            slotAssignments = [];
+            let slotCount = 0;
+            let inputCount = 0;
+
+            lvl.lines.forEach(line => {
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "sql-line" + (line.indent ? " sql-indent" : "");
+
+                line.tokens.forEach(tok => {
+                    if (tok.type === "punct") {
+                        const span = document.createElement("span");
+                        span.className = "sql-punct";
+                        span.textContent = tok.text;
+                        lineDiv.appendChild(span);
+                    } else if (tok.type === "slot") {
+                        const sIdx = slotCount++;
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sql-slot";
+                        btn.dataset.slotIndex = `#${sIdx + 1}`;
+                        btn.dataset.idx = sIdx;
+                        btn.dataset.answer = tok.answer;
+                        btn.textContent = "___";
+                        btn.addEventListener("click", () => onSlotClicked(sIdx));
+                        lineDiv.appendChild(btn);
+                    } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
+                        const inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.className = "sql-input";
+                        inp.autocomplete = "off";
+                        inp.spellcheck = false;
+                        inp.style.width = tok.width || "110px";
+                        inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
+                        inp.addEventListener("input", () => {
+                            inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
+                        });
+                        lineDiv.appendChild(inp);
+                    }
+                });
+
+                sqlBuilderContainerEl.appendChild(lineDiv);
+            });
+
+            keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
+            lvl.bank.forEach((word, bIdx) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
+                chip.dataset.bankIdx = bIdx;
+                chip.textContent = word;
+                chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
+                keywordBankEl.appendChild(chip);
+            });
+
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderTableVisor(lvl);
+            if (levelSolved) {
+                applyDmlAnimation(lvl);
+                showFeedback(true, "✅ Este nivel ya fue completado correctamente.");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                }
+            }
+
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onSlotClicked(sIdx) {
+            if (levelSolved) return;
+            const current = slotAssignments[sIdx];
+            if (current) {
+                const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
+                if (chip) chip.classList.remove("used");
+                slotAssignments[sIdx] = null;
+            }
+            activeSlotIndex = sIdx;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onBankChipClicked(bankIdx, word, evt) {
+            if (levelSolved) return;
+            if (activeSlotIndex === null || activeSlotIndex >= slotAssignments.length) {
+                const firstEmpty = slotAssignments.findIndex(x => x === null);
+                if (firstEmpty === -1) return;
+                activeSlotIndex = firstEmpty;
+            }
+
+            const existing = slotAssignments[activeSlotIndex];
+            if (existing) {
+                const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
+                if (oldChip) oldChip.classList.remove("used");
+            }
+
+            slotAssignments[activeSlotIndex] = { bankIdx, value: word };
+            const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
+            if (chip) chip.classList.add("used");
+
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#65a30d", 10);
+
+            const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
+            if (nextEmpty !== -1) {
+                activeSlotIndex = nextEmpty;
+            } else {
+                const anyEmpty = slotAssignments.findIndex(x => x === null);
+                activeSlotIndex = anyEmpty !== -1 ? anyEmpty : activeSlotIndex;
+            }
+
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function updateSlotHighlights() {
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            slots.forEach((el, idx) => {
+                el.classList.remove("active-target", "filled", "slot-error", "slot-correct");
+                const assigned = slotAssignments[idx];
+                if (assigned) {
+                    el.textContent = assigned.value;
+                    el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
+                } else {
+                    el.textContent = "___";
+                }
+                if (idx === activeSlotIndex && !levelSolved) {
+                    el.classList.add("active-target");
+                }
+            });
+            slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
+        }
+
+        function renderTableVisor(lvl) {
+            const headersHTML = lvl.columns.map(c => `<th>${c}</th>`).join("");
+            const rowsHTML = lvl.initialRows.map(r => {
+                const rowId = r[lvl.columns[0]];
+                const cells = lvl.columns.map(col => `<td data-col="${col}">${r[col]}</td>`).join("");
+                return `<tr data-rowid="${rowId}">${cells}</tr>`;
+            }).join("");
+
+            visorStageEl.innerHTML = `
+                <div class="data-table-wrap">
+                    <div class="data-table-banner">
+                        <span>📋 TABLA: ${lvl.tableName}</span>
+                        <span id="rowCountBadge">${lvl.initialRows.length} registros</span>
+                    </div>
+                    <table class="visual-grid">
+                        <thead><tr>${headersHTML}</tr></thead>
+                        <tbody id="visorTableBody">${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function validateAndRun() {
+            if (levelSolved) return;
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+
+            let allSlotsOk = true;
+            let allInputsOk = true;
+
+            slots.forEach((slotEl, idx) => {
+                const expected = slotEl.dataset.answer.trim().toUpperCase();
+                const current = slotAssignments[idx] ? slotAssignments[idx].value.trim().toUpperCase() : "";
+                slotEl.classList.remove("slot-error", "slot-correct");
+                if (current === expected) {
+                    slotEl.classList.add("slot-correct");
+                } else {
+                    slotEl.classList.add("slot-error");
+                    allSlotsOk = false;
+                }
+            });
+
+            inputs.forEach(inpEl => {
+                const expected = inpEl.dataset.answer.trim();
+                const current = inpEl.value.trim();
+                inpEl.classList.remove("input-error", "input-correct");
+                if (current === expected) {
+                    inpEl.classList.add("input-correct");
+                } else {
+                    inpEl.classList.add("input-error");
+                    allInputsOk = false;
+                }
+            });
+
+            if (!allSlotsOk || !allInputsOk) {
+                streak = 0;
+                streakDisplayEl.textContent = streak;
+                saveCurrentLevelProgress();
+                showFeedback(false, "❌ Revisa los elementos en rojo: verifica tanto las palabras clave como los nombres de campos/valores escritos manualmente.");
+                return;
+            }
+
+            levelSolved = true;
+            clearInterval(timerInterval);
+
+            const lvl = LEVELS[currentLevelIdx];
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
+            streak++;
+            const gained = 100 + timeBonus + (streak * 15);
+            score += gained;
+            completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+
+            showFeedback(true, `✅ ¡Sentencia DML ejecutada! +${gained} pts (Bono rapidez: +${timeBonus} pts)`);
+            visorStatusEl.textContent = "Query OK · Filas afectadas";
+            visorStatusEl.className = "visor-status-pill executed";
+
+            const rect = visorStageEl.getBoundingClientRect();
+            spawnBurst(rect.left + rect.width / 2, rect.top + 120, "#10b981", 28);
+
+            applyDmlAnimation(lvl);
+
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextLevelBtn.classList.add("visible");
+            }
+        }
+
+        function applyDmlAnimation(lvl) {
+            const tbody = document.getElementById("visorTableBody");
+            const countBadge = document.getElementById("rowCountBadge");
+            const eff = lvl.effect;
+
+            if (eff.type === "insert") {
+                const cells = lvl.columns.map((col, idx) => {
+                    const extra = idx === 0 ? `<span class="row-badge-new">POPUP NUEVO</span>` : "";
+                    return `<td data-col="${col}">${eff.newRow[col]} ${extra}</td>`;
+                }).join("");
+                const tr = document.createElement("tr");
+                tr.className = "row-popup-insert";
+                tr.innerHTML = cells;
+                tbody.appendChild(tr);
+                if (countBadge) countBadge.textContent = `${lvl.initialRows.length + 1} registros`;
+            } else if (eff.type === "update") {
+                eff.matchIds.forEach(id => {
+                    const tr = tbody.querySelector(`tr[data-rowid="${id}"]`);
+                    if (tr) {
+                        tr.classList.add("row-updated-anim");
+                        Object.keys(eff.changes).forEach(colName => {
+                            const td = tr.querySelector(`td[data-col="${colName}"]`);
+                            if (td) {
+                                td.classList.add("cell-changed");
+                                td.textContent = "✨ " + eff.changes[colName];
+                            }
+                        });
+                    }
+                });
+            } else if (eff.type === "delete") {
+                eff.matchIds.forEach(id => {
+                    const tr = tbody.querySelector(`tr[data-rowid="${id}"]`);
+                    if (tr) {
+                        tr.classList.add("row-delete-out");
+                        setTimeout(() => tr.remove(), 650);
+                    }
+                });
+                if (countBadge) {
+                    countBadge.textContent = `${lvl.initialRows.length - eff.matchIds.length} registros`;
+                }
+            }
+        }
+
+        function showFeedback(isOk, msg) {
+            feedbackBannerEl.className = "feedback-banner show " + (isOk ? "ok" : "err");
+            feedbackBannerEl.textContent = msg;
+        }
+
+        /* Partículas */
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let ambientParticles = [];
+        let burstParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 24; i++) {
+            ambientParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: 1.5 + Math.random() * 2.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                color: i % 2 === 0 ? "rgba(101, 163, 13, 0.16)" : "rgba(5, 150, 105, 0.14)"
+            });
+        }
+
+        function spawnBurst(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4.2;
+                burstParticles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,
+                    r: 2.5 + Math.random() * 3,
+                    alpha: 1,
+                    color
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ambientParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const b = burstParticles[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.08;
+                b.alpha -= 0.024;
+                if (b.alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        runQueryBtn.addEventListener("click", validateAndRun);
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
+        nextLevelBtn.addEventListener("click", () => {
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+            }
+        });
+
+        loadPersistedState();
+        loadLevel(0);
+    </script>
+</body>
+</html>

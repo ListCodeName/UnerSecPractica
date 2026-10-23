@@ -864,12 +864,15 @@
                     </a>
                 </div>
                 <div class="module-tabs">
-                    <a href="Ejercicio 1-1.html" class="module-tab active">1-1 · DDL Tablas</a>
-                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML Registros</a>
-                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL Consultas</a>
-                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL (Terna 2)</a>
-                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML (Terna 2)</a>
-                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL (Terna 2)</a>
+                    <a href="Ejercicio 1-1.html" class="module-tab active">1-1 · DDL</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL</a>
+                    <a href="Ejercicio 3-1.html" class="module-tab">3-1 · DDL (Terna 3)</a>
+                    <a href="Ejercicio 3-2.html" class="module-tab">3-2 · DML (Terna 3)</a>
+                    <a href="Ejercicio 3-3.html" class="module-tab">3-3 · DQL (Terna 3)</a>
                 </div>
             </div>
         </nav>
@@ -1012,7 +1015,7 @@
                         ]
                     }
                 ],
-                bank: ["CREATE TABLE", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "DROP TABLE", "DATE", "UNIQUE"],
+                bank: ["VARCHAR", "DROP TABLE", "AUTO_INCREMENT", "DATE", "CREATE TABLE", "UNIQUE", "NOT NULL", "ALTER TABLE", "INT", "DECIMAL", "PRIMARY KEY", "IF EXISTS"],
                 initialTable: null,
                 afterEffect: {
                     mode: "create_table",
@@ -1080,7 +1083,7 @@
                         tokens: [{ type: "punct", text: ");" }]
                     }
                 ],
-                bank: ["CREATE TABLE", "IF NOT EXISTS", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "UNIQUE", "DATE", "NOT NULL", "ALTER TABLE", "TEXT"],
+                bank: ["UNIQUE", "ALTER TABLE", "NOT NULL", "DATE", "IF NOT EXISTS", "DROP COLUMN", "INT", "VARCHAR", "CREATE TABLE", "DECIMAL", "AUTO_INCREMENT", "IF EXISTS", "PRIMARY KEY", "NOT NULL", "ADD COLUMN"],
                 initialTable: null,
                 afterEffect: {
                     mode: "create_table",
@@ -1150,7 +1153,7 @@
                         tokens: [{ type: "punct", text: ");" }]
                     }
                 ],
-                bank: ["CREATE TABLE", "INT", "PRIMARY KEY", "AUTO_INCREMENT", "VARCHAR", "NOT NULL", "DECIMAL", "NOT NULL", "ADD COLUMN", "DATE"],
+                bank: ["DECIMAL", "NOT NULL", "MODIFY COLUMN", "VARCHAR", "PRIMARY KEY", "DROP TABLE", "INT", "UNIQUE", "CREATE TABLE", "DATE", "NOT NULL", "AUTO_INCREMENT", "ADD COLUMN"],
                 initialTable: null,
                 afterEffect: {
                     mode: "create_table",
@@ -1189,7 +1192,7 @@
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "ADD COLUMN", "VARCHAR", "NOT NULL", "CREATE TABLE", "MODIFY COLUMN", "DROP COLUMN", "INT"],
+                bank: ["MODIFY COLUMN", "NOT NULL", "CREATE TABLE", "ADD COLUMN", "INT", "DROP COLUMN", "VARCHAR", "PRIMARY KEY", "ALTER TABLE", "UNIQUE", "DATE"],
                 initialTable: {
                     tableName: "clientes",
                     columns: [
@@ -1228,7 +1231,7 @@
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "ADD COLUMN", "INT", "NOT NULL", "MODIFY COLUMN", "VARCHAR", "UNIQUE", "DROP TABLE"],
+                bank: ["VARCHAR", "INT", "DROP TABLE", "NOT NULL", "MODIFY COLUMN", "ALTER TABLE", "UNIQUE", "ADD COLUMN", "DECIMAL", "PRIMARY KEY"],
                 initialTable: {
                     tableName: "productos",
                     columns: [
@@ -1270,7 +1273,7 @@
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "MODIFY COLUMN", "VARCHAR", "NOT NULL", "ADD COLUMN", "DROP COLUMN", "INT", "UNIQUE"],
+                bank: ["ADD COLUMN", "VARCHAR", "DROP COLUMN", "NOT NULL", "INT", "ALTER TABLE", "CREATE TABLE", "MODIFY COLUMN", "UNIQUE", "DATE"],
                 initialTable: {
                     tableName: "productos",
                     columns: [
@@ -1309,7 +1312,7 @@
                         ]
                     }
                 ],
-                bank: ["ALTER TABLE", "DROP COLUMN", "DROP TABLE", "ADD COLUMN", "MODIFY COLUMN", "DELETE"],
+                bank: ["DROP TABLE", "ADD COLUMN", "DROP COLUMN", "DELETE", "MODIFY COLUMN", "ALTER TABLE", "IF EXISTS", "CREATE TABLE", "NOT NULL"],
                 initialTable: {
                     tableName: "clientes",
                     columns: [
@@ -1345,7 +1348,7 @@
                         ]
                     }
                 ],
-                bank: ["DROP TABLE", "IF EXISTS", "ALTER TABLE", "DROP COLUMN", "IF NOT EXISTS", "CREATE TABLE"],
+                bank: ["IF NOT EXISTS", "ALTER TABLE", "DROP COLUMN", "IF EXISTS", "DELETE", "CREATE TABLE", "DROP TABLE", "MODIFY COLUMN", "WHERE"],
                 initialTable: {
                     tableName: "logs_temporales",
                     columns: [

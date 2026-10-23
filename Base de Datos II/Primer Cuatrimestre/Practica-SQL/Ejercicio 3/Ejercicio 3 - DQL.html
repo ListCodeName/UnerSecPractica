@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Base de Datos II — Ejercicio 3: Consultas y Filtros Básicos (DQL)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --bg-grad: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 50%, #f5f3ff 100%);
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --surface-code: #f1f5f9;
+            --border: #dbe3ef;
+            --border-strong: #cbd5e1;
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-light: #e0f2fe;
+            --accent: #7c3aed;
+            --accent-dark: #5b21b6;
+            --accent-light: #ede9fe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 8px 24px rgba(2, 132, 199, 0.09);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .top-nav-inner {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(3deg); }
+        }
+
+        .context-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .context-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.36rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .context-pill.active-db {
+            background: var(--primary-light);
+            border-color: #7dd3fc;
+            color: var(--primary-dark);
+        }
+
+        .hud-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hud-inner {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .level-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .level-pill.current {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: scale(1.06);
+        }
+
+        .level-pill.done {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-chip.timer-chip {
+            background: var(--primary-light);
+            border-color: #7dd3fc;
+            color: var(--primary-dark);
+            min-width: 106px;
+        }
+
+        .stat-chip.timer-chip.warning {
+            background: var(--warning-light);
+            border-color: #fde68a;
+            color: #b45309;
+            animation: pulseUrgent 0.8s infinite alternate;
+        }
+
+        .stat-chip.timer-chip.danger {
+            background: var(--danger-light);
+            border-color: #fecaca;
+            color: #b91c1c;
+            animation: pulseUrgent 0.45s infinite alternate;
+        }
+
+        @keyframes pulseUrgent {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.35s linear, background 0.3s;
+        }
+
+        .workspace {
+            max-width: 1480px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.35rem 1.5rem 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            flex: 1;
+        }
+
+        .card {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 1.75rem;
+            scroll-margin-top: 84px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .objective-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+
+        .objective-desc {
+            font-size: 0.94rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* TABLAS DE MUESTRA EN FORMATO SIMPLIFICADO */
+        .sample-schema-wrapper {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.9rem 1.05rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .sample-schema-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.7rem;
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+        }
+
+        .sample-tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .sample-table-card {
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
+            border-radius: 9px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+        }
+
+        .sample-table-title {
+            background: #f1f5f9;
+            padding: 0.4rem 0.7rem;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .sample-table-scroll {
+            overflow-x: auto;
+        }
+
+        table.sample-mini-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+        }
+
+        table.sample-mini-grid th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.35rem 0.55rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        table.sample-mini-grid th.sample-pk {
+            color: #0369a1;
+            background: #e0f2fe;
+        }
+
+        table.sample-mini-grid th.sample-fk {
+            color: #5b21b6;
+            background: #f5f3ff;
+        }
+
+        table.sample-mini-grid td {
+            padding: 0.32rem 0.55rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* BOTÓN DE FOCO "PISTA" Y ESPECIFICACIÓN OCULTA POR DEFECTO */
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.36rem 0.8rem;
+            border-radius: 999px;
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.14);
+        }
+
+        .btn-hint:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.22);
+        }
+
+        .btn-hint.active {
+            background: #f59e0b;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+
+        .btn-hint svg {
+            transition: transform 0.25s ease;
+        }
+
+        .btn-hint:hover svg,
+        .btn-hint.active svg {
+            transform: scale(1.15) rotate(-6deg);
+        }
+
+        .spec-box {
+            display: none;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.05rem;
+            font-size: 0.84rem;
+        }
+
+        .spec-box.visible {
+            display: block;
+            animation: resultPopup 0.28s ease;
+        }
+
+        .spec-box-title {
+            font-weight: 700;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            color: #b45309;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+
+        .spec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            font-size: 0.79rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.1rem 0.42rem;
+            border-radius: 5px;
+        }
+
+        /* SQL BUILDER */
+        .sql-editor-box {
+            background: var(--surface-code);
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.86rem;
+            line-height: 2.15;
+            overflow-x: auto;
+        }
+
+        .sql-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed var(--border-strong);
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        .sql-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.38rem;
+            margin-bottom: 0.38rem;
+        }
+
+        .sql-indent {
+            padding-left: 1.35rem;
+        }
+
+        .sql-punct {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sql-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 88px;
+            height: 34px;
+            padding: 0 0.65rem;
+            border-radius: 7px;
+            border: 2px dashed #94a3b8;
+            background: #ffffff;
+            color: #475569;
+            font-family: var(--font-mono);
+            font-size: 0.81rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .sql-slot::before {
+            content: attr(data-slot-index);
+            font-size: 0.65rem;
+            opacity: 0.55;
+            margin-right: 4px;
+        }
+
+        .sql-slot.active-target {
+            border-style: solid;
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .sql-slot.filled {
+            border-style: solid;
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent-dark);
+        }
+
+        .sql-slot.slot-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-slot.slot-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #991b1b !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        .sql-input {
+            height: 34px;
+            padding: 0 0.52rem;
+            border-radius: 7px;
+            border: 2px solid #94a3b8;
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.83rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .sql-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+        }
+
+        .sql-input.input-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-input.input-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        @keyframes shakeElem {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .keyword-bank-title {
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .keyword-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .kw-chip {
+            padding: 0.42rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+            transition: all 0.16s ease;
+            user-select: none;
+        }
+
+        .kw-chip:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .kw-chip.used {
+            opacity: 0.35;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1.1rem;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-replay {
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            border: 1px solid #c4b5fd;
+            display: none;
+        }
+
+        .btn-replay.visible {
+            display: inline-flex;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: #fff;
+            display: none;
+        }
+
+        .btn-next.visible {
+            display: inline-flex;
+        }
+
+        .feedback-banner {
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback-banner.show {
+            display: block;
+            animation: resultPopup 0.3s ease;
+        }
+
+        .feedback-banner.ok {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback-banner.err {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        /* =========================================================
+           VISOR ANIMADO DQL (100% WIDTH + ALTO DINÁMICO)
+           ========================================================= */
+        .visor-card {
+            width: 100%;
+            height: auto;
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+            padding: 1.65rem 1.85rem;
+            border: 2px solid #cbd5e1;
+        }
+
+        .visor-card.visor-highlight-active {
+            border-color: var(--primary);
+            box-shadow: 0 14px 36px rgba(2, 132, 199, 0.14);
+        }
+
+        .visor-stage {
+            flex: 1;
+            width: 100%;
+            height: auto;
+            min-height: 500px;
+            background:
+                radial-gradient(#cbd5e1 1px, transparent 1px) 0 0 / 20px 20px,
+                #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.65rem 1.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .visor-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.34rem 0.85rem;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            transition: all 0.25s;
+        }
+
+        .visor-status-pill.phase-key {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .visor-status-pill.phase-where {
+            background: var(--warning-light);
+            color: #b45309;
+        }
+
+        .visor-status-pill.executed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .dql-steps-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            padding: 0.7rem 1rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .dql-step-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.36rem 0.85rem;
+            border-radius: 999px;
+            background: var(--surface-alt);
+            color: var(--text-soft);
+            border: 1px solid var(--border);
+            transition: all 0.28s ease;
+        }
+
+        .dql-step-chip.active-step {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-color: #38bdf8;
+            transform: scale(1.04);
+        }
+
+        .dql-step-chip.done-step {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .table-box {
+            background: #ffffff;
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .table-box.result-box {
+            border-color: var(--success);
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.15);
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .table-banner {
+            padding: 0.68rem 1rem;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+        }
+
+        .table-banner.result-banner {
+            background: linear-gradient(135deg, var(--primary), var(--accent), var(--success));
+        }
+
+        table.dql-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        table.dql-grid th {
+            background: #f1f5f9;
+            color: var(--text);
+            text-align: left;
+            padding: 0.62rem 0.85rem;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            transition: all 0.25s;
+        }
+
+        table.dql-grid td {
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.28s;
+        }
+
+        th.col-selected {
+            background: var(--primary-light) !important;
+            color: var(--primary-dark) !important;
+            border-bottom-color: var(--primary) !important;
+        }
+
+        tr.row-where-pass {
+            background: #ecfdf5 !important;
+        }
+
+        tr.row-where-pass td {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        tr.row-where-fail {
+            opacity: 0.35;
+            background: #fff1f2 !important;
+        }
+
+        tr.result-row-pop {
+            animation: resultPopup 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        .visor-footer-actions {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-strong);
+        }
+
+        .visor-footer-actions.visible {
+            display: flex;
+        }
+
+        @keyframes resultPopup {
+            0% {
+                opacity: 0;
+                transform: scale(0.88) translateY(14px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.02) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-wrapper">
+        <nav class="top-nav">
+            <div class="top-nav-inner">
+                <a href="Ejercicio 3 - DQL.html" class="brand">
+                    <span class="brand-icon" aria-hidden="true">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                    </span>
+                    <span>Base de Datos II · Ejercicio 3: Consultas y Filtros Básicos (DQL)</span>
+                </a>
+                <div class="context-badges">
+                    <span class="context-pill active-db">🗄️ Esquema: tienda_ejercicio (db_tienda.sql)</span>
+                    <span class="context-pill">🔍 SELECT · WHERE · LIKE · BETWEEN · IN · ORDER BY · LIMIT</span>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hud-bar">
+            <div class="hud-inner">
+                <div class="level-pills" id="levelPills"></div>
+                <div class="stats-group">
+                    <div class="stat-chip timer-chip" id="timerChip">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <circle cx="12" cy="13" r="8"></circle>
+                            <path d="M12 9v4l2.5 2.5"></path>
+                            <path d="M9 2h6"></path>
+                        </svg>
+                        <span id="timerDisplay">05:30</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>⚡ Racha:</span>
+                        <span id="streakDisplay">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>🏆 Puntos:</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+
+        <main class="workspace">
+            <!-- SECCIÓN SUPERIOR (100% WIDTH): CONSIGNA + TABLAS SIMPLIFICADAS + CONSTRUCTOR SQL -->
+            <section class="card" id="builderCard">
+                <div class="card-header">
+                    <span class="badge-tag" id="levelBadge">Ejercicio 3 (DQL) · Nivel 1 de 7</span>
+                    <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+                        <button type="button" class="btn-hint" id="hintToggleBtn" title="Mostrar u ocultar Especificación Estricta (Pista)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18h6"></path>
+                                <path d="M10 22h4"></path>
+                                <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"></path>
+                            </svg>
+                            <span id="hintBtnText">Pista</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.34rem 0.7rem;font-size:0.76rem;">
+                            🧹 Limpiar Respuesta
+                        </button>
+                    </div>
+                </div>
+
+                <h1 class="objective-title" id="objTitle"></h1>
+                <p class="objective-desc" id="objDesc"></p>
+
+                <!-- TABLAS DE MUESTRA EN FORMATO SIMPLIFICADO (SIEMPRE VISIBLES) -->
+                <div class="sample-schema-wrapper" id="sampleSchemaWrapper">
+                    <div class="sample-schema-header">
+                        <span id="sampleSchemaTitle">🗂️ Tablas de Muestra Simplificadas — Esquema: tienda_ejercicio (db_tienda.sql)</span>
+                        <span style="text-transform:none;font-weight:600;">🔑 Clave Primaria (PK) · 🔗 Clave Foránea (FK) · Muestra de 2 registros por tabla</span>
+                    </div>
+                    <div class="sample-tables-grid" id="sampleTablesGrid"></div>
+                </div>
+
+                <!-- ESPECIFICACIÓN ESTRICTA OCULTA POR DEFECTO (SOLO SE MUESTRA AL PULSAR "PISTA") -->
+                <div class="spec-box" id="specBox">
+                    <div class="spec-box-title">
+                        <span>💡 Pista — Especificación Estricta de Consulta DQL</span>
+                    </div>
+                    <ul class="spec-list" id="specList"></ul>
+                </div>
+
+                <div class="sql-editor-box">
+                    <div class="sql-editor-header">
+                        <span>CONSTRUCTOR SQL DQL (MySQL) — Sin ayudas de autocompletado</span>
+                        <span id="slotIndicator">Slot activo: #1</span>
+                    </div>
+                    <div id="sqlBuilderContainer"></div>
+                </div>
+
+                <div class="keyword-bank-title">
+                    <span>🧩 Banco de Palabras Clave SQL (Orden Alternado + Distractores)</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para cambiar su palabra</span>
+                </div>
+                <div class="keyword-bank" id="keywordBank"></div>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-primary" id="runQueryBtn">
+                        ▶ Ejecutar Consulta DQL
+                    </button>
+                    <button type="button" class="btn btn-replay" id="replayAnimBtn">
+                        🔄 Repetir Animación DQL
+                    </button>
+                    <button type="button" class="btn btn-next" id="nextLevelBtn">
+                        Siguiente Ejercicio ➔
+                    </button>
+                </div>
+
+                <div class="feedback-banner" id="feedbackBanner"></div>
+            </section>
+
+            <!-- SECCIÓN INFERIOR (100% WIDTH + ALTO DINÁMICO): VISOR ANIMADO DQL -->
+            <section class="card visor-card" id="visorCard">
+                <div class="card-header">
+                    <span class="badge-tag" style="background:#e0f2fe;color:#0369a1;">🔍 Visor Animado de Filtrado y Extracción DQL</span>
+                    <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-replay" id="replayVisorBtn" style="padding:0.34rem 0.8rem;font-size:0.78rem;">
+                            🔄 Repetir Animación DQL
+                        </button>
+                        <button type="button" class="btn btn-next" id="nextVisorHeaderBtn" style="padding:0.34rem 0.8rem;font-size:0.78rem;">
+                            Siguiente Ejercicio ➔
+                        </button>
+                        <span class="visor-status-pill" id="visorStatus">Esperando consulta DQL...</span>
+                    </div>
+                </div>
+
+                <div class="dql-steps-bar">
+                    <span class="dql-step-chip" id="stepChip1">1️⃣ Evaluación de Filas (FROM + WHERE)</span>
+                    <span class="dql-step-chip" id="stepChip2">2️⃣ Proyección y Orden (SELECT + ORDER BY)</span>
+                    <span class="dql-step-chip" id="stepChip3">3️⃣ Resultado Extraído (LIMIT)</span>
+                </div>
+
+                <div class="visor-stage" id="visorStage"></div>
+
+                <div class="visor-footer-actions" id="visorFooterActions">
+                    <button type="button" class="btn btn-secondary" id="backToBuilderBtn">
+                        ⬆️ Subir a la Consigna
+                    </button>
+                    <div style="display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-replay visible" id="replayVisorFooterBtn">
+                            🔄 Repetir Animación DQL
+                        </button>
+                        <button type="button" class="btn btn-next" id="nextVisorFooterBtn">
+                            Siguiente Ejercicio ➔
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           DATOS DE TIENDA_EJERCICIO (db_tienda.sql — Ejercicio 3)
+           ========================================================= */
+        const TIENDA_TABLES = {
+            productos: {
+                name: "productos",
+                pk: "id_producto",
+                cols: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                rows: [
+                    { id_producto: 1, nombre: 'Smart TV 55" 4K', categoria: "Electrónica", precio: 850000, stock: 15 },
+                    { id_producto: 2, nombre: "Notebook Intel i5 16GB", categoria: "Electrónica", precio: 1200000, stock: 8 },
+                    { id_producto: 3, nombre: "Smartphone Android 128GB", categoria: "Electrónica", precio: 450000, stock: 25 },
+                    { id_producto: 6, nombre: "Licuadora Americana 1.5L", categoria: "Electrodomésticos", precio: 92000, stock: 5 },
+                    { id_producto: 7, nombre: "Microondas Digital 20L", categoria: "Electrodomésticos", precio: 185000, stock: 0 },
+                    { id_producto: 10, nombre: "Remera Algodón Básica", categoria: "Indumentaria", precio: 22000, stock: 100 },
+                    { id_producto: 12, nombre: "Campera de Abrigo Impermeable", categoria: "Indumentaria", precio: 210000, stock: 3 },
+                    { id_producto: 13, nombre: "Escritorio de Madera Moderno", categoria: "Hogar", precio: 240000, stock: 6 },
+                    { id_producto: 14, nombre: "Silla Ergonómica de Oficina", categoria: "Hogar", precio: 320000, stock: 14 }
+                ]
+            },
+            clientes: {
+                name: "clientes",
+                pk: "id_cliente",
+                cols: ["id_cliente", "nombre", "apellido", "email", "ciudad", "fecha_registro"],
+                rows: [
+                    { id_cliente: 1, nombre: "Juan", apellido: "Gomez", email: "juan.gomez@email.com", ciudad: "Paraná", fecha_registro: "2025-01-10" },
+                    { id_cliente: 2, nombre: "María", apellido: "Rodríguez", email: "maria.rod@email.com", ciudad: "Oro Verde", fecha_registro: "2025-01-15" },
+                    { id_cliente: 3, nombre: "Javier", apellido: "Lopez", email: "javi.lopez@email.com", ciudad: "Paraná", fecha_registro: "2025-02-01" },
+                    { id_cliente: 4, nombre: "Laura", apellido: "Martínez", email: "laura.m@email.com", ciudad: "Santa Fe", fecha_registro: "2025-02-12" },
+                    { id_cliente: 5, nombre: "Carlos", apellido: "Sánchez", email: "carlos.sanchez@email.com", ciudad: "Crespo", fecha_registro: "2025-03-05" }
+                ]
+            },
+            pedidos: {
+                name: "pedidos",
+                pk: "id_pedido",
+                fk: "id_cliente",
+                cols: ["id_pedido", "id_cliente", "fecha_pedido", "monto_total", "estado"],
+                rows: [
+                    { id_pedido: 1, id_cliente: 1, fecha_pedido: "2025-02-05", monto_total: 850000, estado: "Entregado" },
+                    { id_pedido: 2, id_cliente: 2, fecha_pedido: "2025-02-18", monto_total: 65000, estado: "Entregado" },
+                    { id_pedido: 3, id_cliente: 3, fecha_pedido: "2025-02-22", monto_total: 1292000, estado: "Entregado" },
+                    { id_pedido: 4, id_cliente: 4, fecha_pedido: "2025-03-01", monto_total: 22000, estado: "Cancelado" },
+                    { id_pedido: 5, id_cliente: 5, fecha_pedido: "2025-03-10", monto_total: 450000, estado: "Entregado" },
+                    { id_pedido: 6, id_cliente: 6, fecha_pedido: "2025-03-24", monto_total: 92000, estado: "Pendiente" }
+                ]
+            }
+        };
+
+        const LEVELS = [
+            {
+                id: 1,
+                title: "1. Listado General de Stock (SELECT *)",
+                timeLimit: 300,
+                desc: "La gerencia comercial necesita visualizar todo el catálogo de artículos registrados en la tienda. Confecciona una consulta que devuelva todas las columnas (usando el comodín *) de la tabla productos.",
+                specs: [
+                    "Proyección completa: <span class='code-pill'>SELECT</span> <span class='code-pill'>*</span>",
+                    "Tabla origen: <span class='code-pill'>FROM</span> <span class='code-pill'>productos</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "*", width: "60px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "120px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["FROM", "WHERE", "SELECT", "ORDER BY", "LIMIT", "IN", "INSERT INTO"],
+                dqlConfig: {
+                    table: "productos",
+                    selectedCols: ["id_producto", "nombre", "categoria", "precio", "stock"],
+                    filterFn: () => true,
+                    sortFn: null,
+                    limit: null
+                }
+            },
+            {
+                id: 2,
+                title: "2. Filtro de Artículos de Alta Gama (WHERE >)",
+                timeLimit: 300,
+                desc: "Se planea analizar los artículos más costosos. Lista el nombre, la categoría y el precio (en ese orden) de todos los registros de la tabla productos cuyo precio unitario sea estrictamente mayor a 200000.",
+                specs: [
+                    "Proyección: <span class='code-pill'>SELECT</span> <span class='code-pill'>nombre</span>, <span class='code-pill'>categoria</span>, <span class='code-pill'>precio</span> <span class='code-pill'>FROM</span> <span class='code-pill'>productos</span>",
+                    "Condición: <span class='code-pill'>WHERE</span> <span class='code-pill'>precio</span> &gt; <span class='code-pill'>200000</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "categoria", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "precio", width: "90px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "115px" },
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "precio", width: "90px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "200000", width: "95px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["WHERE", "FROM", "SELECT", "BETWEEN", "ORDER BY", "HAVING", "AND", "LIMIT"],
+                dqlConfig: {
+                    table: "productos",
+                    selectedCols: ["nombre", "categoria", "precio"],
+                    filterFn: (r) => r.precio > 200000,
+                    sortFn: null,
+                    limit: null
+                }
+            },
+            {
+                id: 3,
+                title: "3. Búsqueda de Clientes por Apellido (LIKE + OR)",
+                timeLimit: 330,
+                desc: "El área de atención al cliente necesita ubicar a un comprador. Consulta el nombre, el apellido y el email (en ese orden) de todos los registros de la tabla clientes cuyo apellido comience con 'L%' o cuyo apellido comience con 'G%'.",
+                specs: [
+                    "Proyección: <span class='code-pill'>SELECT</span> <span class='code-pill'>nombre</span>, <span class='code-pill'>apellido</span>, <span class='code-pill'>email</span> <span class='code-pill'>FROM</span> <span class='code-pill'>clientes</span>",
+                    "Filtro de patrón: <span class='code-pill'>WHERE</span> <span class='code-pill'>apellido</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'L%'</span> <span class='code-pill'>OR</span> <span class='code-pill'>apellido</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'G%'</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "email", width: "85px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "clientes", width: "105px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "L%", width: "65px" },
+                            { type: "punct", text: "'" },
+                            { type: "slot", answer: "OR" },
+                            { type: "input", answer: "apellido", width: "95px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "G%", width: "65px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["LIKE", "OR", "WHERE", "FROM", "LIKE", "SELECT", "AND", "IN", "BETWEEN", "NOT"],
+                dqlConfig: {
+                    table: "clientes",
+                    selectedCols: ["nombre", "apellido", "email"],
+                    filterFn: (r) => r.apellido.startsWith("L") || r.apellido.startsWith("G"),
+                    sortFn: null,
+                    limit: null
+                }
+            },
+            {
+                id: 4,
+                title: "4. Alerta de Stock Crítico (Operadores Relacionales + AND)",
+                timeLimit: 330,
+                desc: "Logística necesita reponer mercadería de urgencia. Consulta el nombre, la categoría y el stock (en ese orden) de los artículos de la tabla productos que tengan un stock menor o igual a 5 unidades y cuyo stock sea estrictamente mayor a 0.",
+                specs: [
+                    "Proyección: <span class='code-pill'>SELECT</span> <span class='code-pill'>nombre</span>, <span class='code-pill'>categoria</span>, <span class='code-pill'>stock</span> <span class='code-pill'>FROM</span> <span class='code-pill'>productos</span>",
+                    "Condición doble: <span class='code-pill'>WHERE</span> <span class='code-pill'>stock</span> &lt;= <span class='code-pill'>5</span> <span class='code-pill'>AND</span> <span class='code-pill'>stock</span> &gt; <span class='code-pill'>0</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "categoria", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "stock", width: "85px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "stock", width: "85px" },
+                            { type: "punct", text: "<=" },
+                            { type: "input", answer: "5", width: "55px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "stock", width: "85px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "0", width: "55px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["AND", "WHERE", "FROM", "SELECT", "OR", "BETWEEN", "IN", "ORDER BY", "LIMIT"],
+                dqlConfig: {
+                    table: "productos",
+                    selectedCols: ["nombre", "categoria", "stock"],
+                    filterFn: (r) => r.stock <= 5 && r.stock > 0,
+                    sortFn: null,
+                    limit: null
+                }
+            },
+            {
+                id: 5,
+                title: "5. Reporte de Pedidos de Febrero (BETWEEN + AND + ORDER BY DESC)",
+                timeLimit: 360,
+                desc: "Administración requiere revisar las operaciones de febrero. Consulta todas las columnas (*) de la tabla pedidos cuya fecha de pedido esté entre '2025-02-01' y '2025-02-28' y cuyo estado sea 'Entregado', ordenando los resultados por monto_total de mayor a menor (DESC).",
+                specs: [
+                    "Extracción: <span class='code-pill'>SELECT</span> <span class='code-pill'>*</span> <span class='code-pill'>FROM</span> <span class='code-pill'>pedidos</span>",
+                    "Rango y estado: <span class='code-pill'>WHERE</span> <span class='code-pill'>fecha_pedido</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>'2025-02-01'</span> <span class='code-pill'>AND</span> <span class='code-pill'>'2025-02-28'</span> <span class='code-pill'>AND</span> <span class='code-pill'>estado</span> = <span class='code-pill'>'Entregado'</span>",
+                    "Ordenamiento: <span class='code-pill'>ORDER BY</span> <span class='code-pill'>monto_total</span> <span class='code-pill'>DESC</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "*", width: "55px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pedidos", width: "100px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "fecha_pedido", width: "130px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "2025-02-01", width: "115px" },
+                            { type: "punct", text: "'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "2025-02-28", width: "115px" },
+                            { type: "punct", text: "'" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "estado", width: "85px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Entregado", width: "105px" },
+                            { type: "punct", text: "'" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ORDER BY" },
+                            { type: "input", answer: "monto_total", width: "125px" },
+                            { type: "slot", answer: "DESC" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["BETWEEN", "ORDER BY", "AND", "WHERE", "DESC", "FROM", "AND", "SELECT", "ASC", "LIMIT", "IN"],
+                dqlConfig: {
+                    table: "pedidos",
+                    selectedCols: ["id_pedido", "id_cliente", "fecha_pedido", "monto_total", "estado"],
+                    filterFn: (r) => r.fecha_pedido >= "2025-02-01" && r.fecha_pedido <= "2025-02-28" && r.estado === "Entregado",
+                    sortFn: (a, b) => b.monto_total - a.monto_total,
+                    limit: null
+                }
+            },
+            {
+                id: 6,
+                title: "6. Filtrado Sectorial de Hogar e Indumentaria (Operador IN)",
+                timeLimit: 330,
+                desc: "Marketing lanzará una campaña promocional para ciertos rubros. Utiliza el operador de pertenencia a conjuntos IN para listar el nombre, la categoría y el precio (en ese orden) de todos los artículos de la tabla productos cuya categoría sea 'Hogar' o 'Indumentaria'.",
+                specs: [
+                    "Proyección: <span class='code-pill'>SELECT</span> <span class='code-pill'>nombre</span>, <span class='code-pill'>categoria</span>, <span class='code-pill'>precio</span> <span class='code-pill'>FROM</span> <span class='code-pill'>productos</span>",
+                    "Conjunto: <span class='code-pill'>WHERE</span> <span class='code-pill'>categoria</span> <span class='code-pill'>IN</span> (<span class='code-pill'>'Hogar'</span>, <span class='code-pill'>'Indumentaria'</span>);"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "categoria", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "precio", width: "90px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "categoria", width: "105px" },
+                            { type: "slot", answer: "IN" },
+                            { type: "punct", text: "('" },
+                            { type: "input", answer: "Hogar", width: "85px" },
+                            { type: "punct", text: "', '" },
+                            { type: "input", answer: "Indumentaria", width: "130px" },
+                            { type: "punct", text: "');" }
+                        ]
+                    }
+                ],
+                bank: ["IN", "WHERE", "SELECT", "FROM", "BETWEEN", "LIKE", "AND", "ORDER BY"],
+                dqlConfig: {
+                    table: "productos",
+                    selectedCols: ["nombre", "categoria", "precio"],
+                    filterFn: (r) => ["Hogar", "Indumentaria"].includes(r.categoria),
+                    sortFn: null,
+                    limit: null
+                }
+            },
+            {
+                id: 7,
+                title: "7. Podio de los 3 Productos Más Caros (ORDER BY DESC + LIMIT)",
+                timeLimit: 330,
+                desc: "Diseña una consulta que proyecte únicamente el nombre y el precio (en ese orden) de la tabla productos, ordenando los registros por precio de forma descendente (DESC) y limitando la salida a los 3 productos más costosos.",
+                specs: [
+                    "Proyección: <span class='code-pill'>SELECT</span> <span class='code-pill'>nombre</span>, <span class='code-pill'>precio</span> <span class='code-pill'>FROM</span> <span class='code-pill'>productos</span>",
+                    "Podio: <span class='code-pill'>ORDER BY</span> <span class='code-pill'>precio</span> <span class='code-pill'>DESC</span> <span class='code-pill'>LIMIT</span> <span class='code-pill'>3</span>;"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "precio", width: "90px" },
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "productos", width: "110px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "ORDER BY" },
+                            { type: "input", answer: "precio", width: "90px" },
+                            { type: "slot", answer: "DESC" },
+                            { type: "slot", answer: "LIMIT" },
+                            { type: "input", answer: "3", width: "55px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["LIMIT", "ORDER BY", "DESC", "FROM", "SELECT", "ASC", "WHERE", "GROUP BY", "BETWEEN"],
+                dqlConfig: {
+                    table: "productos",
+                    selectedCols: ["nombre", "precio"],
+                    filterFn: () => true,
+                    sortFn: (a, b) => b.precio - a.precio,
+                    limit: 3
+                }
+            }
+        ];
+
+        const STORAGE_KEY = "bd2_ej3_dql_state_v1";
+        let currentLevelIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let completedLevels = new Set();
+        let activeSlotIndex = 0;
+        let slotAssignments = [];
+        let timerSeconds = 300;
+        let timerMax = 300;
+        let timerInterval = null;
+        let levelSolved = false;
+        let hasLoadedOnce = false;
+        let animTimeouts = [];
+
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function clearAnimTimeouts() {
+            animTimeouts.forEach(t => clearTimeout(t));
+            animTimeouts = [];
+        }
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+
+        const builderCardEl = document.getElementById("builderCard");
+        const visorCardEl = document.getElementById("visorCard");
+        const levelPillsEl = document.getElementById("levelPills");
+        const timerDisplayEl = document.getElementById("timerDisplay");
+        const timerChipEl = document.getElementById("timerChip");
+        const timerBarFillEl = document.getElementById("timerBarFill");
+        const streakDisplayEl = document.getElementById("streakDisplay");
+        const scoreDisplayEl = document.getElementById("scoreDisplay");
+        const levelBadgeEl = document.getElementById("levelBadge");
+        const objTitleEl = document.getElementById("objTitle");
+        const objDescEl = document.getElementById("objDesc");
+        const specBoxEl = document.getElementById("specBox");
+        const specListEl = document.getElementById("specList");
+        const hintToggleBtn = document.getElementById("hintToggleBtn");
+        const hintBtnTextEl = document.getElementById("hintBtnText");
+        const sampleTablesGridEl = document.getElementById("sampleTablesGrid");
+        const sqlBuilderContainerEl = document.getElementById("sqlBuilderContainer");
+        const keywordBankEl = document.getElementById("keywordBank");
+        const slotIndicatorEl = document.getElementById("slotIndicator");
+        const feedbackBannerEl = document.getElementById("feedbackBanner");
+        const visorStageEl = document.getElementById("visorStage");
+        const visorStatusEl = document.getElementById("visorStatus");
+        const nextLevelBtn = document.getElementById("nextLevelBtn");
+        const replayAnimBtn = document.getElementById("replayAnimBtn");
+        const replayVisorBtn = document.getElementById("replayVisorBtn");
+        const nextVisorHeaderBtn = document.getElementById("nextVisorHeaderBtn");
+        const visorFooterActionsEl = document.getElementById("visorFooterActions");
+        const backToBuilderBtn = document.getElementById("backToBuilderBtn");
+        const replayVisorFooterBtn = document.getElementById("replayVisorFooterBtn");
+        const nextVisorFooterBtn = document.getElementById("nextVisorFooterBtn");
+        const runQueryBtn = document.getElementById("runQueryBtn");
+        const resetLevelBtn = document.getElementById("resetLevelBtn");
+        const stepChip1El = document.getElementById("stepChip1");
+        const stepChip2El = document.getElementById("stepChip2");
+        const stepChip3El = document.getElementById("stepChip3");
+
+        function scrollToVisor() {
+            if (visorCardEl) visorCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function scrollToBuilder() {
+            if (builderCardEl) builderCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function hideHint() {
+            if (specBoxEl) specBoxEl.classList.remove("visible");
+            if (hintToggleBtn) hintToggleBtn.classList.remove("active");
+            if (hintBtnTextEl) hintBtnTextEl.textContent = "Pista";
+        }
+
+        function toggleHint() {
+            if (!specBoxEl) return;
+            const isNowVisible = specBoxEl.classList.toggle("visible");
+            if (hintToggleBtn) hintToggleBtn.classList.toggle("active", isNowVisible);
+            if (hintBtnTextEl) hintBtnTextEl.textContent = isNowVisible ? "Ocultar Pista" : "Pista";
+        }
+
+        function renderSimplifiedSampleTables() {
+            if (!sampleTablesGridEl) return;
+            sampleTablesGridEl.innerHTML = Object.values(TIENDA_TABLES).map(tObj => {
+                const ths = tObj.cols.map(c => {
+                    const isPk = c === tObj.pk;
+                    const isFk = c === tObj.fk;
+                    const cls = isPk ? "sample-pk" : (isFk ? "sample-fk" : "");
+                    const icon = isPk ? " 🔑" : (isFk ? " 🔗" : "");
+                    return `<th class="${cls}">${c}${icon}</th>`;
+                }).join("");
+                const trs = tObj.rows.slice(0, 2).map(r => `<tr>${tObj.cols.map(c => `<td>${r[c]}</td>`).join("")}</tr>`).join("");
+                return `
+                    <div class="sample-table-card">
+                        <div class="sample-table-title">
+                            <span>📋 Tabla: ${tObj.name}</span>
+                            <span style="font-size:0.68rem;color:#64748b;">${tObj.cols.length} atributos</span>
+                        </div>
+                        <div class="sample-table-scroll">
+                            <table class="sample-mini-grid">
+                                <thead><tr>${ths}</tr></thead>
+                                <tbody>${trs}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function setStepIndicator(activePhase) {
+            [stepChip1El, stepChip2El, stepChip3El].forEach((el, idx) => {
+                el.classList.remove("active-step", "done-step");
+                const stepNum = idx + 1;
+                if (activePhase > stepNum) {
+                    el.classList.add("done-step");
+                } else if (activePhase === stepNum) {
+                    el.classList.add("active-step");
+                }
+            });
+        }
+
+        function renderLevelPills() {
+            levelPillsEl.innerHTML = "";
+            LEVELS.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "level-pill" +
+                    (idx === currentLevelIdx ? " current" : "") +
+                    (completedLevels.has(lvl.id) ? " done" : "");
+                btn.textContent = lvl.id;
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
+                levelPillsEl.appendChild(btn);
+            });
+        }
+
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, "0");
+            const s = String(sec % 60).padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function resumeTimer() {
+            clearInterval(timerInterval);
+            updateTimerUI();
+            if (levelSolved || timerSeconds <= 0) return;
+
+            timerInterval = setInterval(() => {
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
+                updateTimerUI();
+                saveCurrentLevelProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    streak = 0;
+                    streakDisplayEl.textContent = streak;
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la consulta DQL para continuar.");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            timerDisplayEl.textContent = formatTime(Math.max(0, timerSeconds));
+            const pct = Math.max(0, (timerSeconds / timerMax) * 100);
+            timerBarFillEl.style.width = pct + "%";
+            timerChipEl.classList.remove("warning", "danger");
+            if (timerSeconds <= 30) {
+                timerChipEl.classList.add("danger");
+                timerBarFillEl.style.background = "var(--danger)";
+            } else if (timerSeconds <= 60) {
+                timerChipEl.classList.add("warning");
+                timerBarFillEl.style.background = "var(--warning)";
+            } else {
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--primary), var(--accent))";
+            }
+        }
+
+        function loadLevel(idx) {
+            clearAnimTimeouts();
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
+            currentLevelIdx = idx;
+
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+            levelBadgeEl.textContent = `Ejercicio 3 (DQL) · Nivel ${lvl.id} de ${LEVELS.length}`;
+            objTitleEl.textContent = lvl.title;
+            objDescEl.textContent = lvl.desc;
+            specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
+            hideHint();
+            renderSimplifiedSampleTables();
+
+            feedbackBannerEl.className = "feedback-banner";
+            visorCardEl.classList.remove("visor-highlight-active");
+            nextLevelBtn.classList.remove("visible");
+            nextVisorHeaderBtn.classList.remove("visible");
+            nextVisorFooterBtn.classList.remove("visible");
+            visorFooterActionsEl.classList.remove("visible");
+            replayAnimBtn.classList.remove("visible");
+            replayVisorBtn.classList.remove("visible");
+            setStepIndicator(0);
+            visorStatusEl.textContent = `Tabla origen lista: ${lvl.dqlConfig.table}`;
+            visorStatusEl.className = "visor-status-pill";
+
+            sqlBuilderContainerEl.innerHTML = "";
+            slotAssignments = [];
+            let slotCount = 0;
+            let inputCount = 0;
+
+            lvl.lines.forEach(line => {
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "sql-line" + (line.indent ? " sql-indent" : "");
+
+                line.tokens.forEach(tok => {
+                    if (tok.type === "punct") {
+                        const span = document.createElement("span");
+                        span.className = "sql-punct";
+                        span.textContent = tok.text;
+                        lineDiv.appendChild(span);
+                    } else if (tok.type === "slot") {
+                        const sIdx = slotCount++;
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sql-slot";
+                        btn.dataset.slotIndex = `#${sIdx + 1}`;
+                        btn.dataset.idx = sIdx;
+                        btn.dataset.answer = tok.answer;
+                        btn.textContent = "___";
+                        btn.addEventListener("click", () => onSlotClicked(sIdx));
+                        lineDiv.appendChild(btn);
+                    } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
+                        const inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.className = "sql-input";
+                        inp.autocomplete = "off";
+                        inp.spellcheck = false;
+                        inp.style.width = tok.width || "110px";
+                        inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
+                        inp.addEventListener("input", () => {
+                            inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
+                        });
+                        lineDiv.appendChild(inp);
+                    }
+                });
+                sqlBuilderContainerEl.appendChild(lineDiv);
+            });
+
+            keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
+            lvl.bank.forEach((word, bIdx) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
+                chip.dataset.bankIdx = bIdx;
+                chip.textContent = word;
+                chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
+                keywordBankEl.appendChild(chip);
+            });
+
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderSourceDQLVisor(lvl);
+
+            if (levelSolved) {
+                visorCardEl.classList.add("visor-highlight-active");
+                replayAnimBtn.classList.add("visible");
+                replayVisorBtn.classList.add("visible");
+                visorFooterActionsEl.classList.add("visible");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                    nextVisorHeaderBtn.classList.add("visible");
+                    nextVisorFooterBtn.classList.add("visible");
+                }
+                showFeedback(true, "✅ Nivel completado. Puedes pulsar «🔄 Repetir Animación DQL» cuando quieras.");
+                playDQLAnimation(lvl);
+            }
+
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onSlotClicked(sIdx) {
+            if (levelSolved) return;
+            const current = slotAssignments[sIdx];
+            if (current) {
+                const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
+                if (chip) chip.classList.remove("used");
+                slotAssignments[sIdx] = null;
+            }
+            activeSlotIndex = sIdx;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onBankChipClicked(bankIdx, word, evt) {
+            if (levelSolved) return;
+            if (activeSlotIndex === null || activeSlotIndex >= slotAssignments.length) {
+                const firstEmpty = slotAssignments.findIndex(x => x === null);
+                if (firstEmpty === -1) return;
+                activeSlotIndex = firstEmpty;
+            }
+            const existing = slotAssignments[activeSlotIndex];
+            if (existing) {
+                const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
+                if (oldChip) oldChip.classList.remove("used");
+            }
+            slotAssignments[activeSlotIndex] = { bankIdx, value: word };
+            const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
+            if (chip) chip.classList.add("used");
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#0284c7", 10);
+
+            const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
+            if (nextEmpty !== -1) {
+                activeSlotIndex = nextEmpty;
+            } else {
+                const anyEmpty = slotAssignments.findIndex(x => x === null);
+                activeSlotIndex = anyEmpty !== -1 ? anyEmpty : activeSlotIndex;
+            }
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function updateSlotHighlights() {
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            slots.forEach((el, idx) => {
+                el.classList.remove("active-target", "filled", "slot-error", "slot-correct");
+                const assigned = slotAssignments[idx];
+                if (assigned) {
+                    el.textContent = assigned.value;
+                    el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
+                } else {
+                    el.textContent = "___";
+                }
+                if (idx === activeSlotIndex && !levelSolved) {
+                    el.classList.add("active-target");
+                }
+            });
+            slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
+        }
+
+        /* =========================================================
+           RENDERIZADO Y ANIMACIÓN DE LA TUBERÍA DQL
+           ========================================================= */
+        function renderSourceDQLVisor(lvl) {
+            const cfg = lvl.dqlConfig;
+            const tObj = TIENDA_TABLES[cfg.table];
+            const ths = tObj.cols.map(c => `<th data-col="${c}">${c}${c === tObj.pk ? ' 🔑' : ''}</th>`).join("");
+            const trs = tObj.rows.map((r, rIdx) => `
+                <tr data-rowidx="${rIdx}">
+                    ${tObj.cols.map(c => `<td>${r[c]}</td>`).join("")}
+                </tr>
+            `).join("");
+
+            visorStageEl.innerHTML = `
+                <div class="table-box">
+                    <div class="table-banner">
+                        <span>📘 Tabla Origen (FROM): tienda_ejercicio.${tObj.name}</span>
+                        <span>${tObj.rows.length} registros almacenados</span>
+                    </div>
+                    <table class="dql-grid" id="sourceDqlGrid">
+                        <thead><tr>${ths}</tr></thead>
+                        <tbody>${trs}</tbody>
+                    </table>
+                </div>
+                <div id="dqlResultContainer"></div>
+            `;
+        }
+
+        function playDQLAnimation(lvl) {
+            clearAnimTimeouts();
+            renderSourceDQLVisor(lvl);
+
+            const cfg = lvl.dqlConfig;
+            const tObj = TIENDA_TABLES[cfg.table];
+            const grid = document.getElementById("sourceDqlGrid");
+
+            setStepIndicator(1);
+            visorStatusEl.textContent = "Fase 1: Escaneando filas y evaluando filtro WHERE...";
+            visorStatusEl.className = "visor-status-pill phase-key";
+
+            tObj.rows.forEach((row, rIdx) => {
+                animTimeouts.push(setTimeout(() => {
+                    const tr = grid && grid.querySelector(`tr[data-rowidx="${rIdx}"]`);
+                    if (tr) {
+                        tr.classList.add(cfg.filterFn(row) ? "row-where-pass" : "row-where-fail");
+                    }
+                }, rIdx * 95));
+            });
+
+            const phase2Delay = tObj.rows.length * 95 + 220;
+            animTimeouts.push(setTimeout(() => {
+                setStepIndicator(2);
+                visorStatusEl.textContent = "Fase 2: Seleccionando columnas (SELECT) y ordenando...";
+                visorStatusEl.className = "visor-status-pill phase-where";
+
+                cfg.selectedCols.forEach(c => {
+                    const th = grid && grid.querySelector(`th[data-col="${c}"]`);
+                    if (th) th.classList.add("col-selected");
+                });
+            }, phase2Delay));
+
+            const phase3Delay = phase2Delay + 600;
+            animTimeouts.push(setTimeout(() => {
+                setStepIndicator(3);
+                let outRows = tObj.rows.filter(cfg.filterFn);
+                if (cfg.sortFn) outRows = [...outRows].sort(cfg.sortFn);
+                if (cfg.limit) outRows = outRows.slice(0, cfg.limit);
+
+                visorStatusEl.textContent = `Consulta DQL completada: ${outRows.length} fila(s) extraída(s)`;
+                visorStatusEl.className = "visor-status-pill executed";
+
+                const resContainer = document.getElementById("dqlResultContainer");
+                const ths = cfg.selectedCols.map(c => `<th>${c}</th>`).join("");
+                resContainer.innerHTML = `
+                    <div class="table-box result-box">
+                        <div class="table-banner result-banner">
+                            <span>✨ RESULTADO EXTRAÍDO DE LA CONSULTA DQL</span>
+                            <span>${outRows.length} registro(s)</span>
+                        </div>
+                        <table class="dql-grid">
+                            <thead><tr>${ths}</tr></thead>
+                            <tbody id="dqlResultBody"></tbody>
+                        </table>
+                    </div>
+                `;
+                const tbody = document.getElementById("dqlResultBody");
+                outRows.forEach((r, idx) => {
+                    animTimeouts.push(setTimeout(() => {
+                        const tr = document.createElement("tr");
+                        tr.className = "result-row-pop";
+                        tr.innerHTML = cfg.selectedCols.map(c => `<td style="font-weight:700;color:#0f172a;">${r[c]}</td>`).join("");
+                        tbody.appendChild(tr);
+                    }, idx * 140));
+                });
+            }, phase3Delay));
+        }
+
+        function validateAndRun() {
+            if (levelSolved) {
+                scrollToVisor();
+                playDQLAnimation(LEVELS[currentLevelIdx]);
+                return;
+            }
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+
+            let allSlotsOk = true;
+            let allInputsOk = true;
+
+            slots.forEach((slotEl, idx) => {
+                const expected = slotEl.dataset.answer.trim().toUpperCase();
+                const current = slotAssignments[idx] ? slotAssignments[idx].value.trim().toUpperCase() : "";
+                slotEl.classList.remove("slot-error", "slot-correct");
+                if (current === expected) {
+                    slotEl.classList.add("slot-correct");
+                } else {
+                    slotEl.classList.add("slot-error");
+                    allSlotsOk = false;
+                }
+            });
+
+            inputs.forEach(inpEl => {
+                const expected = inpEl.dataset.answer.trim();
+                const current = inpEl.value.trim();
+                inpEl.classList.remove("input-error", "input-correct");
+                if (current === expected) {
+                    inpEl.classList.add("input-correct");
+                } else {
+                    inpEl.classList.add("input-error");
+                    allInputsOk = false;
+                }
+            });
+
+            if (!allSlotsOk || !allInputsOk) {
+                streak = 0;
+                streakDisplayEl.textContent = streak;
+                saveCurrentLevelProgress();
+                showFeedback(false, "❌ Revisa los elementos en rojo: verifica las cláusulas DQL y los nombres de tablas, atributos o valores escritos manualmente.");
+                return;
+            }
+
+            levelSolved = true;
+            clearInterval(timerInterval);
+            inputs.forEach(inp => { inp.readOnly = true; });
+
+            const lvl = LEVELS[currentLevelIdx];
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
+            streak++;
+            const gained = 120 + timeBonus + (streak * 15);
+            score += gained;
+            completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+
+            showFeedback(true, `✅ ¡Consulta DQL ejecutada correctamente! Desplazando al visor (+${gained} pts).`);
+
+            visorCardEl.classList.add("visor-highlight-active");
+            replayAnimBtn.classList.add("visible");
+            replayVisorBtn.classList.add("visible");
+            visorFooterActionsEl.classList.add("visible");
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextLevelBtn.classList.add("visible");
+                nextVisorHeaderBtn.classList.add("visible");
+                nextVisorFooterBtn.classList.add("visible");
+            }
+
+            scrollToVisor();
+
+            const startAnimTimeout = setTimeout(() => {
+                const rect = visorStageEl.getBoundingClientRect();
+                spawnBurst(rect.left + rect.width / 2, Math.max(120, rect.top + 120), "#0284c7", 28);
+                playDQLAnimation(lvl);
+            }, 320);
+            animTimeouts.push(startAnimTimeout);
+        }
+
+        function showFeedback(isOk, msg) {
+            feedbackBannerEl.className = "feedback-banner show " + (isOk ? "ok" : "err");
+            feedbackBannerEl.textContent = msg;
+        }
+
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let ambientParticles = [];
+        let burstParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        for (let i = 0; i < 24; i++) {
+            ambientParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: 1.5 + Math.random() * 2.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                color: i % 2 === 0 ? "rgba(2, 132, 199, 0.14)" : "rgba(124, 58, 237, 0.14)"
+            });
+        }
+
+        function spawnBurst(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4.2;
+                burstParticles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,
+                    r: 2.5 + Math.random() * 3,
+                    alpha: 1,
+                    color
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ambientParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const b = burstParticles[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.08;
+                b.alpha -= 0.024;
+                if (b.alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function goToNextLevel() {
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+                scrollToBuilder();
+            }
+        }
+
+        runQueryBtn.addEventListener("click", validateAndRun);
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
+        hintToggleBtn.addEventListener("click", toggleHint);
+        replayAnimBtn.addEventListener("click", () => {
+            if (levelSolved) {
+                scrollToVisor();
+                playDQLAnimation(LEVELS[currentLevelIdx]);
+            }
+        });
+        replayVisorBtn.addEventListener("click", () => {
+            if (levelSolved) playDQLAnimation(LEVELS[currentLevelIdx]);
+        });
+        replayVisorFooterBtn.addEventListener("click", () => {
+            if (levelSolved) playDQLAnimation(LEVELS[currentLevelIdx]);
+        });
+        backToBuilderBtn.addEventListener("click", scrollToBuilder);
+        nextLevelBtn.addEventListener("click", goToNextLevel);
+        nextVisorHeaderBtn.addEventListener("click", goToNextLevel);
+        nextVisorFooterBtn.addEventListener("click", goToNextLevel);
+
+        loadPersistedState();
+        loadLevel(0);
+    </script>
+</body>
+</html>

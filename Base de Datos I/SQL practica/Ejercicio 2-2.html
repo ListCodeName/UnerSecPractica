@@ -802,12 +802,15 @@
                     </a>
                 </div>
                 <div class="module-tabs">
-                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL Tablas</a>
-                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML Registros</a>
-                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL Consultas</a>
-                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL (Terna 2)</a>
-                    <a href="Ejercicio 2-2.html" class="module-tab active">2-2 · DML (Terna 2)</a>
-                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL (Terna 2)</a>
+                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab">1-3 · DQL</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab active">2-2 · DML</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL</a>
+                    <a href="Ejercicio 3-1.html" class="module-tab">3-1 · DDL (Terna 3)</a>
+                    <a href="Ejercicio 3-2.html" class="module-tab">3-2 · DML (Terna 3)</a>
+                    <a href="Ejercicio 3-3.html" class="module-tab">3-3 · DQL (Terna 3)</a>
                 </div>
             </div>
         </nav>
@@ -943,7 +946,7 @@
                         ]
                     }
                 ],
-                bank: ["INSERT INTO", "VALUES", "UPDATE", "SET", "SELECT", "FROM", "WHERE"],
+                bank: ["SELECT", "VALUES", "WHERE", "UPDATE", "INSERT INTO", "SET", "FROM", "DELETE", "ADD COLUMN"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,
@@ -989,7 +992,7 @@
                         ]
                     }
                 ],
-                bank: ["INSERT INTO", "VALUES", "INTO", "ADD COLUMN", "UPDATE", "SET"],
+                bank: ["INTO", "UPDATE", "VALUES", "SET", "ADD COLUMN", "WHERE", "INSERT INTO", "DELETE", "SELECT"],
                 tableName: "socios",
                 columns: ["id_socio", "nombre_socio", "localidad", "categoria"],
                 initialRows: [
@@ -1039,7 +1042,7 @@
                         ]
                     }
                 ],
-                bank: ["UPDATE", "SET", "WHERE", "INSERT INTO", "VALUES", "FROM", "SELECT"],
+                bank: ["VALUES", "WHERE", "SELECT", "UPDATE", "FROM", "SET", "INSERT INTO", "DELETE", "AND", "OR"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,
@@ -1086,7 +1089,7 @@
                         ]
                     }
                 ],
-                bank: ["UPDATE", "SET", "WHERE", "AND", "OR", "NOT", "BETWEEN", "FROM"],
+                bank: ["BETWEEN", "AND", "FROM", "WHERE", "OR", "SET", "NOT", "UPDATE", "LIKE", "DELETE", "SELECT"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,
@@ -1132,7 +1135,7 @@
                         ]
                     }
                 ],
-                bank: ["UPDATE", "SET", "WHERE", "LIKE", "BETWEEN", "AND", "SELECT"],
+                bank: ["AND", "WHERE", "SELECT", "LIKE", "BETWEEN", "SET", "OR", "UPDATE", "NOT", "FROM", "VALUES"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,
@@ -1167,7 +1170,7 @@
                         ]
                     }
                 ],
-                bank: ["DELETE", "FROM", "WHERE", "DROP TABLE", "UPDATE", "SET"],
+                bank: ["UPDATE", "FROM", "DROP TABLE", "WHERE", "SET", "DELETE", "DROP COLUMN", "SELECT", "OR"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,
@@ -1208,7 +1211,7 @@
                         ]
                     }
                 ],
-                bank: ["DELETE", "FROM", "WHERE", "BETWEEN", "AND", "OR", "LIKE", "UPDATE"],
+                bank: ["LIKE", "AND", "UPDATE", "FROM", "OR", "BETWEEN", "WHERE", "DELETE", "SET", "NOT", "DROP TABLE"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,
@@ -1252,7 +1255,7 @@
                         ]
                     }
                 ],
-                bank: ["DELETE", "FROM", "WHERE", "OR", "AND", "NOT", "BETWEEN", "SET"],
+                bank: ["NOT", "OR", "SET", "WHERE", "AND", "DELETE", "BETWEEN", "FROM", "LIKE", "UPDATE"],
                 tableName: "libros",
                 columns: ["id_libro", "titulo", "genero", "anio", "ejemplares"],
                 initialRows: BASE_LIBROS,

@@ -1,0 +1,3039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Base de Datos II — Práctica Interactiva SQL: INNER JOIN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --bg-grad: linear-gradient(135deg, #eff6ff 0%, #f8fafc 48%, #f0fdfa 100%);
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --surface-code: #f1f5f9;
+            --border: #dbe3ef;
+            --border-strong: #cbd5e1;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --accent: #0d9488;
+            --accent-dark: #0f766e;
+            --accent-light: #ccfbf1;
+            --join-key: #7c3aed;
+            --join-key-light: #ede9fe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 8px 24px rgba(37, 99, 235, 0.09);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-grad);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* NAV SUPERIOR */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .top-nav-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--join-key));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(3deg); }
+        }
+
+        .context-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .context-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.36rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .context-pill.active-db {
+            background: var(--join-key-light);
+            border-color: #c4b5fd;
+            color: #5b21b6;
+        }
+
+        /* HUD BAR */
+        .hud-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.65rem 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hud-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .level-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .level-pill.current {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            transform: scale(1.06);
+        }
+
+        .level-pill.done {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 10px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .stat-chip.timer-chip {
+            background: var(--primary-light);
+            border-color: #93c5fd;
+            color: var(--primary-dark);
+            min-width: 106px;
+        }
+
+        .stat-chip.timer-chip.warning {
+            background: var(--warning-light);
+            border-color: #fde68a;
+            color: #b45309;
+            animation: pulseUrgent 0.8s infinite alternate;
+        }
+
+        .stat-chip.timer-chip.danger {
+            background: var(--danger-light);
+            border-color: #fecaca;
+            color: #b91c1c;
+            animation: pulseUrgent 0.45s infinite alternate;
+        }
+
+        @keyframes pulseUrgent {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .timer-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--join-key), var(--accent));
+            transition: width 0.35s linear, background 0.3s;
+        }
+
+        /* WORKSPACE: 100% WIDTH ARRIBA (CONSIGNA + RESPUESTA) Y 100% WIDTH ABAJO (VISOR) */
+        .workspace {
+            max-width: 1480px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.35rem 1.5rem 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            flex: 1;
+        }
+
+        .card {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 1.75rem;
+            scroll-margin-top: 84px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .objective-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+
+        .objective-desc {
+            font-size: 0.94rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        /* TABLAS DE MUESTRA EN FORMATO SIMPLIFICADO (ESTRUCTURA Y ATRIBUTOS) */
+        .sample-schema-wrapper {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.9rem 1.05rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .sample-schema-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.7rem;
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+        }
+
+        .sample-tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .sample-table-card {
+            background: #ffffff;
+            border: 1px solid var(--border-strong);
+            border-radius: 9px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+        }
+
+        .sample-table-card.active-join-table {
+            border-color: #93c5fd;
+        }
+
+        .sample-table-title {
+            background: #f1f5f9;
+            padding: 0.4rem 0.7rem;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .sample-table-scroll {
+            overflow-x: auto;
+        }
+
+        table.sample-mini-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+        }
+
+        table.sample-mini-grid th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.35rem 0.55rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        table.sample-mini-grid th.sample-pk {
+            color: #5b21b6;
+            background: #f5f3ff;
+        }
+
+        table.sample-mini-grid th.sample-fk {
+            color: #0f766e;
+            background: #f0fdfa;
+        }
+
+        table.sample-mini-grid td {
+            padding: 0.32rem 0.55rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* BOTÓN DE FOCO "PISTA" Y CAJA DE ESPECIFICACIÓN ESTRICTA (OCULTA POR DEFECTO) */
+        .btn-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.36rem 0.8rem;
+            border-radius: 999px;
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.14);
+        }
+
+        .btn-hint:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.22);
+        }
+
+        .btn-hint.active {
+            background: #f59e0b;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+
+        .btn-hint svg {
+            transition: transform 0.25s ease;
+        }
+
+        .btn-hint:hover svg,
+        .btn-hint.active svg {
+            transform: scale(1.15) rotate(-6deg);
+        }
+
+        .spec-box {
+            display: none;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.05rem;
+            font-size: 0.84rem;
+        }
+
+        .spec-box.visible {
+            display: block;
+            animation: resultPopup 0.28s ease;
+        }
+
+        .spec-box-title {
+            font-weight: 700;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            color: #b45309;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .spec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            font-size: 0.79rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 0.1rem 0.42rem;
+            border-radius: 5px;
+        }
+
+        .code-pill.pk-pill {
+            background: #ede9fe;
+            color: #5b21b6;
+            border: 1px solid #ddd6fe;
+        }
+
+        /* SQL BUILDER */
+        .sql-editor-box {
+            background: var(--surface-code);
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.86rem;
+            line-height: 2.15;
+            overflow-x: auto;
+        }
+
+        .sql-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed var(--border-strong);
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        .sql-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.38rem;
+            margin-bottom: 0.38rem;
+        }
+
+        .sql-indent {
+            padding-left: 1.15rem;
+        }
+
+        .sql-punct {
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sql-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 88px;
+            height: 34px;
+            padding: 0 0.65rem;
+            border-radius: 7px;
+            border: 2px dashed #94a3b8;
+            background: #ffffff;
+            color: #475569;
+            font-family: var(--font-mono);
+            font-size: 0.81rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+        }
+
+        .sql-slot::before {
+            content: attr(data-slot-index);
+            font-size: 0.65rem;
+            opacity: 0.55;
+            margin-right: 4px;
+        }
+
+        .sql-slot.active-target {
+            border-style: solid;
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .sql-slot.filled {
+            border-style: solid;
+            border-color: var(--join-key);
+            background: var(--join-key-light);
+            color: #5b21b6;
+        }
+
+        .sql-slot.slot-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-slot.slot-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            color: #991b1b !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        .sql-input {
+            height: 34px;
+            padding: 0 0.52rem;
+            border-radius: 7px;
+            border: 2px solid #94a3b8;
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.83rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .sql-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+        }
+
+        .sql-input.input-correct {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: #065f46 !important;
+        }
+
+        .sql-input.input-error {
+            border-color: var(--danger) !important;
+            background: var(--danger-light) !important;
+            animation: shakeElem 0.35s ease;
+        }
+
+        @keyframes shakeElem {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .keyword-bank-title {
+            font-size: 0.77rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .keyword-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .kw-chip {
+            padding: 0.42rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: #ffffff;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+            transition: all 0.16s ease;
+            user-select: none;
+        }
+
+        .kw-chip:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .kw-chip.used {
+            opacity: 0.35;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.65rem 1.1rem;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--join-key));
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border-strong);
+        }
+
+        .btn-replay {
+            background: var(--join-key-light);
+            color: #5b21b6;
+            border: 1px solid #c4b5fd;
+            display: none;
+        }
+
+        .btn-replay.visible {
+            display: inline-flex;
+        }
+
+        .btn-replay:hover {
+            background: #ddd6fe;
+            transform: translateY(-1px);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: #fff;
+            display: none;
+        }
+
+        .btn-next.visible {
+            display: inline-flex;
+        }
+
+        .feedback-banner {
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback-banner.show {
+            display: block;
+            animation: resultPopup 0.3s ease;
+        }
+
+        .feedback-banner.ok {
+            background: var(--success-light);
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .feedback-banner.err {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        /* =========================================================
+           VISOR ANIMADO DE INNER JOIN (100% WIDTH + ALTO DINÁMICO)
+           ========================================================= */
+        .visor-card {
+            width: 100%;
+            height: auto;
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+            padding: 1.65rem 1.85rem;
+            border: 2px solid #cbd5e1;
+        }
+
+        .visor-card.visor-highlight-active {
+            border-color: var(--join-key);
+            box-shadow: 0 14px 36px rgba(124, 58, 237, 0.14);
+        }
+
+        .visor-stage {
+            flex: 1;
+            width: 100%;
+            height: auto;
+            min-height: 520px;
+            background:
+                radial-gradient(#cbd5e1 1px, transparent 1px) 0 0 / 20px 20px,
+                #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.65rem 1.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.85rem;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .visor-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.34rem 0.85rem;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            transition: all 0.25s;
+        }
+
+        .visor-status-pill.phase-key {
+            background: var(--join-key-light);
+            color: #5b21b6;
+        }
+
+        .visor-status-pill.phase-where {
+            background: var(--warning-light);
+            color: #b45309;
+        }
+
+        .visor-status-pill.executed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        /* Barra de pasos de la animación JOIN */
+        .join-steps-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            padding: 0.7rem 1rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .join-step-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.36rem 0.85rem;
+            border-radius: 999px;
+            background: var(--surface-alt);
+            color: var(--text-soft);
+            border: 1px solid var(--border);
+            transition: all 0.28s ease;
+        }
+
+        .join-step-chip.active-step {
+            background: var(--join-key-light);
+            color: #5b21b6;
+            border-color: #a78bfa;
+            transform: scale(1.04);
+            box-shadow: 0 2px 10px rgba(124, 58, 237, 0.16);
+        }
+
+        .join-step-chip.done-step {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        /* Contenedor de las dos tablas y el canal central amplio para el SVG conector */
+        .join-tables-arena {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.2rem;
+            align-items: start;
+            padding: 0.35rem 0.2rem;
+            width: 100%;
+        }
+
+        @media (min-width: 900px) {
+            .join-tables-arena {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                column-gap: 6.5rem;
+                row-gap: 2rem;
+            }
+        }
+
+        .join-links-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 6;
+            overflow: visible;
+        }
+
+        .join-link-path {
+            fill: none;
+            stroke: var(--join-key);
+            stroke-width: 2.8;
+            stroke-dasharray: 7 5;
+            opacity: 0;
+            transition: opacity 0.35s ease, stroke 0.35s ease, stroke-width 0.3s ease;
+            animation: dashFlow 1.2s linear infinite;
+        }
+
+        .join-link-path.visible {
+            opacity: 0.88;
+        }
+
+        .join-link-path.filtered-out {
+            stroke: #94a3b8;
+            opacity: 0.22;
+            animation: none;
+        }
+
+        .join-link-path.final-match {
+            stroke: var(--success);
+            stroke-width: 3.4;
+            stroke-dasharray: none;
+            opacity: 0.96;
+        }
+
+        @keyframes dashFlow {
+            to {
+                stroke-dashoffset: -24;
+            }
+        }
+
+        .table-box {
+            background: #ffffff;
+            border: 2px solid var(--border-strong);
+            border-radius: 12px;
+            overflow-x: auto;
+            position: relative;
+            z-index: 3;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .table-box.left-table {
+            border-color: #93c5fd;
+        }
+
+        .table-box.right-table {
+            border-color: #5eead4;
+        }
+
+        .table-box.result-box {
+            border-color: var(--success);
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.16);
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin-top: 0.35rem;
+        }
+
+        .table-banner {
+            padding: 0.68rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+        }
+
+        .table-banner.left-banner {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        .table-banner.right-banner {
+            background: linear-gradient(135deg, #0f766e, #0d9488);
+        }
+
+        .table-banner.result-banner {
+            background: linear-gradient(135deg, var(--primary), var(--join-key), var(--success));
+        }
+
+        table.dql-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        table.dql-grid th {
+            background: #f1f5f9;
+            color: var(--text);
+            text-align: left;
+            padding: 0.62rem 0.85rem;
+            border-bottom: 2px solid var(--border);
+            transition: all 0.25s;
+            white-space: nowrap;
+        }
+
+        table.dql-grid td {
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            transition: all 0.28s;
+        }
+
+        th.key-col-header {
+            background: var(--join-key-light) !important;
+            color: #5b21b6 !important;
+            border-bottom-color: var(--join-key) !important;
+        }
+
+        td.key-col-cell {
+            font-weight: 800;
+            color: #5b21b6 !important;
+            background: rgba(237, 233, 254, 0.45);
+        }
+
+        th.col-selected {
+            background: var(--primary-light) !important;
+            color: var(--primary-dark) !important;
+            border-bottom-color: var(--primary) !important;
+        }
+
+        /* Estados de fila durante la animación de JOIN */
+        tr.row-key-paired {
+            background: #f5f3ff !important;
+        }
+
+        tr.row-key-paired td {
+            color: #4c1d95;
+            font-weight: 600;
+        }
+
+        tr.row-orphan {
+            opacity: 0.35;
+            background: #f8fafc !important;
+        }
+
+        tr.row-where-pass {
+            background: #ecfdf5 !important;
+        }
+
+        tr.row-where-pass td {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        tr.row-where-fail {
+            opacity: 0.4;
+            background: #fff1f2 !important;
+        }
+
+        tr.result-row-pop {
+            animation: resultPopup 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        .key-link-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.16rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            background: var(--join-key-light);
+            color: #5b21b6;
+            border: 1px solid #c4b5fd;
+        }
+
+        .src-tag-left {
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        .src-tag-right {
+            color: #0f766e;
+            font-weight: 700;
+        }
+
+        .visor-footer-actions {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-strong);
+        }
+
+        .visor-footer-actions.visible {
+            display: flex;
+        }
+
+        @keyframes resultPopup {
+            0% {
+                opacity: 0;
+                transform: scale(0.88) translateY(14px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.02) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-wrapper">
+        <nav class="top-nav">
+            <div class="top-nav-inner">
+                <a href="Ejercicio 4 - Inner Joins.html" class="brand">
+                    <span class="brand-icon" aria-hidden="true">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                            <circle cx="8" cy="12" r="5"></circle>
+                            <circle cx="16" cy="12" r="5"></circle>
+                        </svg>
+                    </span>
+                    <span>Base de Datos II · Práctica SQL: INNER JOIN</span>
+                </a>
+                <div class="context-badges">
+                    <span class="context-pill active-db" id="activeDbPill">🗄️ Esquema: biblioteca_ejercicio</span>
+                    <span class="context-pill">🔗 Intersección Relacional (PK = FK)</span>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hud-bar">
+            <div class="hud-inner">
+                <div class="level-pills" id="levelPills"></div>
+                <div class="stats-group">
+                    <div class="stat-chip timer-chip" id="timerChip">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <circle cx="12" cy="13" r="8"></circle>
+                            <path d="M12 9v4l2.5 2.5"></path>
+                            <path d="M9 2h6"></path>
+                        </svg>
+                        <span id="timerDisplay">05:30</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>⚡ Racha:</span>
+                        <span id="streakDisplay">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span>🏆 Puntos:</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+
+        <main class="workspace">
+            <!-- SECCIÓN SUPERIOR (100% WIDTH): CONSIGNA + TABLAS SIMPLIFICADAS + CONSTRUCTOR SQL -->
+            <section class="card" id="builderCard">
+                <div class="card-header">
+                    <span class="badge-tag" id="levelBadge">Base de Datos II · Nivel 1 de 10</span>
+                    <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+                        <button type="button" class="btn-hint" id="hintToggleBtn" title="Mostrar u ocultar Especificación Estricta (Pista)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18h6"></path>
+                                <path d="M10 22h4"></path>
+                                <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"></path>
+                            </svg>
+                            <span id="hintBtnText">Pista</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetLevelBtn" style="padding:0.34rem 0.7rem;font-size:0.76rem;">
+                            🧹 Limpiar Respuesta
+                        </button>
+                    </div>
+                </div>
+
+                <h1 class="objective-title" id="objTitle"></h1>
+                <p class="objective-desc" id="objDesc"></p>
+
+                <!-- TABLAS DE MUESTRA EN FORMATO SIMPLIFICADO (SIEMPRE VISIBLES PARA ENTENDER ESTRUCTURA Y ATRIBUTOS) -->
+                <div class="sample-schema-wrapper" id="sampleSchemaWrapper">
+                    <div class="sample-schema-header">
+                        <span id="sampleSchemaTitle">🗂️ Tablas de Muestra (Estructura y Atributos del Esquema)</span>
+                        <span style="text-transform:none;font-weight:600;">🔑 Clave Primaria (PK) · 🔗 Clave Foránea (FK) · Muestra de 2 registros por tabla</span>
+                    </div>
+                    <div class="sample-tables-grid" id="sampleTablesGrid"></div>
+                </div>
+
+                <!-- ESPECIFICACIÓN ESTRICTA OCULTA POR DEFECTO (SOLO SE MUESTRA AL PULSAR "PISTA") -->
+                <div class="spec-box" id="specBox">
+                    <div class="spec-box-title" id="specBoxTitle">
+                        <span>💡 Pista — Especificación Estricta de Unión Relacional (INNER JOIN)</span>
+                    </div>
+                    <ul class="spec-list" id="specList"></ul>
+                </div>
+
+                <div class="sql-editor-box">
+                    <div class="sql-editor-header">
+                        <span>CONSTRUCTOR SQL (MySQL) — Sin ayudas de autocompletado</span>
+                        <span id="slotIndicator">Slot activo: #1</span>
+                    </div>
+                    <div id="sqlBuilderContainer"></div>
+                </div>
+
+                <div class="keyword-bank-title">
+                    <span>🧩 Banco de Palabras Clave SQL (Orden Alternado + Distractores)</span>
+                    <span style="font-size:0.72rem;text-transform:none;">Haz clic en un slot lleno para cambiar su palabra</span>
+                </div>
+                <div class="keyword-bank" id="keywordBank"></div>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-primary" id="runQueryBtn">
+                        ▶ Ejecutar INNER JOIN
+                    </button>
+                    <button type="button" class="btn btn-replay" id="replayAnimBtn">
+                        🔄 Repetir Animación JOIN
+                    </button>
+                    <button type="button" class="btn btn-next" id="nextLevelBtn">
+                        Siguiente Ejercicio ➔
+                    </button>
+                </div>
+
+                <div class="feedback-banner" id="feedbackBanner"></div>
+            </section>
+
+            <!-- SECCIÓN INFERIOR (100% WIDTH + ALTO DINÁMICO): VISOR ANIMADO DE UNIÓN INNER JOIN -->
+            <section class="card visor-card" id="visorCard">
+                <div class="card-header">
+                    <span class="badge-tag" style="background:#ede9fe;color:#5b21b6;">🔗 Visor Animado de Unión por Clave (PK ↔ FK)</span>
+                    <div style="display:flex;align-items:center;gap:0.55rem;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-replay" id="replayVisorBtn" style="padding:0.34rem 0.8rem;font-size:0.78rem;">
+                            🔄 Repetir Animación JOIN
+                        </button>
+                        <button type="button" class="btn btn-next" id="nextVisorHeaderBtn" style="padding:0.34rem 0.8rem;font-size:0.78rem;">
+                            Siguiente Ejercicio ➔
+                        </button>
+                        <span class="visor-status-pill" id="visorStatus">Esperando consulta JOIN...</span>
+                    </div>
+                </div>
+
+                <div class="join-steps-bar">
+                    <span class="join-step-chip" id="stepChip1">1️⃣ Acoplamiento ON (PK = FK)</span>
+                    <span class="join-step-chip" id="stepChip2">2️⃣ Filtrado de Filas (WHERE)</span>
+                    <span class="join-step-chip" id="stepChip3">3️⃣ Proyección Fusionada (SELECT)</span>
+                </div>
+
+                <div class="visor-stage" id="visorStage"></div>
+
+                <div class="visor-footer-actions" id="visorFooterActions">
+                    <button type="button" class="btn btn-secondary" id="backToBuilderBtn">
+                        ⬆️ Subir a la Consigna
+                    </button>
+                    <div style="display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;">
+                        <button type="button" class="btn btn-replay visible" id="replayVisorFooterBtn">
+                            🔄 Repetir Animación JOIN
+                        </button>
+                        <button type="button" class="btn btn-next" id="nextVisorFooterBtn">
+                            Siguiente Ejercicio ➔
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           DATASETS TOMADOS DE PRACTICA-SQL (EJERCICIOS 3, 4 y 5)
+           1. biblioteca_ejercicio (db_biblioteca.sql)
+           2. tienda_ejercicio (db_tienda.sql)
+           3. empresa_ejercicio (db_empresa.sql)
+           ========================================================= */
+        const DB_SCHEMAS = {
+            biblioteca: {
+                dbName: "biblioteca_ejercicio (Ejercicio 4)",
+                tables: {
+                    libros: {
+                        name: "libros",
+                        pk: "id_libro",
+                        fk: "id_autor",
+                        cols: ["id_libro", "titulo", "id_autor", "genero", "precio"],
+                        rows: [
+                            { id_libro: 1, titulo: "Cien años de soledad", id_autor: 1, genero: "Realismo Mágico", precio: 45000 },
+                            { id_libro: 2, titulo: "Ficciones", id_autor: 2, genero: "Fantasía / Ensayo", precio: 32000 },
+                            { id_libro: 3, titulo: "La casa de los espíritus", id_autor: 3, genero: "Realismo Mágico", precio: 41000 },
+                            { id_libro: 4, titulo: "Rayuela", id_autor: 4, genero: "Novela Experimental", precio: 48000 },
+                            { id_libro: 5, titulo: "It (Eso)", id_autor: 5, genero: "Terror / Suspenso", precio: 64000 }
+                        ]
+                    },
+                    autores: {
+                        name: "autores",
+                        pk: "id_autor",
+                        cols: ["id_autor", "nombre", "apellido", "nacionalidad"],
+                        rows: [
+                            { id_autor: 1, nombre: "Gabriel", apellido: "García Márquez", nacionalidad: "Colombiana" },
+                            { id_autor: 2, nombre: "Jorge Luis", apellido: "Borges", nacionalidad: "Argentina" },
+                            { id_autor: 3, nombre: "Isabel", apellido: "Allende", nacionalidad: "Chilena" },
+                            { id_autor: 4, nombre: "Julio", apellido: "Cortázar", nacionalidad: "Argentina" },
+                            { id_autor: 5, nombre: "Stephen", apellido: "King", nacionalidad: "Estadounidense" },
+                            { id_autor: 6, nombre: "Edgar Allan", apellido: "Poe", nacionalidad: "Estadounidense" }
+                        ]
+                    },
+                    usuarios: {
+                        name: "usuarios",
+                        pk: "id_usuario",
+                        cols: ["id_usuario", "nombre", "apellido", "email"],
+                        rows: [
+                            { id_usuario: 1, nombre: "Juan", apellido: "Gomez", email: "juan.gomez@email.com" },
+                            { id_usuario: 2, nombre: "María", apellido: "Rodríguez", email: "maria.rod@email.com" },
+                            { id_usuario: 3, nombre: "Javier", apellido: "Lopez", email: "javi.lopez@email.com" },
+                            { id_usuario: 4, nombre: "Carlos", apellido: "Sánchez", email: "carlos.sanchez@email.com" }
+                        ]
+                    },
+                    prestamos: {
+                        name: "prestamos",
+                        pk: "id_prestamo",
+                        fks: ["id_libro", "id_usuario"],
+                        cols: ["id_prestamo", "id_libro", "id_usuario", "fecha_prestamo", "estado_dev", "monto_multa"],
+                        rows: [
+                            { id_prestamo: 101, id_libro: 1, id_usuario: 1, fecha_prestamo: "2025-02-10", estado_dev: "Devuelto", monto_multa: 0 },
+                            { id_prestamo: 102, id_libro: 2, id_usuario: 2, fecha_prestamo: "2025-02-20", estado_dev: "Pendiente", monto_multa: 0 },
+                            { id_prestamo: 103, id_libro: 5, id_usuario: 2, fecha_prestamo: "2025-03-01", estado_dev: "Devuelto", monto_multa: 1500 },
+                            { id_prestamo: 104, id_libro: 4, id_usuario: 3, fecha_prestamo: "2025-03-15", estado_dev: "Pendiente", monto_multa: 0 }
+                        ]
+                    }
+                }
+            },
+            tienda: {
+                dbName: "tienda_ejercicio (Ejercicio 3)",
+                tables: {
+                    clientes: {
+                        name: "clientes",
+                        pk: "id_cliente",
+                        cols: ["id_cliente", "nombre", "apellido", "ciudad"],
+                        rows: [
+                            { id_cliente: 1, nombre: "Juan", apellido: "Gomez", ciudad: "Parana" },
+                            { id_cliente: 2, nombre: "María", apellido: "Rodríguez", ciudad: "Oro Verde" },
+                            { id_cliente: 3, nombre: "Javier", apellido: "Lopez", ciudad: "Parana" },
+                            { id_cliente: 4, nombre: "Laura", apellido: "Martínez", ciudad: "Santa Fe" },
+                            { id_cliente: 5, nombre: "Carlos", apellido: "Sánchez", ciudad: "Crespo" }
+                        ]
+                    },
+                    pedidos: {
+                        name: "pedidos",
+                        pk: "id_pedido",
+                        fk: "id_cliente",
+                        cols: ["id_pedido", "id_cliente", "fecha_pedido", "monto_total", "estado"],
+                        rows: [
+                            { id_pedido: 10, id_cliente: 1, fecha_pedido: "2025-02-05", monto_total: 850000, estado: "Entregado" },
+                            { id_pedido: 11, id_cliente: 2, fecha_pedido: "2025-02-18", monto_total: 65000, estado: "Entregado" },
+                            { id_pedido: 12, id_cliente: 3, fecha_pedido: "2025-02-22", monto_total: 1292000, estado: "Entregado" },
+                            { id_pedido: 13, id_cliente: 4, fecha_pedido: "2025-03-01", monto_total: 22000, estado: "Cancelado" }
+                        ]
+                    }
+                }
+            },
+            empresa: {
+                dbName: "empresa_ejercicio (Ejercicio 5)",
+                tables: {
+                    departamentos: {
+                        name: "departamentos",
+                        pk: "id_departamento",
+                        cols: ["id_departamento", "nombre_depto", "presupuesto", "ubicacion"],
+                        rows: [
+                            { id_departamento: 1, nombre_depto: "Sistemas", presupuesto: 15000000, ubicacion: "Piso 3" },
+                            { id_departamento: 2, nombre_depto: "Ventas", presupuesto: 8000000, ubicacion: "Piso 1" },
+                            { id_departamento: 3, nombre_depto: "Recursos Humanos", presupuesto: 3500000, ubicacion: "Piso 2" },
+                            { id_departamento: 4, nombre_depto: "Investigación y Desarrollo", presupuesto: 12000000, ubicacion: "Laboratorio 1" }
+                        ]
+                    },
+                    empleados: {
+                        name: "empleados",
+                        pk: "id_empleado",
+                        fk: "id_departamento",
+                        cols: ["id_empleado", "nombre", "apellido", "salario", "id_departamento"],
+                        rows: [
+                            { id_empleado: 1, nombre: "Rodolfo", apellido: "Gimenez", salario: 950000, id_departamento: 1 },
+                            { id_empleado: 2, nombre: "Marta", apellido: "Fischer", salario: 450000, id_departamento: 1 },
+                            { id_empleado: 3, nombre: "Laura", apellido: "Peralta", salario: 820000, id_departamento: 2 },
+                            { id_empleado: 4, nombre: "Valeria", apellido: "Ruiz", salario: 580000, id_departamento: 3 }
+                        ]
+                    }
+                }
+            }
+        };
+
+        /* =========================================================
+           10 NIVELES PROGRESIVOS DE INNER JOIN (SIN PLACEHOLDERS)
+           ========================================================= */
+        const LEVELS = [
+            {
+                id: 1,
+                schemaKey: "biblioteca",
+                title: "Catálogo de Libros con sus Autores (INNER JOIN Básico)",
+                timeLimit: 330,
+                desc: "Observa las tablas de muestra del esquema biblioteca_ejercicio y confecciona una consulta que proyecte el título y el género de cada libro junto con el nombre y el apellido de su autor (en ese orden), tomando la tabla de libros como tabla principal y uniéndola con la de autores mediante su atributo clave en común (sin utilizar alias de tabla).",
+                specs: [
+                    "Tabla principal (<span class='code-pill'>FROM</span>): <span class='code-pill'>libros</span> · Tabla a unir (<span class='code-pill'>INNER JOIN</span>): <span class='code-pill'>autores</span>",
+                    "Atributo clave de unión (<span class='code-pill'>ON</span>): <span class='code-pill pk-pill'>libros.id_autor = autores.id_autor</span>",
+                    "Columnas a proyectar en orden: <span class='code-pill'>libros.titulo</span>, <span class='code-pill'>libros.genero</span>, <span class='code-pill'>autores.nombre</span>, <span class='code-pill'>autores.apellido</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "libros.titulo", width: "125px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "libros.genero", width: "125px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "autores.nombre", width: "130px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "autores.apellido", width: "138px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "libros", width: "95px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "autores", width: "100px" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "libros.id_autor", width: "135px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "autores.id_autor", width: "145px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["ON", "WHERE", "INNER JOIN", "FROM", "LEFT JOIN", "SELECT", "AND", "GROUP BY", "VALUES"],
+                joinConfig: {
+                    leftTable: "libros",
+                    rightTable: "autores",
+                    leftKey: "id_autor",
+                    rightKey: "id_autor",
+                    hasWhere: false,
+                    selectedLeftCols: ["titulo", "genero"],
+                    selectedRightCols: ["nombre", "apellido"],
+                    outputCols: [
+                        { label: "libros.titulo", side: "left", col: "titulo" },
+                        { label: "libros.genero", side: "left", col: "genero" },
+                        { label: "autores.nombre", side: "right", col: "nombre" },
+                        { label: "autores.apellido", side: "right", col: "apellido" }
+                    ],
+                    passFilter: () => true
+                }
+            },
+            {
+                id: 2,
+                schemaKey: "biblioteca",
+                title: "INNER JOIN con Alias de Tabla y Filtro por Nacionalidad",
+                timeLimit: 330,
+                desc: "Utiliza alias de tabla (l para la tabla principal de libros y a para la de autores) para proyectar el título del libro, el apellido y la nacionalidad del autor (en ese orden), filtrando únicamente las obras de autores de nacionalidad 'Argentina'.",
+                specs: [
+                    "Tabla origen (<span class='code-pill'>FROM</span>): <span class='code-pill'>libros</span> con alias <span class='code-pill'>l</span> · Unión (<span class='code-pill'>INNER JOIN</span>): <span class='code-pill'>autores</span> con alias <span class='code-pill'>a</span>",
+                    "Condición de acoplamiento (<span class='code-pill'>ON</span>): <span class='code-pill pk-pill'>l.id_autor = a.id_autor</span>",
+                    "Columnas a proyectar: <span class='code-pill'>l.titulo</span>, <span class='code-pill'>a.apellido</span>, <span class='code-pill'>a.nacionalidad</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>a.nacionalidad</span> = <span class='code-pill'>'Argentina'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "l.titulo", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "a.apellido", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "a.nacionalidad", width: "130px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "libros", width: "90px" },
+                            { type: "input", answer: "l", width: "45px" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "autores", width: "95px" },
+                            { type: "input", answer: "a", width: "45px" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "l.id_autor", width: "105px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "a.id_autor", width: "105px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "a.nacionalidad", width: "130px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Argentina", width: "105px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["WHERE", "ON", "FROM", "LEFT JOIN", "INNER JOIN", "SELECT", "AND", "OR", "HAVING", "SET"],
+                joinConfig: {
+                    leftTable: "libros",
+                    rightTable: "autores",
+                    leftKey: "id_autor",
+                    rightKey: "id_autor",
+                    hasWhere: true,
+                    selectedLeftCols: ["titulo"],
+                    selectedRightCols: ["apellido", "nacionalidad"],
+                    outputCols: [
+                        { label: "l.titulo", side: "left", col: "titulo" },
+                        { label: "a.apellido", side: "right", col: "apellido" },
+                        { label: "a.nacionalidad", side: "right", col: "nacionalidad" }
+                    ],
+                    passFilter: (lRow, rRow) => rRow.nacionalidad === "Argentina"
+                }
+            },
+            {
+                id: 3,
+                schemaKey: "biblioteca",
+                title: "INNER JOIN + Condición Compuesta con AND",
+                timeLimit: 360,
+                desc: "Une la tabla principal de libros (alias l) con la de autores (alias a) para obtener el título del libro, su precio y el apellido del autor (en ese orden), filtrando las obras del género 'Realismo Mágico' cuyo precio supere los 42000.",
+                specs: [
+                    "Tablas con alias: <span class='code-pill'>libros l</span> e <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>autores a</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>l.id_autor = a.id_autor</span>",
+                    "Proyección: <span class='code-pill'>l.titulo</span>, <span class='code-pill'>l.precio</span>, <span class='code-pill'>a.apellido</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>l.genero</span> = <span class='code-pill'>'Realismo Mágico'</span> <span class='code-pill'>AND</span> <span class='code-pill'>l.precio</span> &gt; <span class='code-pill'>42000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "l.titulo", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "l.precio", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "a.apellido", width: "105px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "libros", width: "90px" },
+                            { type: "punct", text: "l" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "autores", width: "95px" },
+                            { type: "punct", text: "a" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "l.id_autor", width: "105px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "a.id_autor", width: "105px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "l.genero", width: "95px" },
+                            { type: "punct", text: "= 'Realismo Mágico'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "l.precio", width: "95px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "42000", width: "80px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["AND", "ON", "WHERE", "INNER JOIN", "OR", "FROM", "SELECT", "BETWEEN", "LEFT JOIN", "NOT"],
+                joinConfig: {
+                    leftTable: "libros",
+                    rightTable: "autores",
+                    leftKey: "id_autor",
+                    rightKey: "id_autor",
+                    hasWhere: true,
+                    selectedLeftCols: ["titulo", "precio"],
+                    selectedRightCols: ["apellido"],
+                    outputCols: [
+                        { label: "l.titulo", side: "left", col: "titulo" },
+                        { label: "l.precio", side: "left", col: "precio" },
+                        { label: "a.apellido", side: "right", col: "apellido" }
+                    ],
+                    passFilter: (lRow) => lRow.genero === "Realismo Mágico" && lRow.precio > 42000
+                }
+            },
+            {
+                id: 4,
+                schemaKey: "biblioteca",
+                title: "Control de Préstamos Pendientes por Usuario (Ejercicio 4.6)",
+                timeLimit: 360,
+                desc: "Une la tabla principal de préstamos (alias p) con la tabla de usuarios (alias u) para mostrar el nombre, el apellido y el email del usuario junto con la fecha del préstamo (en ese orden), filtrando únicamente los préstamos cuyo estado de devolución sea 'Pendiente'.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>prestamos</span> <span class='code-pill'>p</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>usuarios</span> <span class='code-pill'>u</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>p.id_usuario = u.id_usuario</span>",
+                    "Columnas a proyectar: <span class='code-pill'>u.nombre</span>, <span class='code-pill'>u.apellido</span>, <span class='code-pill'>u.email</span>, <span class='code-pill'>p.fecha_prestamo</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>p.estado_dev</span> = <span class='code-pill'>'Pendiente'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "u.nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "u.apellido", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "u.email", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.fecha_prestamo", width: "145px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "prestamos", width: "105px" },
+                            { type: "punct", text: "p" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "usuarios", width: "100px" },
+                            { type: "punct", text: "u" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "p.id_usuario", width: "115px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "u.id_usuario", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "p.estado_dev", width: "120px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Pendiente", width: "105px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["INNER JOIN", "WHERE", "FROM", "ON", "SELECT", "LEFT JOIN", "AND", "OR", "LIKE", "SET"],
+                joinConfig: {
+                    leftTable: "prestamos",
+                    rightTable: "usuarios",
+                    leftKey: "id_usuario",
+                    rightKey: "id_usuario",
+                    hasWhere: true,
+                    selectedLeftCols: ["fecha_prestamo"],
+                    selectedRightCols: ["nombre", "apellido", "email"],
+                    outputCols: [
+                        { label: "u.nombre", side: "right", col: "nombre" },
+                        { label: "u.apellido", side: "right", col: "apellido" },
+                        { label: "u.email", side: "right", col: "email" },
+                        { label: "p.fecha_prestamo", side: "left", col: "fecha_prestamo" }
+                    ],
+                    passFilter: (lRow) => lRow.estado_dev === "Pendiente"
+                }
+            },
+            {
+                id: 5,
+                schemaKey: "biblioteca",
+                title: "Auditoría de Multas por Libro Prestado (INNER JOIN)",
+                timeLimit: 330,
+                desc: "Une la tabla principal de préstamos (alias p) con la tabla de libros (alias l) para listar el título del libro, la fecha del préstamo y el monto de la multa (en ese orden) en aquellos préstamos con monto de multa mayor a 0.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>prestamos</span> <span class='code-pill'>p</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>libros</span> <span class='code-pill'>l</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>p.id_libro = l.id_libro</span>",
+                    "Proyección: <span class='code-pill'>l.titulo</span>, <span class='code-pill'>p.fecha_prestamo</span>, <span class='code-pill'>p.monto_multa</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>p.monto_multa</span> &gt; <span class='code-pill'>0</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "l.titulo", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.fecha_prestamo", width: "145px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.monto_multa", width: "130px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "prestamos", width: "105px" },
+                            { type: "punct", text: "p" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "libros", width: "90px" },
+                            { type: "punct", text: "l" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "p.id_libro", width: "105px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "l.id_libro", width: "105px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "p.monto_multa", width: "130px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "0", width: "55px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["ON", "WHERE", "SELECT", "INNER JOIN", "FROM", "BETWEEN", "AND", "LEFT JOIN", "NOT", "UPDATE"],
+                joinConfig: {
+                    leftTable: "prestamos",
+                    rightTable: "libros",
+                    leftKey: "id_libro",
+                    rightKey: "id_libro",
+                    hasWhere: true,
+                    selectedLeftCols: ["fecha_prestamo", "monto_multa"],
+                    selectedRightCols: ["titulo"],
+                    outputCols: [
+                        { label: "l.titulo", side: "right", col: "titulo" },
+                        { label: "p.fecha_prestamo", side: "left", col: "fecha_prestamo" },
+                        { label: "p.monto_multa", side: "left", col: "monto_multa" }
+                    ],
+                    passFilter: (lRow) => lRow.monto_multa > 0
+                }
+            },
+            {
+                id: 6,
+                schemaKey: "tienda",
+                title: "Pedidos Entregados con Datos del Cliente (tienda_ejercicio)",
+                timeLimit: 330,
+                desc: "Cambiando al esquema tienda_ejercicio (Ejercicio 3), une la tabla principal de pedidos (alias p) con la de clientes (alias c) para proyectar el nombre, el apellido y la ciudad del cliente junto con el monto total del pedido (en ese orden), filtrando únicamente los pedidos con estado 'Entregado'.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>pedidos</span> <span class='code-pill'>p</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>clientes</span> <span class='code-pill'>c</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>p.id_cliente = c.id_cliente</span>",
+                    "Columnas a proyectar: <span class='code-pill'>c.nombre</span>, <span class='code-pill'>c.apellido</span>, <span class='code-pill'>c.ciudad</span>, <span class='code-pill'>p.monto_total</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>p.estado</span> = <span class='code-pill'>'Entregado'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "c.nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "c.apellido", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "c.ciudad", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.monto_total", width: "125px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pedidos", width: "95px" },
+                            { type: "punct", text: "p" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "clientes", width: "95px" },
+                            { type: "punct", text: "c" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "p.id_cliente", width: "115px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "c.id_cliente", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "p.estado", width: "95px" },
+                            { type: "punct", text: "= '" },
+                            { type: "input", answer: "Entregado", width: "105px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["FROM", "WHERE", "ON", "SELECT", "INNER JOIN", "AND", "OR", "LEFT JOIN", "LIKE", "VALUES"],
+                joinConfig: {
+                    leftTable: "pedidos",
+                    rightTable: "clientes",
+                    leftKey: "id_cliente",
+                    rightKey: "id_cliente",
+                    hasWhere: true,
+                    selectedLeftCols: ["monto_total"],
+                    selectedRightCols: ["nombre", "apellido", "ciudad"],
+                    outputCols: [
+                        { label: "c.nombre", side: "right", col: "nombre" },
+                        { label: "c.apellido", side: "right", col: "apellido" },
+                        { label: "c.ciudad", side: "right", col: "ciudad" },
+                        { label: "p.monto_total", side: "left", col: "monto_total" }
+                    ],
+                    passFilter: (lRow) => lRow.estado === "Entregado"
+                }
+            },
+            {
+                id: 7,
+                schemaKey: "tienda",
+                title: "INNER JOIN + Filtro de Rango con BETWEEN",
+                timeLimit: 360,
+                desc: "Une la tabla principal de pedidos (alias p) con la de clientes (alias c) para obtener el apellido del cliente, la fecha del pedido y el monto total (en ese orden), filtrando mediante rango los pedidos cuyo monto total se encuentre entre 50000 y 900000.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>pedidos</span> <span class='code-pill'>p</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>clientes</span> <span class='code-pill'>c</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>p.id_cliente = c.id_cliente</span>",
+                    "Proyección: <span class='code-pill'>c.apellido</span>, <span class='code-pill'>p.fecha_pedido</span>, <span class='code-pill'>p.monto_total</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>p.monto_total</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>50000</span> <span class='code-pill'>AND</span> <span class='code-pill'>900000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "c.apellido", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.fecha_pedido", width: "135px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.monto_total", width: "125px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "pedidos", width: "95px" },
+                            { type: "punct", text: "p" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "clientes", width: "95px" },
+                            { type: "punct", text: "c" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "p.id_cliente", width: "115px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "c.id_cliente", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "p.monto_total", width: "125px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "50000", width: "80px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "900000", width: "85px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["BETWEEN", "ON", "AND", "WHERE", "INNER JOIN", "SELECT", "FROM", "OR", "LIKE", "NOT", "LEFT JOIN"],
+                joinConfig: {
+                    leftTable: "pedidos",
+                    rightTable: "clientes",
+                    leftKey: "id_cliente",
+                    rightKey: "id_cliente",
+                    hasWhere: true,
+                    selectedLeftCols: ["fecha_pedido", "monto_total"],
+                    selectedRightCols: ["apellido"],
+                    outputCols: [
+                        { label: "c.apellido", side: "right", col: "apellido" },
+                        { label: "p.fecha_pedido", side: "left", col: "fecha_pedido" },
+                        { label: "p.monto_total", side: "left", col: "monto_total" }
+                    ],
+                    passFilter: (lRow) => lRow.monto_total >= 50000 && lRow.monto_total <= 900000
+                }
+            },
+            {
+                id: 8,
+                schemaKey: "tienda",
+                title: "INNER JOIN + Búsqueda por Patrón de Texto con LIKE",
+                timeLimit: 360,
+                desc: "Une la tabla principal de clientes (alias c) con la de pedidos (alias p) para proyectar el nombre y la ciudad del cliente junto con el estado y el monto total del pedido (en ese orden), filtrando por patrón de texto aquellos clientes cuya ciudad comience con 'Para'.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>clientes</span> <span class='code-pill'>c</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>pedidos</span> <span class='code-pill'>p</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>c.id_cliente = p.id_cliente</span>",
+                    "Proyección: <span class='code-pill'>c.nombre</span>, <span class='code-pill'>c.ciudad</span>, <span class='code-pill'>p.estado</span>, <span class='code-pill'>p.monto_total</span>",
+                    "Condición (<span class='code-pill'>WHERE</span>): <span class='code-pill'>c.ciudad</span> <span class='code-pill'>LIKE</span> <span class='code-pill'>'Para%'</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "c.nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "c.ciudad", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.estado", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "p.monto_total", width: "125px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "clientes", width: "95px" },
+                            { type: "punct", text: "c" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "pedidos", width: "95px" },
+                            { type: "punct", text: "p" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "c.id_cliente", width: "115px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "p.id_cliente", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "c.ciudad", width: "95px" },
+                            { type: "slot", answer: "LIKE" },
+                            { type: "punct", text: "'" },
+                            { type: "input", answer: "Para%", width: "85px" },
+                            { type: "punct", text: "';" }
+                        ]
+                    }
+                ],
+                bank: ["LIKE", "WHERE", "INNER JOIN", "FROM", "ON", "SELECT", "BETWEEN", "AND", "NOT", "OR", "SET"],
+                joinConfig: {
+                    leftTable: "clientes",
+                    rightTable: "pedidos",
+                    leftKey: "id_cliente",
+                    rightKey: "id_cliente",
+                    hasWhere: true,
+                    selectedLeftCols: ["nombre", "ciudad"],
+                    selectedRightCols: ["estado", "monto_total"],
+                    outputCols: [
+                        { label: "c.nombre", side: "left", col: "nombre" },
+                        { label: "c.ciudad", side: "left", col: "ciudad" },
+                        { label: "p.estado", side: "right", col: "estado" },
+                        { label: "p.monto_total", side: "right", col: "monto_total" }
+                    ],
+                    passFilter: (lRow) => lRow.ciudad.startsWith("Para")
+                }
+            },
+            {
+                id: 9,
+                schemaKey: "empresa",
+                title: "Empleados y Departamentos con INNER JOIN + AND (empresa_ejercicio)",
+                timeLimit: 390,
+                desc: "En el esquema empresa_ejercicio (Ejercicio 5), une la tabla principal de empleados (alias e) con la de departamentos (alias d) para listar el nombre, el apellido y el salario del empleado junto con el nombre del departamento (en ese orden), filtrando quienes pertenezcan al departamento 'Sistemas' y cobren un salario mayor a 500000.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>empleados</span> <span class='code-pill'>e</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>departamentos</span> <span class='code-pill'>d</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>e.id_departamento = d.id_departamento</span>",
+                    "Proyección: <span class='code-pill'>e.nombre</span>, <span class='code-pill'>e.apellido</span>, <span class='code-pill'>e.salario</span>, <span class='code-pill'>d.nombre_depto</span>",
+                    "Filtro (<span class='code-pill'>WHERE</span>): <span class='code-pill'>d.nombre_depto</span> = <span class='code-pill'>'Sistemas'</span> <span class='code-pill'>AND</span> <span class='code-pill'>e.salario</span> &gt; <span class='code-pill'>500000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "e.nombre", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "e.apellido", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "e.salario", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "d.nombre_depto", width: "135px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "105px" },
+                            { type: "punct", text: "e" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "departamentos", width: "130px" },
+                            { type: "punct", text: "d" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "e.id_departamento", width: "150px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "d.id_departamento", width: "150px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "input", answer: "d.nombre_depto", width: "135px" },
+                            { type: "punct", text: "= 'Sistemas'" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "e.salario", width: "95px" },
+                            { type: "punct", text: ">" },
+                            { type: "input", answer: "500000", width: "85px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["AND", "WHERE", "ON", "FROM", "INNER JOIN", "SELECT", "OR", "BETWEEN", "NOT", "LEFT JOIN", "LIKE"],
+                joinConfig: {
+                    leftTable: "empleados",
+                    rightTable: "departamentos",
+                    leftKey: "id_departamento",
+                    rightKey: "id_departamento",
+                    hasWhere: true,
+                    selectedLeftCols: ["nombre", "apellido", "salario"],
+                    selectedRightCols: ["nombre_depto"],
+                    outputCols: [
+                        { label: "e.nombre", side: "left", col: "nombre" },
+                        { label: "e.apellido", side: "left", col: "apellido" },
+                        { label: "e.salario", side: "left", col: "salario" },
+                        { label: "d.nombre_depto", side: "right", col: "nombre_depto" }
+                    ],
+                    passFilter: (lRow, rRow) => rRow.nombre_depto === "Sistemas" && lRow.salario > 500000
+                }
+            },
+            {
+                id: 10,
+                schemaKey: "empresa",
+                title: "Desafío Final: INNER JOIN + NOT + BETWEEN",
+                timeLimit: 420,
+                desc: "Une la tabla principal de empleados (alias e) con la de departamentos (alias d) para proyectar el apellido y el salario del empleado junto con el nombre y la ubicación del departamento (en ese orden), filtrando con negación quienes NO pertenezcan al departamento 'Ventas' y tengan un salario entre 400000 y 960000.",
+                specs: [
+                    "Unión: <span class='code-pill'>FROM</span> <span class='code-pill'>empleados</span> <span class='code-pill'>e</span> <span class='code-pill'>INNER JOIN</span> <span class='code-pill'>departamentos</span> <span class='code-pill'>d</span> <span class='code-pill'>ON</span> <span class='code-pill pk-pill'>e.id_departamento = d.id_departamento</span>",
+                    "Proyección: <span class='code-pill'>e.apellido</span>, <span class='code-pill'>e.salario</span>, <span class='code-pill'>d.nombre_depto</span>, <span class='code-pill'>d.ubicacion</span>",
+                    "Filtro 1 (<span class='code-pill'>WHERE</span>): <span class='code-pill'>NOT</span> <span class='code-pill'>d.nombre_depto</span> = <span class='code-pill'>'Ventas'</span>",
+                    "Conector y Filtro 2: <span class='code-pill'>AND</span> <span class='code-pill'>e.salario</span> <span class='code-pill'>BETWEEN</span> <span class='code-pill'>400000</span> <span class='code-pill'>AND</span> <span class='code-pill'>960000</span>"
+                ],
+                lines: [
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "SELECT" },
+                            { type: "input", answer: "e.apellido", width: "105px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "e.salario", width: "95px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "d.nombre_depto", width: "135px" },
+                            { type: "punct", text: "," },
+                            { type: "input", answer: "d.ubicacion", width: "115px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "FROM" },
+                            { type: "input", answer: "empleados", width: "105px" },
+                            { type: "punct", text: "e" },
+                            { type: "slot", answer: "INNER JOIN" },
+                            { type: "input", answer: "departamentos", width: "130px" },
+                            { type: "punct", text: "d" },
+                            { type: "slot", answer: "ON" },
+                            { type: "input", answer: "e.id_departamento", width: "150px" },
+                            { type: "punct", text: "=" },
+                            { type: "input", answer: "d.id_departamento", width: "150px" }
+                        ]
+                    },
+                    {
+                        indent: false,
+                        tokens: [
+                            { type: "slot", answer: "WHERE" },
+                            { type: "slot", answer: "NOT" },
+                            { type: "input", answer: "d.nombre_depto", width: "135px" },
+                            { type: "punct", text: "= 'Ventas'" }
+                        ]
+                    },
+                    {
+                        indent: true,
+                        tokens: [
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "e.salario", width: "95px" },
+                            { type: "slot", answer: "BETWEEN" },
+                            { type: "input", answer: "400000", width: "85px" },
+                            { type: "slot", answer: "AND" },
+                            { type: "input", answer: "960000", width: "85px" },
+                            { type: "punct", text: ";" }
+                        ]
+                    }
+                ],
+                bank: ["NOT", "BETWEEN", "ON", "AND", "WHERE", "INNER JOIN", "FROM", "AND", "SELECT", "OR", "LEFT JOIN", "LIKE", "SET"],
+                joinConfig: {
+                    leftTable: "empleados",
+                    rightTable: "departamentos",
+                    leftKey: "id_departamento",
+                    rightKey: "id_departamento",
+                    hasWhere: true,
+                    selectedLeftCols: ["apellido", "salario"],
+                    selectedRightCols: ["nombre_depto", "ubicacion"],
+                    outputCols: [
+                        { label: "e.apellido", side: "left", col: "apellido" },
+                        { label: "e.salario", side: "left", col: "salario" },
+                        { label: "d.nombre_depto", side: "right", col: "nombre_depto" },
+                        { label: "d.ubicacion", side: "right", col: "ubicacion" }
+                    ],
+                    passFilter: (lRow, rRow) => rRow.nombre_depto !== "Ventas" && lRow.salario >= 400000 && lRow.salario <= 960000
+                }
+            }
+        ];
+
+        /* =========================================================
+           LÓGICA DE JUEGO, TEMPORIZADOR PERSISTENTE Y ANIMACIÓN JOIN
+           ========================================================= */
+        const STORAGE_KEY = "bd2_practica_inner_joins_state_v1";
+        let currentLevelIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let completedLevels = new Set();
+        let activeSlotIndex = 0;
+        let slotAssignments = [];
+        let timerSeconds = 330;
+        let timerMax = 330;
+        let timerInterval = null;
+        let levelSolved = false;
+        let hasLoadedOnce = false;
+        let animTimeouts = [];
+
+        const levelStates = LEVELS.map(lvl => ({
+            remaining: lvl.timeLimit,
+            solved: false,
+            slots: null,
+            inputs: null
+        }));
+
+        function clearJoinAnimTimeouts() {
+            animTimeouts.forEach(t => clearTimeout(t));
+            animTimeouts = [];
+        }
+
+        function loadPersistedState() {
+            try {
+                const raw = sessionStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.score === "number") score = parsed.score;
+                if (typeof parsed.streak === "number") streak = parsed.streak;
+                if (Array.isArray(parsed.completed)) completedLevels = new Set(parsed.completed);
+                if (Array.isArray(parsed.levels)) {
+                    parsed.levels.forEach((st, i) => {
+                        if (levelStates[i] && st) {
+                            if (typeof st.remaining === "number") levelStates[i].remaining = st.remaining;
+                            if (typeof st.solved === "boolean") levelStates[i].solved = st.solved;
+                            if (Array.isArray(st.slots)) levelStates[i].slots = st.slots;
+                            if (Array.isArray(st.inputs)) levelStates[i].inputs = st.inputs;
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
+        function saveCurrentLevelProgress() {
+            if (!hasLoadedOnce) return;
+            const st = levelStates[currentLevelIdx];
+            if (st) {
+                st.remaining = timerSeconds;
+                st.solved = levelSolved;
+                st.slots = slotAssignments.map(s => (s ? { bankIdx: s.bankIdx, value: s.value } : null));
+                const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+                st.inputs = Array.from(inputs).map(inp => inp.value);
+            }
+            try {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    score,
+                    streak,
+                    completed: Array.from(completedLevels),
+                    levels: levelStates
+                }));
+            } catch (e) {}
+        }
+
+        window.addEventListener("pagehide", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+        window.addEventListener("beforeunload", () => {
+            clearInterval(timerInterval);
+            saveCurrentLevelProgress();
+        });
+
+        const builderCardEl = document.getElementById("builderCard");
+        const visorCardEl = document.getElementById("visorCard");
+        const levelPillsEl = document.getElementById("levelPills");
+        const timerDisplayEl = document.getElementById("timerDisplay");
+        const timerChipEl = document.getElementById("timerChip");
+        const timerBarFillEl = document.getElementById("timerBarFill");
+        const streakDisplayEl = document.getElementById("streakDisplay");
+        const scoreDisplayEl = document.getElementById("scoreDisplay");
+        const levelBadgeEl = document.getElementById("levelBadge");
+        const activeDbPillEl = document.getElementById("activeDbPill");
+        const objTitleEl = document.getElementById("objTitle");
+        const objDescEl = document.getElementById("objDesc");
+        const specBoxEl = document.getElementById("specBox");
+        const specListEl = document.getElementById("specList");
+        const hintToggleBtn = document.getElementById("hintToggleBtn");
+        const hintBtnTextEl = document.getElementById("hintBtnText");
+        const sampleSchemaTitleEl = document.getElementById("sampleSchemaTitle");
+        const sampleTablesGridEl = document.getElementById("sampleTablesGrid");
+        const sqlBuilderContainerEl = document.getElementById("sqlBuilderContainer");
+        const keywordBankEl = document.getElementById("keywordBank");
+        const slotIndicatorEl = document.getElementById("slotIndicator");
+        const feedbackBannerEl = document.getElementById("feedbackBanner");
+        const visorStageEl = document.getElementById("visorStage");
+        const visorStatusEl = document.getElementById("visorStatus");
+        const nextLevelBtn = document.getElementById("nextLevelBtn");
+        const replayAnimBtn = document.getElementById("replayAnimBtn");
+        const replayVisorBtn = document.getElementById("replayVisorBtn");
+        const nextVisorHeaderBtn = document.getElementById("nextVisorHeaderBtn");
+        const visorFooterActionsEl = document.getElementById("visorFooterActions");
+        const backToBuilderBtn = document.getElementById("backToBuilderBtn");
+        const replayVisorFooterBtn = document.getElementById("replayVisorFooterBtn");
+        const nextVisorFooterBtn = document.getElementById("nextVisorFooterBtn");
+        const runQueryBtn = document.getElementById("runQueryBtn");
+        const resetLevelBtn = document.getElementById("resetLevelBtn");
+        const stepChip1El = document.getElementById("stepChip1");
+        const stepChip2El = document.getElementById("stepChip2");
+        const stepChip3El = document.getElementById("stepChip3");
+
+        function scrollToVisor() {
+            if (visorCardEl) {
+                visorCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+
+        function scrollToBuilder() {
+            if (builderCardEl) {
+                builderCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+
+        function setStepIndicator(activePhase) {
+            [stepChip1El, stepChip2El, stepChip3El].forEach((el, idx) => {
+                el.classList.remove("active-step", "done-step");
+                const stepNum = idx + 1;
+                if (activePhase > stepNum) {
+                    el.classList.add("done-step");
+                } else if (activePhase === stepNum) {
+                    el.classList.add("active-step");
+                }
+            });
+        }
+
+        function renderLevelPills() {
+            levelPillsEl.innerHTML = "";
+            LEVELS.forEach((lvl, idx) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "level-pill" +
+                    (idx === currentLevelIdx ? " current" : "") +
+                    (completedLevels.has(lvl.id) ? " done" : "");
+                btn.textContent = lvl.id;
+                btn.addEventListener("click", () => {
+                    if (idx !== currentLevelIdx) loadLevel(idx);
+                });
+                levelPillsEl.appendChild(btn);
+            });
+        }
+
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, "0");
+            const s = String(sec % 60).padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function resumeTimer() {
+            clearInterval(timerInterval);
+            updateTimerUI();
+
+            if (levelSolved || timerSeconds <= 0) {
+                if (!levelSolved && timerSeconds <= 0) {
+                    showFeedback(false, "⏰ El tiempo de este ejercicio se agotó. Aún puedes resolverlo sin bono por tiempo.");
+                }
+                return;
+            }
+
+            timerInterval = setInterval(() => {
+                if (levelSolved) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timerSeconds--;
+                levelStates[currentLevelIdx].remaining = timerSeconds;
+                updateTimerUI();
+                saveCurrentLevelProgress();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    streak = 0;
+                    streakDisplayEl.textContent = streak;
+                    saveCurrentLevelProgress();
+                    showFeedback(false, "⏰ ¡Se agotó el tiempo de este ejercicio! Completa la consulta para continuar (sin bono de tiempo).");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            timerDisplayEl.textContent = formatTime(Math.max(0, timerSeconds));
+            const pct = Math.max(0, (timerSeconds / timerMax) * 100);
+            timerBarFillEl.style.width = pct + "%";
+
+            timerChipEl.classList.remove("warning", "danger");
+            if (timerSeconds <= 30) {
+                timerChipEl.classList.add("danger");
+                timerBarFillEl.style.background = "var(--danger)";
+            } else if (timerSeconds <= 60) {
+                timerChipEl.classList.add("warning");
+                timerBarFillEl.style.background = "var(--warning)";
+            } else {
+                timerBarFillEl.style.background = "linear-gradient(90deg, var(--primary), var(--join-key), var(--accent))";
+            }
+        }
+
+        function hideHint() {
+            if (specBoxEl) specBoxEl.classList.remove("visible");
+            if (hintToggleBtn) hintToggleBtn.classList.remove("active");
+            if (hintBtnTextEl) hintBtnTextEl.textContent = "Pista";
+        }
+
+        function toggleHint() {
+            if (!specBoxEl) return;
+            const isNowVisible = specBoxEl.classList.toggle("visible");
+            if (hintToggleBtn) hintToggleBtn.classList.toggle("active", isNowVisible);
+            if (hintBtnTextEl) hintBtnTextEl.textContent = isNowVisible ? "Ocultar Pista" : "Pista";
+        }
+
+        function renderSimplifiedSampleTables(lvl) {
+            if (!sampleTablesGridEl) return;
+            const schema = DB_SCHEMAS[lvl.schemaKey];
+            if (sampleSchemaTitleEl) {
+                sampleSchemaTitleEl.textContent = `🗂️ Tablas de Muestra Simplificadas — Esquema: ${schema.dbName}`;
+            }
+
+            const tableEntries = Object.values(schema.tables);
+            sampleTablesGridEl.innerHTML = tableEntries.map(tObj => {
+                const fkSet = new Set(Array.isArray(tObj.fks) ? tObj.fks : (tObj.fk ? [tObj.fk] : []));
+                const ths = tObj.cols.map(col => {
+                    const isPk = col === tObj.pk;
+                    const isFk = fkSet.has(col);
+                    const cls = isPk ? "sample-pk" : (isFk ? "sample-fk" : "");
+                    const icon = isPk ? " 🔑" : (isFk ? " 🔗" : "");
+                    return `<th class="${cls}">${col}${icon}</th>`;
+                }).join("");
+
+                const sampleRows = tObj.rows.slice(0, 2).map(r => {
+                    const tds = tObj.cols.map(col => `<td>${r[col]}</td>`).join("");
+                    return `<tr>${tds}</tr>`;
+                }).join("");
+
+                return `
+                    <div class="sample-table-card">
+                        <div class="sample-table-title">
+                            <span>📋 Tabla: ${tObj.name}</span>
+                            <span style="font-size:0.68rem;color:#64748b;font-weight:600;">${tObj.cols.length} atributos</span>
+                        </div>
+                        <div class="sample-table-scroll">
+                            <table class="sample-mini-grid">
+                                <thead><tr>${ths}</tr></thead>
+                                <tbody>${sampleRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function loadLevel(idx) {
+            clearJoinAnimTimeouts();
+            if (hasLoadedOnce) {
+                clearInterval(timerInterval);
+                saveCurrentLevelProgress();
+            }
+            hasLoadedOnce = true;
+            currentLevelIdx = idx;
+
+            const lvl = LEVELS[idx];
+            const st = levelStates[idx];
+            const schema = DB_SCHEMAS[lvl.schemaKey];
+            levelSolved = st.solved;
+            timerMax = lvl.timeLimit;
+            timerSeconds = st.remaining;
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+            levelBadgeEl.textContent = `INNER JOIN · Nivel ${lvl.id} de ${LEVELS.length}`;
+            activeDbPillEl.textContent = `🗄️ Esquema: ${schema.dbName}`;
+            objTitleEl.textContent = lvl.title;
+            objDescEl.textContent = lvl.desc;
+            specListEl.innerHTML = lvl.specs.map(s => `<li>• <span>${s}</span></li>`).join("");
+            hideHint();
+            renderSimplifiedSampleTables(lvl);
+
+            feedbackBannerEl.className = "feedback-banner";
+            visorCardEl.classList.remove("visor-highlight-active");
+            nextLevelBtn.classList.remove("visible");
+            nextVisorHeaderBtn.classList.remove("visible");
+            nextVisorFooterBtn.classList.remove("visible");
+            visorFooterActionsEl.classList.remove("visible");
+            replayAnimBtn.classList.remove("visible");
+            replayVisorBtn.classList.remove("visible");
+            setStepIndicator(0);
+            visorStatusEl.textContent = `Tablas listas: ${lvl.joinConfig.leftTable} ↔ ${lvl.joinConfig.rightTable}`;
+            visorStatusEl.className = "visor-status-pill";
+
+            sqlBuilderContainerEl.innerHTML = "";
+            slotAssignments = [];
+            let slotCount = 0;
+            let inputCount = 0;
+
+            lvl.lines.forEach(line => {
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "sql-line" + (line.indent ? " sql-indent" : "");
+
+                line.tokens.forEach(tok => {
+                    if (tok.type === "punct") {
+                        const span = document.createElement("span");
+                        span.className = "sql-punct";
+                        span.textContent = tok.text;
+                        lineDiv.appendChild(span);
+                    } else if (tok.type === "slot") {
+                        const sIdx = slotCount++;
+                        const savedSlot = (st.slots && st.slots[sIdx]) ? st.slots[sIdx] : null;
+                        slotAssignments.push(savedSlot);
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "sql-slot";
+                        btn.dataset.slotIndex = `#${sIdx + 1}`;
+                        btn.dataset.idx = sIdx;
+                        btn.dataset.answer = tok.answer;
+                        btn.textContent = "___";
+                        btn.addEventListener("click", () => onSlotClicked(sIdx));
+                        lineDiv.appendChild(btn);
+                    } else if (tok.type === "input") {
+                        const iIdx = inputCount++;
+                        const inp = document.createElement("input");
+                        inp.type = "text";
+                        inp.className = "sql-input";
+                        inp.autocomplete = "off";
+                        inp.spellcheck = false;
+                        inp.style.width = tok.width || "110px";
+                        inp.dataset.answer = tok.answer;
+                        if (st.inputs && typeof st.inputs[iIdx] === "string") {
+                            inp.value = st.inputs[iIdx];
+                        }
+                        if (levelSolved) {
+                            inp.value = tok.answer;
+                            inp.classList.add("input-correct");
+                            inp.readOnly = true;
+                        }
+                        inp.addEventListener("input", () => {
+                            inp.classList.remove("input-error", "input-correct");
+                            saveCurrentLevelProgress();
+                        });
+                        lineDiv.appendChild(inp);
+                    }
+                });
+
+                sqlBuilderContainerEl.appendChild(lineDiv);
+            });
+
+            keywordBankEl.innerHTML = "";
+            const usedBankIndices = new Set(slotAssignments.filter(Boolean).map(s => s.bankIdx));
+            lvl.bank.forEach((word, bIdx) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "kw-chip" + (usedBankIndices.has(bIdx) ? " used" : "");
+                chip.dataset.bankIdx = bIdx;
+                chip.textContent = word;
+                chip.addEventListener("click", (e) => onBankChipClicked(bIdx, word, e));
+                keywordBankEl.appendChild(chip);
+            });
+
+            const firstEmpty = slotAssignments.findIndex(x => x === null);
+            activeSlotIndex = firstEmpty !== -1 ? firstEmpty : 0;
+            updateSlotHighlights();
+
+            renderSourceTablesVisor(lvl);
+
+            if (levelSolved) {
+                visorCardEl.classList.add("visor-highlight-active");
+                replayAnimBtn.classList.add("visible");
+                replayVisorBtn.classList.add("visible");
+                visorFooterActionsEl.classList.add("visible");
+                if (currentLevelIdx < LEVELS.length - 1) {
+                    nextLevelBtn.classList.add("visible");
+                    nextVisorHeaderBtn.classList.add("visible");
+                    nextVisorFooterBtn.classList.add("visible");
+                }
+                showFeedback(true, "✅ Nivel completado. Puedes pulsar «🔄 Repetir Animación JOIN» para volver a ver cómo se unen y filtran las tablas.");
+                playJoinAnimationSequence(lvl);
+            }
+
+            resumeTimer();
+        }
+
+        function clearCurrentResponseOnly() {
+            if (levelSolved) return;
+            slotAssignments = slotAssignments.map(() => null);
+            keywordBankEl.querySelectorAll(".kw-chip").forEach(c => c.classList.remove("used"));
+            sqlBuilderContainerEl.querySelectorAll(".sql-input").forEach(inp => {
+                inp.value = "";
+                inp.classList.remove("input-error", "input-correct");
+            });
+            feedbackBannerEl.className = "feedback-banner";
+            activeSlotIndex = 0;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onSlotClicked(sIdx) {
+            if (levelSolved) return;
+            const current = slotAssignments[sIdx];
+            if (current) {
+                const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${current.bankIdx}"]`);
+                if (chip) chip.classList.remove("used");
+                slotAssignments[sIdx] = null;
+            }
+            activeSlotIndex = sIdx;
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function onBankChipClicked(bankIdx, word, evt) {
+            if (levelSolved) return;
+            if (activeSlotIndex === null || activeSlotIndex >= slotAssignments.length) {
+                const firstEmpty = slotAssignments.findIndex(x => x === null);
+                if (firstEmpty === -1) return;
+                activeSlotIndex = firstEmpty;
+            }
+
+            const existing = slotAssignments[activeSlotIndex];
+            if (existing) {
+                const oldChip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${existing.bankIdx}"]`);
+                if (oldChip) oldChip.classList.remove("used");
+            }
+
+            slotAssignments[activeSlotIndex] = { bankIdx, value: word };
+            const chip = keywordBankEl.querySelector(`.kw-chip[data-bank-idx="${bankIdx}"]`);
+            if (chip) chip.classList.add("used");
+
+            if (evt) spawnBurst(evt.clientX, evt.clientY, "#7c3aed", 10);
+
+            const nextEmpty = slotAssignments.findIndex((x, i) => x === null && i > activeSlotIndex);
+            if (nextEmpty !== -1) {
+                activeSlotIndex = nextEmpty;
+            } else {
+                const anyEmpty = slotAssignments.findIndex(x => x === null);
+                activeSlotIndex = anyEmpty !== -1 ? anyEmpty : activeSlotIndex;
+            }
+
+            updateSlotHighlights();
+            saveCurrentLevelProgress();
+        }
+
+        function updateSlotHighlights() {
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            slots.forEach((el, idx) => {
+                el.classList.remove("active-target", "filled", "slot-error", "slot-correct");
+                const assigned = slotAssignments[idx];
+                if (assigned) {
+                    el.textContent = assigned.value;
+                    el.classList.add("filled");
+                    if (levelSolved) el.classList.add("slot-correct");
+                } else {
+                    el.textContent = "___";
+                }
+                if (idx === activeSlotIndex && !levelSolved) {
+                    el.classList.add("active-target");
+                }
+            });
+            slotIndicatorEl.textContent = `Slot activo: #${(activeSlotIndex ?? 0) + 1}`;
+        }
+
+        /* =========================================================
+           RENDERIZADO DE LAS DOS TABLAS Y ANIMACIÓN PASO A PASO
+           ========================================================= */
+        function renderSourceTablesVisor(lvl) {
+            const schema = DB_SCHEMAS[lvl.schemaKey];
+            const jc = lvl.joinConfig;
+            const leftT = schema.tables[jc.leftTable];
+            const rightT = schema.tables[jc.rightTable];
+
+            const buildGridHTML = (tObj, keyCol, side) => {
+                const headers = tObj.cols.map(c => {
+                    const isKey = c === keyCol;
+                    const badge = isKey ? (c === tObj.pk ? " 🔑" : " 🔗") : "";
+                    return `<th data-col="${c}" class="${isKey ? "key-col-header" : ""}">${c}${badge}</th>`;
+                }).join("");
+
+                const rows = tObj.rows.map((r, rIdx) => {
+                    const cells = tObj.cols.map(c => {
+                        const isKey = c === keyCol;
+                        return `<td data-col="${c}" class="${isKey ? "key-col-cell" : ""}">${r[c]}</td>`;
+                    }).join("");
+                    return `<tr data-side="${side}" data-rowidx="${rIdx}" data-keyval="${r[keyCol]}">${cells}</tr>`;
+                }).join("");
+
+                return `
+                    <table class="dql-grid" id="${side}Grid">
+                        <thead><tr>${headers}</tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+            };
+
+            visorStageEl.innerHTML = `
+                <div class="join-tables-arena" id="joinArena">
+                    <svg class="join-links-svg" id="joinLinksSvg"></svg>
+                    <div class="table-box left-table" id="leftTableBox">
+                        <div class="table-banner left-banner">
+                            <span>📘 FROM: ${leftT.name}</span>
+                            <span>Clave: ${jc.leftKey}</span>
+                        </div>
+                        ${buildGridHTML(leftT, jc.leftKey, "left")}
+                    </div>
+                    <div class="table-box right-table" id="rightTableBox">
+                        <div class="table-banner right-banner">
+                            <span>📗 INNER JOIN: ${rightT.name}</span>
+                            <span>Clave: ${jc.rightKey}</span>
+                        </div>
+                        ${buildGridHTML(rightT, jc.rightKey, "right")}
+                    </div>
+                </div>
+                <div id="resultContainer"></div>
+            `;
+        }
+
+        function drawSvgConnectors(pairs) {
+            const arena = document.getElementById("joinArena");
+            const svg = document.getElementById("joinLinksSvg");
+            if (!arena || !svg) return;
+
+            const arenaRect = arena.getBoundingClientRect();
+            svg.innerHTML = "";
+
+            pairs.forEach((pair, pIdx) => {
+                const leftTr = arena.querySelector(`tr[data-side="left"][data-rowidx="${pair.leftIdx}"]`);
+                const rightTr = arena.querySelector(`tr[data-side="right"][data-rowidx="${pair.rightIdx}"]`);
+                if (!leftTr || !rightTr) return;
+
+                const lRect = leftTr.getBoundingClientRect();
+                const rRect = rightTr.getBoundingClientRect();
+
+                const x1 = lRect.right - arenaRect.left;
+                const y1 = lRect.top + lRect.height / 2 - arenaRect.top;
+                const x2 = rRect.left - arenaRect.left;
+                const y2 = rRect.top + rRect.height / 2 - arenaRect.top;
+                const cx1 = x1 + (x2 - x1) * 0.42;
+                const cx2 = x1 + (x2 - x1) * 0.58;
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`);
+                path.setAttribute("class", "join-link-path");
+                path.dataset.pairIdx = pIdx;
+                svg.appendChild(path);
+
+                const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                c1.setAttribute("cx", x1);
+                c1.setAttribute("cy", y1);
+                c1.setAttribute("r", "4");
+                c1.setAttribute("fill", "#7c3aed");
+                svg.appendChild(c1);
+
+                const c2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                c2.setAttribute("cx", x2);
+                c2.setAttribute("cy", y2);
+                c2.setAttribute("r", "4");
+                c2.setAttribute("fill", "#0d9488");
+                svg.appendChild(c2);
+            });
+        }
+
+        function playJoinAnimationSequence(lvl) {
+            clearJoinAnimTimeouts();
+            renderSourceTablesVisor(lvl);
+
+            const schema = DB_SCHEMAS[lvl.schemaKey];
+            const jc = lvl.joinConfig;
+            const leftT = schema.tables[jc.leftTable];
+            const rightT = schema.tables[jc.rightTable];
+
+            // Calcular pares que coinciden por clave ON (leftKey = rightKey)
+            const matchedPairs = [];
+            const pairedLeftIndices = new Set();
+            const pairedRightIndices = new Set();
+
+            leftT.rows.forEach((lRow, lIdx) => {
+                rightT.rows.forEach((rRow, rIdx) => {
+                    if (lRow[jc.leftKey] === rRow[jc.rightKey]) {
+                        const passesWhere = jc.passFilter(lRow, rRow);
+                        matchedPairs.push({
+                            leftIdx: lIdx,
+                            rightIdx: rIdx,
+                            leftRow: lRow,
+                            rightRow: rRow,
+                            keyVal: lRow[jc.leftKey],
+                            passesWhere
+                        });
+                        pairedLeftIndices.add(lIdx);
+                        pairedRightIndices.add(rIdx);
+                    }
+                });
+            });
+
+            // FASE 1: Emparejamiento por Clave ON (PK = FK)
+            setStepIndicator(1);
+            visorStatusEl.textContent = `Fase 1: Uniendo por clave ${jc.leftKey} = ${jc.rightKey}...`;
+            visorStatusEl.className = "visor-status-pill phase-key";
+
+            drawSvgConnectors(matchedPairs);
+
+            // Atenuar filas huérfanas (sin par en INNER JOIN, ej. Edgar Allan Poe o Carlos Sánchez)
+            const leftTrs = visorStageEl.querySelectorAll(`tr[data-side="left"]`);
+            const rightTrs = visorStageEl.querySelectorAll(`tr[data-side="right"]`);
+            leftTrs.forEach((tr, idx) => {
+                if (!pairedLeftIndices.has(idx)) tr.classList.add("row-orphan");
+            });
+            rightTrs.forEach((tr, idx) => {
+                if (!pairedRightIndices.has(idx)) tr.classList.add("row-orphan");
+            });
+
+            // Mostrar conectores uno por uno
+            matchedPairs.forEach((pair, pIdx) => {
+                const tId = setTimeout(() => {
+                    const path = visorStageEl.querySelector(`.join-link-path[data-pair-idx="${pIdx}"]`);
+                    if (path) path.classList.add("visible");
+                    const lTr = visorStageEl.querySelector(`tr[data-side="left"][data-rowidx="${pair.leftIdx}"]`);
+                    const rTr = visorStageEl.querySelector(`tr[data-side="right"][data-rowidx="${pair.rightIdx}"]`);
+                    if (lTr) lTr.classList.add("row-key-paired");
+                    if (rTr) rTr.classList.add("row-key-paired");
+                }, 180 + pIdx * 210);
+                animTimeouts.push(tId);
+            });
+
+            const phase2Delay = 350 + matchedPairs.length * 210;
+
+            // FASE 2: Filtrado WHERE sobre las filas emparejadas
+            const tPhase2 = setTimeout(() => {
+                setStepIndicator(2);
+                visorStatusEl.textContent = jc.hasWhere
+                    ? "Fase 2: Aplicando filtro WHERE sobre filas unidas..."
+                    : "Fase 2: Sin filtro WHERE (pasan todas las uniones)...";
+                visorStatusEl.className = "visor-status-pill phase-where";
+
+                const passingLeftSet = new Set();
+                const passingRightSet = new Set();
+                matchedPairs.forEach((pair, pIdx) => {
+                    const path = visorStageEl.querySelector(`.join-link-path[data-pair-idx="${pIdx}"]`);
+                    if (pair.passesWhere) {
+                        passingLeftSet.add(pair.leftIdx);
+                        passingRightSet.add(pair.rightIdx);
+                        if (path) path.classList.add("final-match");
+                    } else {
+                        if (path) path.classList.add("filtered-out");
+                    }
+                });
+
+                matchedPairs.forEach(pair => {
+                    const lTr = visorStageEl.querySelector(`tr[data-side="left"][data-rowidx="${pair.leftIdx}"]`);
+                    const rTr = visorStageEl.querySelector(`tr[data-side="right"][data-rowidx="${pair.rightIdx}"]`);
+                    if (lTr) {
+                        lTr.classList.remove("row-key-paired");
+                        lTr.classList.add(passingLeftSet.has(pair.leftIdx) ? "row-where-pass" : "row-where-fail");
+                    }
+                    if (rTr) {
+                        rTr.classList.remove("row-key-paired");
+                        rTr.classList.add(passingRightSet.has(pair.rightIdx) ? "row-where-pass" : "row-where-fail");
+                    }
+                });
+            }, phase2Delay);
+            animTimeouts.push(tPhase2);
+
+            // FASE 3: Proyección de columnas y aparición de tabla fusionada
+            const phase3Delay = phase2Delay + 750;
+            const tPhase3 = setTimeout(() => {
+                setStepIndicator(3);
+                const finalRows = matchedPairs.filter(p => p.passesWhere);
+                visorStatusEl.textContent = `INNER JOIN completado: ${finalRows.length} fila(s) fusionada(s)`;
+                visorStatusEl.className = "visor-status-pill executed";
+
+                const leftGrid = document.getElementById("leftGrid");
+                const rightGrid = document.getElementById("rightGrid");
+                jc.selectedLeftCols.forEach(col => {
+                    const th = leftGrid && leftGrid.querySelector(`th[data-col="${col}"]`);
+                    if (th) th.classList.add("col-selected");
+                });
+                jc.selectedRightCols.forEach(col => {
+                    const th = rightGrid && rightGrid.querySelector(`th[data-col="${col}"]`);
+                    if (th) th.classList.add("col-selected");
+                });
+
+                const resultContainer = document.getElementById("resultContainer");
+                const resHeaders = [
+                    `<th>🔗 Clave (${jc.leftKey})</th>`,
+                    ...jc.outputCols.map(c => `<th>${c.label}</th>`)
+                ].join("");
+
+                resultContainer.innerHTML = `
+                    <div class="table-box result-box">
+                        <div class="table-banner result-banner">
+                            <span>✨ RESULTADO FUSIONADO DEL INNER JOIN (${leftT.name} ⋈ ${rightT.name})</span>
+                            <span>${finalRows.length} registro(s)</span>
+                        </div>
+                        <table class="dql-grid">
+                            <thead><tr>${resHeaders}</tr></thead>
+                            <tbody id="resultBody"></tbody>
+                        </table>
+                    </div>
+                `;
+
+                const resultBody = document.getElementById("resultBody");
+                finalRows.forEach((pair, rIdx) => {
+                    const rowTimer = setTimeout(() => {
+                        const tr = document.createElement("tr");
+                        tr.className = "result-row-pop";
+                        const keyCell = `<td><span class="key-link-badge">🔗 ${jc.leftKey} = ${pair.keyVal}</span></td>`;
+                        const dataCells = jc.outputCols.map(c => {
+                            const val = c.side === "left" ? pair.leftRow[c.col] : pair.rightRow[c.col];
+                            const cls = c.side === "left" ? "src-tag-left" : "src-tag-right";
+                            return `<td><span class="${cls}">${val}</span></td>`;
+                        }).join("");
+                        tr.innerHTML = keyCell + dataCells;
+                        resultBody.appendChild(tr);
+                    }, rIdx * 170);
+                    animTimeouts.push(rowTimer);
+                });
+            }, phase3Delay);
+            animTimeouts.push(tPhase3);
+        }
+
+        function validateAndRun() {
+            if (levelSolved) {
+                scrollToVisor();
+                playJoinAnimationSequence(LEVELS[currentLevelIdx]);
+                return;
+            }
+            const slots = sqlBuilderContainerEl.querySelectorAll(".sql-slot");
+            const inputs = sqlBuilderContainerEl.querySelectorAll(".sql-input");
+
+            let allSlotsOk = true;
+            let allInputsOk = true;
+
+            slots.forEach((slotEl, idx) => {
+                const expected = slotEl.dataset.answer.trim().toUpperCase();
+                const current = slotAssignments[idx] ? slotAssignments[idx].value.trim().toUpperCase() : "";
+                slotEl.classList.remove("slot-error", "slot-correct");
+                if (current === expected) {
+                    slotEl.classList.add("slot-correct");
+                } else {
+                    slotEl.classList.add("slot-error");
+                    allSlotsOk = false;
+                }
+            });
+
+            inputs.forEach(inpEl => {
+                const expected = inpEl.dataset.answer.trim();
+                const current = inpEl.value.trim();
+                inpEl.classList.remove("input-error", "input-correct");
+                if (current === expected) {
+                    inpEl.classList.add("input-correct");
+                } else {
+                    inpEl.classList.add("input-error");
+                    allInputsOk = false;
+                }
+            });
+
+            if (!allSlotsOk || !allInputsOk) {
+                streak = 0;
+                streakDisplayEl.textContent = streak;
+                saveCurrentLevelProgress();
+                showFeedback(false, "❌ Revisa los elementos en rojo: verifica las palabras clave del INNER JOIN y los nombres de tablas, alias o atributos escritos manualmente.");
+                return;
+            }
+
+            levelSolved = true;
+            clearInterval(timerInterval);
+            inputs.forEach(inp => { inp.readOnly = true; });
+
+            const lvl = LEVELS[currentLevelIdx];
+            const timeBonus = Math.max(0, Math.floor(timerSeconds / 2));
+            streak++;
+            const gained = 120 + timeBonus + (streak * 15);
+            score += gained;
+            completedLevels.add(lvl.id);
+            levelStates[currentLevelIdx].solved = true;
+            saveCurrentLevelProgress();
+
+            streakDisplayEl.textContent = streak;
+            scoreDisplayEl.textContent = score;
+            renderLevelPills();
+
+            showFeedback(true, `✅ ¡INNER JOIN ejecutado correctamente! Desplazando al visor animado (+${gained} pts). Puedes repetir la animación cuando quieras.`);
+
+            visorCardEl.classList.add("visor-highlight-active");
+            replayAnimBtn.classList.add("visible");
+            replayVisorBtn.classList.add("visible");
+            visorFooterActionsEl.classList.add("visible");
+            if (currentLevelIdx < LEVELS.length - 1) {
+                nextLevelBtn.classList.add("visible");
+                nextVisorHeaderBtn.classList.add("visible");
+                nextVisorFooterBtn.classList.add("visible");
+            }
+
+            scrollToVisor();
+
+            const startAnimTimeout = setTimeout(() => {
+                const rect = visorStageEl.getBoundingClientRect();
+                spawnBurst(rect.left + rect.width / 2, Math.max(120, rect.top + 120), "#7c3aed", 30);
+                playJoinAnimationSequence(lvl);
+            }, 320);
+            animTimeouts.push(startAnimTimeout);
+        }
+
+        function showFeedback(isOk, msg) {
+            feedbackBannerEl.className = "feedback-banner show " + (isOk ? "ok" : "err");
+            feedbackBannerEl.textContent = msg;
+        }
+
+        /* Redibujar conectores SVG al redimensionar la ventana */
+        window.addEventListener("resize", () => {
+            resizeCanvas();
+            if (levelSolved) {
+                playJoinAnimationSequence(LEVELS[currentLevelIdx]);
+            }
+        });
+
+        /* Partículas de fondo y explosiones */
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let ambientParticles = [];
+        let burstParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+
+        for (let i = 0; i < 24; i++) {
+            ambientParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: 1.5 + Math.random() * 2.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                color: i % 2 === 0 ? "rgba(37, 99, 235, 0.14)" : "rgba(124, 58, 237, 0.14)"
+            });
+        }
+
+        function spawnBurst(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 4.2;
+                burstParticles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1,
+                    r: 2.5 + Math.random() * 3,
+                    alpha: 1,
+                    color
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ambientParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                const b = burstParticles[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.vy += 0.08;
+                b.alpha -= 0.024;
+                if (b.alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                    continue;
+                }
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function goToNextLevel() {
+            if (currentLevelIdx < LEVELS.length - 1) {
+                loadLevel(currentLevelIdx + 1);
+                scrollToBuilder();
+            }
+        }
+
+        runQueryBtn.addEventListener("click", validateAndRun);
+        resetLevelBtn.addEventListener("click", clearCurrentResponseOnly);
+        hintToggleBtn.addEventListener("click", toggleHint);
+        replayAnimBtn.addEventListener("click", () => {
+            if (levelSolved) {
+                scrollToVisor();
+                playJoinAnimationSequence(LEVELS[currentLevelIdx]);
+            }
+        });
+        replayVisorBtn.addEventListener("click", () => {
+            if (levelSolved) playJoinAnimationSequence(LEVELS[currentLevelIdx]);
+        });
+        replayVisorFooterBtn.addEventListener("click", () => {
+            if (levelSolved) playJoinAnimationSequence(LEVELS[currentLevelIdx]);
+        });
+        backToBuilderBtn.addEventListener("click", scrollToBuilder);
+        nextLevelBtn.addEventListener("click", goToNextLevel);
+        nextVisorHeaderBtn.addEventListener("click", goToNextLevel);
+        nextVisorFooterBtn.addEventListener("click", goToNextLevel);
+
+        loadPersistedState();
+        loadLevel(0);
+    </script>
+</body>
+</html>

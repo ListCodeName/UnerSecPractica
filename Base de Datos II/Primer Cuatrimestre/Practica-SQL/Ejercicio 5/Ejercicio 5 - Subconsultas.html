@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base de Datos II - Ejercicio 5: Subconsultas (Subqueries)</title>
+<style>
+  :root {
+    --bg-main: #f5f3ff;
+    --bg-card: #ffffff;
+    --bg-code: #0f172a;
+    --primary: #6d28d9;
+    --primary-light: #ede9fe;
+    --primary-dark: #4c1d95;
+    --accent: #0284c7;
+    --accent-light: #e0f2fe;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --success: #059669;
+    --success-light: #d1fae5;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --border: #ddd6fe;
+    --shadow: 0 10px 30px -5px rgba(109, 40, 217, 0.08), 0 4px 12px -2px rgba(109, 40, 217, 0.05);
+    --radius: 16px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0f2fe 100%);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    padding-bottom: 3rem;
+  }
+
+  #particles-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Header & HUD */
+  .header-hud {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .brand-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+    animation: floatIcon 3s ease-in-out infinite;
+  }
+
+  @keyframes floatIcon {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(-3deg); }
+  }
+
+  .brand-text h1 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+  }
+
+  .brand-text p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .hud-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #faf5ff;
+    border: 1px solid var(--border);
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .stat-pill.timer-pill {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: #c4b5fd;
+  }
+
+  .stat-pill.timer-pill.warning {
+    background: var(--amber-light);
+    color: #92400e;
+    border-color: #fcd34d;
+    animation: pulseWarn 1s infinite;
+  }
+
+  .stat-pill.timer-pill.danger {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: #fca5a5;
+  }
+
+  @keyframes pulseWarn {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  /* Level Tabs */
+  .level-nav {
+    display: flex;
+    gap: 0.45rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .level-tab {
+    flex: 1;
+    min-width: 135px;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #faf5ff;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .level-tab:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #ffffff;
+  }
+
+  .level-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+  }
+
+  .level-tab.completed {
+    background: var(--success-light);
+    color: var(--success);
+    border-color: #6ee7b7;
+  }
+
+  .level-tab.active.completed {
+    background: var(--success);
+    color: white;
+  }
+
+  /* Stacked Layout (100% Width top and bottom) */
+  .workspace-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    width: 100%;
+  }
+
+  .card {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  .objective-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .badge-mission {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .objective-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-top: 0.35rem;
+  }
+
+  .objective-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    background: #faf5ff;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+  }
+
+  /* Simplified Sample Tables Reference */
+  .sample-tables-section {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .sample-tables-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sample-tables-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .btn-hint-bulb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1.5px solid #f59e0b;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.18);
+  }
+
+  .btn-hint-bulb:hover {
+    background: #fde68a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+
+  .btn-hint-bulb.active {
+    background: #f59e0b;
+    color: #ffffff;
+    border-color: #d97706;
+  }
+
+  .bulb-icon {
+    font-size: 1rem;
+    display: inline-block;
+    animation: glowBulb 2s infinite ease-in-out;
+  }
+
+  @keyframes glowBulb {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.4)); }
+    50% { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8)); }
+  }
+
+  .sample-tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .sample-table-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.03);
+  }
+
+  .sample-table-head {
+    background: #ede9fe;
+    padding: 0.45rem 0.75rem;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    border-bottom: 1px solid #ddd6fe;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sample-table-wrap {
+    overflow-x: auto;
+  }
+
+  .sample-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.74rem;
+  }
+
+  .sample-mini-table th {
+    background: #f8fafc;
+    color: #334155;
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    font-weight: 800;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+
+  .sample-mini-table td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+    white-space: nowrap;
+  }
+
+  .pk-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #b45309;
+    font-size: 0.63rem;
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+    margin-left: 0.25rem;
+    font-weight: 800;
+  }
+
+  .fk-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.63rem;
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+    margin-left: 0.25rem;
+    font-weight: 800;
+  }
+
+  /* Strict Specification Box (Hidden by default, shown on Pista click) */
+  .spec-box {
+    display: none;
+    background: #fffbeb;
+    border: 1.5px dashed #f59e0b;
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    animation: fadeInHint 0.25s ease-out;
+  }
+
+  .spec-box.visible {
+    display: block;
+  }
+
+  @keyframes fadeInHint {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .spec-box h3 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #b45309;
+    margin-bottom: 0.55rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .spec-item {
+    background: white;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .spec-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .spec-val {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.82rem;
+    word-break: break-word;
+  }
+
+  /* SQL Builder Terminal */
+  .sql-terminal {
+    background: var(--bg-code);
+    border-radius: 14px;
+    padding: 1rem;
+    color: #f8fafc;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.4);
+    border: 1px solid #1e293b;
+  }
+
+  .terminal-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .terminal-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+  .dot.red { background: #ef4444; }
+  .dot.yellow { background: #f59e0b; }
+  .dot.green { background: #10b981; }
+
+  .terminal-title {
+    font-family: 'Consolas', monospace;
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .sql-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.92rem;
+  }
+
+  .sql-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    line-height: 1.6;
+  }
+
+  .sql-line.indent-1 {
+    padding-left: 1.5rem;
+  }
+
+  .sql-line.indent-2 {
+    padding-left: 3rem;
+  }
+
+  .sql-punct {
+    color: #94a3b8;
+    font-weight: 700;
+  }
+
+  /* Keyword Slot */
+  .kw-slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 98px;
+    height: 34px;
+    padding: 0 0.65rem;
+    border-radius: 8px;
+    border: 2px dashed #475569;
+    background: rgba(30, 41, 59, 0.75);
+    color: #64748b;
+    font-family: 'Consolas', monospace;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+
+  .kw-slot.active-target {
+    border-color: #a78bfa;
+    background: rgba(139, 92, 246, 0.16);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+  }
+
+  .kw-slot.filled {
+    border-style: solid;
+    border-color: #8b5cf6;
+    background: #4c1d95;
+    color: #ede9fe;
+  }
+
+  .kw-slot.correct {
+    border-color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.22) !important;
+    color: #6ee7b7 !important;
+  }
+
+  .kw-slot.wrong {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.22) !important;
+    color: #fca5a5 !important;
+    animation: shake 0.35s;
+  }
+
+  /* Manual Text Input (Strictly NO placeholders) */
+  .sql-input {
+    height: 34px;
+    padding: 0 0.6rem;
+    border-radius: 8px;
+    border: 2px solid #334155;
+    background: #1e293b;
+    color: #f8fafc;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.86rem;
+    font-weight: 700;
+    outline: none;
+    transition: all 0.18s;
+  }
+
+  .sql-input:focus {
+    border-color: #a78bfa;
+    background: #0f172a;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+  }
+
+  .sql-input.correct {
+    border-color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #6ee7b7 !important;
+  }
+
+  .sql-input.wrong {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
+    animation: shake 0.35s;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  /* Keyword Bank */
+  .kw-bank-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .kw-bank-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .kw-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    background: #faf5ff;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .kw-chip {
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    background: white;
+    border: 1.5px solid #c4b5fd;
+    color: var(--primary-dark);
+    font-family: 'Consolas', monospace;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 4px rgba(15,23,42,0.04);
+    user-select: none;
+  }
+
+  .kw-chip:hover:not(.used) {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: translateY(-2px);
+  }
+
+  .kw-chip.used {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+  }
+
+  /* Action Bar & Feedback */
+  .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .btn {
+    padding: 0.7rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #5b21b6);
+    color: white;
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(109, 40, 217, 0.4);
+  }
+
+  .btn-secondary {
+    background: #f1f5f9;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: var(--text-main);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--success), #047857);
+    color: white;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .feedback-banner {
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .feedback-banner.show {
+    display: flex;
+  }
+
+  .feedback-banner.success {
+    background: var(--success-light);
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+  }
+
+  .feedback-banner.error {
+    background: var(--danger-light);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  /* Animated Subquery Visor (Full 100% Width & Dynamic Height) */
+  #visorCard {
+    scroll-margin-top: 1.25rem;
+    padding: 1.75rem;
+  }
+
+  .visor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .visor-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+
+  .phase-stepper {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .phase-pill {
+    font-size: 0.73rem;
+    font-weight: 700;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    transition: all 0.25s;
+  }
+
+  .phase-pill.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.3);
+  }
+
+  .phase-pill.done {
+    background: var(--success-light);
+    color: var(--success);
+    border-color: #6ee7b7;
+  }
+
+  .visor-stage {
+    background: #faf5ff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.35rem;
+    width: 100%;
+    height: auto;
+    min-height: 440px;
+  }
+
+  .subquery-pipeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+
+  .pipeline-card {
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #cbd5e1;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.35s ease;
+  }
+
+  .pipeline-card.active-inner {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+  }
+
+  .pipeline-card.active-outer {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2);
+  }
+
+  .pipeline-head {
+    padding: 0.6rem 1rem;
+    font-family: 'Consolas', monospace;
+    font-size: 0.82rem;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pipeline-head.inner-head {
+    background: #ede9fe;
+    color: #4c1d95;
+    border-bottom: 1px solid #ddd6fe;
+  }
+
+  .pipeline-head.outer-head {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-bottom: 1px solid #bae6fd;
+  }
+
+  .pipeline-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+  }
+
+  .subquery-output-badge {
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
+    font-family: 'Consolas', monospace;
+    font-size: 0.85rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    transition: all 0.35s ease;
+  }
+
+  .subquery-output-badge.pulse-emit {
+    background: #8b5cf6;
+    border-color: #6d28d9;
+    color: #ffffff;
+    transform: scale(1.02);
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35);
+  }
+
+  .mini-table-wrap {
+    overflow-x: auto;
+  }
+
+  .mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    font-family: 'Consolas', monospace;
+  }
+
+  .mini-table th {
+    background: #f8fafc;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .mini-table td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-main);
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+
+  .mini-table tr.row-scanning td {
+    background: #ede9fe;
+    color: #4c1d95;
+    font-weight: 700;
+  }
+
+  .mini-table tr.row-matched td {
+    background: #d1fae5;
+    color: #065f46;
+    font-weight: 700;
+  }
+
+  .mini-table tr.row-filtered td {
+    opacity: 0.32;
+    background: #f8fafc;
+    text-decoration: line-through;
+  }
+
+  /* Result Set Section */
+  .result-box {
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #cbd5e1;
+    overflow: hidden;
+    transition: all 0.3s;
+    margin-top: 0.25rem;
+  }
+
+  .result-box.ready {
+    border-color: var(--success);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.12);
+  }
+
+  .result-head {
+    background: #0f172a;
+    color: white;
+    padding: 0.65rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .result-row-anim {
+    animation: popRow 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes popRow {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="app-container">
+  <!-- Header & HUD -->
+  <header class="header-hud">
+    <div class="hud-top">
+      <div class="brand">
+        <div class="brand-icon">SUB</div>
+        <div class="brand-text">
+          <h1>Base de Datos II — Práctica Interactiva: Subconsultas (Subqueries)</h1>
+          <p>Ejercicio 5 • Consultas Escalares, Correlacionadas, IN, NOT EXISTS, SELECT y Tablas Derivadas</p>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <div class="stat-pill">
+          <span>🗄️ BD:</span>
+          <code>empresa_ejercicio</code>
+        </div>
+        <div class="stat-pill timer-pill" id="timerPill">
+          <span>⏱️ Tiempo Nivel:</span>
+          <span id="timerDisplay">06:00</span>
+        </div>
+        <div class="stat-pill">
+          <span>🏆 Progreso:</span>
+          <span id="scoreDisplay">0 / 6</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="level-nav" id="levelNav"></nav>
+  </header>
+
+  <!-- Main Workspace (100% Width Stacked) -->
+  <main class="workspace-grid">
+    <!-- Top Panel: Consigna, Simplified Sample Tables & SQL Builder (100% width) -->
+    <section class="card" id="builderCard">
+      <div class="objective-header">
+        <div>
+          <span class="badge-mission" id="missionBadge">PUNTO 1 DE 6</span>
+          <h2 class="objective-title" id="objTitle">Cargando objetivo...</h2>
+        </div>
+      </div>
+
+      <p class="objective-desc" id="objDesc"></p>
+
+      <!-- Simplified Sample Tables & Lightbulb Hint Button -->
+      <div class="sample-tables-section">
+        <div class="sample-tables-header">
+          <div class="sample-tables-title">
+            <span>📋 Tablas de Muestra Simplificadas (Estructura y Atributos)</span>
+          </div>
+          <button class="btn-hint-bulb" id="hintToggleBtn" type="button">
+            <span class="bulb-icon">💡</span>
+            <span id="hintBtnText">Pista</span>
+          </button>
+        </div>
+        <div class="sample-tables-grid" id="sampleTablesGrid"></div>
+      </div>
+
+      <!-- Hidden Strict Specification (Only shown when clicking 'Pista') -->
+      <div class="spec-box" id="specBox">
+        <h3>💡 Pista — Especificación Estricta de la Subconsulta</h3>
+        <div class="spec-grid" id="specGrid"></div>
+      </div>
+
+      <div class="sql-terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">mysql&gt; USE empresa_ejercicio; — Editor de Subconsultas</span>
+        </div>
+        <div class="sql-lines" id="sqlBuilder"></div>
+      </div>
+
+      <div class="kw-bank-section">
+        <div class="kw-bank-header">
+          <span>🧩 Banco de Palabras Clave SQL (incluye distractores — haz clic para colocar o quitar)</span>
+          <button class="btn btn-secondary" id="clearSlotsBtn" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">Limpiar Slots</button>
+        </div>
+        <div class="kw-bank" id="kwBank"></div>
+      </div>
+
+      <div class="feedback-banner" id="feedbackBanner"></div>
+
+      <div class="action-bar">
+        <button class="btn btn-primary" id="verifyBtn">⚡ Ejecutar y Validar Subconsulta</button>
+        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+          <button class="btn btn-secondary" id="replayBtn" style="display:none;">🔄 Repetir Animación</button>
+          <button class="btn btn-success" id="nextLevelBtn" style="display:none;">Siguiente Ejercicio ➡️</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Panel: Animated Subquery Visor (100% width) -->
+    <section class="card" id="visorCard">
+      <div class="visor-header">
+        <div class="visor-title">
+          <span>🎬 Visor Animado de Ejecución de Subconsultas</span>
+        </div>
+        <div class="phase-stepper">
+          <span class="phase-pill" id="phase1Pill">1. Subconsulta Interna</span>
+          <span class="phase-pill" id="phase2Pill">2. Inyección / Correlación</span>
+          <span class="phase-pill" id="phase3Pill">3. Resultado Final</span>
+        </div>
+      </div>
+
+      <div class="visor-stage">
+        <div class="subquery-pipeline" id="subqueryPipeline"></div>
+
+        <div class="result-box" id="resultBox">
+          <div class="result-head">
+            <span id="resultTitle">📊 Tabla de Resultado Final (Ejecuta la subconsulta para visualizar)</span>
+            <span id="resultCountBadge" style="font-family:monospace; font-size:0.74rem; color:#6ee7b7;">0 filas</span>
+          </div>
+          <div class="mini-table-wrap" id="resultTableContainer">
+            <div style="padding: 1.5rem; text-align: center; color: #64748b; font-size: 0.85rem;">
+              Completa la sentencia SQL con subconsulta arriba y presiona <strong>Ejecutar y Validar Subconsulta</strong> para animar el cálculo interno y la consulta principal.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ==========================================================================
+   BASE DE DATOS EMPRESA_EJERCICIO (Fiel a db_empresa.sql)
+   ========================================================================== */
+const DB = {
+  departamentos: [
+    { id_departamento: 1, nombre_depto: 'Sistemas', presupuesto: 15000000.00, ubicacion: 'Piso 3 - Ala Norte' },
+    { id_departamento: 2, nombre_depto: 'Ventas', presupuesto: 8000000.00, ubicacion: 'Piso 1 - Ala Sur' },
+    { id_departamento: 3, nombre_depto: 'Recursos Humanos', presupuesto: 3500000.00, ubicacion: 'Piso 2 - Ala Este' },
+    { id_departamento: 4, nombre_depto: 'Administración', presupuesto: 5000000.00, ubicacion: 'Piso 1 - Ala Este' },
+    { id_departamento: 5, nombre_depto: 'Investigación y Desarrollo', presupuesto: 12000000.00, ubicacion: 'Laboratorio 1' }
+  ],
+  empleados: [
+    { id_empleado: 1, nombre: 'Rodolfo', apellido: 'Gimenez', salario: 950000.00, fecha_ingreso: '2020-03-01', id_departamento: 1 },
+    { id_empleado: 2, nombre: 'Marta', apellido: 'Fischer', salario: 450000.00, fecha_ingreso: '2022-06-15', id_departamento: 1 },
+    { id_empleado: 3, nombre: 'Hugo', apellido: 'Benitez', salario: 380000.00, fecha_ingreso: '2023-01-10', id_departamento: 1 },
+    { id_empleado: 4, nombre: 'Laura', apellido: 'Peralta', salario: 820000.00, fecha_ingreso: '2021-05-12', id_departamento: 2 },
+    { id_empleado: 5, nombre: 'Javier', apellido: 'Sosa', salario: 350000.00, fecha_ingreso: '2023-08-01', id_departamento: 2 },
+    { id_empleado: 6, nombre: 'Daniela', apellido: 'Flores', salario: 310000.00, fecha_ingreso: '2024-02-15', id_departamento: 2 },
+    { id_empleado: 7, nombre: 'Valeria', apellido: 'Ruiz', salario: 580000.00, fecha_ingreso: '2021-11-20', id_departamento: 3 },
+    { id_empleado: 8, nombre: 'Enzo', apellido: 'Martinez', salario: 280000.00, fecha_ingreso: '2024-01-10', id_departamento: 3 },
+    { id_empleado: 9, nombre: 'Mónica', apellido: 'Carrizo', salario: 650000.00, fecha_ingreso: '2019-10-01', id_departamento: 4 },
+    { id_empleado: 10, nombre: 'Pedro', apellido: 'Vazquez', salario: 340000.00, fecha_ingreso: '2023-04-12', id_departamento: 4 },
+    { id_empleado: 11, nombre: 'Lucas', apellido: 'Romero', salario: 180000.00, fecha_ingreso: '2025-02-01', id_departamento: 1 }
+  ],
+  proyectos: [
+    { id_proyecto: 1, nombre_proyecto: 'Sistema de Gestión ERP', presupuesto: 2500000.00, id_lider: 1 },
+    { id_proyecto: 2, nombre_proyecto: 'Expansión Comercial de Sucursales', presupuesto: 1200000.00, id_lider: 4 },
+    { id_proyecto: 3, nombre_proyecto: 'Auditoría Integral de Procesos', presupuesto: 350000.00, id_lider: 7 },
+    { id_proyecto: 4, nombre_proyecto: 'Migración de Infraestructura Cloud', presupuesto: 8000000.00, id_lider: 1 }
+  ],
+  empleados_proyectos: [
+    { id_empleado: 1, id_proyecto: 1, horas_dedicadas: 40 },
+    { id_empleado: 2, id_proyecto: 1, horas_dedicadas: 80 },
+    { id_empleado: 3, id_proyecto: 1, horas_dedicadas: 60 },
+    { id_empleado: 4, id_proyecto: 2, horas_dedicadas: 30 },
+    { id_empleado: 5, id_proyecto: 2, horas_dedicadas: 90 },
+    { id_empleado: 6, id_proyecto: 2, horas_dedicadas: 70 },
+    { id_empleado: 7, id_proyecto: 3, horas_dedicadas: 20 },
+    { id_empleado: 8, id_proyecto: 3, horas_dedicadas: 40 },
+    { id_empleado: 9, id_proyecto: 3, horas_dedicadas: 10 },
+    { id_empleado: 1, id_proyecto: 4, horas_dedicadas: 50 },
+    { id_empleado: 2, id_proyecto: 4, horas_dedicadas: 120 },
+    { id_empleado: 3, id_proyecto: 4, horas_dedicadas: 90 }
+  ]
+};
+
+const TABLE_SCHEMAS = {
+  departamentos: {
+    cols: [
+      { name: 'id_departamento', badge: 'PK' },
+      { name: 'nombre_depto' },
+      { name: 'presupuesto' },
+      { name: 'ubicacion' }
+    ],
+    sampleRows: DB.departamentos.slice(0, 4)
+  },
+  empleados: {
+    cols: [
+      { name: 'id_empleado', badge: 'PK' },
+      { name: 'nombre' },
+      { name: 'apellido' },
+      { name: 'salario' },
+      { name: 'id_departamento', badge: 'FK' }
+    ],
+    sampleRows: DB.empleados.slice(0, 4)
+  },
+  proyectos: {
+    cols: [
+      { name: 'id_proyecto', badge: 'PK' },
+      { name: 'nombre_proyecto' },
+      { name: 'presupuesto' },
+      { name: 'id_lider', badge: 'FK' }
+    ],
+    sampleRows: DB.proyectos
+  },
+  empleados_proyectos: {
+    cols: [
+      { name: 'id_empleado', badge: 'FK' },
+      { name: 'id_proyecto', badge: 'FK' },
+      { name: 'horas_dedicadas' }
+    ],
+    sampleRows: DB.empleados_proyectos.slice(0, 4)
+  }
+};
+
+/* ==========================================================================
+   DEFINICIÓN DE LOS 6 EJERCICIOS DE SUBCONSULTAS (README.md Ejercicio 5)
+   ========================================================================== */
+const LEVELS = [
+  {
+    id: 1,
+    tabName: "1. Escalar (AVG)",
+    badge: "PUNTO 1 DE 6 • SUBCONSULTA ESCALAR EN WHERE",
+    title: "Premio a la Productividad (Salario Mayor al Promedio General)",
+    desc: "La dirección de RRHH quiere premiar la productividad. Encuentra el <strong>nombre</strong>, <strong>apellido</strong> y <strong>salario</strong> de todos los empleados de la tabla <code>empleados</code> que ganen un salario <strong>estrictamente mayor (<code>&gt;</code>) al salario promedio (<code>AVG(salario)</code>)</strong> de toda la compañía.",
+    sampleTables: ['empleados'],
+    specs: [
+      { label: "Tabla Principal", val: "empleados" },
+      { label: "Columnas SELECT", val: "nombre, apellido, salario" },
+      { label: "Condición WHERE", val: "salario > (subconsulta)" },
+      { label: "Subconsulta Escalar", val: "SELECT AVG(salario) FROM empleados" }
+    ],
+    lines: [
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's1', answer: 'SELECT' },
+          { type: 'input', id: 'i1', answer: 'nombre', width: 95 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i2', answer: 'apellido', width: 105 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i3', answer: 'salario', width: 95 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's2', answer: 'FROM' },
+          { type: 'input', id: 'i4', answer: 'empleados', width: 120 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's3', answer: 'WHERE' },
+          { type: 'input', id: 'i5', answer: 'salario', width: 95 },
+          { type: 'slot', id: 's4', answer: '>' },
+          { type: 'punct', text: '(' }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's5', answer: 'SELECT' },
+          { type: 'slot', id: 's6', answer: 'AVG' },
+          { type: 'punct', text: '(' },
+          { type: 'input', id: 'i6', answer: 'salario', width: 95 },
+          { type: 'punct', text: ')' },
+          { type: 'slot', id: 's7', answer: 'FROM' },
+          { type: 'input', id: 'i7', answer: 'empleados', width: 120 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'punct', text: ');' }
+        ]
+      }
+    ],
+    keywords: ['AVG', 'WHERE', 'SUM', 'SELECT', '>', 'FROM', 'HAVING', 'FROM', '<', 'SELECT', 'COUNT'],
+    visorConfig: {
+      innerTitle: "Subconsulta Escalar: SELECT AVG(salario) FROM empleados",
+      innerOutputLabel: "Valor Escalar Calculado: AVG(salario) = $480,909.09",
+      innerHeaders: ['id_empleado', 'nombre', 'salario'],
+      innerRows: DB.empleados.slice(0, 6).map(e => ({ cells: [e.id_empleado, e.nombre, '$' + e.salario.toFixed(2)], match: true })),
+      outerTitle: "Consulta Principal: WHERE salario > 480909.09",
+      outerHeaders: ['nombre', 'apellido', 'salario', '¿> $480,909.09?'],
+      outerRows: DB.empleados.map(e => ({
+        cells: [e.nombre, e.apellido, '$' + e.salario.toFixed(2), e.salario > 480909.09 ? '✔ Sí' : '✖ No'],
+        match: e.salario > 480909.09
+      })),
+      resultHeaders: ['nombre', 'apellido', 'salario'],
+      resultRows: DB.empleados.filter(e => e.salario > 480909.09).map(e => [e.nombre, e.apellido, e.salario.toFixed(2)])
+    }
+  },
+  {
+    id: 2,
+    tabName: "2. Correlacionada",
+    badge: "PUNTO 2 DE 6 • SUBCONSULTA CORRELACIONADA EN WHERE",
+    title: "Asimetrías de Sueldos Internos por Departamento",
+    desc: "Para detectar asimetrías salariales internas, lista <code>e.nombre</code>, <code>e.apellido</code>, <code>e.salario</code> y <code>e.id_departamento</code> de la tabla <code>empleados e</code> cuyo salario sea <strong>estrictamente mayor (<code>&gt;</code>) al promedio (<code>AVG(sub.salario)</code>) de su propio departamento</strong> (en <code>empleados sub</code>, correlacionando donde <code>sub.id_departamento = e.id_departamento</code>).",
+    sampleTables: ['empleados', 'departamentos'],
+    specs: [
+      { label: "Tabla Externa y Alias", val: "empleados e" },
+      { label: "Columnas SELECT", val: "e.nombre, e.apellido, e.salario, e.id_departamento" },
+      { label: "Tabla Interna y Alias", val: "empleados sub" },
+      { label: "Correlación WHERE", val: "sub.id_departamento = e.id_departamento" }
+    ],
+    lines: [
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's1', answer: 'SELECT' },
+          { type: 'input', id: 'i1', answer: 'e.nombre', width: 100 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i2', answer: 'e.apellido', width: 110 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i3', answer: 'e.salario', width: 100 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i4', answer: 'e.id_departamento', width: 165 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's2', answer: 'FROM' },
+          { type: 'input', id: 'i5', answer: 'empleados', width: 115 },
+          { type: 'input', id: 'i6', answer: 'e', width: 45 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's3', answer: 'WHERE' },
+          { type: 'input', id: 'i7', answer: 'e.salario', width: 100 },
+          { type: 'slot', id: 's4', answer: '>' },
+          { type: 'punct', text: '(' }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's5', answer: 'SELECT' },
+          { type: 'slot', id: 's6', answer: 'AVG' },
+          { type: 'punct', text: '(' },
+          { type: 'input', id: 'i8', answer: 'sub.salario', width: 120 },
+          { type: 'punct', text: ')' },
+          { type: 'slot', id: 's7', answer: 'FROM' },
+          { type: 'input', id: 'i9', answer: 'empleados', width: 115 },
+          { type: 'input', id: 'i10', answer: 'sub', width: 55 }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's8', answer: 'WHERE' },
+          { type: 'input', id: 'i11', answer: 'sub.id_departamento', width: 175 },
+          { type: 'slot', id: 's9', answer: '=' },
+          { type: 'input', id: 'i12', answer: 'e.id_departamento', width: 165 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'punct', text: ');' }
+        ]
+      }
+    ],
+    keywords: ['WHERE', 'AVG', '=', 'SELECT', 'FROM', '>', 'WHERE', 'FROM', 'SELECT', 'MAX', 'GROUP BY', '<>'],
+    visorConfig: {
+      innerTitle: "Subconsulta Correlacionada: AVG(sub.salario) por id_departamento",
+      innerOutputLabel: "Promedios Dinámicos: D1=$490k | D2=$493.3k | D3=$430k | D4=$495k",
+      innerHeaders: ['id_departamento', 'AVG(sub.salario)'],
+      innerRows: [
+        { cells: ['1 (Sistemas)', '$490,000.00'], match: true },
+        { cells: ['2 (Ventas)', '$493,333.33'], match: true },
+        { cells: ['3 (RRHH)', '$430,000.00'], match: true },
+        { cells: ['4 (Administración)', '$495,000.00'], match: true }
+      ],
+      outerTitle: "Evaluación Fila a Fila en empleados e",
+      outerHeaders: ['e.nombre', 'e.salario', 'e.id_depto', '¿Supera AVG de su Depto?'],
+      outerRows: [
+        { cells: ['Rodolfo', '$950,000.00', '1', '✔ Sí (> $490k)'], match: true },
+        { cells: ['Marta', '$450,000.00', '1', '✖ No'], match: false },
+        { cells: ['Laura', '$820,000.00', '2', '✔ Sí (> $493.3k)'], match: true },
+        { cells: ['Valeria', '$580,000.00', '3', '✔ Sí (> $430k)'], match: true },
+        { cells: ['Mónica', '$650,000.00', '4', '✔ Sí (> $495k)'], match: true }
+      ],
+      resultHeaders: ['nombre', 'apellido', 'salario', 'id_departamento'],
+      resultRows: [
+        ['Rodolfo', 'Gimenez', '950000.00', 1],
+        ['Laura', 'Peralta', '820000.00', 2],
+        ['Valeria', 'Ruiz', '580000.00', 3],
+        ['Mónica', 'Carrizo', '650000.00', 4]
+      ]
+    }
+  },
+  {
+    id: 3,
+    tabName: "3. Operador IN",
+    badge: "PUNTO 3 DE 6 • SUBCONSULTA CON OPERADOR IN",
+    title: "Auditoría de Departamentos con Proyectos Millonarios",
+    desc: "Finanzas está auditando los costos logísticos. Lista el <code>id_departamento</code> y el <code>nombre_depto</code> de la tabla <code>departamentos</code> que tengan empleados asignados a proyectos con presupuesto <strong>mayor a <code>1000000</code></strong>. Filtra con <code>id_departamento IN (...)</code> seleccionando <code>id_departamento</code> de <code>empleados</code> donde <code>id_empleado IN (...)</code> seleccione <code>id_lider</code> de <code>proyectos</code> con <code>presupuesto &gt; 1000000</code>.",
+    sampleTables: ['departamentos', 'empleados', 'proyectos'],
+    specs: [
+      { label: "Consulta Principal", val: "SELECT id_departamento, nombre_depto FROM departamentos" },
+      { label: "Filtro 1 (Empleados)", val: "WHERE id_departamento IN (SELECT id_departamento FROM empleados ...)" },
+      { label: "Filtro 2 (Proyectos)", val: "WHERE id_empleado IN (SELECT id_lider FROM proyectos WHERE presupuesto > 1000000)" }
+    ],
+    lines: [
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's1', answer: 'SELECT' },
+          { type: 'input', id: 'i1', answer: 'id_departamento', width: 155 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i2', answer: 'nombre_depto', width: 135 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's2', answer: 'FROM' },
+          { type: 'input', id: 'i3', answer: 'departamentos', width: 140 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's3', answer: 'WHERE' },
+          { type: 'input', id: 'i4', answer: 'id_departamento', width: 155 },
+          { type: 'slot', id: 's4', answer: 'IN' },
+          { type: 'punct', text: '(' }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's5', answer: 'SELECT' },
+          { type: 'input', id: 'i5', answer: 'id_departamento', width: 155 },
+          { type: 'slot', id: 's6', answer: 'FROM' },
+          { type: 'input', id: 'i6', answer: 'empleados', width: 115 },
+          { type: 'slot', id: 's7', answer: 'WHERE' },
+          { type: 'input', id: 'i7', answer: 'id_empleado', width: 125 },
+          { type: 'slot', id: 's8', answer: 'IN' },
+          { type: 'punct', text: '(' }
+        ]
+      },
+      {
+        indent: 2,
+        tokens: [
+          { type: 'slot', id: 's9', answer: 'SELECT' },
+          { type: 'input', id: 'i8', answer: 'id_lider', width: 100 },
+          { type: 'slot', id: 's10', answer: 'FROM' },
+          { type: 'input', id: 'i9', answer: 'proyectos', width: 115 },
+          { type: 'slot', id: 's11', answer: 'WHERE' },
+          { type: 'input', id: 'i10', answer: 'presupuesto', width: 125 },
+          { type: 'slot', id: 's12', answer: '>' },
+          { type: 'input', id: 'i11', answer: '1000000', width: 95 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'punct', text: '));' }
+        ]
+      }
+    ],
+    keywords: ['IN', 'WHERE', 'SELECT', 'FROM', '>', 'IN', 'SELECT', 'WHERE', 'FROM', 'SELECT', 'FROM', 'WHERE', 'NOT IN', 'EXISTS'],
+    visorConfig: {
+      innerTitle: "Subconsultas Anidadas: proyectos (> $1M) ➔ empleados ➔ id_departamento",
+      innerOutputLabel: "Conjunto Devuelto por IN: id_departamento IN (1, 2)",
+      innerHeaders: ['id_proyecto', 'nombre_proyecto', 'presupuesto', 'id_lider (Depto)'],
+      innerRows: [
+        { cells: [1, 'Sistema de Gestión ERP', '$2,500,000', '1 (Depto 1)'], match: true },
+        { cells: [2, 'Expansión Comercial', '$1,200,000', '4 (Depto 2)'], match: true },
+        { cells: [3, 'Auditoría Integral', '$350,000', '7 (Depto 3)'], match: false },
+        { cells: [4, 'Migración Cloud', '$8,000,000', '1 (Depto 1)'], match: true }
+      ],
+      outerTitle: "Consulta Externa: departamentos WHERE id_departamento IN (1, 2)",
+      outerHeaders: ['id_departamento', 'nombre_depto', '¿Pertenece a IN (1, 2)?'],
+      outerRows: DB.departamentos.map(d => ({
+        cells: [d.id_departamento, d.nombre_depto, [1, 2].includes(d.id_departamento) ? '✔ En Conjunto' : '✖ Descartado'],
+        match: [1, 2].includes(d.id_departamento)
+      })),
+      resultHeaders: ['id_departamento', 'nombre_depto'],
+      resultRows: [
+        [1, 'Sistemas'],
+        [2, 'Ventas']
+      ]
+    }
+  },
+  {
+    id: 4,
+    tabName: "4. NOT EXISTS",
+    badge: "PUNTO 4 DE 6 • SUBCONSULTA CON OPERADOR NOT EXISTS",
+    title: "Auditoría de Departamentos Sin Empleados (Vacantes)",
+    desc: "El Director General quiere cerrar o reubicar departamentos inactivos. Identifica el <code>d.nombre_depto</code> y la <code>d.ubicacion</code> de la tabla <code>departamentos d</code> que <strong>no tengan ningún empleado asignado actualmente</strong> utilizando <code>NOT EXISTS</code> y <code>SELECT 1</code> sobre <code>empleados e</code> donde <code>e.id_departamento = d.id_departamento</code>.",
+    sampleTables: ['departamentos', 'empleados'],
+    specs: [
+      { label: "Tabla Externa", val: "departamentos d" },
+      { label: "Columnas SELECT", val: "d.nombre_depto, d.ubicacion" },
+      { label: "Operador Lógico", val: "WHERE NOT EXISTS (...)" },
+      { label: "Subconsulta Cortocircuito", val: "SELECT 1 FROM empleados e WHERE e.id_departamento = d.id_departamento" }
+    ],
+    lines: [
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's1', answer: 'SELECT' },
+          { type: 'input', id: 'i1', answer: 'd.nombre_depto', width: 150 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i2', answer: 'd.ubicacion', width: 130 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's2', answer: 'FROM' },
+          { type: 'input', id: 'i3', answer: 'departamentos', width: 140 },
+          { type: 'input', id: 'i4', answer: 'd', width: 45 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's3', answer: 'WHERE' },
+          { type: 'slot', id: 's4', answer: 'NOT EXISTS' },
+          { type: 'punct', text: '(' }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's5', answer: 'SELECT' },
+          { type: 'input', id: 'i5', answer: '1', width: 45 },
+          { type: 'slot', id: 's6', answer: 'FROM' },
+          { type: 'input', id: 'i6', answer: 'empleados', width: 115 },
+          { type: 'input', id: 'i7', answer: 'e', width: 45 }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's7', answer: 'WHERE' },
+          { type: 'input', id: 'i8', answer: 'e.id_departamento', width: 165 },
+          { type: 'slot', id: 's8', answer: '=' },
+          { type: 'input', id: 'i9', answer: 'd.id_departamento', width: 165 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'punct', text: ');' }
+        ]
+      }
+    ],
+    keywords: ['NOT EXISTS', 'WHERE', 'SELECT', '=', 'FROM', 'EXISTS', 'SELECT', 'FROM', 'WHERE', 'NOT IN', 'IS NULL'],
+    visorConfig: {
+      innerTitle: "Subconsulta Cortocircuito: SELECT 1 FROM empleados e WHERE e.id_depto = d.id_depto",
+      innerOutputLabel: "NOT EXISTS devuelve TRUE solo cuando la subconsulta retorna 0 filas",
+      innerHeaders: ['d.id_departamento', ' Empleados Encontrados', 'Resultado NOT EXISTS'],
+      innerRows: [
+        { cells: ['1 (Sistemas)', '4 empleados', 'FALSE'], match: false },
+        { cells: ['2 (Ventas)', '3 empleados', 'FALSE'], match: false },
+        { cells: ['3 (RRHH)', '2 empleados', 'FALSE'], match: false },
+        { cells: ['4 (Administración)', '2 empleados', 'FALSE'], match: false },
+        { cells: ['5 (Investigación y Desarrollo)', '0 empleados (Vacío)', 'TRUE ✔'], match: true }
+      ],
+      outerTitle: "Departamentos Filtrados por NOT EXISTS",
+      outerHeaders: ['d.nombre_depto', 'd.ubicacion', 'Estado'],
+      outerRows: DB.departamentos.map(d => ({
+        cells: [d.nombre_depto, d.ubicacion, d.id_departamento === 5 ? '✔ Sin Empleados' : '✖ Con Personal'],
+        match: d.id_departamento === 5
+      })),
+      resultHeaders: ['nombre_depto', 'ubicacion'],
+      resultRows: [
+        ['Investigación y Desarrollo', 'Laboratorio 1']
+      ]
+    }
+  },
+  {
+    id: 5,
+    tabName: "5. En SELECT",
+    badge: "PUNTO 5 DE 6 • SUBCONSULTA EN LA CLÁUSULA SELECT",
+    title: "Consolidado Estructural de Empleados por Departamento",
+    desc: "Genera un reporte gerencial que liste <code>d.nombre_depto</code>, <code>d.presupuesto</code> de la tabla <code>departamentos d</code>, y una tercera columna autocalculada mediante una subconsulta <code>(SELECT COUNT(*) FROM empleados e WHERE e.id_departamento = d.id_departamento)</code> renombrada con el alias <code>AS cantidad_empleados</code>.",
+    sampleTables: ['departamentos', 'empleados'],
+    specs: [
+      { label: "Tabla Principal", val: "departamentos d" },
+      { label: "Columnas Base", val: "d.nombre_depto, d.presupuesto" },
+      { label: "Subconsulta en SELECT", val: "(SELECT COUNT(*) FROM empleados e WHERE e.id_departamento = d.id_departamento)" },
+      { label: "Alias de Columna", val: "AS cantidad_empleados" }
+    ],
+    lines: [
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's1', answer: 'SELECT' },
+          { type: 'input', id: 'i1', answer: 'd.nombre_depto', width: 150 },
+          { type: 'punct', text: ',' },
+          { type: 'input', id: 'i2', answer: 'd.presupuesto', width: 140 },
+          { type: 'punct', text: ',' }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'punct', text: '(' },
+          { type: 'slot', id: 's2', answer: 'SELECT' },
+          { type: 'slot', id: 's3', answer: 'COUNT(*)' },
+          { type: 'slot', id: 's4', answer: 'FROM' },
+          { type: 'input', id: 'i3', answer: 'empleados', width: 115 },
+          { type: 'input', id: 'i4', answer: 'e', width: 45 },
+          { type: 'slot', id: 's5', answer: 'WHERE' },
+          { type: 'input', id: 'i5', answer: 'e.id_departamento', width: 165 },
+          { type: 'slot', id: 's6', answer: '=' },
+          { type: 'input', id: 'i6', answer: 'd.id_departamento', width: 165 },
+          { type: 'punct', text: ')' },
+          { type: 'slot', id: 's7', answer: 'AS' },
+          { type: 'input', id: 'i7', answer: 'cantidad_empleados', width: 175 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's8', answer: 'FROM' },
+          { type: 'input', id: 'i8', answer: 'departamentos', width: 140 },
+          { type: 'input', id: 'i9', answer: 'd', width: 45 },
+          { type: 'punct', text: ';' }
+        ]
+      }
+    ],
+    keywords: ['COUNT(*)', 'AS', 'WHERE', 'SELECT', 'FROM', '=', 'SELECT', 'FROM', 'SUM', 'GROUP BY', 'HAVING'],
+    visorConfig: {
+      innerTitle: "Subconsulta en SELECT: COUNT(*) por cada fila de departamentos d",
+      innerOutputLabel: "Inyecta columna calculada cantidad_empleados en cada fila",
+      innerHeaders: ['d.id_departamento', 'Cálculo COUNT(*) en empleados e'],
+      innerRows: [
+        { cells: ['1 (Sistemas)', 'COUNT(*) ➔ 4'], match: true },
+        { cells: ['2 (Ventas)', 'COUNT(*) ➔ 3'], match: true },
+        { cells: ['3 (Recursos Humanos)', 'COUNT(*) ➔ 2'], match: true },
+        { cells: ['4 (Administración)', 'COUNT(*) ➔ 2'], match: true },
+        { cells: ['5 (Investigación y Desarrollo)', 'COUNT(*) ➔ 0'], match: true }
+      ],
+      outerTitle: "Proyección Final con Columna Autocalculada",
+      outerHeaders: ['d.nombre_depto', 'd.presupuesto', 'cantidad_empleados'],
+      outerRows: [
+        { cells: ['Sistemas', '$15,000,000.00', '4'], match: true },
+        { cells: ['Ventas', '$8,000,000.00', '3'], match: true },
+        { cells: ['Recursos Humanos', '$3,500,000.00', '2'], match: true },
+        { cells: ['Administración', '$5,000,000.00', '2'], match: true },
+        { cells: ['Investigación y Desarrollo', '$12,000,000.00', '0'], match: true }
+      ],
+      resultHeaders: ['nombre_depto', 'presupuesto', 'cantidad_empleados'],
+      resultRows: [
+        ['Sistemas', '15000000.00', 4],
+        ['Ventas', '8000000.00', 3],
+        ['Recursos Humanos', '3500000.00', 2],
+        ['Administración', '5000000.00', 2],
+        ['Investigación y Desarrollo', '12000000.00', 0]
+      ]
+    }
+  },
+  {
+    id: 6,
+    tabName: "6. En FROM (Derivada)",
+    badge: "PUNTO 6 DE 6 • SUBCONSULTA EN LA CLÁUSULA FROM (TABLA DERIVADA)",
+    title: "Análisis de Gasto Salarial Máximo mediante Tabla Derivada",
+    desc: "Calcula la masa salarial de cada departamento en una subconsulta interna (<code>SELECT id_departamento, SUM(salario) AS gasto_total FROM empleados GROUP BY id_departamento</code>) y, ubicándola en la cláusula <code>FROM</code> como tabla derivada con alias obligatorio <code>AS resumen_gastos</code>, obtén en la consulta principal el gasto máximo con <code>MAX(gasto_total)</code>.",
+    sampleTables: ['empleados', 'departamentos'],
+    specs: [
+      { label: "Consulta Principal", val: "SELECT MAX(gasto_total) FROM (...) AS resumen_gastos" },
+      { label: "Tabla Derivada (Subconsulta)", val: "SELECT id_departamento, SUM(salario) AS gasto_total FROM empleados" },
+      { label: "Agrupamiento Interno", val: "GROUP BY id_departamento" },
+      { label: "Alias Tabla Derivada", val: "AS resumen_gastos" }
+    ],
+    lines: [
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's1', answer: 'SELECT' },
+          { type: 'slot', id: 's2', answer: 'MAX' },
+          { type: 'punct', text: '(' },
+          { type: 'input', id: 'i1', answer: 'gasto_total', width: 130 },
+          { type: 'punct', text: ')' }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'slot', id: 's3', answer: 'FROM' },
+          { type: 'punct', text: '(' }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's4', answer: 'SELECT' },
+          { type: 'input', id: 'i2', answer: 'id_departamento', width: 155 },
+          { type: 'punct', text: ',' },
+          { type: 'slot', id: 's5', answer: 'SUM' },
+          { type: 'punct', text: '(' },
+          { type: 'input', id: 'i3', answer: 'salario', width: 95 },
+          { type: 'punct', text: ')' },
+          { type: 'slot', id: 's6', answer: 'AS' },
+          { type: 'input', id: 'i4', answer: 'gasto_total', width: 130 }
+        ]
+      },
+      {
+        indent: 1,
+        tokens: [
+          { type: 'slot', id: 's7', answer: 'FROM' },
+          { type: 'input', id: 'i5', answer: 'empleados', width: 115 },
+          { type: 'slot', id: 's8', answer: 'GROUP BY' },
+          { type: 'input', id: 'i6', answer: 'id_departamento', width: 155 }
+        ]
+      },
+      {
+        indent: 0,
+        tokens: [
+          { type: 'punct', text: ')' },
+          { type: 'slot', id: 's9', answer: 'AS' },
+          { type: 'input', id: 'i7', answer: 'resumen_gastos', width: 155 },
+          { type: 'punct', text: ';' }
+        ]
+      }
+    ],
+    keywords: ['MAX', 'GROUP BY', 'SUM', 'SELECT', 'AS', 'FROM', 'AS', 'SELECT', 'FROM', 'AVG', 'ORDER BY', 'HAVING'],
+    visorConfig: {
+      innerTitle: "Tabla Derivada en Memoria: resumen_gastos (GROUP BY id_departamento)",
+      innerOutputLabel: "Tabla Virtual Generada: 4 filas agrupadas con gasto_total",
+      innerHeaders: ['id_departamento', 'gasto_total (SUM(salario))'],
+      innerRows: [
+        { cells: ['1 (Sistemas)', '$1,960,000.00'], match: true },
+        { cells: ['2 (Ventas)', '$1,480,000.00'], match: true },
+        { cells: ['3 (RRHH)', '$860,000.00'], match: true },
+        { cells: ['4 (Administración)', '$990,000.00'], match: true }
+      ],
+      outerTitle: "Consulta Principal sobre resumen_gastos: SELECT MAX(gasto_total)",
+      outerHeaders: ['id_departamento', 'gasto_total', '¿Es MAX(gasto_total)?'],
+      outerRows: [
+        { cells: ['1 (Sistemas)', '$1,960,000.00', '✔ MÁXIMO ($1,960,000.00)'], match: true },
+        { cells: ['2 (Ventas)', '$1,480,000.00', '✖ No'], match: false },
+        { cells: ['3 (RRHH)', '$860,000.00', '✖ No'], match: false },
+        { cells: ['4 (Administración)', '$990,000.00', '✖ No'], match: false }
+      ],
+      resultHeaders: ['MAX(gasto_total)'],
+      resultRows: [
+        ['1960000.00']
+      ]
+    }
+  }
+];
+
+/* ==========================================================================
+   ESTADO DEL JUEGO Y TEMPORIZADORES PERSISTENTES (SIN RESET)
+   ========================================================================== */
+const state = {
+  currentLevelIdx: 0,
+  completedLevels: new Set(),
+  levelTimers: LEVELS.map(() => 360), // 6 minutos por nivel, persistentes
+  levelLocked: LEVELS.map(() => false),
+  activeInterval: null,
+  slotValues: {},
+  chipUsed: {},
+  activeSlotId: null,
+  animTimeouts: []
+};
+
+/* ==========================================================================
+   INICIALIZACIÓN Y EVENTOS
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+  renderLevelTabs();
+  loadLevel(0);
+  startTimerLoop();
+
+  document.getElementById('clearSlotsBtn').addEventListener('click', clearAllSlots);
+  document.getElementById('verifyBtn').addEventListener('click', verifyCurrentLevel);
+  document.getElementById('replayBtn').addEventListener('click', () => playSubqueryAnimation(LEVELS[state.currentLevelIdx]));
+  document.getElementById('nextLevelBtn').addEventListener('click', () => {
+    if (state.currentLevelIdx < LEVELS.length - 1) {
+      loadLevel(state.currentLevelIdx + 1);
+      document.getElementById('builderCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  document.getElementById('hintToggleBtn').addEventListener('click', () => {
+    const specBox = document.getElementById('specBox');
+    const hintBtn = document.getElementById('hintToggleBtn');
+    const hintText = document.getElementById('hintBtnText');
+    const isVisible = specBox.classList.toggle('visible');
+    hintBtn.classList.toggle('active', isVisible);
+    hintText.textContent = isVisible ? 'Ocultar Pista' : 'Pista';
+  });
+});
+
+/* ==========================================================================
+   TEMPORIZADOR PERSISTENTE POR NIVEL
+   ========================================================================== */
+function startTimerLoop() {
+  if (state.activeInterval) clearInterval(state.activeInterval);
+  state.activeInterval = setInterval(() => {
+    const idx = state.currentLevelIdx;
+    if (state.completedLevels.has(idx) || state.levelLocked[idx]) return;
+
+    if (state.levelTimers[idx] > 0) {
+      state.levelTimers[idx]--;
+      updateTimerUI();
+      if (state.levelTimers[idx] === 0) {
+        state.levelLocked[idx] = true;
+        handleTimeUp();
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const secs = state.levelTimers[state.currentLevelIdx];
+  const mins = Math.floor(secs / 60).toString().padStart(2, '0');
+  const rem = (secs % 60).toString().padStart(2, '0');
+  const display = document.getElementById('timerDisplay');
+  const pill = document.getElementById('timerPill');
+
+  display.textContent = `${mins}:${rem}`;
+  pill.classList.remove('warning', 'danger');
+  if (secs <= 30) {
+    pill.classList.add('danger');
+  } else if (secs <= 90) {
+    pill.classList.add('warning');
+  }
+}
+
+function handleTimeUp() {
+  const banner = document.getElementById('feedbackBanner');
+  banner.className = 'feedback-banner show error';
+  banner.innerHTML = '⏰ <span>¡Tiempo agotado en este ejercicio! Puedes cambiar a otro ejercicio desde las pestañas superiores.</span>';
+  document.getElementById('verifyBtn').disabled = true;
+}
+
+/* ==========================================================================
+   RENDERIZADO DE NIVEL Y UI
+   ========================================================================== */
+function renderLevelTabs() {
+  const nav = document.getElementById('levelNav');
+  nav.innerHTML = '';
+  LEVELS.forEach((lvl, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'level-tab';
+    if (idx === state.currentLevelIdx) btn.classList.add('active');
+    if (state.completedLevels.has(idx)) btn.classList.add('completed');
+
+    const icon = state.completedLevels.has(idx) ? '✅' : '🟣';
+    btn.innerHTML = `<span>${icon}</span><span>${lvl.tabName}</span>`;
+    btn.addEventListener('click', () => loadLevel(idx));
+    nav.appendChild(btn);
+  });
+  document.getElementById('scoreDisplay').textContent = `${state.completedLevels.size} / ${LEVELS.length}`;
+}
+
+function renderSampleTables(level) {
+  const grid = document.getElementById('sampleTablesGrid');
+  grid.innerHTML = '';
+
+  level.sampleTables.forEach(tableName => {
+    const schema = TABLE_SCHEMAS[tableName];
+    if (!schema) return;
+
+    const card = document.createElement('div');
+    card.className = 'sample-table-card';
+
+    const head = document.createElement('div');
+    head.className = 'sample-table-head';
+    head.innerHTML = `<span>🗂️ Tabla: ${tableName}</span><span style="font-size:0.7rem; font-weight:600; color:#5b21b6;">muestra</span>`;
+    card.appendChild(head);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'sample-table-wrap';
+
+    const table = document.createElement('table');
+    table.className = 'sample-mini-table';
+
+    const thead = document.createElement('thead');
+    const trH = document.createElement('tr');
+    schema.cols.forEach(col => {
+      const th = document.createElement('th');
+      th.textContent = col.name;
+      if (col.badge === 'PK') {
+        const b = document.createElement('span');
+        b.className = 'pk-badge';
+        b.textContent = '🔑 PK';
+        th.appendChild(b);
+      } else if (col.badge === 'FK') {
+        const b = document.createElement('span');
+        b.className = 'fk-badge';
+        b.textContent = '🔗 FK';
+        th.appendChild(b);
+      }
+      trH.appendChild(th);
+    });
+    thead.appendChild(trH);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    schema.sampleRows.forEach(row => {
+      const tr = document.createElement('tr');
+      schema.cols.forEach(col => {
+        const td = document.createElement('td');
+        td.textContent = row[col.name];
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    wrap.appendChild(table);
+    card.appendChild(wrap);
+    grid.appendChild(card);
+  });
+}
+
+function loadLevel(idx) {
+  clearAnimationTimeouts();
+  state.currentLevelIdx = idx;
+  state.slotValues = {};
+  state.chipUsed = {};
+  state.activeSlotId = null;
+
+  const level = LEVELS[idx];
+  renderLevelTabs();
+  updateTimerUI();
+
+  document.getElementById('missionBadge').textContent = level.badge;
+  document.getElementById('objTitle').textContent = level.title;
+  document.getElementById('objDesc').innerHTML = level.desc;
+
+  // Render simplified sample tables
+  renderSampleTables(level);
+
+  // Reset Hint Box to hidden by default
+  const specBox = document.getElementById('specBox');
+  const hintBtn = document.getElementById('hintToggleBtn');
+  const hintText = document.getElementById('hintBtnText');
+  specBox.classList.remove('visible');
+  hintBtn.classList.remove('active');
+  hintText.textContent = 'Pista';
+
+  // Render Specs inside hidden hint box
+  const specGrid = document.getElementById('specGrid');
+  specGrid.innerHTML = '';
+  level.specs.forEach(sp => {
+    const item = document.createElement('div');
+    item.className = 'spec-item';
+    item.innerHTML = `<span class="spec-label">${sp.label}</span><span class="spec-val">${sp.val}</span>`;
+    specGrid.appendChild(item);
+  });
+
+  // Render SQL Builder (Strictly NO placeholder attributes)
+  const builder = document.getElementById('sqlBuilder');
+  builder.innerHTML = '';
+  let firstSlotId = null;
+
+  level.lines.forEach(line => {
+    const row = document.createElement('div');
+    row.className = 'sql-line' + (line.indent === 1 ? ' indent-1' : line.indent === 2 ? ' indent-2' : '');
+
+    line.tokens.forEach(tok => {
+      if (tok.type === 'punct') {
+        const span = document.createElement('span');
+        span.className = 'sql-punct';
+        span.textContent = tok.text;
+        row.appendChild(span);
+      } else if (tok.type === 'slot') {
+        if (!firstSlotId) firstSlotId = tok.id;
+        const slot = document.createElement('div');
+        slot.className = 'kw-slot';
+        slot.dataset.slotId = tok.id;
+        slot.textContent = '[ SQL ]';
+        slot.addEventListener('click', () => handleSlotClick(tok.id));
+        row.appendChild(slot);
+      } else if (tok.type === 'input') {
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'sql-input';
+        inp.dataset.inputId = tok.id;
+        inp.autocomplete = 'off';
+        inp.spellcheck = false;
+        inp.style.width = (tok.width || 120) + 'px';
+        row.appendChild(inp);
+      }
+    });
+
+    builder.appendChild(row);
+  });
+
+  state.activeSlotId = firstSlotId;
+  updateSlotsUI();
+
+  // Render Keyword Bank
+  const bank = document.getElementById('kwBank');
+  bank.innerHTML = '';
+  level.keywords.forEach((kw, cIdx) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'kw-chip';
+    chip.dataset.chipIdx = cIdx;
+    chip.textContent = kw;
+    chip.addEventListener('click', () => handleChipClick(cIdx, kw));
+    bank.appendChild(chip);
+  });
+
+  // Reset Feedback & Buttons
+  const banner = document.getElementById('feedbackBanner');
+  banner.className = 'feedback-banner';
+  banner.innerHTML = '';
+
+  const isDone = state.completedLevels.has(idx);
+  const isLocked = state.levelLocked[idx];
+  document.getElementById('verifyBtn').disabled = isLocked && !isDone;
+  document.getElementById('replayBtn').style.display = isDone ? 'inline-flex' : 'none';
+  document.getElementById('nextLevelBtn').style.display = (isDone && idx < LEVELS.length - 1) ? 'inline-flex' : 'none';
+
+  // Render Initial Visor Preview
+  renderInitialVisor(level);
+}
+
+/* ==========================================================================
+   INTERACCIÓN CON SLOTS Y BANCO DE PALABRAS CLAVE
+   ========================================================================== */
+function getAllSlotIds(level) {
+  const ids = [];
+  level.lines.forEach(l => l.tokens.forEach(t => {
+    if (t.type === 'slot') ids.push(t.id);
+  }));
+  return ids;
+}
+
+function handleSlotClick(slotId) {
+  if (state.slotValues[slotId]) {
+    const chipIdx = state.slotValues[slotId].chipIdx;
+    delete state.chipUsed[chipIdx];
+    delete state.slotValues[slotId];
+    state.activeSlotId = slotId;
+  } else {
+    state.activeSlotId = slotId;
+  }
+  clearValidationStyles();
+  updateSlotsUI();
+}
+
+function handleChipClick(chipIdx, kwText) {
+  if (state.chipUsed[chipIdx]) return;
+  const level = LEVELS[state.currentLevelIdx];
+  const slotIds = getAllSlotIds(level);
+
+  let targetSlot = state.activeSlotId;
+  if (!targetSlot || state.slotValues[targetSlot]) {
+    targetSlot = slotIds.find(id => !state.slotValues[id]);
+  }
+  if (!targetSlot) return;
+
+  state.slotValues[targetSlot] = { chipIdx, text: kwText };
+  state.chipUsed[chipIdx] = true;
+
+  const nextEmpty = slotIds.find(id => !state.slotValues[id]);
+  state.activeSlotId = nextEmpty || null;
+
+  clearValidationStyles();
+  updateSlotsUI();
+}
+
+function clearAllSlots() {
+  state.slotValues = {};
+  state.chipUsed = {};
+  const level = LEVELS[state.currentLevelIdx];
+  const slotIds = getAllSlotIds(level);
+  state.activeSlotId = slotIds[0] || null;
+  clearValidationStyles();
+  updateSlotsUI();
+}
+
+function clearValidationStyles() {
+  document.querySelectorAll('.kw-slot, .sql-input').forEach(el => {
+    el.classList.remove('correct', 'wrong');
+  });
+}
+
+function updateSlotsUI() {
+  document.querySelectorAll('.kw-slot').forEach(slot => {
+    const id = slot.dataset.slotId;
+    const val = state.slotValues[id];
+    slot.classList.remove('filled', 'active-target');
+    if (val) {
+      slot.classList.add('filled');
+      slot.textContent = val.text;
+    } else {
+      slot.textContent = '[ SQL ]';
+      if (id === state.activeSlotId) {
+        slot.classList.add('active-target');
+      }
+    }
+  });
+
+  document.querySelectorAll('.kw-chip').forEach(chip => {
+    const cIdx = chip.dataset.chipIdx;
+    chip.classList.toggle('used', !!state.chipUsed[cIdx]);
+  });
+}
+
+/* ==========================================================================
+   VALIDACIÓN ESTRICTA DE SENTENCIA SQL
+   ========================================================================== */
+function normalizeToken(str) {
+  return str.trim().replace(/\s+/g, ' ');
+}
+
+function verifyCurrentLevel() {
+  const level = LEVELS[state.currentLevelIdx];
+  let allCorrect = true;
+
+  level.lines.forEach(line => {
+    line.tokens.forEach(tok => {
+      if (tok.type === 'slot') {
+        const el = document.querySelector(`.kw-slot[data-slot-id="${tok.id}"]`);
+        const userVal = state.slotValues[tok.id] ? state.slotValues[tok.id].text : '';
+        if (userVal.toUpperCase() === tok.answer.toUpperCase()) {
+          el.classList.add('correct');
+          el.classList.remove('wrong');
+        } else {
+          el.classList.add('wrong');
+          el.classList.remove('correct');
+          allCorrect = false;
+        }
+      } else if (tok.type === 'input') {
+        const el = document.querySelector(`.sql-input[data-input-id="${tok.id}"]`);
+        const rawUser = normalizeToken(el.value);
+        const expected = tok.answer;
+
+        const isMatch = rawUser.toLowerCase() === expected.toLowerCase();
+
+        if (isMatch) {
+          el.classList.add('correct');
+          el.classList.remove('wrong');
+        } else {
+          el.classList.add('wrong');
+          el.classList.remove('correct');
+          allCorrect = false;
+        }
+      }
+    });
+  });
+
+  const banner = document.getElementById('feedbackBanner');
+  if (allCorrect) {
+    state.completedLevels.add(state.currentLevelIdx);
+    renderLevelTabs();
+
+    banner.className = 'feedback-banner show success';
+    banner.innerHTML = '🎉 <span>¡Subconsulta SQL exacta! Desplazando al visor animado para inspeccionar la ejecución interna y externa...</span>';
+
+    document.getElementById('replayBtn').style.display = 'inline-flex';
+    if (state.currentLevelIdx < LEVELS.length - 1) {
+      document.getElementById('nextLevelBtn').style.display = 'inline-flex';
+    }
+
+    setTimeout(() => {
+      document.getElementById('visorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+
+    playSubqueryAnimation(level);
+  } else {
+    banner.className = 'feedback-banner show error';
+    banner.innerHTML = '❌ <span>Verifica los bloques marcados en rojo. Revisa las tablas de muestra o presiona el botón <strong>💡 Pista</strong> si necesitas ayuda.</span>';
+  }
+}
+
+/* ==========================================================================
+   VISOR ANIMADO DE SUBCONSULTAS (3 FASES)
+   ========================================================================== */
+function clearAnimationTimeouts() {
+  state.animTimeouts.forEach(t => clearTimeout(t));
+  state.animTimeouts = [];
+}
+
+function setPhaseIndicator(phaseNum) {
+  const pills = [
+    document.getElementById('phase1Pill'),
+    document.getElementById('phase2Pill'),
+    document.getElementById('phase3Pill')
+  ];
+  pills.forEach((p, idx) => {
+    p.classList.remove('active', 'done');
+    if (phaseNum > idx + 1) p.classList.add('done');
+    if (phaseNum === idx + 1) p.classList.add('active');
+  });
+}
+
+function renderInitialVisor(level) {
+  setPhaseIndicator(0);
+  const cfg = level.visorConfig;
+  const pipeline = document.getElementById('subqueryPipeline');
+
+  let innerRowsHtml = cfg.innerRows.map((r, i) => `
+    <tr id="innerRow_${i}">
+      ${r.cells.map(c => `<td>${c}</td>`).join('')}
+    </tr>
+  `).join('');
+
+  let outerRowsHtml = cfg.outerRows.map((r, i) => `
+    <tr id="outerRow_${i}">
+      ${r.cells.map(c => `<td>${c}</td>`).join('')}
+    </tr>
+  `).join('');
+
+  pipeline.innerHTML = `
+    <div class="pipeline-card" id="innerCard">
+      <div class="pipeline-head inner-head">
+        <span>🔎 Paso 1: ${cfg.innerTitle}</span>
+      </div>
+      <div class="pipeline-body">
+        <div class="subquery-output-badge" id="subqueryBadge">
+          <span>⚙️ Salida Interna:</span>
+          <span>${cfg.innerOutputLabel}</span>
+        </div>
+        <div class="mini-table-wrap">
+          <table class="mini-table">
+            <thead>
+              <tr>${cfg.innerHeaders.map(h => `<th>${h}</th>`).join('')}</tr>
+            </thead>
+            <tbody>${innerRowsHtml}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-card" id="outerCard">
+      <div class="pipeline-head outer-head">
+        <span>🚀 Paso 2: ${cfg.outerTitle}</span>
+      </div>
+      <div class="pipeline-body">
+        <div class="mini-table-wrap">
+          <table class="mini-table">
+            <thead>
+              <tr>${cfg.outerHeaders.map(h => `<th>${h}</th>`).join('')}</tr>
+            </thead>
+            <tbody>${outerRowsHtml}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('resultBox').classList.remove('ready');
+  document.getElementById('resultTitle').textContent = '📊 Tabla de Resultado Final (Pendiente de ejecución)';
+  document.getElementById('resultCountBadge').textContent = '0 filas';
+  document.getElementById('resultTableContainer').innerHTML = `
+    <div style="padding: 1.5rem; text-align: center; color: #64748b; font-size: 0.85rem;">
+      Valida la sentencia SQL para animar cómo el motor evalúa primero la subconsulta y luego la consulta principal.
+    </div>
+  `;
+}
+
+function playSubqueryAnimation(level) {
+  clearAnimationTimeouts();
+  renderInitialVisor(level);
+  const cfg = level.visorConfig;
+
+  // FASE 1: Ejecución de la Subconsulta Interna
+  setPhaseIndicator(1);
+  document.getElementById('innerCard').classList.add('active-inner');
+
+  cfg.innerRows.forEach((r, idx) => {
+    const t = setTimeout(() => {
+      const tr = document.getElementById(`innerRow_${idx}`);
+      if (tr) tr.classList.add(r.match ? 'row-scanning' : 'row-filtered');
+    }, 180 * (idx + 1));
+    state.animTimeouts.push(t);
+  });
+
+  const phase1End = 180 * (cfg.innerRows.length + 1) + 250;
+  state.animTimeouts.push(setTimeout(() => {
+    const badge = document.getElementById('subqueryBadge');
+    if (badge) badge.classList.add('pulse-emit');
+  }, phase1End));
+
+  // FASE 2: Inyección / Correlación en Consulta Externa
+  const phase2Start = phase1End + 650;
+  state.animTimeouts.push(setTimeout(() => {
+    setPhaseIndicator(2);
+    document.getElementById('outerCard').classList.add('active-outer');
+
+    cfg.outerRows.forEach((r, idx) => {
+      const t2 = setTimeout(() => {
+        const tr = document.getElementById(`outerRow_${idx}`);
+        if (tr) tr.classList.add(r.match ? 'row-matched' : 'row-filtered');
+      }, 170 * (idx + 1));
+      state.animTimeouts.push(t2);
+    });
+  }, phase2Start));
+
+  // FASE 3: Construcción de la Tabla de Resultado Final
+  const phase3Start = phase2Start + 170 * (cfg.outerRows.length + 1) + 450;
+  state.animTimeouts.push(setTimeout(() => {
+    setPhaseIndicator(3);
+    renderResultTableAnimated(cfg);
+  }, phase3Start));
+}
+
+function renderResultTableAnimated(cfg) {
+  const resultBox = document.getElementById('resultBox');
+  resultBox.classList.add('ready');
+
+  document.getElementById('resultTitle').textContent = `✅ Resultado Final Consolidado`;
+  document.getElementById('resultCountBadge').textContent = `${cfg.resultRows.length} filas devueltas`;
+
+  const container = document.getElementById('resultTableContainer');
+  const table = document.createElement('table');
+  table.className = 'mini-table';
+
+  const thead = document.createElement('thead');
+  const trH = document.createElement('tr');
+  cfg.resultHeaders.forEach(h => {
+    const th = document.createElement('th');
+    th.textContent = h;
+    trH.appendChild(th);
+  });
+  thead.appendChild(trH);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+  container.innerHTML = '';
+  container.appendChild(table);
+
+  cfg.resultRows.forEach((rowCells, rIdx) => {
+    const t = setTimeout(() => {
+      const tr = document.createElement('tr');
+      tr.className = 'result-row-anim row-matched';
+      rowCells.forEach(val => {
+        const td = document.createElement('td');
+        td.textContent = val;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }, rIdx * 150);
+    state.animTimeouts.push(t);
+  });
+}
+
+/* ==========================================================================
+   FONDO DE PARTÍCULAS ANIMADAS (TEMA CLARO)
+   ========================================================================== */
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const particles = Array.from({ length: 32 }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    r: Math.random() * 2.5 + 1.2,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: (Math.random() - 0.5) * 0.35
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(109, 40, 217, 0.16)';
+    particles.forEach((p, i) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > width) p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+        if (dist < 120) {
+          ctx.strokeStyle = `rgba(109, 40, 217, ${0.07 * (1 - dist / 120)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+</body>
+</html>

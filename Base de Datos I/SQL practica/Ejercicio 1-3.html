@@ -791,12 +791,15 @@
                     </a>
                 </div>
                 <div class="module-tabs">
-                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL Tablas</a>
-                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML Registros</a>
-                    <a href="Ejercicio 1-3.html" class="module-tab active">1-3 · DQL Consultas</a>
-                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL (Terna 2)</a>
-                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML (Terna 2)</a>
-                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL (Terna 2)</a>
+                    <a href="Ejercicio 1-1.html" class="module-tab">1-1 · DDL</a>
+                    <a href="Ejercicio 1-2.html" class="module-tab">1-2 · DML</a>
+                    <a href="Ejercicio 1-3.html" class="module-tab active">1-3 · DQL</a>
+                    <a href="Ejercicio 2-1.html" class="module-tab">2-1 · DDL</a>
+                    <a href="Ejercicio 2-2.html" class="module-tab">2-2 · DML</a>
+                    <a href="Ejercicio 2-3.html" class="module-tab">2-3 · DQL</a>
+                    <a href="Ejercicio 3-1.html" class="module-tab">3-1 · DDL (Terna 3)</a>
+                    <a href="Ejercicio 3-2.html" class="module-tab">3-2 · DML (Terna 3)</a>
+                    <a href="Ejercicio 3-3.html" class="module-tab">3-3 · DQL (Terna 3)</a>
                 </div>
             </div>
         </nav>
@@ -929,7 +932,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "LIKE"],
+                bank: ["WHERE", "FROM", "UPDATE", "LIKE", "SELECT", "AND", "SET", "OR", "VALUES"],
                 selectedCols: ["nombre", "apellido", "sector"],
                 matchedIds: [1, 2, 3, 4, 5]
             },
@@ -966,7 +969,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "SET"],
+                bank: ["BETWEEN", "WHERE", "SET", "FROM", "AND", "UPDATE", "SELECT", "OR", "NOT", "LIKE"],
                 selectedCols: ["nombre", "salario"],
                 matchedIds: [1, 3]
             },
@@ -1008,7 +1011,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "AND", "OR", "NOT", "BETWEEN"],
+                bank: ["OR", "WHERE", "BETWEEN", "AND", "FROM", "NOT", "SELECT", "LIKE", "SET", "UPDATE"],
                 selectedCols: ["nombre", "apellido", "salario"],
                 matchedIds: [3]
             },
@@ -1048,7 +1051,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "OR", "AND", "NOT", "LIKE"],
+                bank: ["AND", "OR", "LIKE", "FROM", "NOT", "WHERE", "BETWEEN", "SELECT", "SET", "DELETE"],
                 selectedCols: ["nombre", "sector"],
                 matchedIds: [2, 5]
             },
@@ -1089,7 +1092,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "BETWEEN", "AND", "OR", "LIKE"],
+                bank: ["LIKE", "AND", "WHERE", "OR", "BETWEEN", "SELECT", "NOT", "FROM", "SET", "UPDATE"],
                 selectedCols: ["nombre", "sector", "salario"],
                 matchedIds: [1, 2, 4]
             },
@@ -1129,7 +1132,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "LIKE", "BETWEEN", "AND", "NOT"],
+                bank: ["BETWEEN", "LIKE", "AND", "FROM", "NOT", "SELECT", "OR", "WHERE", "SET", "VALUES"],
                 selectedCols: ["id_empleado", "nombre", "apellido"],
                 matchedIds: [2, 4]
             },
@@ -1167,7 +1170,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "NOT", "AND", "OR", "LIKE"],
+                bank: ["OR", "NOT", "LIKE", "WHERE", "AND", "FROM", "BETWEEN", "SELECT", "SET", "DELETE"],
                 selectedCols: ["nombre", "sector"],
                 matchedIds: [2, 4, 5]
             },
@@ -1206,7 +1209,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "NOT", "LIKE", "BETWEEN", "OR"],
+                bank: ["BETWEEN", "LIKE", "OR", "FROM", "NOT", "AND", "WHERE", "SELECT", "SET", "UPDATE"],
                 selectedCols: ["nombre", "email"],
                 matchedIds: [1, 3, 4]
             },
@@ -1246,7 +1249,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "NOT", "BETWEEN", "AND", "OR", "LIKE"],
+                bank: ["OR", "BETWEEN", "LIKE", "NOT", "FROM", "AND", "SELECT", "WHERE", "SET", "DELETE", "VALUES"],
                 selectedCols: ["nombre", "salario"],
                 matchedIds: [3, 5]
             },
@@ -1302,7 +1305,7 @@
                         ]
                     }
                 ],
-                bank: ["SELECT", "FROM", "WHERE", "LIKE", "AND", "BETWEEN", "AND", "OR", "NOT"],
+                bank: ["OR", "AND", "BETWEEN", "WHERE", "NOT", "LIKE", "SELECT", "SET", "AND", "FROM", "UPDATE", "DELETE"],
                 selectedCols: ["nombre", "apellido", "sector", "salario"],
                 matchedIds: [1, 4]
             }
